@@ -1,0 +1,807 @@
+<wgui:block name="configurationMain">
+	<div id="prlCfgTabs">
+		<ul>
+			<li sct="CfgCmpc"><a href="#prlCfgCmpcTab"><wgui:text id="prlcfgCmpcTab"/></a></li>
+			<li sct="CfgLoac"><a href="#prlCfgLoacTab"><wgui:text id="prlcfgLoacTab"/></a></li>
+			<li sct="CfgInsc"><a href="#prlCfgInscTab"><wgui:text id="prlcfgInscTab"/></a></li>
+			<li sct="CfgSyac"><a href="#prlCfgSyacTab"><wgui:text id="prlcfgSyacTab"/></a></li>
+			<li sct="CfgDasc"><a href="#prlCfgDascTab"><wgui:text id="prlcfgDasTab"/></a></li>
+			<li sct="CfgDiv"><a href="#prlCfgDivTab"><wgui:text id="prlcfgDivTab"/></a></li>
+			<li sct="CfgSys"><a href="#prlCfgSysTab"><wgui:text id="prlcfgSysTab"/></a></li>
+		</ul>
+		<div id="prlCfgCmpcTab">
+			<div id="toolbar" class="ui-widget-header ui-corner-all">
+				<button id="prlCfgCmpcBtnNew"><wgui:text id="prlCfgCmpcBtnNew"/></button>
+				<input type="checkbox" id="prlCfgCmpcBtnQFilter" /><label for="prlCfgCmpcBtnQFilter"><wgui:text id="prlCfgCmpcBtnQFilter"/></label>
+				<button id="prlCfgCmpcBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+			</div>
+			<div id="gridCfgCmpc" style="width:600px;height:500px;"></div>
+		</div>
+		<div id="prlCfgLoacTab">
+			<div id="toolbar" class="ui-widget-header ui-corner-all">
+				<button id="prlCfgLoacBtnNew"><wgui:text id="prlcfgLoacBtnNew"/></button>
+				<input type="checkbox" id="prlCfgLoacBtnQFilter" /><label for="prlCfgLoacBtnQFilter"><wgui:text id="prlcfgLoacBtnQFilter"/></label>
+				<button id="prlCfgLoacBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+				<button id="prlCfgLoacBtnFinMgmtAcc"><wgui:text id="prlCfgLoacBtnFinMgmtAcc"/></button>
+				<button id="prlCfgLoacBtnFldMod"><wgui:text id="prlCfgLoacBtnFldMod"/></button>
+			</div>
+			<div id="gridCfgLoac" style="width:600px;height:500px;"></div>
+		</div>
+		<div id="prlCfgInscTab">
+			<div id="toolbar" class="ui-widget-header ui-corner-all">
+				<select>
+					<option value="1">AHV</option>
+					<option value="2">ALV</option>
+					<option value="3">FAK</option>
+					<option value="4">UVG</option>
+					<option value="5">UVGZ</option>
+					<option value="6">KTG</option>
+					<option value="7">BVG</option>
+				</select>
+				<button id="prlCfgInscBtnNew"><wgui:text id="prlCfgInscBtnNew"/></button>
+				<input type="checkbox" id="prlCfgInscBtnQFilter" /><label for="prlCfgInscBtnQFilter"><wgui:text id="prlCfgInscBtnQFilter"/></label>
+				<button id="prlCfgInscBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+				<button id="prlCfgInscBtnInsr"><wgui:text id="prlCfgInscBtnInsr"/></button>
+				<button id="prlCfgInscBtnCode"><wgui:text id="prlCfgInscBtnCode"/></button>
+			</div>
+			<div id="gridCfgInsc" style="width:600px;height:500px;"></div>
+		</div>
+		<div id="prlCfgSyacTab">
+			<div id="toolbar" class="ui-widget-header ui-corner-all">
+				<input type="checkbox" id="prlCfgSyacBtnQFilter" /><label for="prlCfgSyacBtnQFilter"><wgui:text id="prlCfgSyacBtnQFilter"/></label>
+				<button id="prlCfgSyacBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+			</div>
+			<div id="gridCfgSyac" style="width:600px;height:500px;"></div>
+		</div>
+		<div id="prlCfgDascTab">
+			<div id="toolbar" class="ui-widget-header ui-corner-all">
+				<button id="prlCfgDascBtnNew"><wgui:text id="prlCfgDasBtnNew"/></button>
+				<input type="checkbox" id="prlCfgDascBtnQFilter" /><label for="prlCfgDascBtnQFilter"><wgui:text id="prlCfgDasBtnQFilter"/></label>
+				<button id="prlCfgDascBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+				<button id="prlCfgDascBtnSettings"><wgui:text id="prlCfgDasBtnGlobAcc"/></button>
+				<button id="prlCfgDascBtnFldMod"><wgui:text id="prlCfgDasBtnFldMod"/></button>
+			</div>
+			<div id="gridCfgDasc" style="width:600px;height:500px;"></div>
+		</div>
+		<div id="prlCfgDivTab">
+			<button class="PesarisButton" onclick="cb('payroll.prepareCalculation',{'stage':2});" style="width:300px;"><wgui:text id="txtAbrechnungsdatenvorbereiten"/></button>
+			<button class="PesarisButton" onclick="cb('payroll.payslipConfig', {'f':'templateOv'});" style="width:300px;"><wgui:text id="txtLohnabrechnungsVorlagen"/></button>
+			<br/>
+			<button class="PesarisButton" onclick="cb('payroll.prlVlFieldCfg');" style="width:300px;"><wgui:text id="txtPersonalstammfelderverwalten"/></button>
+			<button class="PesarisButton" onclick="cb('payroll.copyPayrollAccount');" style="width:300px;"><wgui:text id="txtLohnartkopieren"/></button>
+			<br/>
+			<button class="PesarisButton" onclick="cb('payroll.currencyConfig');" style="width:300px;"><wgui:text id="txtFremdwaehrungenVerwalten"/></button>
+			<button class="PesarisButton" onclick="cb('payroll.paymentSplit', {'action': 'GUI_bank_source_Overview');" style="width:300px;"><wgui:text id="txtZahlstelleBearbeiten"/></button>
+			<br/>
+		</div>
+		<div id="prlCfgSysTab">
+			<br/><br/>
+			<button class="PesarisButton" onclick="cb('payroll.dbBackup');" style="width:200px;"><wgui:text id="txtDBBackup"/></button>
+			<button class="PesarisButton" onclick="cb('payroll.dbRestore');" style="width:200px;"><wgui:text id="txtDBRestore"/></button>
+
+		</div>
+	</div>
+	<ul id="prlCfgOvMenu">
+		<li><a href="#" fnc="1">Bearbeiten</a></li>
+		<li><a href="#" fnc="2">L&ouml;schen</a></li>
+	</ul>
+</wgui:block name="configurationMain">
+<wgui:block name="payrollAccountForm">
+	<div id="loacTabs">
+		<ul>
+			<li><a href="#loacTab1"><wgui:text id="loacTab1"/></a></li>
+			<li><a href="#loacTab5"><wgui:text id="loacTab5"/></a></li>
+			<li><a href="#loacTab2"><wgui:text id="loacTab2"/></a></li>
+			<li><a href="#loacTab3"><wgui:text id="loacTab3"/></a></li>
+			<li><a href="#loacTab4"><wgui:text id="loacTab4"/></a></li>
+		</ul>
+		<div id="loacTab1">
+			<fieldset>
+				<legend><wgui:text id="loacLgnAccNoTxt"/></legend>
+				<label for="loac_id"><wgui:text id="loacAccountNumber"/></label><input type="text" id="loac_id"/><br/>
+				<wgui:loop name="lblLoop" varname="language_list">
+					<label for="loac_label_<wgui:loopvar loopname="lblLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="lblLoop" varname="LanguageName"/>:</label><input type="text" id="loac_label_<wgui:loopvar loopname="lblLoop" varname="LanguageCode"/>" class="loacTxt"/><br/>
+				</wgui:loop name="lblLoop">
+			</fieldset>
+			<fieldset>
+				<legend><wgui:text id="loacLgnDiv"/></legend>
+				<label for="loac_sign"><wgui:text id="loacSign"/></label><select id="loac_sign"><option value="0"><wgui:text id="loacSignPlus"/></option><option value="1"><wgui:text id="loacSignMinus"/></option></select><br/>
+				<label for="loac_print_account"><wgui:text id="loacPrintAcc"/></label><select id="loac_print_account"><option value="0"><wgui:text id="loacPrintAccNo"/></option><option value="1"><wgui:text id="loacPrintAccAmount"/></option><option value="2"><wgui:text id="loacPrintAccQuantity"/></option><option value="3"><wgui:text id="loacPrintAccAmountAndQuantity"/></option></select><br/>
+				<label for="loac_var_fields"><wgui:text id="loacVarFields"/></label><select id="loac_var_fields"><option value="0"><wgui:text id="loacVarFieldsNone"/></option><option value="1"><wgui:text id="loacVarFieldsQuantity"/></option><option value="2"><wgui:text id="loacVarFieldsRate"/></option><option value="4"><wgui:text id="loacVarFieldsAmount"/></option><option value="6"><wgui:text id="loacVarFieldsAmountRate"/></option><option value="3"><wgui:text id="loacVarFieldsRateQuantity"/></option><option value="5"><wgui:text id="loacVarFieldsAmountQuantity"/></option><option value="7"><wgui:text id="loacVarFieldsAmountRateQuantity"/></option></select><br/>
+				<label for="loac_carry_over"><wgui:text id="loacCarryOver"/></label><select id="loac_carry_over"><option value="0"><wgui:text id="loacCarryOverNo"/></option><option value="5"><wgui:text id="loacCarryOverAmount"/></option><option value="3"><wgui:text id="loacCarryOverQuantity"/></option><option value="4"><wgui:text id="loacCarryOverRate"/></option></select><br/>
+			</fieldset>
+		</div>
+		<div id="loacTab5">
+			<fieldset class="loacFsLeft">
+				<legend><wgui:text id="loacLgnFormatQuantity"/></legend>
+				<label for="loac_quantity_conversion"><wgui:text id="loacQuantityConversion"/></label><input type="text" id="loac_quantity_conversion" class="loacTxtRight"/><br/>
+				<label for="loac_quantity_decimal"><wgui:text id="loacQuantityDecimal"/></label><select id="loac_quantity_decimal"><option value="10"><wgui:text id="loacQuantityDecimalDefault"/></option><option value="0"><wgui:text id="loacQuantityDecimalNone"/></option><option value="1">#.0</option><option value="2">#.00</option><option value="3">#.000</option><option value="4">#.0000</option><option value="5">#.00000</option></select><br/>
+				<label for="loac_quantity_print"><wgui:text id="loacQuantityPrint"/></label><input type="checkbox" id="loac_quantity_print"/><br/>
+				<label for="loac_unit"><wgui:text id="loacUnit"/></label><br/>
+				<wgui:loop name="lblLoop" varname="language_list">
+					<label for="loac_quantity_unit_<wgui:loopvar loopname="lblLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="lblLoop" varname="LanguageName"/>:</label><input type="text" id="loac_quantity_unit_<wgui:loopvar loopname="lblLoop" varname="LanguageCode"/>" class="loacTxt"/><br/>
+				</wgui:loop name="lblLoop">
+			</fieldset>
+			<fieldset class="loacFsRight">
+				<legend><wgui:text id="loacLgnFormatRate"/></legend>
+				<label for="loac_rate_conversion"><wgui:text id="loacRateConversion"/></label><input type="text" id="loac_rate_conversion" class="loacTxtRight"/><br/>
+				<label for="loac_rate_decimal"><wgui:text id="loacRateDecimal"/></label><select id="loac_rate_decimal"><option value="10"><wgui:text id="loacRateDecimalDefault"/></option><option value="0"><wgui:text id="loacRateDecimalNone"/></option><option value="1">#.0</option><option value="2">#.00</option><option value="3">#.000</option><option value="4">#.0000</option><option value="5">#.00000</option></select><br/>
+				<label for="loac_rate_print"><wgui:text id="loacRatePrint"/></label><input type="checkbox" id="loac_rate_print"/><br/>
+				<label for="loac_unit"><wgui:text id="loacUnit"/></label><br/>
+				<wgui:loop name="lblLoop" varname="language_list">
+					<label for="loac_rate_unit_<wgui:loopvar loopname="lblLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="lblLoop" varname="LanguageName"/>:</label><input type="text" id="loac_rate_unit_<wgui:loopvar loopname="lblLoop" varname="LanguageCode"/>" class="loacTxt"/><br/>
+				</wgui:loop name="lblLoop">
+			</fieldset>
+			<fieldset>
+				<legend><wgui:text id="loacLgnFormatAmount"/></legend>
+				<label for="loac_amount_conversion"><wgui:text id="loacAmountConversion"/></label><input type="text" id="loac_amount_conversion" class="loacTxtRight"/><br/>
+				<label for="loac_amount_decimal"><wgui:text id="loacAmountDecimal"/></label><select id="loac_amount_decimal"><option value="10"><wgui:text id="loacAmountDecimalDefault"/></option><option value="0"><wgui:text id="loacAmountDecimalNone"/></option><option value="1">#.0</option><option value="2">#.00</option><option value="3">#.000</option><option value="4">#.0000</option><option value="5">#.00000</option></select><br/>
+				<label for="loac_amount_print"><wgui:text id="loacAmountPrint"/></label><input type="checkbox" id="loac_amount_print"/><br/>
+			</fieldset>
+			<fieldset>
+				<legend>Diverse Einstellungen</legend>
+				<label for="loac_bold">Fettschrift:</label><select id="loac_bold"><option value="0">Nein</option><option value="1">Ja</option></select><br/>
+				<label for="loac_space_before">Abstand vor:</label><select id="loac_space_before"><option value="0"></option><option value="20">klein</option><option value="40">mittel</option><option value="60">gross</option></select><br/>
+				<label for="loac_space_after">Abstand nach:</label><select id="loac_space_after"><option value="0"></option><option value="20">klein</option><option value="40">mittel</option><option value="60">gross</option></select><br/>
+			</fieldset>
+		</div>
+		<div id="loacTab2">
+			<fieldset>
+				<legend><wgui:text id="loacLgnAccAssigned"/></legend>
+				<select id="loacInpLOA" size="8"></select><br/>
+				<button id="loacInpAdd"><wgui:text id="btnAdd"/></button><button id="loacInpEdit"><wgui:text id="btnEdit"/></button><button id="loacInpDel"><wgui:text id="btnDelete"/></button><button id="loacInpGoto"><wgui:text id="btnOpen"/></button>
+			</fieldset>
+			<fieldset>
+				<legend id="loacInpLgA"><wgui:text id="loacLgnNewAssignment"/></legend>
+				<legend id="loacInpLgE"><wgui:text id="loacLgnEditAssignment"/></legend>
+				<label for="loacInpSel"><wgui:text id="loacLblPayrollAccount"/></label><select id="loacInpSel"></select><br/>
+				<label for="loacInpFld"><wgui:text id="loacLblValueFromField"/></label><select id="loacInpFld"><option value="5"><wgui:text id="loacFieldAMOUNT"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option></select><br/>
+				<label for="loacInpNeg"><wgui:text id="loacLblFwdNegativeValues"/></label><input type="checkbox" id="loacInpNeg"/><br/>
+				<label for="loacInpInv"><wgui:text id="loacLblInvertValues"/></label><input type="checkbox" id="loacInpInv"/><br/>
+				<label for="loacInpTarget"><wgui:text id="loacLblValueIntoField"/></label><select id="loacInpTarget"><option value="0"><wgui:text id="loacDefaultTarget"/></option><option value="1"><wgui:text id="loacFieldFACTOR"/></option><option value="2"><wgui:text id="loacFieldSURCHARGE"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option><option value="5"><wgui:text id="loacFieldAMOUNT"/></option></select><br/>
+				<button id="loacInpOK"><wgui:text id="btnSaveAssign"/></button><button id="loacInpCancel"><wgui:text id="btnCancel"/></button>
+			</fieldset>
+		</div>
+		<div id="loacTab3">
+			<fieldset>
+				<legend><input id="loac_having_limits" type="checkbox"/><label for="loac_having_limits"><wgui:text id="loacLgnLimits"/></label></legend>
+				<div class="loacLimitsLeft">
+					<label for="loac_max_limit"><wgui:text id="loacMaxLimit"/></label><input type="text" id="loac_max_limit"/><br/>
+					<label for="loac_deduction"><wgui:text id="loacDeduction"/></label><input type="text" id="loac_deduction"/><br/>
+					<label for="loac_min_limit"><wgui:text id="loacMinLimit"/></label><input type="text" id="loac_min_limit"/><br/>
+				</div>
+				<div class="loacLimitsRight">
+					<label for="loac_limits_calc_mode"><wgui:text id="loacLimitsCalcMode"/></label><select id="loac_limits_calc_mode"><option value="2"><wgui:text id="loacLimitsCalcMode2"/></option><option value="0"><wgui:text id="loacLimitsCalcMode0"/></option><option value="1"><wgui:text id="loacLimitsCalcMode1"/></option></select><br/>
+					<label for="loac_limits_aux_account_ID"><wgui:text id="loaclimitsAuxAccount"/></label><select id="loac_limits_aux_account_ID"></select><br/>
+				</div>
+			</fieldset>
+			<fieldset id="loacFsAsgnIn">
+				<legend><wgui:text id="loacLgnInputAssignment"/></legend>
+				<label for="loac_input_assignment"><wgui:text id="loacInputAssignment"/></label><select id="loac_input_assignment"><option value="0"><wgui:text id="loacNoAssignment"/></option><option value="1"><wgui:text id="loacFieldFACTOR"/></option><option value="2"><wgui:text id="loacFieldSURCHARGE"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option><option value="5"><wgui:text id="loacFieldAMOUNT"/></option></select><br/>
+			</fieldset>
+			<ul class="loacFields">
+				<li><ul class="loacFieldsRow"><li><wgui:text id="loacFieldFACTOR"/></li><li><wgui:text id="loacFieldSURCHARGE"/></li><li><wgui:text id="loacFieldQUANTITY"/></li><li><wgui:text id="loacFieldRATE"/></li><li><wgui:text id="loacFieldAMOUNT"/></li></ul></li>
+				<li><ul class="loacFieldsRow"><li><input type="text" id="loac_factor"/></li><li><input type="text" id="loac_surcharge"/></li><li><input type="text" id="loac_quantity"/></li><li><input type="text" id="loac_rate"/></li><li><input type="text" id="loac_amount"/></li></ul></li>
+			</ul>
+
+
+			<fieldset>
+				<legend><input id="loac_having_calculation" type="checkbox"/><label for="loac_having_calculation"><wgui:text id="loacLgnCalculation"/></label></legend>
+				<label for="loac_payroll_formula_ID"><wgui:text id="loacCalculationFormula"/></label><select id="loac_payroll_formula_ID">
+					<wgui:loop name="formulaLoop" varname="formula_list">
+						<option value="<wgui:loopvar loopname="formulaLoop" varname="id"/>"><wgui:loopvar loopname="formulaLoop" varname="formula"/></option>
+					</wgui:loop name="formulaLoop">
+				</select><a href="#" class="loacFormulaEditor" title="<wgui:text id="loacFormulaEditor"/>"></a><br/>
+			</fieldset>
+			<fieldset>
+				<legend><input id="loac_having_rounding" type="checkbox"/><label for="loac_having_rounding"><wgui:text id="loacLgnRounding"/></label></legend>
+				<label for="loac_round_param"><wgui:text id="loacRoundParam"/></label><input type="text" id="loac_round_param"/><br/>
+			</fieldset>
+			<fieldset id="loacFsAsgnOut">
+				<legend><wgui:text id="loacLgnOutputAssignment"/></legend>
+				<label for="loac_output_assignment"><wgui:text id="loacOutputAssignment"/></label><select id="loac_output_assignment"><option value="0"><wgui:text id="loacNoAssignment"/></option><option value="5"><wgui:text id="loacFieldAMOUNT"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option></select><br/>
+			</fieldset>
+		</div>
+		<div id="loacTab4">
+			<fieldset>
+				<legend><wgui:text id="loacLgnAccAssigned"/></legend>
+				<select id="loacOutLOA" size="8"></select><br/>
+				<button id="loacOutAdd"><wgui:text id="btnAdd"/></button><button id="loacOutEdit"><wgui:text id="btnEdit"/></button><button id="loacOutDel"><wgui:text id="btnDelete"/></button><button id="loacOutGoto"><wgui:text id="btnOpen"/></button>
+			</fieldset>
+			<fieldset>
+				<legend id="loacOutLgA"><wgui:text id="loacLgnNewAssignment"/></legend>
+				<legend id="loacOutLgE"><wgui:text id="loacLgnEditAssignment"/></legend>
+				<label for="loacOutSel"><wgui:text id="loacLblPayrollAccount"/></label><select id="loacOutSel"></select><br/>
+				<label for="loacOutFld"><wgui:text id="loacLblValueFromField"/></label><select id="loacOutFld"><option value="5"><wgui:text id="loacFieldAMOUNT"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option></select><br/>
+				<label for="loacOutNeg"><wgui:text id="loacLblFwdNegativeValues"/></label><input type="checkbox" id="loacOutNeg"/><br/>
+				<label for="loacOutInv"><wgui:text id="loacLblInvertValues"/></label><input type="checkbox" id="loacOutInv"/><br/>
+				<label for="loacOutTarget"><wgui:text id="loacLblValueIntoField"/></label><select id="loacOutTarget"><option value="0"><wgui:text id="loacDefaultTarget"/></option><option value="1"><wgui:text id="loacFieldFACTOR"/></option><option value="2"><wgui:text id="loacFieldSURCHARGE"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option><option value="5"><wgui:text id="loacFieldAMOUNT"/></option></select><br/>
+				<button id="loacOutOK"><wgui:text id="btnSaveAssign"/></button><button id="loacOutCancel"><wgui:text id="btnCancel"/></button>
+			</fieldset>
+		</div>
+	</div>
+	<button id="loacBtnSave" onclick="prlLoacSave();"><wgui:text id="btnSave"/></button>
+	<button onclick="$('#payrollAccountForm').mb_close();"><wgui:text id="btnCancel"/></button>
+</wgui:block name="payrollAccountForm">
+<wgui:block name="payrollFinMgmtAccounting">
+	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<input type="checkbox" id="prlAccAsgBtnQFilter" /><label for="prlAccAsgBtnQFilter"><wgui:text id="prlAccAsgBtnQFilter"/></label>
+	</div>
+	<div id="prlAccAsgTabs">
+		<ul>
+			<li><a href="#prlAccAsgTb1"><wgui:text id="prlAccAsgTb1"/></a></li>
+			<li><a href="#prlAccAsgTb2"><wgui:text id="prlAccAsgTb2"/></a></li>
+			<li><a href="#prlAccAsgTb3"><wgui:text id="prlAccAsgTb3"/></a></li>
+		</ul>
+		<div id="prlAccAsgTb1">
+			<div id="prlAccAsgGrd1" style="width:750px;height:300px;"></div>
+			<label for="prlAccAsg_cid1"><wgui:text id="prlAccAsg_cid1"/></label>
+			<label for="prlAccAsg_eid1"><wgui:text id="prlAccAsg_eid1"/></label>
+			<label for="prlAccAsg_cc1"><wgui:text id="prlAccAsg_cc1"/></label>
+			<label for="prlAccAsg_aid1"><wgui:text id="prlAccAsg_aid1"/></label>
+			<label for="prlAccAsg_acc1"><wgui:text id="prlAccAsg_acc1"/></label>
+			<label for="prlAccAsg_cacc1"><wgui:text id="prlAccAsg_cacc1"/></label>
+			<label for="prlAccAsg_dc1"><wgui:text id="prlAccAsg_dc1"/></label>
+			<label for="prlAccAsg_inv1"><wgui:text id="prlAccAsg_inv1"/></label>
+			<label for="prlAccAsg_et1"><wgui:text id="prlAccAsg_et1"/></label>
+
+			<select id="prlAccAsg_cid1"></select>
+			<select id="prlAccAsg_eid1"></select>
+			<input type="text" id="prlAccAsg_cc1"/>
+			<input type="text" id="prlAccAsg_aid1"/>
+			<input type="text" id="prlAccAsg_acc1"/>
+			<input type="text" id="prlAccAsg_cacc1"/>
+			<select id="prlAccAsg_dc1"><option value="0"><wgui:text id="prlAccAsgOptionDebit"/></option><option value="1"><wgui:text id="prlAccAsgOptionCredit"/></option></select>
+			<select id="prlAccAsg_inv1"><option value="0"><wgui:text id="prlAccAsgOptionNo"/></option><option value="1"><wgui:text id="prlAccAsgOptionYes"/></option></select>
+			<input type="text" id="prlAccAsg_et1"/>
+
+			<div id="prlAccAsgErr1"></div>
+		</div>
+		<div id="prlAccAsgTb2">
+			<div id="prlAccAsgGrd2" style="width:750px;height:300px;"></div>
+			<label for="prlAccAsg_cid2"><wgui:text id="prlAccAsg_cid2"/></label>
+			<label for="prlAccAsg_eid2"><wgui:text id="prlAccAsg_eid2"/></label>
+			<label for="prlAccAsg_cc2"><wgui:text id="prlAccAsg_cc2"/></label>
+			<label for="prlAccAsg_aid2"><wgui:text id="prlAccAsg_aid2"/></label>
+			<label for="prlAccAsg_amt2"><wgui:text id="prlAccAsg_amt2"/></label>
+			<label for="prlAccAsg_inv2"><wgui:text id="prlAccAsg_inv2"/></label>
+			<label for="prlAccAsg_rem2"><wgui:text id="prlAccAsg_rem2"/></label>
+
+			<select id="prlAccAsg_cid2"></select>
+			<select id="prlAccAsg_eid2"></select>
+			<input type="text" id="prlAccAsg_cc2"/>
+			<input type="text" id="prlAccAsg_aid2"/>
+			<input type="text" id="prlAccAsg_amt2"/>
+			<select id="prlAccAsg_inv2"><option value="0"><wgui:text id="prlAccAsgOptionNo"/></option><option value="1"><wgui:text id="prlAccAsgOptionYes"/></option></select>
+			<select id="prlAccAsg_rem2"><option value="0"><wgui:text id="prlAccAsg_rem2Opt0"/></option><option value="1"><wgui:text id="prlAccAsg_rem2Opt1"/></option></select>
+
+			<div id="prlAccAsgErr2"></div>
+		</div>
+		<div id="prlAccAsgTb3">
+			<div id="prlAccAsgGrd3" style="width:750px;height:300px;"></div>
+			<label for="prlAccAsg_cid3"><wgui:text id="prlAccAsg_cid3"/></label>
+			<label for="prlAccAsg_eid3"><wgui:text id="prlAccAsg_eid3"/></label>
+			<label for="prlAccAsg_cc3"><wgui:text id="prlAccAsg_cc3"/></label>
+			<label for="prlAccAsg_aid3"><wgui:text id="prlAccAsg_aid3"/></label>
+			<label for="prlAccAsg_acc3"><wgui:text id="prlAccAsg_acc3"/></label>
+			<label for="prlAccAsg_cacc3"><wgui:text id="prlAccAsg_cacc3"/></label>
+			<label for="prlAccAsg_dc3"><wgui:text id="prlAccAsg_dc3"/></label>
+			<label for="prlAccAsg_inv3"><wgui:text id="prlAccAsg_inv3"/></label>
+			<label for="prlAccAsg_et3"><wgui:text id="prlAccAsg_et3"/></label>
+
+			<select id="prlAccAsg_cid3"></select>
+			<select id="prlAccAsg_eid3"></select>
+			<input type="text" id="prlAccAsg_cc3"/>
+			<input type="text" id="prlAccAsg_aid3"/>
+			<input type="text" id="prlAccAsg_acc3"/>
+			<input type="text" id="prlAccAsg_cacc3"/>
+			<select id="prlAccAsg_dc3"><option value="0"><wgui:text id="prlAccAsgOptionDebit"/></option><option value="1"><wgui:text id="prlAccAsgOptionCredit"/></option></select>
+			<select id="prlAccAsg_inv3"><option value="0"><wgui:text id="prlAccAsgOptionNo"/></option><option value="1"><wgui:text id="prlAccAsgOptionYes"/></option></select>
+			<input type="text" id="prlAccAsg_et3"/>
+
+			<div id="prlAccAsgErr3"></div>
+		</div>
+	</div>
+	<button id="prlAccAsgBtnSave"><wgui:text id="btnSave"/></button>
+	<button id="prlAccAsgBtnCancel"><wgui:text id="btnCancel"/></button>
+	<button id="prlAccAsgBtnClose"><wgui:text id="btnClose"/></button>
+	<div id="prlAccAsgDel">
+		<p><wgui:text id="txtLoeschungBestaetigen"/></p>
+		<button><wgui:text id="btnDelEntry"/></button><button><wgui:text id="btnCancel"/></button>
+	</div>
+	<ul id="prlAccAsgTblMenu" tid="0" rid="0">
+		<li><a href="#" act="1"><wgui:text id="btnEdit"/></a></li>
+		<li><a href="#" act="2"><wgui:text id="btnDelete"/></a></li>
+	</ul>
+</wgui:block name="payrollFinMgmtAccounting">
+<wgui:block name="prlFormCfgCmpc">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<input type="hidden" id="prlFormCfg_rid"/>
+		<label for="prlFormCfg_id"><wgui:text id="prlFormCfg_id"/></label><input type="text" id="prlFormCfg_id"/><br/>
+		<label for="prlFormCfg_company_shortname"><wgui:text id="prlFormCfg_company_shortname"/></label><input type="text" id="prlFormCfg_company_shortname"/><br/>
+		<label for="prlFormCfg_HR_RC_Name"><wgui:text id="prlFormCfg_HR_RC_Name"/></label><input type="text" id="prlFormCfg_HR_RC_Name"/><br/>
+		<label for="prlFormCfg_Street"><wgui:text id="prlFormCfg_Street"/></label><input type="text" id="prlFormCfg_Street"/><br/>
+		<label for="prlFormCfg_ZIP_Code"><wgui:text id="prlFormCfg_ZIP_Code"/></label><input type="text" id="prlFormCfg_ZIP_Code"/><br/>
+		<label for="prlFormCfg_City"><wgui:text id="prlFormCfg_City"/></label><input type="text" id="prlFormCfg_City"/><br/>
+		<label for="prlFormCfg_UID_EHRA"><wgui:text id="prlFormCfg_UID_EHRA"/></label><input type="text" id="prlFormCfg_UID_EHRA"/><br/>
+		<label for="prlFormCfg_BUR_REE_Number"><wgui:text id="prlFormCfg_BUR_REE_Number"/></label><input type="text" id="prlFormCfg_BUR_REE_Number"/><br/>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlFormCfgCmpc">
+<wgui:block name="prlFormCfgSyac">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<input type="hidden" id="prlFormCfg_id"/>
+		<label for="prlFormCfg_Description"><wgui:text id="prlFormCfg_Description"/></label><input type="text" id="prlFormCfg_Description" disabled/><br/>
+		<label for="prlFormCfg_payroll_account_ID"><wgui:text id="prlFormCfg_payroll_account_ID"/></label><input type="text" id="prlFormCfg_payroll_account_ID"/><br/>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlFormCfgSyac">
+<wgui:block name="prlFormCfgInscInsr">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscInsrBtnNew"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="prlFormCfgInscInsrLgndExistingInsr"/></legend>
+		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlFormCfgInscInsrLblInsr"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlFormCfgInscInsrOptChooseInsr"/></option>
+		<wgui:loop name="insuranceLoop" varname="insurance_list">
+			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/> (<wgui:text id="prlFormCfgInscInsrInsrID"/> <wgui:loopvar loopname="insuranceLoop" varname="InsuranceID"/>, <wgui:text id="prlFormCfgInscInsrSubnumber"/> <wgui:loopvar loopname="insuranceLoop" varname="SubNumber"/>)</option>
+		</wgui:loop name="insuranceLoop">
+		</select><br/>
+		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscInsr","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
+		</fieldset>
+	</div>
+	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlFormCfgInscInsr">
+<wgui:block name="prlFormCfgInscInsrEdt">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<input type="hidden" id="prlFormCfg_id" value="0"/>
+		<label for="prlFormCfg_CompanyName"><wgui:text id="prlFormCfg_CompanyName"/></label><input type="text" id="prlFormCfg_CompanyName"/><br/>
+		<label for="prlFormCfg_InsuranceID"><wgui:text id="prlFormCfg_InsuranceID"/></label><input type="text" id="prlFormCfg_InsuranceID"/><br/>
+		<label for="prlFormCfg_IsSUVA"><wgui:text id="prlFormCfg_IsSUVA"/></label><input type="checkbox" id="prlFormCfg_IsSUVA"/><br/>
+		<label for="prlFormCfg_SubNumber"><wgui:text id="prlFormCfg_SubNumber"/></label><input type="text" id="prlFormCfg_SubNumber"/><br/>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlFormCfgInscInsrEdt">
+<wgui:block name="prlFormCfgInscCode">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscCodeEdt","id":0,"InsuranceType":"<wgui:var name="InsuranceType"/>"});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscCodeBtnNew"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="prlFormCfgInscCodeLgndExistingInsr"/></legend>
+		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlFormCfgInscCodeLblInsr"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlFormCfgInscCodeOptChooseInsr"/></option>
+		<wgui:loop name="insuranceLoop" varname="insuranceCode_list">
+			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="InsuranceCode"/>, <wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/></option>
+		</wgui:loop name="insuranceLoop">
+		</select><br/>
+		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscCodeEdt","id":$("#prlFormCfg_id").val(),"InsuranceType":"<wgui:var name="InsuranceType"/>"});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscCode","id":$("#prlFormCfg_id").val(),"InsuranceType":"<wgui:var name="InsuranceType"/>"});'><wgui:text id="btnDelete"/></button>
+		</fieldset>
+	</div>
+	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlFormCfgInscCode">
+<wgui:block name="prlFormCfgInscCodeEdt">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<input type="hidden" id="prlFormCfg_id" value="0"/>
+		<input type="hidden" id="prlFormCfg_payroll_insurance_type_ID" value="<wgui:var name="InsuranceType"/>"/>
+		<label for="prlFormCfg_payroll_company_ID"><wgui:text id="prlFormCfg_payroll_company_ID"/></label>
+		<select id="prlFormCfg_payroll_company_ID">
+		<wgui:loop name="filterLoop" varname="company_list">
+			<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="company_shortname"/></option>
+		</wgui:loop name="filterLoop">
+		</select><br/>
+		<label for="prlFormCfg_InsuranceCode"><wgui:text id="prlFormCfg_InsuranceCode"/></label><input type="text" id="prlFormCfg_InsuranceCode"/><br/>
+		<label for="prlFormCfg_payroll_insurance_ID"><wgui:text id="prlFormCfg_payroll_insurance_ID"/></label>
+		<select id="prlFormCfg_payroll_insurance_ID">
+		<wgui:loop name="insuranceLoop" varname="insurance_list">
+			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/> (<wgui:text id="prlFormCfgInscInsrInsrID"/> <wgui:loopvar loopname="insuranceLoop" varname="InsuranceID"/>, <wgui:text id="prlFormCfgInscInsrSubnumber"/> <wgui:loopvar loopname="insuranceLoop" varname="SubNumber"/>)</option>
+		</wgui:loop name="insuranceLoop">
+		</select><br/>
+		<label for="prlFormCfg_CustomerIdentity"><wgui:text id="prlFormCfg_CustomerIdentity"/></label><input type="text" id="prlFormCfg_CustomerIdentity"/><br/>
+		<label for="prlFormCfg_ContractIdentity"><wgui:text id="prlFormCfg_ContractIdentity"/></label><input type="text" id="prlFormCfg_ContractIdentity"/><br/>
+
+		<fieldset>
+		<legend><wgui:text id="prlFormCfg_legend_labels"/></legend>
+		<wgui:loop name="labelLoop" varname="label_list">
+			<label for="prlFormCfg_label_<wgui:loopvar loopname="labelLoop" varname="core_intl_language_ID"/>"><wgui:loopvar loopname="labelLoop" varname="language_name"/>:</label><input type="text" id="prlFormCfg_label_<wgui:loopvar loopname="labelLoop" varname="core_intl_language_ID"/>"/><br/>
+		</wgui:loop name="labelLoop">
+		</fieldset>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlFormCfgInscCodeEdt">
+<wgui:block name="prlFormCfgInsc">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI CfgInsc">
+	<input type="hidden" id="prlFormCfg_id" value="0"/>
+	<input type="hidden" id="prlFormCfg_InsuranceType" value="<wgui:var name="InsuranceType"/>"/>
+	<ul>
+		<li>
+			<label for="prlFormCfg_payroll_insurance_code_ID"><wgui:text id="prlFormCfg_payroll_insurance_code_ID"/></label><select id="prlFormCfg_payroll_insurance_code_ID">
+			<wgui:loop name="insuranceLoop" varname="insurance_list">
+				<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>" insr="<wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/>" custno="<wgui:loopvar loopname="insuranceLoop" varname="CustomerIdentity"/>" contrno="<wgui:loopvar loopname="insuranceLoop" varname="ContractIdentity"/>" descr="<wgui:loopvar loopname="insuranceLoop" varname="label"/>"><wgui:loopvar loopname="insuranceLoop" varname="InsuranceCode"/></option>
+			</wgui:loop name="insuranceLoop">
+			</select><br/>
+			<label for="prlFormCfginsr"><wgui:text id="prlFormCfgInsr"/></label><input type="text" id="prlFormCfginsr" disabled/><br/>
+			<label for="prlFormCfgcustno"><wgui:text id="prlFormCfgCustNo"/></label><input type="text" id="prlFormCfgcustno" disabled/><br/>
+			<label for="prlFormCfgcontrno"><wgui:text id="prlFormCfgContrNo"/></label><input type="text" id="prlFormCfgcontrno" disabled/><br/>
+			<label for="prlFormCfgdescr"><wgui:text id="prlFormCfgDescr"/></label><input type="text" id="prlFormCfgdescr" disabled/><br/>
+		</li><li>
+			<label for="prlFormCfg_Description"><wgui:text id="prlFormCfg_Description"/></label><input type="text" id="prlFormCfg_Description"/><br/>
+			<label for="prlFormCfg_payroll_account_ID"><wgui:text id="prlFormCfg_payroll_account_ID"/></label><input type="text" id="prlFormCfg_payroll_account_ID"/><br/>
+			<label for="prlFormCfg_rate"><wgui:text id="prlFormCfg_rate"/></label><input type="text" id="prlFormCfg_rate"/><br/>
+			<label for="prlFormCfg_Sex"><wgui:text id="prlFormCfg_Sex"/></label><select id="prlFormCfg_Sex"><option value=""><wgui:text id="prlFormCfg_Sex_none"/></option><option value="M"><wgui:text id="prlFormCfg_Sex_male"/></option><option value="F"><wgui:text id="prlFormCfg_Sex_female"/></option></select><br/>
+			<label for="prlFormCfg_AgeFrom"><wgui:text id="prlFormCfg_AgeFrom"/></label><input type="text" id="prlFormCfg_AgeFrom" class="CfgInscSmall"/> - <input type="text" id="prlFormCfg_AgeTo" class="CfgInscSmall"/><br/>
+			<label for="prlFormCfg_CodeFrom"><wgui:text id="prlFormCfg_CodeFrom"/></label><input type="text" id="prlFormCfg_CodeFrom" class="CfgInscSmall"/> - <input type="text" id="prlFormCfg_CodeTo" class="CfgInscSmall"/><br/>
+		</li>
+	</ul>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlFormCfgInsc">
+<wgui:block name="payrollFieldModifierOv">
+	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<button id="prlFldModBtnNew"><wgui:text id="prlFldModBtnNew"/></button>
+		<input type="checkbox" id="prlFldModBtnQFilter" /><label for="prlFldModBtnQFilter"><wgui:text id="prlFldModBtnQFilter"/></label>
+	</div>
+	<div id="prlFldModGrd"></div>
+	<button id="prlFldModBtnClose"><wgui:text id="btnClose"/></button>
+	<ul id="prlFldModGrdTblMenu" rid="0">
+		<li><a href="#" act="1"><wgui:text id="btnEdit"/></a></li>
+		<li><a href="#" act="2"><wgui:text id="btnDelete"/></a></li>
+	</ul>
+</wgui:block name="payrollFieldModifierOv">
+<wgui:block name="prlFormCfgFldMod">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI CfgFldMod">
+		<input type="hidden" id="prlFormCfg_id" value="0"/>
+		<label for="prlFormCfg_payroll_account_ID"><wgui:text id="prlFormCfg_payroll_account_ID"/></label><input type="text" id="prlFormCfg_payroll_account_ID"/><br/>
+		<label for="prlFormCfg_payroll_empl_filter_ID"><wgui:text id="prlFormCfg_payroll_empl_filter_ID"/></label>
+		<select id="prlFormCfg_payroll_empl_filter_ID">
+		<wgui:loop name="filterLoop" varname="filter_list">
+			<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="FilterName"/></option>
+		</wgui:loop name="filterLoop">
+		</select><br/>
+		<label for="prlFormCfg_processing_order"><wgui:text id="prlFormCfg_processing_order"/></label><input type="text" id="prlFormCfg_processing_order"/><br/>
+		<label for="prlFormCfg_FldModType"><wgui:text id="prlFormCfg_FldModType"/></label>
+		<select id="prlFormCfg_FldModType">
+			<option value="3"><wgui:text id="prlFormCfg_FldModType_QUANTITY"/></option>
+			<option value="4"><wgui:text id="prlFormCfg_FldModType_RATE"/></option>
+			<option value="5"><wgui:text id="prlFormCfg_FldModType_AMOUNT"/></option>
+			<option value="9"><wgui:text id="prlFormCfg_FldModType_LIMITS"/></option>
+		</select><br/>
+		<label for="prlFormCfg_OverwriteOnly"><wgui:text id="prlFormCfg_OverwriteOnly"/></label><input type="checkbox" id="prlFormCfg_OverwriteOnly"/><br/>
+
+		<fieldset>
+		<legend><wgui:text id="prlFormCfg_legend_fields"/></legend>
+			<input type="radio" name="prlFormCfgRdGrp" id="prlFormCfg_TargetType0"/> <label for="prlFormCfg_TargetType0"><wgui:text id="prlFormCfg_TargetType0"/></label> <input type="radio" name="prlFormCfgRdGrp" id="prlFormCfg_TargetType1"/> <label for="prlFormCfg_TargetType1"><wgui:text id="prlFormCfg_TargetType1"/></label><br/>
+			<input type="text" id="prlFormCfg_TargetValue"/><select id="prlFormCfg_FieldName"></select>
+		</fieldset>
+
+		<fieldset>
+		<legend><wgui:text id="prlFormCfg_legend_limits"/></legend>
+			<label for="prlFormCfg_max_limit"><wgui:text id="prlFormCfg_max_limit"/></label><input type="text" id="prlFormCfg_max_limit"/><br/>
+			<label for="prlFormCfg_deduction"><wgui:text id="prlFormCfg_deduction"/></label><input type="text" id="prlFormCfg_deduction"/><br/>
+			<label for="prlFormCfg_min_limit"><wgui:text id="prlFormCfg_min_limit"/></label><input type="text" id="prlFormCfg_min_limit"/><br/>
+		</fieldset>
+
+		<fieldset>
+		<legend><wgui:text id="prlFormCfg_legend_periods"/></legend>
+			<input type="checkbox" id="prlFormCfg_major_period"/> <label for="prlFormCfg_major_period"><wgui:text id="prlFormCfg_major_period"/></label> <input type="checkbox" id="prlFormCfg_major_period_bonus"/> <label for="prlFormCfg_major_period_bonus"><wgui:text id="prlFormCfg_major_period_bonus"/></label> <input type="checkbox" id="prlFormCfg_minor_period"/> <label for="prlFormCfg_minor_period"><wgui:text id="prlFormCfg_minor_period"/></label>
+		</fieldset>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlFormCfgFldMod">
+<wgui:block name="prlFormCfgDascGlob">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlDasGlobal">
+		<input type="hidden" id="prlFormCfg_id" />
+		<fieldset class="prlDasGlobalFsr">
+			<legend>Lohnarten f&uuml;r den Jahresausgleich</legend>
+			<label for="prlFormCfg_AccountType9">QST-Gutschrift (aktuelle Periode)</label><input type="text" id="prlFormCfg_AccountType9" tabindex="7" /><br/>
+			<label for="prlFormCfg_AccountType16">QST-Abzug (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType16" tabindex="8" /><br/>
+			<label for="prlFormCfg_AccountType17">QST-Gutschrift (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType17" tabindex="9" /><br/>
+			<label for="prlFormCfg_AccountType13">QST-Basis f. JAG kumuliert</label><input type="text" id="prlFormCfg_AccountType13" tabindex="10" /><br/>
+			<label for="prlFormCfg_AccountType14">Satzbest. Einkommen JAG</label><input type="text" id="prlFormCfg_AccountType14" tabindex="11" /><br/>
+			<label for="prlFormCfg_AccountType15">Satzbest. Einkommen JAG (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType15" tabindex="12" /><br/>
+			<label for="prlFormCfg_AccountType12">Besch&auml;ftigungsfaktor kumuliert</label><input type="text" id="prlFormCfg_AccountType12" tabindex="13" /><br/>
+		</fieldset>
+		<fieldset>
+			<legend>Allgemeine QST-Lohnarten</legend>
+			<label for="prlFormCfg_AccountType7">QST-Abzug</label><input type="text" id="prlFormCfg_AccountType7" tabindex="1" /><br/>
+		</fieldset>
+		<fieldset>
+			<legend>Lohnarten f&uuml;r die Satzbestimmung</legend>
+			<label for="prlFormCfg_AccountType5">Satzbestimmendes Einkommen</label><input type="text" id="prlFormCfg_AccountType5" tabindex="2" /><br/>
+			<label for="prlFormCfg_AccountType3">Arbeitstage (30-Tage-Regel)</label><input type="text" id="prlFormCfg_AccountType3" tabindex="3" /><br/>
+			<label for="prlFormCfg_AccountType4">Arbeitstage (effektive Tage)</label><input type="text" id="prlFormCfg_AccountType4" tabindex="4" /><br/>
+			<label for="prlFormCfg_AccountType6">Besch&auml;ftigungsfaktor</label><input type="text" id="prlFormCfg_AccountType6" tabindex="5" /><br/>
+		</fieldset>
+		<fieldset>
+			<legend>Netto-Brutto-Aufrechnung QST</legend>
+			<label for="prlFormCfg_AccountType11">Netto-Brutto-Aufrechnung</label><input type="text" id="prlFormCfg_AccountType11" tabindex="6" /><br/>
+		</fieldset>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlFormCfgDascGlob">
+<wgui:block name="prlFormCfgDasc">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlDasCanton">
+		<input type="hidden" id="prlFormCfg_id" />
+		Kanton: <select id="prlFormCfg_DedAtSrcCanton">
+			<option value="AG">AG</option>
+			<option value="AI">AI</option>
+			<option value="AR">AR</option>
+			<option value="BE">BE</option>
+			<option value="BL">BL</option>
+			<option value="BS">BS</option>
+			<option value="FR">FR</option>
+			<option value="GE">GE</option>
+			<option value="GL">GL</option>
+			<option value="GR">GR</option>
+			<option value="JU">JU</option>
+			<option value="LU">LU</option>
+			<option value="NE">NE</option>
+			<option value="NW">NW</option>
+			<option value="OW">OW</option>
+			<option value="SG">SG</option>
+			<option value="SH">SH</option>
+			<option value="SO">SO</option>
+			<option value="SZ">SZ</option>
+			<option value="TG">TG</option>
+			<option value="TI">TI</option>
+			<option value="UR">UR</option>
+			<option value="VD">VD</option>
+			<option value="VS">VS</option>
+			<option value="ZG">ZG</option>
+			<option value="ZH">ZH</option>
+		</select></br>
+		<fieldset class="dascntAddr">
+			<legend>Steuerverwaltung</legend>
+			<label for="prlFormCfg_TaxAdminName">Name</label><input type="text" id="prlFormCfg_TaxAdminName" /><br/>
+			<label for="prlFormCfg_TaxAdminStreet">Strasse</label><input type="text" id="prlFormCfg_TaxAdminStreet" /><br/>
+			<label for="prlFormCfg_TaxAdminZIP">PLZ/Ort</label><input type="text" id="prlFormCfg_TaxAdminZIP" /><input type="text" id="prlFormCfg_TaxAdminCity" /><br/>
+		</fieldset>
+		<fieldset class="dascntSetting">
+			<legend>Einstellungen</legend>
+			<label for="prlFormCfg_AnnualSettlementMode">Jahresausgleich</label><select id="prlFormCfg_AnnualSettlementMode"><option value="0">Nein</option><option value="1">Ja</option></select><br/>
+			<label for="prlFormCfg_DaysPerMonth">Arbeitstage</label><select id="prlFormCfg_DaysPerMonth"><option value="0">30-Tage-Regel</option><option value="1">effektive Tage</option></select><br/>
+			<label for="prlFormCfg_commission">Provision</label><input type="text" id="prlFormCfg_commission" /> %<br/>
+		</fieldset><br/>
+		<fieldset class="dascntAcc">
+			<legend>Zugewiesene Lohnarten</legend>
+			<label for="prlFormCfg_dasacc1">QST-Basis f&uuml;r Jahresausgleich</label><input type="text" id="prlFormCfg_dasacc1" /><br/>
+			<label for="prlFormCfg_dasacc2">QST-Basis satzbestimmend</label><input type="text" id="prlFormCfg_dasacc2" /><br/>
+		</fieldset>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlFormCfgDasc">
+<wgui:block name="prlCfgDascUplRt">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<form id="prlCfgDascUplRtFrm" enctype="multipart/form-data" action="rcvfile.php" method="POST" target="dlFrame">
+			<input type="hidden" name="MAX_FILE_SIZE" value="<wgui:var name="MAX_FILE_SIZE"/>" />
+			Tarifdatei ausw&auml;hlen:<br/>
+			<input name="rcvfile" type="file" /><br/>
+			Bemerkung: Stellen Sie bitte sicher, dass Sie nur Dateien mit der Endung .txt einlesen.
+			<input type="hidden" name="param" value="<wgui:var name="param"/>" />
+		</form>
+	</div>
+	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><div id="prlCfgDascUplRtWait"><img src="web/img/working.gif" /></div>
+</wgui:block name="prlCfgDascUplRt">
+<wgui:block name="prlFormulaOverview">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button onclick='cb("payroll.FormulaEditor",{"action":"editor","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlLoaFeOvBtnNew"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="prlLoaFeOvLgndExisting"/></legend>
+		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlLoaFeOvLblFormula"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlLoaFeOvOptChooseFormula"/></option>
+		<wgui:loop name="formulaLoop" varname="formula_list">
+			<option value="<wgui:loopvar loopname="formulaLoop" varname="id"/>"><wgui:loopvar loopname="formulaLoop" varname="formula"/></option>
+		</wgui:loop name="formulaLoop">
+		</select><br/>
+		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.FormulaEditor",{"action":"editor","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="prlLoaFeOvBtnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.FormulaEditor",{"action":"delete","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
+		</fieldset>
+	</div>
+	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlFormulaOverview">
+<wgui:block name="prlFormulaEditor">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlLoaFeMain">
+		<fieldset class="prlLoaFeLst">
+			<legend><wgui:text id="prlLoaFeLstLegend"/></legend>
+			<div class="prlLoaFeLstD">
+				<ul></ul>
+			</div>
+		</fieldset>
+		<fieldset class="prlLoaFeEdt">
+			<legend><wgui:text id="prlLoaFeEdtLegend"/></legend>
+			<button elmt="factor"><wgui:text id="prlLoaFeEdtFactor"/></button>
+			<button elmt="surcharge"><wgui:text id="prlLoaFeEdtSurcharge"/></button>
+			<button elmt="quantity"><wgui:text id="prlLoaFeEdtQuantity"/></button>
+			<button elmt="rate"><wgui:text id="prlLoaFeEdtRate"/></button>
+			<button elmt="amount"><wgui:text id="prlLoaFeEdtAmount"/></button><br/>
+			<button elmt="+">+</button>
+			<button elmt="-">&#150;</button>
+			<button elmt="*">&times;</button>
+			<button elmt="/">&#247;</button><br/>
+			<button elmt="(">(</button>
+			<button elmt=")">)</button><br/>
+			<button elmt="const"><wgui:text id="prlLoaFeEdtConst"/></button>
+		</fieldset>
+		<div id="prlLoaFeErr"></div>
+	</div>
+	<button id="prlLoaFeSave"><wgui:text id="btnSave"/></button><button id="prlLoaFeCancel"><wgui:text id="prlLoaFeCancel"/></button>
+</wgui:block name="prlFormulaEditor">
+<wgui:block name="prlFormCfgInscInsr">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscInsrBtnNew"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="prlFormCfgInscInsrLgndExistingInsr"/></legend>
+		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlFormCfgInscInsrLblInsr"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlFormCfgInscInsrOptChooseInsr"/></option>
+		<wgui:loop name="insuranceLoop" varname="insurance_list">
+			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/> (<wgui:text id="prlFormCfgInscInsrInsrID"/> <wgui:loopvar loopname="insuranceLoop" varname="InsuranceID"/>, <wgui:text id="prlFormCfgInscInsrSubnumber"/> <wgui:loopvar loopname="insuranceLoop" varname="SubNumber"/>)</option>
+		</wgui:loop name="insuranceLoop">
+		</select><br/>
+		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscInsr","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
+		</fieldset>
+	</div>
+	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlFormCfgInscInsr">
+<wgui:block name="selectPayslipCfg">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":"0","FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-top:10px;margin-bottom:10px;">Neue Vorlage</button><br/>
+		<fieldset>
+		<legend>Bestehende Vorlagen</legend>
+		<label for="templateChooser" style="display:inline-block;width:100px;">Vorlage:</label><select id="templateChooser" style="width:300px;margin-bottom:10px;"><option value="0">-- Vorlage ausw&auml;hlen --</option>
+		<wgui:loop name="templateLoop" varname="template_list">
+			<option value="<wgui:loopvar loopname="templateLoop" varname="id"/>"><wgui:loopvar loopname="templateLoop" varname="payslip_name"/></option>
+		</wgui:loop name="templateLoop">
+		</select><br/>
+		<button onclick='if($("#templateChooser").val()>0) cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":$("#templateChooser").val(),"FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnChange"/></button><button onclick='if($("#templateChooser").val()>0) cb("payroll.payslipConfig",{"f":"takeAction","w":"delete","id":$("#templateChooser").val(),"commit":0});'>L&ouml;schen</button>
+		</fieldset>
+	</div>
+	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="selectPayslipCfg">
+<wgui:block name="editPayslipCfg">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<input id="prlPslpCfg_id" type="hidden" />
+		<fieldset class="prlPslpCfgFSR">
+			<legend>Info-Box</legend>
+			<label for="prlPslpCfg_info_font_name">Schrift:</label><select id="prlPslpCfg_info_font_name" tabindex="13"><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select><select id="prlPslpCfg_info_font_size" tabindex="14"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
+			<label for="prlPslpCfg_info_offset_top">Abstand oben:</label><input id="prlPslpCfg_info_offset_top" type="text" value="" tabindex="15" /> mm<br/>
+			<label for="prlPslpCfg_info_offset_left">Abstand links:</label><input id="prlPslpCfg_info_offset_left" type="text" value="" tabindex="16" /> mm<br/>
+			<hr/>
+			Felder:
+			<div class="prlPslpCfgLstI">
+				<ul></ul>
+			</div>
+			<button id="prlPslpCfgAdd">+</button>
+		</fieldset>
+		<fieldset class="prlPslpCfgFSL">
+			<legend>Allgemein</legend>
+			<label for="prlPslpCfg_payslip_name">Bezeichnung:</label><input id="prlPslpCfg_payslip_name" type="text" value="" tabindex="1" /><br/>
+			<label for="prlPslpCfg_pdf_template">PDF-Vorlage:</label><select id="prlPslpCfg_pdf_template" tabindex="2">
+			<option value="">--- keine Vorlage ---</option>
+			<wgui:loop name="templateLoop" varname="template_list">
+				<option value="<wgui:loopvar loopname="templateLoop" varname="template"/>"><wgui:loopvar loopname="templateLoop" varname="template"/></option>
+			</wgui:loop name="templateLoop">
+			</select><br/>
+			<label for="prlPslpCfg_default_payslip">Standard:</label><input id="prlPslpCfg_default_payslip" type="checkbox" tabindex="3" /><br/>
+		</fieldset>
+		<fieldset class="prlPslpCfgFSL">
+			<legend>Adresse</legend>
+			<label for="prlPslpCfg_addr_font_name">Schrift:</label><select id="prlPslpCfg_addr_font_name" tabindex="4"><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select><select id="prlPslpCfg_addr_font_size" tabindex="5"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
+			<label for="prlPslpCfg_addr_offset_top">Abstand oben:</label><input id="prlPslpCfg_addr_offset_top" type="text" value="" tabindex="6" /> mm<br/>
+			<label for="prlPslpCfg_addr_offset_left">Abstand links:</label><input id="prlPslpCfg_addr_offset_left" type="text" value="" tabindex="7" /> mm<br/>
+		</fieldset>
+		<fieldset class="prlPslpCfgFSL">
+			<legend>Lohndaten</legend>
+			<label for="prlPslpCfg_content_font_name">Schrift:</label><select id="prlPslpCfg_content_font_name" tabindex="8"><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select><select id="prlPslpCfg_content_font_size" tabindex="9"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
+			<label for="prlPslpCfg_content_offset_top">Abstand oben:</label><input id="prlPslpCfg_content_offset_top" type="text" value="" tabindex="10" /> mm<br/>
+			<label for="prlPslpCfg_content_offset_left">Abstand links:</label><input id="prlPslpCfg_content_offset_left" type="text" value="" tabindex="11" /> mm<br/>
+			<label for="prlPslpCfg_content_width">Tabellenbreite:</label><input id="prlPslpCfg_content_width" type="text" value="" tabindex="12" /> mm<br/>
+		</fieldset>
+	</div>
+	<button id="prlPslpCfgSave">Speichern</button><button id="prlPslpCfgCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="editPayslipCfg">
+<wgui:block name="deletePayslipCfg">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+	<br/>Sind Sie sicher, dass Sie die Vorlage '<wgui:var name="TemplateName"/>' unwiderruflich l&ouml;schen wollen?<br/>&nbsp;
+	</div>
+	<button onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"delete","id":<wgui:var name="TemplateId"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button><button onclick='cb("payroll.payslipConfig",{"f":"templateOv"});'>Nein</button>
+</wgui:block name="deletePayslipCfg">
+<wgui:block name="prlVlFldCfgSelect">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+	<br/>
+	<label for="prlVlFldCfg_field">Personalstammfeld ausw&auml;hlen:</label><br/>
+	<select id="prlVlFldCfg_field">
+	<wgui:loop name="fieldLoop" varname="field_list">
+		<option value="<wgui:loopvar loopname="fieldLoop" varname="fieldName"/>"><wgui:loopvar loopname="fieldLoop" varname="label"/></option>
+	</wgui:loop name="fieldLoop">
+	</select>
+	<br/>&nbsp;
+	</div>
+	<button>OK</button><button><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlVlFldCfgSelect">
+<wgui:block name="prlVlFldCfgEditMain">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlVlFldCfg">
+		<fieldset>
+			<legend>Allgemein</legend>
+			<label for="prlVlFldCfg_fieldName">Technischer Feldname:</label><span id="prlVlFldCfg_fieldName"></span><br/>
+			<label for="prlVlFldCfg_fieldType">Typ:</label><span id="prlVlFldCfg_fieldType"></span><br/>
+			<label for="prlVlFldCfg_active">Feld aktiv:</label><input type="checkbox" id="prlVlFldCfg_active"/><br/>
+		</fieldset>
+		<fieldset>
+			<legend>Einstellungen</legend>
+			<div>
+				<label for="prlVlFldCfg_mandatory">Eingabe erforderlich:</label><input type="checkbox" id="prlVlFldCfg_mandatory"/><br/>
+				<label for="prlVlFldCfg_guiWidth">Feldbreite:</label><select id="prlVlFldCfg_guiWidth"><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option></select><br/>
+				<label for="prlVlFldCfg_displayCode">Code in Listenauswahl anzeigen:</label><input type="checkbox" id="prlVlFldCfg_displayCode"/><br/>
+				<label for="prlVlFldCfg_orderBy">Liste sortieren nach:</label><select id="prlVlFldCfg_orderBy"><option value="0">Listentext</option><option value="1">Code</option><option value="2">Sortierzahl</option></select><br/>
+				<label for="prlVlFldCfg_minVal">Zahlenbereich von:</label><input type="text" id="prlVlFldCfg_minVal"/><br/>
+				<label for="prlVlFldCfg_maxVal">Zahlenbereich bis:</label><input type="text" id="prlVlFldCfg_maxVal"/><br/>
+				<label for="prlVlFldCfg_maxLength">Max. Textl&auml;nge:</label><input type="text" id="prlVlFldCfg_maxLength"/><br/>
+				<p id="prlVlFldCfg_noSettings">Keine Einstellungen m&ouml;glich.</p>
+				<hr id="prlVlFldCfg_hr1"/>
+				<button id="prlVlFldCfg_BtnAdd">Listenwert hinzuf&uuml;gen</button>
+				<hr id="prlVlFldCfg_hr2"/>
+				<select id="prlVlFldCfg_listID"><option value="" token="">-- Listenwert ausw&auml;hlen --</option></select><br/>
+				<button id="prlVlFldCfg_BtnEdit">Listenwert bearbeiten</button><button id="prlVlFldCfg_BtnDel">Listenwert l&ouml;schen</button>
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Feldbezeichnung</legend>
+			<div>
+				<wgui:loop name="languageLoop" varname="languageList">
+					<label for="prlVlFldCfg_label_<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="languageLoop" varname="LanguageName"/></label><input type="text" id="prlVlFldCfg_label_<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"/><br/>
+				</wgui:loop name="languageLoop">
+			</div>
+		</fieldset>
+	</div>
+	<button id="prlVlFldCfgSave">Speichern</button><button id="prlVlFldCfgCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlVlFldCfgEditMain">
+<wgui:block name="prlVlFldCfgLstItemDel">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+	<br/>Sind Sie sicher, dass Sie den Listenwert '<wgui:var name="ItemName"/>' l&ouml;schen wollen?<br/>&nbsp;
+	</div>
+	<button onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button><button onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'>Nein</button>
+</wgui:block name="prlVlFldCfgLstItemDel">
+<wgui:block name="prlVlFldCfgLstItemEdit">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlVlFldCfgLI">
+		<fieldset>
+			<legend>Einstellungen</legend>
+			<label for="prlVlFldCfg_ListItemToken">Code:</label><input type="text" id="prlVlFldCfg_ListItemToken"/><br/>
+			<label for="prlVlFldCfg_ListItemOrder">Sortierzahl:</label><input type="text" id="prlVlFldCfg_ListItemOrder"/><br/>
+		</fieldset>
+		<fieldset>
+			<legend>Listentext</legend>
+			<div>
+				<wgui:loop name="languageLoop" varname="languageList">
+					<label for="prlVlFldCfg_label_<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="languageLoop" varname="LanguageName"/></label><input type="text" id="prlVlFldCfg_label_<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"/><br/>
+				</wgui:loop name="languageLoop">
+			</div>
+		</fieldset>
+	</div>
+	<button id="prlVlFldCfgLISave">Speichern</button><button id="prlVlFldCfgLICancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlVlFldCfgLstItemEdit">
+<wgui:block name="prlCurrencyEdit">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlCfgCncy">
+		<table>
+		  <tr>
+		    <th>W&auml;hrung</th>
+		    <th>Umrechnungskurs</th>
+		    <th></th>
+		  </tr>
+		  <tr>
+		    <td><wgui:var name="default_currency"/></td>
+		    <td>1.00000</td>
+		    <td></td>
+		  </tr>
+		<wgui:loop name="tblLoop" varname="currency_table">
+		<tr>
+			<td><wgui:loopvar loopname="tblLoop" varname="core_intl_currency_ID"/></td>
+			<td><input id="prlCfgCncy_forexRate_<wgui:loopvar loopname="tblLoop" varname="core_intl_currency_ID"/>" value="<wgui:loopvar loopname="tblLoop" varname="forex_rate"/>" /></td>
+			<td><div></div></td>
+		</tr>
+		</wgui:loop name="tblLoop">
+		<tr>
+			<td><select id="prlCfgCncy_currency"><option value=""></option>
+			<wgui:loop name="currencyLoop" varname="currency_list">
+				<option value="<wgui:loopvar loopname="currencyLoop" varname="core_intl_currency_ID"/>"><wgui:loopvar loopname="currencyLoop" varname="core_intl_currency_ID"/> - <wgui:loopvar loopname="currencyLoop" varname="currency_name"/></option>
+			</wgui:loop name="currencyLoop"></select></td>
+			<td><input id="prlCfgCncy_forexRate" value="0.00000" /></td>
+			<td></td>
+		</tr>
+	</table>
+	</div>
+	<button id="prlCfgCncySave"><wgui:text id="btnSave"/></button><button id="prlCfgCncyCancel"><wgui:text id="btnCancel"/></button><br/>
+</wgui:block name="prlCurrencyEdit">
+

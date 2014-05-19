@@ -1,0 +1,89 @@
+<wgui:block name="employeeOverview">
+	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<button id="prlPsoBtnNew"><wgui:text id="prlPsoBtnNew"/></button>
+		<button id="prlPsoBtnDFilter"><wgui:text id="prlPsoBtnDFilter"/></button>
+		<button id="prlPsoBtnDEdit"><wgui:text id="prlPsoBtnDEdit"/></button>
+		<input type="checkbox" id="prlPsoBtnQFilter" /><label for="prlPsoBtnQFilter"><wgui:text id="prlPsoBtnQFilter"/></label>
+		<button id="prlPsoBtnEditCols"><wgui:text id="prlPsoBtnEditCols"/></button>
+		<button id="prlPsoBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+		<button id="prlPsoBtnForm"><wgui:text id="prlPsoBtnForm"/></button>
+		<button id="prlPsoBtnFormEdit"><wgui:text id="prlPsoBtnFormEdit"/></button>
+	</div>
+	<div id="gridEmplOv" style="width:600px;height:500px;"></div>
+</wgui:block name="employeeOverview">
+<wgui:block name="employeeForm">
+	<div class="ui-tabs ui-widget ui-widget-content ui-corner-all" id="prlVlTabContainer">
+		<ul class="ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" id="prlVlTabs">
+			<li style="margin:0;padding:0;border:0;background:none;">
+				<ul class="ui-tabs-nav" id="prlVlTab2">
+				</ul><br style="clear:left;"/>
+			</li>
+			<li style="margin:0;padding:0;border:0;background:none;">
+				<ul class="ui-tabs-nav" id="prlVlTab1">
+				</ul><br style="clear:left;"/>
+			</li>
+		</ul>
+	</div>
+	<button onclick="prlVlSave();"><wgui:text id="btnSave"/></button>
+	<button onclick="$('#employeeForm').mb_close();"><wgui:text id="btnCancel"/></button>
+	<ul id="prlVlTblMenu" eid="" rid="">
+		<li><a href="#" act="1"><wgui:text id="btnChange"/></a></li>
+		<li><a href="#" act="2"><wgui:text id="btnDelete"/></a></li>
+	</ul>
+	<div id="prlVlAddElement" style="position: absolute; top: 50%; left: 50%; width: 300px; height: 80px; padding:20px; margin-left: -175px; margin-top: -40px; background-color:#eee; border:1px solid #8ae; display: block;">
+		<select id="availableElements" style="width:290px;"></select><br/>
+		<input type="hidden" id="esTarget" value=""/>
+		<button onclick="prlVlInsertField($('#esTarget').val(), $('#availableElements').val());$('#prlVlAddElement').hide();" style="margin-top:20px;margin-right:10px;"><wgui:text id="btnAdd"/></button><button onclick="$('#prlVlAddElement').hide();"><wgui:text id="btnCancel"/></button>
+	</div>
+	<div id="prlVlAddTab" style="position: absolute; top: 50%; left: 50%; width: 350px; height: 80px; padding:20px; margin-left: -175px; margin-top: -40px; background-color:#eee; border:1px solid #8ae; display: block;">
+		Name des Reiters:<input type="text" id="atName" value="" style="width:200px;"/><br/>
+		<input type="hidden" id="atTarget" value=""/>
+		<button onclick="prlVlInsertTab($('#atTarget').val(), $('#atName').val());$('#prlVlAddTab').hide();" style="margin-top:20px;margin-right:10px;"><wgui:text id="btnAdd"/></button><button onclick="$('#prlVlAddTab').hide();"><wgui:text id="btnCancel"/></button>
+	</div>
+	<div id="prlVlEditTab" style="border: 1px solid rgb(136, 170, 238); padding: 20px; position: absolute; top: 50%; left: 50%; width: 350px; height: 80px; margin-left: -175px; margin-top: -40px; background-color: rgb(238, 238, 238); display: block;">
+		Name des Reiters:<input type="text" id="etName" value="" style="width:200px;"/><br/>
+		<input type="hidden" id="etTarget" value=""/>
+		<button onclick="$('li[ptab-assignment='+$('#etTarget').val()+'] a').text($('#etName').val());$('#prlVlEditTab').hide();"><wgui:text id="btnChange"/></button><button onclick="$('#prlVlEditTab').hide();"><wgui:text id="btnCancel"/></button>
+		<button onclick="prlVlRemoveTab($('#etTarget').val());$('#prlVlEditTab').hide();" style="margin-left:60px;"><wgui:text id="btnDelete"/></button>
+	</div>
+</wgui:block name="employeeForm">
+<wgui:block name="employeeEditFormDlg1">
+	<button onclick='cb("payroll.prlVlEditForm",{"f":"takeAction","w":"new"});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlVlEditDlg1BtnNew"/></button><br/>
+	<fieldset>
+	<legend><wgui:text id="prlVlEditDlg1LgndExistingLayout"/></legend>
+	<label for="layoutChooser" style="display:inline-block;width:100px;"><wgui:text id="prlVlEditDlg1LblLayout"/></label><select id="layoutChooser" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlVlEditDlg1OptChooseLayout"/></option>
+	<wgui:loop name="layoutLoop" varname="layout_list">
+		<option value="<wgui:loopvar loopname="layoutLoop" varname="id"/>"><wgui:loopvar loopname="layoutLoop" varname="FormName"/></option>
+	</wgui:loop name="layoutLoop">
+	</select><br/>
+	<button onclick='if($("#layoutChooser").val()>0) cb("payroll.prlVlEditForm",{"f":"takeAction","w":"edit","id":$("#layoutChooser").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#layoutChooser").val()>0) cb("payroll.prlVlEditForm",{"f":"takeAction","w":"delete","id":$("#layoutChooser").val(),"commit":0});'><wgui:text id="btnDelete"/></button>
+	</fieldset>
+	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="employeeEditFormDlg1">
+<wgui:block name="employeeEditFormDlg2">
+	<label for="layoutName" style="display:inline-block;width:100px;"><wgui:text id="prlVlEditDlg2LblName"/></label><input type="text" id="layoutName" style="width:300px;margin-top:10px;margin-bottom:10px;" value="<wgui:var name="LayoutName"/>"/><br/>
+	<input type="checkbox" id="layoutTemporary" style="margin-bottom:10px;" onclick="if($(this).is(':checked')) { $('#layoutGlobal').removeAttr('checked');$('#layoutGlobal').attr('disabled', 'disabled');}else{ $('#layoutGlobal').removeAttr('disabled');}"<wgui:var name="tempChecked"/>/><label for="layoutTemporary"><wgui:text id="prlVlEditDlg2LblTemporary"/></label><br/>
+	<input type="checkbox" id="layoutGlobal" style="margin-bottom:30px;"<wgui:var name="globalChecked"/>/><label for="layoutGlobal"><wgui:text id="prlVlEditDlg2LblGlobal"/></label><br/>
+	<button onclick='cb("payroll.prlVlEditForm",{"f":"layoutOv"});' style="margin-right:20px;"><wgui:text id="btnBack"/></button><button onclick='if($.trim($("#layoutName").val())!="") cb("payroll.prlVlEditForm",{"f":"takeAction","w":"showEditor","id":<wgui:var name="id"/>,"name":$("#layoutName").val(), "temp":$("#layoutTemporary").is(":checked") ? 1 : 0, "global":$("#layoutGlobal").is(":checked") ? 1 : 0});'><wgui:text id="btnNext"/></button><button onclick='$("#modalContainer").mb_close();' style="margin-left:100px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="employeeEditFormDlg2">
+<wgui:block name="selectEmployeeForm">
+	<label for="layoutChooser" style="display:inline-block;width:150px;margin-top:20px;"><wgui:text id="prlVlSelectFormLblLayout"/></label><select id="layoutChooser" style="width:300px;margin-bottom:10px;">
+	<wgui:loop name="layoutLoop" varname="layout_list">
+		<option value="<wgui:loopvar loopname="layoutLoop" varname="id"/>"><wgui:loopvar loopname="layoutLoop" varname="FormName"/></option>
+	</wgui:loop name="layoutLoop">
+	</select><br/>
+	<button onclick='cb("payroll.prlVlSelectForm",$("#layoutChooser").val());' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnOK"/></button><button onclick='$("#modalContainer").mb_close();'><wgui:text id="btnCancel"/></button>
+</wgui:block name="selectEmployeeForm">
+<wgui:block name="deleteEmployeeForm">
+	<br/>Sind Sie sicher, dass Sie das Layout '<wgui:var name="FormName"/>' unwiderruflich l&ouml;schen wollen?<br/>
+	<button onclick='cb("payroll.prlVlEditForm",{"f":"takeAction","w":"delete","id":<wgui:var name="FormId"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button><button onclick='cb("payroll.prlVlEditForm",{"f":"layoutOv"});'>Nein</button>
+</wgui:block name="deleteEmployeeForm">
+<wgui:block name="selectDBFilterForm">
+	<label for="prlPsoDFilter" style="display:inline-block;width:150px;margin-top:20px;"><wgui:text id="prlPsoDFltLblFilter"/></label><select id="prlPsoDFilter" style="width:300px;margin-bottom:10px;"><option value=""><wgui:text id="prlPsoDFltAllEmployees"/></option>
+	<wgui:loop name="filterLoop" varname="filter_list">
+		<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="FilterName"/></option>
+	</wgui:loop name="filterLoop">
+	</select><br/>
+	<button id="prlPsoDFltBtnOK" style="margin-left:100px;margin-right:20px;"><wgui:text id="btnOK"/></button><button id="prlPsoDFltBtnCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="selectDBFilterForm">
+

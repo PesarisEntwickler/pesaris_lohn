@@ -1,0 +1,277 @@
+<wgui:block name="GUI_paymentSplitOverview">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltMain">
+		<div class="prlPmtSpltLstWrapper">
+			<div class="prlPmtSpltHeader">
+				<wgui:text id="txtTableHeadersPaymentSplit"/>
+			</div>
+			<div class="prlPmtSpltScroll">
+			<ul>
+			<wgui:loop name="paymentSplitLoop" varname="paymentSplitList">
+				<li rid='<wgui:loopvar loopname="paymentSplitLoop" varname="id"/>'>
+					<div><wgui:loopvar loopname="paymentSplitLoop" varname="src_bank_label"/></div>
+					<div><wgui:loopvar loopname="paymentSplitLoop" varname="dest_bank_label"/></div>
+					<div><wgui:loopvar loopname="paymentSplitLoop" varname="split_mode"/></div>
+					<div><wgui:loopvar loopname="paymentSplitLoop" varname="amount"/></div>
+					<div><wgui:loopvar loopname="paymentSplitLoop" varname="period"/></div>
+					<div><span class="e"></span><span class="d"></span></div>
+				</li>
+			</wgui:loop name="paymentSplitLoop">
+			</ul>
+			</div>
+		</div>
+		<wgui:text id="txtAuszkritInReihenfolge"/>
+	</div>
+	<button id="prlPmtSpltSaveOrder"><wgui:text id="btnReihenfolgespeichern"/></button>
+	<button id="prlPmtSpltNew"><wgui:text id="btnPlusAdd"/></button>
+	<button id="prlPmtSpltClose"><wgui:text id="btnClose"/></button>
+</wgui:block name="GUI_paymentSplitOverview">
+<wgui:block name="paymentSplitEdit">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit PesarisWGUI">
+		<label for="prlPmtSplt_period">G&uuml;ltig f&uuml;r:</label>
+				<select id="prlPmtSplt_period">
+					<option value="">alle Abrechnungsperioden</option>
+					<option value="MAP">alle Hauptzahltage</option>
+					<option value="MPB">alle Gratifikationen</option>
+					<option value="MIP">alle Zwischenzahltage</option>
+					<option value="1">Januar</option>
+					<option value="2">Februar</option>
+					<option value="3">M&auml;rz</option>
+					<option value="4">April</option>
+					<option value="5">Mai</option>
+					<option value="6">Juni</option>
+					<option value="7">Juli</option>
+					<option value="8">August</option>
+					<option value="9">September</option>
+					<option value="10">Oktober</option>
+					<option value="11">November</option>
+					<option value="12">Dezember</option>
+					<option value="13">13. Monatslohn</option>
+					<option value="14">14. Monatslohn</option>
+					<option value="15">Gratifikation 1</option>
+					<option value="16">Gratifikation 2</option>
+				</select><br/>
+		<label for="prlPmtSplt_split_mode">Zuteilkriterium:</label>
+				<select id="prlPmtSplt_split_mode">
+					<option value="2">%</option>
+					<option value="3">Betrag</option>
+					<option value="1">Lohnart</option>
+				</select><br/>
+		<label for="prlPmtSplt_amount" smd2="Prozent (%):" smd3="Betrag:"></label>
+				<input type="text" id="prlPmtSplt_amount"/><br/>
+		<label for="prlPmtSplt_payroll_account_ID">Lohnart:</label><input type="text" id="prlPmtSplt_payroll_account_ID"/><br/>
+		<label for="prlPmtSplt_payroll_currency_ID">W&auml;hrung:</label><select id="prlPmtSplt_payroll_currency_ID"><option value="CHF">CHF</option><option value="EUR">EUR</option></select><br/>
+		<label for="prlPmtSplt_payroll_bank_source_ID">Zahlstelle:</label><select id="prlPmtSplt_payroll_bank_source_ID"><option value="0"><wgui:text id="txtStandardVerwenden"/></option>
+			<wgui:loop name="bankSrcLoop" varname="bank_source_list">
+				<option value='<wgui:loopvar loopname="bankSrcLoop" varname="id"/>'><wgui:loopvar loopname="bankSrcLoop" varname="description"/></option>
+			</wgui:loop name="bankSrcLoop">
+			</select>
+			<button id="prlPmtSplt_BtnBSEdit" class="BtnLSpace"><wgui:text id="btnEditArrow"/></button><br/>
+		<label for="prlPmtSplt_payroll_bank_destination_ID">Bankverbindung Mitarb.:</label><select id="prlPmtSplt_payroll_bank_destination_ID"><option value="0"><wgui:text id="txtStandardVerwenden"/></option>
+			<wgui:loop name="bankDestLoop" varname="bank_destination_list">
+				<option value='<wgui:loopvar loopname="bankDestLoop" varname="id"/>'><wgui:loopvar loopname="bankDestLoop" varname="description"/></option>
+			</wgui:loop name="bankDestLoop">
+			</select> 
+			<button id="prlPmtSplt_BtnBDEdit" class="BtnLSpace"><wgui:text id="btnEditArrow"/></button><br/>
+		<label for="prlPmtSplt_having_rounding">Rundung aktivieren:</label><input type="checkbox" id="prlPmtSplt_having_rounding"/><br/>
+		<label for="prlPmtSplt_round_param">Rundungsparameter:</label><input type="text" id="prlPmtSplt_round_param"/><br/>
+	</div>
+	<button id="prlPmtSpltSave" class="PesarisButton" ><wgui:text id="btnSave"/></button>
+	<button id="prlPmtSpltCancel" class="PesarisButton" ><wgui:text id="btnCancel"/></button>
+</wgui:block name="paymentSplitEdit">
+<wgui:block name="paymentSplitDelete">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+	<br/><wgui:text id="txtZahlSplittLoeschenSicher"/><br/>&nbsp;
+	</div>
+	<button id="prlPmtSpltYes"><wgui:text id="txtY"/></button><button id="prlPmtSpltNo"><wgui:text id="txtN"/></button>
+</wgui:block name="paymentSplitDelete">
+<wgui:block name="destinationBankOverview">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button id="prlBankDNew" style="margin-top:10px;margin-bottom:10px;"><wgui:text id="btnNeueBankverbindung"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="txtBestehendeBankverbindungen"/></legend>
+		<label for="prlFormCfg_id" style="display:inline-block;width:150px;"><wgui:text id="txtBankverbindung"/>:</label>
+				<select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;">
+					<option value="0"><wgui:text id="txtBankverbindungAuswaehlen"/></option>
+					<wgui:loop name="bankLoop" varname="bank_list">
+						<option value='<wgui:loopvar loopname="bankLoop" varname="id"/>'>
+							<wgui:loopvar loopname="bankLoop" varname="description"/>
+						</option>
+					</wgui:loop name="bankLoop">
+				</select>
+		<button id="prlBankDEdit" style="margin-left:150px;"><wgui:text id="btnEdit"/></button>
+		<button id="prlBankDDelete" style="margin-left:8px;" class="PesarisButton"><wgui:text id="btnDelete"/></button>
+		</fieldset>
+	</div>
+	<button id="prlBankDCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
+</wgui:block name="destinationBankOverview">
+<wgui:block name="destinationBankEdit">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEditBD">
+		<input type="hidden" id='prlPmtSplt_id' value='<wgui:var name="id"/>'/>
+		<input type="hidden" id='prlPmtSplt_payroll_employee_ID' value='<wgui:var name="payroll_employee_ID"/>'/>
+		<table><tr><td>
+			<fieldset>
+				<legend><wgui:text id="txtAllgemein"/></legend>
+				<label for="prlPmtSplt_description"><wgui:text id="txtBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value="<wgui:var name="description"/>"/><br/>
+				<label for="prlPmtSplt_destination_type">Auszahlungstyp:</label>
+					<select id="prlPmtSplt_destination_type">
+						<option value="1"><wgui:text id="txtBank"/></option>
+						<option value="2"><wgui:text id="txtPost"/></option>
+						<option value="3"><wgui:text id="txtCash"/></option>
+					</select><br/>
+			</fieldset>
+			<fieldset>
+				<legend>Bank</legend>
+				<label for="prlPmtSplt_bank_clearing">Clearing Nummer:</label><input type="text" id="prlPmtSplt_bank_clearing" value="<wgui:var name="bank_clearing"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary_bank_line1">Bankname:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line1" value="<wgui:var name="beneficiary_bank_line1"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary_bank_line2">Adresse:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line2" value="<wgui:var name="beneficiary_bank_line2"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary_bank_line3">PLZ/Ort:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line3" value="<wgui:var name="beneficiary_bank_line3"/>"/><br/>
+				<label for="prlPmtSplt_core_intl_country_ID">Land:</label>
+					<select id="prlPmtSplt_core_intl_country_ID">
+						<wgui:loop name="countryLoop" varname="country_list">
+							<option value='<wgui:loopvar loopname="countryLoop" varname="id"/>'><wgui:loopvar loopname="countryLoop" varname="country_name"/></option>
+						</wgui:loop name="countryLoop">
+					</select><br/>
+				<label for="prlPmtSplt_postfinance_account">Postcheckkonto:</label><input type="text" id="prlPmtSplt_postfinance_account" value="<wgui:var name="postfinance_account"/>"/><br/>
+				<label for="prlPmtSplt_bank_account">Bankkonto od. IBAN:</label><input type="text" id="prlPmtSplt_bank_account" value="<wgui:var name="bank_account"/>"/><br/>
+				<label for="prlPmtSplt_expense">Spesenregelung:</label>
+					<select id="prlPmtSplt_expense">
+						<option value="">keine Regelung</option>
+						<option value="0">zu Lasten Auftraggeber</option>
+						<option value="1">zu Lasten Beg&uuml;nstigter</option>
+						<option value="2">Spesen-Teilung</option>
+					</select><br/>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset>
+				<legend>Beg&uuml;nstigter</legend>
+				<label for="prlPmtSplt_beneficiary1_line1">Name:</label><input type="text" id="prlPmtSplt_beneficiary1_line1" value="<wgui:var name="beneficiary1_line1"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary1_line2">Adresszusatz:</label><input type="text" id="prlPmtSplt_beneficiary1_line2" value="<wgui:var name="beneficiary1_line2"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary1_line3">Adresse:</label><input type="text" id="prlPmtSplt_beneficiary1_line3" value="<wgui:var name="beneficiary1_line3"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary1_line4">PLZ/Ort:</label><input type="text" id="prlPmtSplt_beneficiary1_line4" value="<wgui:var name="beneficiary1_line4"/>"/><br/>
+			</fieldset>
+			<fieldset>
+				<legend>Endbeg&uuml;nstigter</legend>
+				<label for="prlPmtSplt_beneficiary2_line1">Konto:</label><input type="text" id="prlPmtSplt_beneficiary2_line1" value="<wgui:var name="beneficiary2_line1"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary2_line2">Name:</label><input type="text" id="prlPmtSplt_beneficiary2_line2" value="<wgui:var name="beneficiary2_line2"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary2_line3">Adresszusatz:</label><input type="text" id="prlPmtSplt_beneficiary2_line3" value="<wgui:var name="beneficiary2_line3"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary2_line4">Adresse:</label><input type="text" id="prlPmtSplt_beneficiary2_line4" value="<wgui:var name="beneficiary2_line4"/>"/><br/>
+				<label for="prlPmtSplt_beneficiary2_line5">PLZ/Ort:</label><input type="text" id="prlPmtSplt_beneficiary2_line5" value="<wgui:var name="beneficiary2_line5"/>"/><br/>
+			</fieldset>
+			<fieldset>
+				<legend>Mitteilung</legend>
+				<label for="prlPmtSplt_notice_line1">Zeile 1:</label><input type="text" id="prlPmtSplt_notice_line1" value='<wgui:var name="notice_line1"/>'/><br/>
+				<label for="prlPmtSplt_notice_line2">Zeile 2:</label><input type="text" id="prlPmtSplt_notice_line2" value='<wgui:var name="notice_line2"/>'/><br/>
+				<!-- 
+				<label for="prlPmtSplt_notice_line3">Zeile 3:</label><input type="text" id="prlPmtSplt_notice_line3" value="<wgui:var name="notice_line3"/>"/><br/>
+				 -->
+			</fieldset>
+		</td></tr></table>
+	</div>
+	<button id="prlPmtSpltSave" class="PesarisButton"><wgui:text id="btnSave"/></button>
+	<button id="prlPmtSpltCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
+</wgui:block name="destinationBankEdit">
+<wgui:block name="destinationBankDelete">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
+	<br/><wgui:text id="txtDestinationBankLoeschenSicher"/><br/>
+	</div>
+	<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
+	<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
+</wgui:block name="destinationBankDelete">
+
+
+
+
+<wgui:block name="GUItemplate_bank_source_Overview">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
+		<button id="prlBankSourceNew" class="PesarisButton" style="width: 130px;"><wgui:text id="btnNeueZahlstelle"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="txtZahlstelleBestehend"/></legend>
+		<label for="prlFormCfg_id" style="display:inline-block;width:150px;"><wgui:text id="txtZahlstelle"/>:</label>
+		<select id="prlFormCfg_id" style="width:300px;margin-bottom:0px;">
+			<option value="0"><wgui:text id="txtZahlstelleAuswaehlen"/></option>
+			<wgui:loop name="bankLoop" varname="list_of_zahlstellen">
+				<option value='<wgui:loopvar loopname="bankLoop" varname="id"/>'><wgui:loopvar loopname="bankLoop" varname="description"/></option>
+			</wgui:loop name="bankLoop">
+		</select>
+		<button id="prlBankSourceEdit" class="PesarisButton" style="margin-left:150px;"><wgui:text id="btnEdit"/></button>
+		<button id="prlBankSourceDelete" class="PesarisButton" ><wgui:text id="btnDelete"/></button>
+		</fieldset>
+	</div>
+	<button id="prlBankSourceCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
+</wgui:block name="GUItemplate_bank_source_Overview">
+
+
+<wgui:block name="GUI_bank_source_Edit">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit_bank_source">
+		<input type="hidden" id="prlPmtSplt_id" value='<wgui:var name="id"/>'/>
+		<input type="hidden" id="prlPmtSplt_payroll_company_ID" value='<wgui:var name="payroll_company_ID"/>' />
+		<fieldset>
+			<legend><wgui:text id="txtAllgemein"/>:</legend>
+			<label for="prlPmtSplt_description"><wgui:text id="txtZahlstelleBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value='<wgui:var name="description"/>'/><br/>
+			<label for="prlPmtSplt_source_type"><wgui:text id="txtZahlstellenTyp"/>:</label>
+				<select id="prlPmtSplt_source_type">
+					<option value="1"><wgui:text id="txtBank"/></option>
+					<option value="2"><wgui:text id="txtPost"/></option>
+					<option value="3"><wgui:text id="txtCash"/></option>
+				</select><br/>
+				<script type="text/javascript">
+					var st = '<wgui:var name="source_type"/>';
+					if      (st == "1") {document.getElementById("prlPmtSplt_source_type").selectedIndex="0";}
+					else if (st == "2") {document.getElementById("prlPmtSplt_source_type").selectedIndex="1";}
+					else if (st == "3") {document.getElementById("prlPmtSplt_source_type").selectedIndex="2";}
+				</script>			
+			<label for="prlPmtSplt_bank_source_carrier"><wgui:text id="txtZahlungstraeger"/>:</label>
+				<select id="prlPmtSplt_bank_source_carrier">
+					<option value="1"><wgui:text id="txtCarrier1"/></option>
+					<option value="2"><wgui:text id="txtCarrier2"/></option>
+				</select><br/>
+				<script type="text/javascript">
+					var carr = '<wgui:var name="bank_source_carrier"/>';
+					if      (carr == "1") {document.getElementById("prlPmtSplt_bank_source_carrier").selectedIndex="0";}
+					else if (carr == "2") {document.getElementById("prlPmtSplt_bank_source_carrier").selectedIndex="1";}
+				</script>			
+		</fieldset>
+		<fieldset>
+			<legend><wgui:text id="txtZahlstelleAuftraggeber"/>:</legend>
+			<label for="prlPmtSplt_bank_source_currency_code"><wgui:text id="txtZahlungsKontoWaehrung"/>:</label>
+ 				<select id="prlPmtSplt_bank_source_currency_code">
+					<option value="CHF">CHF</option>
+					<option value="EUR">EUR</option>
+					<option value="USD">USD</option>
+				</select><br/>
+				<script type="text/javascript">
+					var curr = '<wgui:var name="bank_source_currency_code"/>';
+					if      (curr == "CHF") {document.getElementById("prlPmtSplt_bank_source_currency_code").selectedIndex="0";}
+					else if (curr == "EUR") {document.getElementById("prlPmtSplt_bank_source_currency_code").selectedIndex="1";}
+					else if (curr == "USD") {document.getElementById("prlPmtSplt_bank_source_currency_code").selectedIndex="2";}
+				</script>			
+				<wgui:loop name="currencyLoop" varname="dbview_payroll_bank_sourcewaehrungen">
+					sw <wgui:loopvar loopname="currencyLoop" varname="core_intl_currency_ID"/> 
+					   <wgui:loopvar loopname="currencyLoop" varname="forex_rate"/>,
+				</wgui:loop name="currencyLoop">
+
+					<wgui:loop name="currencyLoop" varname="list_of_zahlstellen_waehrungen">
+					zs <wgui:loopvar loopname="currencyLoop" varname="core_intl_currency_ID"/> 
+					   <wgui:loopvar loopname="currencyLoop" varname="forex_rate"/>,
+				</wgui:loop name="currencyLoop">
+				<!-- <input type="text" id="prlPmtSplt_bank_source_currency_code" value='<wgui:var name="bank_source_currency_code"/>'/><br/>   -->
+			<label for="prlPmtSplt_bank_source_IBAN"><wgui:text id="txtZahlstellenKontoIBAN"/>:</label><input type="text" id="prlPmtSplt_bank_source_IBAN" value='<wgui:var name="bank_source_IBAN"/>'/><br/>
+			<label for="prlPmtSplt_bank_source_desc1"><wgui:text id="txtZahlstelleBez1"/>:</label><input type="text" id="prlPmtSplt_bank_source_desc1" value='<wgui:var name="bank_source_desc1"/>'/><br/>
+			<label for="prlPmtSplt_bank_source_desc2"><wgui:text id="txtZahlstelleBez2"/>:</label><input type="text" id="prlPmtSplt_bank_source_desc2" value='<wgui:var name="bank_source_desc2"/>'/><br/>
+			<label for="prlPmtSplt_bank_source_desc3"><wgui:text id="txtZahlstelleBez3"/>:</label><input type="text" id="prlPmtSplt_bank_source_desc3" value='<wgui:var name="bank_source_desc3"/>'/><br/>
+			<label for="prlPmtSplt_bank_source_desc4"><wgui:text id="txtZahlstelleBez4"/>:</label><input type="text" id="prlPmtSplt_bank_source_desc4" value='<wgui:var name="bank_source_desc4"/>'/><br/>
+		</fieldset>
+	</div>
+	<button id="prlPmtSplt_BankSourceEdit_btnSave" class="PesarisButton"><wgui:text id="btnSave"/></button>
+	<button id="prlPmtSplt_BankSourceEdit_btnCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
+</wgui:block name="GUI_bank_source_Edit">
+
+<wgui:block name="GUItemplate_bank_source_Delete">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
+		<wgui:text id="txtZahlstelleLoeschenSicher"/>
+	</div>
+	<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
+	<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
+</wgui:block name="GUItemplate_bank_source_Delete">
+

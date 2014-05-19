@@ -1,0 +1,29 @@
+<wgui:block name="main">
+<span id="modalDock"></span>
+
+<div id="splashScreen" style="position:absolute; top:0; left:0; height:100%; width:100%; z-index: 1000; background-color:#252525; background-repeat:no-repeat; text-align:center;"><span id="splashStatusTxt" style="color:#ffffff;"></span></div>
+<div class="ui-layout-center" id="ui-layout-center"></div>
+<div class="ui-layout-north">
+	<img id="appLogo" src="web/img/blue/applogo.gif" style="position:absolute;top:4px;left:18px;z-index:4;" />
+	<div id="loginStatus"><table cellpadding="0" cellspacing="0"><tr><td><wgui:text id="blInfoBoxCustomer"/>:</td><td id="appCustomer">&#151;</td></tr><tr><td><wgui:text id="blInfoBoxUser"/>:</td><td id="appUser">&#151;</td></tr></table></div>
+	<img id="btnLogout" src="web/img/shutdown_box_red.png" onclick="cb('core.logout');" alt="<wgui:text id="blLogout"/>" title="<wgui:text id="blLogout"/>" />
+	<div id="dock"></div>
+	<form id="dlForm" method="post"><input type="hidden" name="param" value=""/></form><iframe id="dlFrame" name="dlFrame"></iframe>
+</div>
+<div class="ui-layout-west">
+	<div id="accordion1" class="basic" appmenu="main">
+			<h3 appmenu="h_system"><a href="#"><wgui:text id="blAppMenuSystem"/></a></h3>
+			<div appmenu="c_system">
+				<ul class="appMenu">
+					<li id="appMenuSysConfig" style="background-image: url(<wgui:var name="iconPath"/>config24x24.png);"><a href="#" onclick="cb('baseLayout.changeConfiguration');"><wgui:text id="blAppMenuSysConfig"/></a></li>
+					<li id="appMenuSysUsers" style="background-image: url(<wgui:var name="iconPath"/>users24x24.png);"><a href="#" onclick="cb('baseLayout.userManager');"><wgui:text id="blAppMenuUserAdmin"/></a></li>
+					<li id="appMenuSysPwd" style="background-image: url(<wgui:var name="iconPath"/>key24x24.png);"><a href="#" onclick="cb('baseLayout.changePassword');"><wgui:text id="blAppMenuSysChangePW"/></a></li>
+				</ul>
+			</div>
+	</div>
+</div>
+
+<div id="mainContent">
+</div>
+</wgui:block name="main">
+

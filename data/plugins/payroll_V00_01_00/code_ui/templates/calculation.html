@@ -1,0 +1,271 @@
+<wgui:block name="calculationOverview">
+	<div id="tbCalcOvRow1" class="ui-widget-header ui-corner-all">
+		<button id="prlCalcOvBtnNew"><wgui:text id="prlCalcOvBtnNew"/></button>
+		<button id="prlCalcOvBtnSettings"><wgui:text id="prlCalcOvBtnSettings"/></button>
+		<wgui:text id="prlCalcOvYear"/> <select id="prlCalcOvYear"></select>
+		<wgui:text id="prlCalcOvPeriod"/> <select id="prlCalcOvMajorPeriod">
+				<optgroup label="<wgui:text id="prlCalcOvMajorPeriods"/>">
+					<option value="1">01 - <wgui:text id="prlCalcOvMonth01"/></option>
+					<option value="2">02 - <wgui:text id="prlCalcOvMonth02"/></option>
+					<option value="3">03 - <wgui:text id="prlCalcOvMonth03"/></option>
+					<option value="4">04 - <wgui:text id="prlCalcOvMonth04"/></option>
+					<option value="5">05 - <wgui:text id="prlCalcOvMonth05"/></option>
+					<option value="6">06 - <wgui:text id="prlCalcOvMonth06"/></option>
+					<option value="7">07 - <wgui:text id="prlCalcOvMonth07"/></option>
+					<option value="8">08 - <wgui:text id="prlCalcOvMonth08"/></option>
+					<option value="9">09 - <wgui:text id="prlCalcOvMonth09"/></option>
+					<option value="10">10 - <wgui:text id="prlCalcOvMonth10"/></option>
+					<option value="11">11 - <wgui:text id="prlCalcOvMonth11"/></option>
+					<option value="12">12 - <wgui:text id="prlCalcOvMonth12"/></option>
+					<option value="13">13</option>
+					<option value="14">14</option>
+				</optgroup>
+				<optgroup label="<wgui:text id="prlCalcOvBonuses"/>">
+					<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
+					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
+				</optgroup>
+			</select>
+		Status:
+	</div>
+	<div id="tbCalcOvRow2" class="ui-widget-header ui-corner-all">
+		<button id="prlCalcOvBtnEdit"><wgui:text id="prlCalcOvBtnEdit"/></button>
+		<button id="prlCalcOvBtnAddEmpl"><wgui:text id="prlCalcOvBtnAddEmpl"/></button>
+		<input type="checkbox" id="prlCalcOvBtnQFilter" /><label for="prlCalcOvBtnQFilter"><wgui:text id="prlCalcOvBtnQFilter"/></label>
+		<button id="prlCalcOvBtnEditCols"><wgui:text id="prlCalcOvBtnEditCols"/></button>
+		<button id="prlCalcOvBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+		<button id="prlCalcOvBtnProcess"><wgui:text id="prlCalcOvBtnProcess"/></button>
+		<button id="prlCalcOvBtnOutput"><wgui:text id="prlCalcOvBtnOutput"/></button>
+		<ul id="prlCalcOvProcessMenu">
+			<li><a href="#" fnc="1">Berechnen</a></li>
+			<li><a href="#" fnc="4">Fixieren/Auszahlen</a></li>
+			<li><a href="#" fnc="2">Verbuchen</a></li>
+			<li><a href="#" fnc="3">Periode abschliessen</a></li>
+		</ul>
+		<ul id="prlCalcOvOutputMenu">
+			<li><a href="#" fnc="2">Kontroll-Journal</a></li>
+			<li><a href="#" fnc="3">FIBU-Kontierungen</a></li>
+			<li><a href="#" fnc="4">BEBU-Kontierungen</a></li>
+			<li><a href="#" fnc="1">Lohnabrechnungen</a></li>
+			<li><a href="#" fnc="5">Lohnkonto</a></li>
+		</ul>
+	</div>
+	<div id="gridCalcOv" style="width:600px;height:500px;"></div>
+</wgui:block name="calculationOverview">
+<wgui:block name="calculationDataEditor">
+<div class="ui-tabs ui-widget-content ui-corner-all">
+	<div class="prlCalcDataDIV">
+		<label for="prlCalcDataTxtEmpl"><wgui:text id="prlCalcDataTxtEmpl"/></label><label for="prlCalcDataCmbEmpl"><wgui:text id="prlCalcDataCmbEmpl"/></label><label for="prlCalcDataCmbType"><wgui:text id="prlCalcDataCmbType"/></label><br/>
+		<input type="text" id="prlCalcDataTxtEmpl"/><input type="radio" name="prlCalcDataRad" value="prlCalcDataTxtEmpl" checked>
+		<select id="prlCalcDataCmbEmpl">
+		</select><input type="radio" name="prlCalcDataRad" value="prlCalcDataCmbEmpl">
+		<select id="prlCalcDataCmbType">
+			<option value="1"><wgui:text id="prlCalcDataCmbTypeOpt1"/></option>
+			<option value="3"><wgui:text id="prlCalcDataCmbTypeOpt3"/></option>
+			<option value="4"><wgui:text id="prlCalcDataCmbTypeOpt4"/></option>
+		</select><input type="radio" name="prlCalcDataRad" value="prlCalcDataCmbType"><br/>
+	</div>
+	<label for="prlCalcDataLoaNo"><wgui:text id="prlCalcDataLoaNo"/></label><input type="text" id="prlCalcDataLoaNo"/><input type="radio" name="prlCalcDataRad" value="prlCalcDataLoaNo"><label for="prlCalcDataLoaTxt"><wgui:text id="prlCalcDataLoaTxt"/></label><input type="text" id="prlCalcDataLoaTxt"/><input type="radio" name="prlCalcDataRad" value="prlCalcDataLoaTxt"><br/>
+	<label for="prlCalcDataQuantity"><wgui:text id="prlCalcDataQuantity"/></label><input type="text" id="prlCalcDataQuantity"/><label for="prlCalcDataRate"><wgui:text id="prlCalcDataRate"/></label><input type="text" id="prlCalcDataRate"/><label for="prlCalcDataAmount"><wgui:text id="prlCalcDataAmount"/></label><input type="text" id="prlCalcDataAmount"/><br/>
+	<label for="prlCalcDataFrom"><wgui:text id="prlCalcDataFrom"/></label><input type="text" id="prlCalcDataFrom"/><label for="prlCalcDataTo"><wgui:text id="prlCalcDataTo"/></label><input type="text" id="prlCalcDataTo"/><br/>
+	<label for="prlCalcDataCC"><wgui:text id="prlCalcDataCC"/></label><input type="text" id="prlCalcDataCC"/>
+	<button id="prlCalcDataBtnAdd" lblAdd="<wgui:text id="btnAdd"/>" lblEdit="<wgui:text id="btnSaveAssign"/>"><wgui:text id="btnAdd"/></button><button id="prlCalcDataBtnClr" lblAdd="<wgui:text id="prlCalcDataBtnClrAdd"/>" lblEdit="<wgui:text id="btnCancel"/>"><wgui:text id="prlCalcDataBtnClrAdd"/></button><br/>
+		<div id="prlCalcDataGrid" style="width:830px;height:250px;"></div>
+	<ul id="prlCalcDataTblMenu" rid="0">
+		<li><a href="#" act="1"><wgui:text id="btnChange"/></a></li>
+		<li><a href="#" act="2"><wgui:text id="btnDelete"/></a></li>
+	</ul>
+</div>
+<button id="prlCalcDataBtnSave"><wgui:text id="btnSave"/></button><button id="prlCalcDataBtnCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="calculationDataEditor">
+<wgui:block name="processPayment">
+<div class="ui-tabs ui-widget-content ui-corner-all">
+	<label for="prlPayout_payment_date"><wgui:text id="prlPayout_payment_date"/></label><input type="text" id="prlPayout_payment_date"/><br/>
+	<label for="prlPayout_interest_date"><wgui:text id="prlPayout_interest_date"/></label><input type="text" id="prlPayout_interest_date"/><br/>
+	<label for="prlPayout_filter_mode"><wgui:text id="prlPayout_filter_mode"/></label><select id="prlPayout_filter_mode"><option value="0"><wgui:text id="prlPayout_filter_mode_ALL"/></option><option value="1"><wgui:text id="prlPayout_filter_mode_COMPANY"/></option><option value="2"><wgui:text id="prlPayout_filter_mode_SELECT"/></option></select><br/>
+	<label for="prlPayout_payroll_company_ID"><wgui:text id="prlPayout_payroll_company_ID"/></label><select id="prlPayout_payroll_company_ID">
+		<wgui:loop name="companyLoop" varname="companyList">
+			<option value="<wgui:loopvar loopname="companyLoop" varname="id"/>"><wgui:loopvar loopname="companyLoop" varname="company_shortname"/></option>
+		</wgui:loop name="companyLoop">
+	</select><br/>
+</div>
+<button id="prlPayoutBtnSave"><wgui:text id="prlPayoutBtnSave"/></button>
+<button id="prlPayoutBtnCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="processPayment">
+<wgui:block name="enterAccountingData">
+<div class="ui-tabs ui-widget-content ui-corner-all">
+	<label for="prlAccEtr_filter_mode"><wgui:text id="prlAccEtr_filter_mode"/></label><select id="prlAccEtr_filter_mode"><option value="0"><wgui:text id="prlAccEtr_filter_mode_ALL"/></option><option value="1"><wgui:text id="prlAccEtr_filter_mode_COMPANY"/></option><option value="2"><wgui:text id="prlAccEtr_filter_mode_SELECTION"/></option></select><br/>
+	<label for="prlAccEtr_payroll_company_ID"><wgui:text id="prlAccEtr_payroll_company_ID"/></label><select id="prlAccEtr_payroll_company_ID">
+		<wgui:loop name="companyLoop" varname="companyList">
+			<option value="<wgui:loopvar loopname="companyLoop" varname="id"/>"><wgui:loopvar loopname="companyLoop" varname="company_shortname"/></option>
+		</wgui:loop name="companyLoop">
+	</select><br/>
+
+	<fieldset>
+	<legend><input type="checkbox" id="prlAccEtr_fin_acc_process" xx="1"/> <label for="prlAccEtr_fin_acc_process" xx="1"><wgui:text id="prlAccEtr_fin_acc_process"/></label></legend>
+	<label for="prlAccEtr_fin_acc_date"><wgui:text id="prlAccEtr_fin_acc_date"/></label><input type="text" id="prlAccEtr_fin_acc_date"/><br/>
+	</fieldset>
+
+	<fieldset>
+	<legend><input type="checkbox" id="prlAccEtr_mgmt_acc_process" xx="1"/> <label for="prlAccEtr_mgmt_acc_process" xx="1"><wgui:text id="prlAccEtr_mgmt_acc_process"/></label></legend>
+	<label for="prlAccEtr_mgmt_acc_quantity"><wgui:text id="prlAccEtr_mgmt_acc_quantity"/></label><input type="checkbox" id="prlAccEtr_mgmt_acc_quantity"/><br/>
+	<label for="prlAccEtr_mgmt_acc_round"><wgui:text id="prlAccEtr_mgmt_acc_round"/></label><input type="checkbox" id="prlAccEtr_mgmt_acc_round"/><br/>
+	<label for="prlAccEtr_mgmt_acc_date"><wgui:text id="prlAccEtr_mgmt_acc_date"/></label><input type="text" id="prlAccEtr_mgmt_acc_date"/><br/>
+	</fieldset>
+</div>
+<button id="prlAccEtrBtnSave"><wgui:text id="btnSave"/></button>
+<button id="prlAccEtrBtnCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="enterAccountingData">
+<wgui:block name="calculationFinalizeWarning">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<br/>
+		Beim Abschliessen der Periode sind Warnungen aufgetreten:<br/>
+		<select id="prlCalcFinWarnList" size="4">
+		<wgui:loop name="warningLoop" varname="warningList">
+			<option><wgui:loopvar loopname="warningLoop" varname="msg"/></option>
+		</wgui:loop name="warningLoop">
+		</select>
+	</div>
+	<button id="prlCalcFinProceed">Fortfahren</button><button id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="calculationFinalizeWarning">
+<wgui:block name="calculationFinalize">
+	<div style="height:100px;" class="ui-tabs ui-widget-content ui-corner-all">
+		<ul class="prlCalcFinNPrd">
+			<li>
+				<ul>
+					<li></li>
+					<li><wgui:text id="prlCalcFinLblPrlYear"/></li>
+					<li><wgui:text id="prlCalcFinLblMajorPeriod"/></li>
+				</ul>
+			</li>
+			<li>
+				<ul>
+					<li><wgui:text id="prlCalcFinLblPrevPeriod"/></li>
+					<li><wgui:var name="currentYear"/></li>
+					<li><wgui:var name="currentMajorPeriod"/></li>
+				</ul>
+			</li>
+			<li>
+				<ul>
+					<li></li>
+					<li>↦</li>
+					<li>↦</li>
+				</ul>
+			</li>
+			<li>
+				<ul>
+					<li><wgui:text id="prlCalcFinLblNewPeriod"/></li>
+					<li><select id="prlCalcFin_payroll_year_ID"></select></li>
+					<li><select id="prlCalcFin_major_period"></select></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<br/>
+	<div id="prlCalcFinTabs">
+		<ul>
+		<li><a href="#prlCalcFinTbDate"><wgui:text id="prlCalcFinTbDate"/></a></li>
+		<li><a href="#prlCalcFinTbFwd"><wgui:text id="prlCalcFinTbFwd"/></a></li>
+		</ul>
+		<div id="prlCalcFinTbDate">
+			<ul class="prlCalcFinDate">
+				<li>
+					<ul>
+						<li></li>
+						<li><wgui:text id="prlCalcFinLblHourlyWage"/></li>
+						<li><wgui:text id="prlCalcFinLblWage"/></li>
+						<li><wgui:text id="prlCalcFinLblSalary"/></li>
+					</ul>
+				</li>
+				<li>
+					<ul>
+						<li><wgui:text id="prlCalcFinLblDateFrom"/></li>
+						<li><input type="text" id="prlCalcFin_HourlyWage_DateFrom"/></li>
+						<li><input type="text" id="prlCalcFin_Wage_DateFrom"/></li>
+						<li><input type="text" id="prlCalcFin_Salary_DateFrom"/></li>
+					</ul>
+				</li>
+				<li>
+					<ul>
+						<li><wgui:text id="prlCalcFinLblDateTo"/></li>
+						<li><input type="text" id="prlCalcFin_HourlyWage_DateTo"/></li>
+						<li><input type="text" id="prlCalcFin_Wage_DateTo"/></li>
+						<li><input type="text" id="prlCalcFin_Salary_DateTo"/></li>
+					</ul>
+				</li>
+			</ul>
+			<br/>
+			<input type="checkbox" id="prlCalcFin_equalDates"><label for="prlCalcFin_equalDates"><wgui:text id="prlCalcFinEqualDates"/></label>
+		</div>
+		<div id="prlCalcFinTbFwd">
+			<label for="prlCalcFin_FwdEmpl"><wgui:text id="prlCalcFinLblFwdEmpl"/></label><input type="checkbox" id="prlCalcFin_FwdEmpl"><br/>
+			<label for="prlCalcFin_FwdData"><wgui:text id="prlCalcFinLblFwdData"/></label><input type="checkbox" id="prlCalcFin_FwdData">
+		</div>
+	</div>
+
+	<div id="prlCalcFinErr"></div>
+	<button id="prlCalcFinSave"><wgui:text id="prlCalcFinSave"/></button><button id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="calculationFinalize">
+<wgui:block name="prlCalcOvSettings">
+	<div id="prlPrdSetTabs">
+		<ul>
+		<li><a href="#prlPrdSetTbSettings"><wgui:text id="prlCalcOvSetTbSettings"/></a></li>
+		<li><a href="#prlPrdSetTbMsg"><wgui:text id="prlCalcOvSetTbMsg"/></a></li>
+		</ul>
+		<div id="prlPrdSetTbSettings">
+			<fieldset>
+				<legend><wgui:text id="prlCalcOvSetDates"/></legend>
+				<ul class="prlPrdSetDate">
+					<li>
+						<ul>
+							<li></li>
+							<li><wgui:text id="prlCalcOvSetTitHourlyWage"/></li>
+							<li><wgui:text id="prlCalcOvSetTitWage"/></li>
+							<li><wgui:text id="prlCalcOvSetTitSalary"/></li>
+						</ul>
+					</li>
+					<li>
+						<ul>
+							<li><wgui:text id="prlCalcOvSetFrom"/></li>
+							<li><input type="text" id="prlPrdSet_HourlyWage_DateFrom" tabindex="1" value="<wgui:var name="HourlyWage_DateFrom"/>"/></li>
+							<li><input type="text" id="prlPrdSet_Wage_DateFrom" tabindex="3" value="<wgui:var name="Wage_DateFrom"/>"/></li>
+							<li><input type="text" id="prlPrdSet_Salary_DateFrom" tabindex="5" value="<wgui:var name="Salary_DateFrom"/>"/></li>
+						</ul>
+					</li>
+					<li>
+						<ul>
+							<li><wgui:text id="prlCalcOvSetTo"/></li>
+							<li><input type="text" id="prlPrdSet_HourlyWage_DateTo" tabindex="2" value="<wgui:var name="HourlyWage_DateTo"/>"/></li>
+							<li><input type="text" id="prlPrdSet_Wage_DateTo" tabindex="4" value="<wgui:var name="Wage_DateTo"/>"/></li>
+							<li><input type="text" id="prlPrdSet_Salary_DateTo" tabindex="6" value="<wgui:var name="Salary_DateTo"/>"/></li>
+						</ul>
+					</li>
+				</ul>
+			</fieldset>
+			<br/>
+			<fieldset>
+				<legend><wgui:text id="prlCalcOvSetWorktime"/></legend>
+				<div>
+					<wgui:loop name="attimeLoop" varname="attimeList">
+						<label for="prlPrdSet_TmCd<wgui:loopvar loopname="attimeLoop" varname="attended_time_code"/>"><wgui:loopvar loopname="attimeLoop" varname="label"/></label><input type="text" id="prlPrdSet_TmCd<wgui:loopvar loopname="attimeLoop" varname="attended_time_code"/>" tabindex="<wgui:loopvar loopname="attimeLoop" varname="tabindex"/>" value="<wgui:loopvar loopname="attimeLoop" varname="attended_time"/>"/> <wgui:text id="prlCalcOvSetHours"/><br/>
+					</wgui:loop name="attimeLoop">
+				</div>
+			</fieldset>
+		</div>
+		<div id="prlPrdSetTbMsg">
+			<label for="prlPrdSet_msg_comp"><wgui:text id="prlCalcOvSetMsgFor"/></label><label for="prlPrdSet_msg_language"><wgui:text id="prlCalcOvSetMsgLanguage"/></label><br/>
+			<select id="prlPrdSet_msg_comp"><option value="0"><wgui:text id="prlCalcOvSetAllEmpl"/></option>
+				<wgui:loop name="companyLoop" varname="companyList">
+					<option value="<wgui:loopvar loopname="companyLoop" varname="id"/>"><wgui:loopvar loopname="companyLoop" varname="company_shortname"/></option>
+				</wgui:loop name="companyLoop">
+			</select><select id="prlPrdSet_msg_language">
+				<wgui:loop name="languageLoop" varname="languageList">
+					<option value="<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="languageLoop" varname="LanguageName"/></option>
+				</wgui:loop name="languageLoop">
+			</select>
+
+			<label for="prlPrdSet_msg_txt"><wgui:text id="prlCalcOvSetMsg"/></label><br/>
+			<textarea id="prlPrdSet_msg_txt"></textarea>
+		</div>
+	</div>
+	<button id="prlPrdSetSave"><wgui:text id="btnSave"/></button><button id="prlPrdSetCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="prlCalcOvSettings">

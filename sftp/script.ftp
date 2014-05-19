@@ -1,0 +1,31 @@
+open webdev@srv2.copronet.ch
+
+cd  data/plugins/payroll_V00_01_00/code_ui/cache/
+lcd data/plugins/payroll_V00_01_00/code_ui/cache/
+del *.p*
+
+cd ..
+lcd ..
+mput *.php 
+
+
+cd css
+lcd css
+mput *.* 
+
+cd ../js
+lcd ../js
+mput *.* 
+
+
+cd ../templates
+lcd ../templates
+mput *.* 
+
+
+cd ../../../code_logic
+lcd ../../../code_logic
+mput p*.php 
+ 
+______________________________________________________Ende_des_Transfers__________________________________
+bye

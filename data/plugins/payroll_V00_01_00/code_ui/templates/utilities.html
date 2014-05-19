@@ -1,0 +1,69 @@
+<wgui:block name="EmployeeSelector">
+	<div id="prlPsSelTB" class="ui-widget-header ui-corner-all">
+		<wgui:text id="prlPsSelLblFilter"/> <select id="prlPsSelDBFilter">
+		<wgui:loop name="filterLoop" varname="dbFilterList">
+			<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="FilterName"/></option>
+		</wgui:loop name="filterLoop">
+		</select>
+		<wgui:text id="prlPsSelLblQFilter"/> <input type="text" id="prlPsSelQFilter" />
+	</div>
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div class="prlPsSelLeft">
+			<select size="10" id="prlPsSelLst" multiple></select>
+		</div>
+		<div class="prlPsSelRight">
+			<button><wgui:text id="prlPsSelBtnSelectAll"/></button>
+			<button><wgui:text id="prlPsSelBtnDeselectAll"/></button>
+			<button><wgui:text id="prlPsSelBtnInvertSelection"/></button>
+		</div>
+		<div id="prlPsSelErr"></div>
+	</div>
+	<button id="prlPsSelSave"><wgui:text id="btnOK"/></button><button id="prlPsSelCancel"><wgui:text id="btnCancel"/></button>
+</wgui:block name="EmployeeSelector">
+<wgui:block name="EmployeeFilterOverview">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<button id="prlUtlEfcBtnNew" style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlUtlEfcBtnNew"/></button><br/>
+		<fieldset>
+		<legend><wgui:text id="prlUtlEfcLgndExistingFilter"/></legend>
+		<label for="prlUtlEfc_id" style="display:inline-block;width:100px;"><wgui:text id="prlUtlEfcLblFilter"/></label><select id="prlUtlEfc_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlUtlEfcOptChooseFilter"/></option>
+		<wgui:loop name="empfltLoop" varname="employeeFilter_list">
+			<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>"><wgui:loopvar loopname="empfltLoop" varname="FilterName"/></option>
+		</wgui:loop name="empfltLoop">
+		</select><br/>
+		<button id="prlUtlEfcBtnEdit" style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button id="btnDelete"><wgui:text id="prlUtlEfcBtnDelete"/></button>
+		</fieldset>
+	</div>
+	<button id="prlUtlEfcBtnCancel" style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+</wgui:block name="EmployeeFilterOverview">
+<wgui:block name="EmployeeFilterEditor">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlUtlEfcMain">
+		<label for="prlUtlEfc_FilterName"><wgui:text id="prlUtlEfcFilterName"/></label><input type="text" id="prlUtlEfc_FilterName"/>
+		<fieldset>
+			<legend><wgui:text id="prlUtlEfcFldset"/></legend>
+			<input type="checkbox" id="prlUtlEfc_ValidForEmplOverview"/><label for="prlUtlEfc_ValidForEmplOverview"><wgui:text id="prlUtlEfcValidForEmplOverview"/></label> <input type="checkbox" id="prlUtlEfc_ValidForCalculation"/><label for="prlUtlEfc_ValidForCalculation"><wgui:text id="prlUtlEfcValidForCalculation"/></label> <input type="checkbox" id="prlUtlEfc_GlobalFilter"/><label for="prlUtlEfc_GlobalFilter"><wgui:text id="prlUtlEfcGlobalFilter"/></label> <input type="checkbox" id="prlUtlEfc_TemporaryFilter"/><label for="prlUtlEfc_TemporaryFilter"><wgui:text id="prlUtlEfcTemporaryFilter"/></label>
+		</fieldset>
+		<fieldset class="prlUtlEfcLst">
+			<legend><wgui:text id="prlUtlEfcLstFldset"/></legend>
+			<div class="prlUtlEfcLstD">
+				<ul></ul>
+			</div>
+		</fieldset>
+		<fieldset class="prlUtlEfcEdt">
+			<legend><wgui:text id="prlUtlEfcEdtFldset"/></legend>
+			<label for="prlUtlEfcEdtCriteriaType"><wgui:text id="prlUtlEfcEdtCriteriaType"/></label><select id="prlUtlEfcEdtCriteriaType"/><option value="1"><wgui:text id="prlUtlEfcEdtCriteriaTypeCond"/></option><option value="2"><wgui:text id="prlUtlEfcEdtCriteriaTypeComp"/></option><option value="3">(</option><option value="4">)</option></select><br/>
+			<label for="prlUtlEfcEdtFieldName"><wgui:text id="prlUtlEfcEdtFieldName"/></label><select id="prlUtlEfcEdtFieldName"></select><br/>
+			<label for="prlUtlEfcEdtFieldModifier"><wgui:text id="prlUtlEfcEdtFieldModifier"/></label><select id="prlUtlEfcEdtFieldModifier"/><option value="0">---</option><option value="1"><wgui:text id="prlUtlEfcEdtFieldModifierDAY"/></option><option value="2"><wgui:text id="prlUtlEfcEdtFieldModifierMONTH"/></option><option value="3"><wgui:text id="prlUtlEfcEdtFieldModifierYEAR"/></option></select><br/>
+			<label for="prlUtlEfcEdtConjunction"><wgui:text id="prlUtlEfcEdtConjunction"/></label><select id="prlUtlEfcEdtConjunction"/><option value="1"><wgui:text id="prlUtlEfcEdtConjunctionAND"/></option><option value="2"><wgui:text id="prlUtlEfcEdtConjunctionOR"/></option></select><br/>
+			<label for="prlUtlEfcEdtComparison"><wgui:text id="prlUtlEfcEdtComparison"/></label><select id="prlUtlEfcEdtComparison"/><option value="1">=</option><option value="2">&lt;=</option><option value="3">&gt;=</option><option value="4">&lt;&gt;</option><option value="5">&gt;</option><option value="6">&lt;</option><option value="7"><wgui:text id="prlUtlEfcEdtComparisonList"/></option></select><br/>
+			<label for="prlUtlEfcEdtComparativeValues"><wgui:text id="prlUtlEfcEdtComparativeValues"/></label><input type="text" id="prlUtlEfcEdtComparativeValues"/><br/>
+			<label for="prlUtlEfcEdtCheckbox"><wgui:text id="prlUtlEfcEdtCheckbox"/></label><input type="checkbox" id="prlUtlEfcEdtCheckbox"/><br/>
+			<label for="prlUtlEfcEdtSelect"><wgui:text id="prlUtlEfcEdtSelect"/></label><select id="prlUtlEfcEdtSelect"/></select><br/>
+			<label for="prlUtlEfcEdtDateFrom">Datum von:</label><input type="text" id="prlUtlEfcEdtDateFrom"/><br/>
+			<label for="prlUtlEfcEdtDateTo">Datum bis:</label><input type="text" id="prlUtlEfcEdtDateTo"/><br/>
+			<button id="prlUtlEfcEdtBtnSet"><wgui:text id="prlUtlEfcEdtBtnSet"/></button><button id="prlUtlEfcEdtBtnCancel"><wgui:text id="btnCancel"/></button>
+		</fieldset>
+		<div id="prlUtlEfcErr"></div>
+	</div>
+	<button id="prlUtlEfcSave"><wgui:text id="btnSave"/></button><button id="prlUtlEfcCancel"><wgui:text id="btnCancel"/></button><button id="prlUtlEfcNew"><wgui:text id="btnPlusAdd"/></button>
+</wgui:block name="EmployeeFilterEditor">
+

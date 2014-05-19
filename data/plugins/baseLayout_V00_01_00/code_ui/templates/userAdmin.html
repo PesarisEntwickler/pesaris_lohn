@@ -1,0 +1,190 @@
+<wgui:block name="main">
+<div id="useradmTabs">
+    <ul>
+        <li><a href="#useradmFragmentUsers"><span><wgui:text id="blUserAdmLblTabUsers"/></span></a></li>
+        <li><a href="#useradmFragmentGroups"><span><wgui:text id="blUserAdmLblTabGroups"/></span></a></li>
+    </ul>
+    <div id="useradmFragmentUsers">
+	<table id="useradmTableUsers">
+	<thead>
+	<tr>
+	    <th></th>
+	    <th><wgui:text id="blUserAdmUserUID"/></th>
+	    <th><wgui:text id="blUserAdmUserName"/></th>
+	    <th><wgui:text id="blUserAdmUserMail"/></th>
+	    <th><wgui:text id="blUserAdmUserLanguage"/></th>
+	    <th></th>
+	    <th></th>
+	</tr>
+	</thead>
+	<tbody>
+	</tbody>
+	</table>
+    </div>
+    <div id="useradmFragmentGroups">
+	<table id="useradmTableGroups">
+	<thead>
+	<tr>
+	    <th><wgui:text id="blUserAdmGrpName"/></th>
+	    <th><wgui:text id="blUserAdmGrpDescription"/></th>
+	    <th><wgui:text id="blUserAdmGrpStatus"/></th>
+	    <th></th>
+	    <th></th>
+	</tr>
+	</thead>
+	<tbody>
+	</tbody>
+	</table>
+    </div>
+</div>
+</wgui:block name="main">
+<wgui:block name="userEditor">
+<div id="userEditorTabs">
+	<form id="userEditForm" action="javascript:void(0);" class="userEditForm">
+	<ul>
+	<li><a href="#UserEditorFragUser"><span><wgui:text id="blUserEditorTabUser"/></span></a></li>
+	<li><a href="#UserEditorFragGroups"><span><wgui:text id="blUserEditorTabGroups"/></span></a></li>
+	<li><a href="#UserEditorFragExt"><span><wgui:text id="blUserEditorTabExtended"/></span></a></li>
+	</ul>
+	<div id="UserEditorFragUser">
+		<input type="hidden" id="rec_id" name="rec_id" value="<wgui:var name="id"/>"><input type="hidden" id="ueListChange" name="ueListChange" value="0"><br/>
+		<div>
+		<label for="uid"><wgui:text id="blUserEditorUid"/></label>
+			<input type="text" id="uid" name="uid" value="<wgui:var name="uid"/>" onchange="document.getElementById('ueListChange').value='1';"><br/>
+		</div>
+		<div>
+		<label for="full_name"><wgui:text id="blUserEditorFull_name"/></label>
+			<input type="text" id="full_name" name="full_name" value="<wgui:var name="full_name"/>" onchange="document.getElementById('ueListChange').value='1';"><br/>
+		</div>
+		<div>
+		<label for="email"><wgui:text id="blUserEditorEmail"/></label>
+			<input type="text" id="email" name="email" value="<wgui:var name="email"/>" onchange="document.getElementById('ueListChange').value='1';"><br/>
+		</div>
+		<div>
+		<label for="language"><wgui:text id="blUserEditorLanguage"/></label>
+			<select id="language" name="language" onchange="document.getElementById('ueListChange').value='1';"><option value="de"<wgui:var name="language_de"/>><wgui:text id="blUserEditorLanguage_de"/></option></select><br/>
+		</div>
+		<div>
+		<label for="inactive"><wgui:text id="blUserEditorInactive"/></label>
+			<input type="checkbox" id="inactive" name="inactive" value="1"<wgui:var name="inactive"/>><br/>
+		</div>
+		<div>
+		<label for="timeout_minutes"><wgui:text id="blUserEditorTimeout_minutes"/></label>
+			<input type="text" id="timeout_minutes" name="timeout_minutes" value="<wgui:var name="timeout_minutes"/>"> Minuten<br/>
+		</div>
+		<div>
+		<label for="force_pwd_change"><wgui:text id="blUserEditorForce_pwd_change"/></label>
+			<input type="checkbox" id="force_pwd_change" name="force_pwd_change" value="1"<wgui:var name="force_pwd_change"/>><br/>
+		</div>
+		<div>
+		<label for="pwd_change_period"><wgui:text id="blUserEditorPwd_change_period"/></label>
+			<select id="pwd_change_period" name="pwd_change_period"><option value="0"<wgui:var name="pwd_change_period_0"/>><wgui:text id="blUserEditorPwd_change_period_0"/></option><option value="1"<wgui:var name="pwd_change_period_1"/>><wgui:text id="blUserEditorPwd_change_period_1"/></option><option value="2"<wgui:var name="pwd_change_period_2"/>><wgui:text id="blUserEditorPwd_change_period_2"/></option><option value="4"<wgui:var name="pwd_change_period_4"/>><wgui:text id="blUserEditorPwd_change_period_4"/></option><option value="6"<wgui:var name="pwd_change_period_6"/>><wgui:text id="blUserEditorPwd_change_period_6"/></option><option value="8"<wgui:var name="pwd_change_period_8"/>><wgui:text id="blUserEditorPwd_change_period_8"/></option><option value="12"<wgui:var name="pwd_change_period_12"/>><wgui:text id="blUserEditorPwd_change_period_12"/></option></select><br/>
+		</div>
+		<div>
+		<label for="disallow_pwd_change"><wgui:text id="blUserEditorDisallow_pwd_change"/></label>
+			<input type="checkbox" id="disallow_pwd_change" name="disallow_pwd_change" value="1"<wgui:var name="disallow_pwd_change"/>><br/>
+		</div>
+	</div>
+	<div id="UserEditorFragGroups">
+		<div id="ueAvailableGroups"><wgui:text id="blUserEditorGrpAvailable"/></div><div id="ueSelectedGroups"><wgui:text id="blUserEditorGrpSelected"/></div>
+		<select class="csUserEditorGroups" id="ueGrpSelect" name="ueGrpSelect" multiple="multiple">
+			<wgui:loop name="UserEditorGroups" varname="group_list">
+				<option value="<wgui:loopvar loopname="UserEditorGroups" varname="core_group_ID"/>"<wgui:switch name="status" varname="UserEditorGroups|selected"><wgui:case switchname="statuscol" condition="1"> selected</wgui:case switchname="statuscol"></wgui:switch name="status">><wgui:loopvar loopname="UserEditorGroups" varname="group_name"/></option>
+			</wgui:loop name="UserEditorGroups">
+		</select>
+
+	</div>
+	<div id="UserEditorFragExt">
+		<fieldset id="fieldsTimeRestriction">
+			<legend><input type="checkbox" id="timeRestriction" name="timeRestriction" value="1" onClick="toggleTimeRestrictionFields();"<wgui:var name="timeRestriction"/>> <wgui:text id="blUserEditorTimeRestriction"/></legend>
+
+			<div>
+			<label for="bMon"><wgui:text id="blUserEditorBMon"/></label><br/>
+			<input type="checkbox" id="bMon" name="bMon" value="1"<wgui:var name="bMon"/>>
+			</div>
+
+			<div>
+			<label for="bTue"><wgui:text id="blUserEditorBTue"/></label><br/>
+			<input type="checkbox" id="bTue" name="bTue" value="1"<wgui:var name="bTue"/>>
+			</div>
+
+			<div>
+			<label for="bWed"><wgui:text id="blUserEditorBWed"/></label><br/>
+			<input type="checkbox" id="bWed" name="bWed" value="1"<wgui:var name="bWed"/>>
+			</div>
+
+			<div>
+			<label for="bThu"><wgui:text id="blUserEditorBThu"/></label><br/>
+			<input type="checkbox" id="bThu" name="bThu" value="1"<wgui:var name="bThu"/>>
+			</div>
+
+			<div>
+			<label for="bFri"><wgui:text id="blUserEditorBFri"/></label><br/>
+			<input type="checkbox" id="bFri" name="bFri" value="1"<wgui:var name="bFri"/>>
+			</div>
+
+			<div>
+			<label for="bSat"><wgui:text id="blUserEditorBSat"/></label><br/>
+			<input type="checkbox" id="bSat" name="bSat" value="1"<wgui:var name="bSat"/>>
+			</div>
+
+			<div>
+			<label for="bSun"><wgui:text id="blUserEditorBSun"/></label><br/>
+			<input type="checkbox" id="bSun" name="bSun" value="1"<wgui:var name="bSun"/>>
+			</div>
+
+			<p><wgui:text id="blUserEditorTimeFrom"/> <input type="text" id="timeFrom" name="timeFrom" value="<wgui:var name="timeFrom"/>"> <wgui:text id="blUserEditorTimeUntil"/> <input type="text" id="timeUntil" name="timeUntil" value="<wgui:var name="timeUntil"/>"></p>
+		</fieldset>
+
+		<fieldset id="fieldsIpRestriction">
+			<legend><input type="checkbox" id="ipRestriction" name="ipRestriction" value="1" onClick="toggleIpRestrictionFields();"<wgui:var name="ipRestriction"/>> <wgui:text id="blUserEditorIpRestriction"/></legend>
+			<label for="ipInclude1"><wgui:text id="blUserEditorIpField1"/></label> <input type="text" id="ipInclude1" name="ipInclude1" value="<wgui:var name="ipInclude1"/>"> <label for="subnetInclude1"><wgui:text id="blUserEditorSubnetMask"/></label> <input type="text" id="subnetInclude1" name="subnetInclude1" value="<wgui:var name="subnetInclude1"/>"><br/>
+			<label for="ipInclude2"><wgui:text id="blUserEditorIpField2"/></label> <input type="text" id="ipInclude2" name="ipInclude2" value="<wgui:var name="ipInclude2"/>"> <label for="subnetInclude2"><wgui:text id="blUserEditorSubnetMask"/></label> <input type="text" id="subnetInclude2" name="subnetInclude2" value="<wgui:var name="subnetInclude2"/>"><br/>
+			<label for="ipInclude3"><wgui:text id="blUserEditorIpField3"/></label> <input type="text" id="ipInclude3" name="ipInclude3" value="<wgui:var name="ipInclude3"/>"> <label for="subnetInclude3"><wgui:text id="blUserEditorSubnetMask"/></label> <input type="text" id="subnetInclude3" name="subnetInclude3" value="<wgui:var name="subnetInclude3"/>"><br/>
+			<label for="ipInclude4"><wgui:text id="blUserEditorIpField4"/></label> <input type="text" id="ipInclude4" name="ipInclude4" value="<wgui:var name="ipInclude4"/>"> <label for="subnetInclude4"><wgui:text id="blUserEditorSubnetMask"/></label> <input type="text" id="subnetInclude4" name="subnetInclude4" value="<wgui:var name="subnetInclude4"/>"><br/>
+			<label for="ipInclude5"><wgui:text id="blUserEditorIpField5"/></label> <input type="text" id="ipInclude5" name="ipInclude5" value="<wgui:var name="ipInclude5"/>"> <label for="subnetInclude5"><wgui:text id="blUserEditorSubnetMask"/></label> <input type="text" id="subnetInclude5" name="subnetInclude5" value="<wgui:var name="subnetInclude5"/>"><br/>
+		</fieldset>
+	</div>
+	<div id="baseLayoutUaErr"></div>
+	<button id="btnUserDataSubmit" onclick="cb('baseLayout.saveUserEditorData',xajax.getFormValues('userEditForm',1));"><wgui:text id="blUserEditorOK"/></button><button id="btnUserDataCancel" onclick="$('#modalContainer').mb_close();"><wgui:text id="blUserEditorCancel"/></button>
+	</form>
+</div>
+</wgui:block name="userEditor">
+<wgui:block name="groupEditor">
+<div id="groupEditorTabs">
+	<form id="groupEditForm" action="javascript:void(0);" class="groupEditForm">
+	<ul>
+	<li><a href="#GroupEditorFragGroup"><span><wgui:text id="blGroupEditorTabGroup"/></span></a></li>
+	<li><a href="#GroupEditorFragPermissions"><span><wgui:text id="blGroupEditorTabPermissions"/></span></a></li>
+	</ul>
+	<div id="GroupEditorFragGroup">
+		<input type="hidden" id="rec_id" name="rec_id" value="<wgui:var name="id"/>"><input type="hidden" id="geListChange" name="geListChange" value="0"><br/>
+		<div>
+		<label for="name"><wgui:text id="blGroupEditorName"/></label>
+			<input type="text" id="name" name="name" value="<wgui:var name="name"/>" onchange="document.getElementById('geListChange').value='1';"><br/>
+		</div>
+		<div>
+		<label for="description"><wgui:text id="blGroupEditorDescription"/></label>
+			<input type="text" id="description" name="description" value="<wgui:var name="description"/>" onchange="document.getElementById('geListChange').value='1';"><br/>
+		</div>
+		<div>
+		<label for="inactive"><wgui:text id="blGroupEditorInactive"/></label>
+			<input type="checkbox" id="inactive" name="inactive" value="1"<wgui:var name="inactive"/> onchange="document.getElementById('geListChange').value='1';"><br/>
+		</div>
+	</div>
+	<div id="GroupEditorFragPermissions">
+		<div id="geAvailableModules">
+			<wgui:text id="blGroupEditorModulesAvailable"/>
+			<select class="csGroupEditorModules" id="geGrpSelect" name="geGrpSelect">
+				<wgui:var name="moduleList"/>
+			</select>
+		</div>
+		<div id="gePermissionContainer">
+		</div>
+	</div>
+	<div id="baseLayoutUaErr"></div>
+	<button id="btnGroupDataSubmit" onclick="cb('baseLayout.saveGroupEditorData',xajax.getFormValues('groupEditForm',1));"><wgui:text id="blGroupEditorOK"/></button><button id="btnGroupDataCancel" onclick="$('#modalContainer').mb_close();"><wgui:text id="blGroupEditorCancel"/></button>
+	</form>
+</div>
+</wgui:block name="groupEditor">
+
