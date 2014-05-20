@@ -539,6 +539,9 @@ class employee {
 		}
 		$id = $param["rid"];
 
+		require_once('chkDate.php');
+		$chkDate = new chkDate();
+		
 		$returnFieldValuePairs = array();
 		switch($param["fieldName"]) {
 		case 'Sex':
@@ -546,7 +549,8 @@ class employee {
 			$gender = $param["value"]=="F" ? "F" : "M";
 			if(isset($param["DateOfBirth"]) && !($param["DateOfBirth"]=="0" && $id==0)) { //if the DateOfBirth was submitted, we need to check it or query the database
 				if(strlen($param["DateOfBirth"])>5) {
-					if(!$this->chkDate($param["DateOfBirth"], 3, $retDate)) {
+					
+					if(!$chkDate->chkDate($param["DateOfBirth"], 3, $retDate)) {
 						$response["success"] = false;
 						$response["errCode"] = 40;
 						$response["errText"] = "invalid date value";
@@ -573,7 +577,7 @@ class employee {
 			}
 			break;
 		case 'DateOfBirth':
-			if($this->chkDate($param["value"], 3, $retDate)) {
+			if($chkDate->chkDate($param["value"], 3, $retDate)) {
 				$years = date("Y") - $retDate["year"] - 1;
 				if($years<12) {
 					$response["success"] = false;
@@ -612,7 +616,7 @@ class employee {
 			}
 			break;
 		case 'SeniorityJoining':
-			if($this->chkDate($param["value"], 3, $retDate)) {
+			if($chkDate->chkDate($param["value"], 3, $retDate)) {
 				$years = date("Y") - $retDate["year"];
 				$months = date("m") - $retDate["month"];
 				if($months < 0) { $months += 12; $years--; }
@@ -778,7 +782,7 @@ class employee {
 					}
 					break;
 				case 5: //Date
-					if($this->chkDate($curRawValue, 1, $retDate)) {
+					if($chkDate->chkDate($curRawValue, 1, $retDate)) {
 						$fieldset[$fieldName]["value"] = "'".$retDate."'";
 					}else $arrFieldName[] = $fieldName;
 					break;
@@ -894,7 +898,7 @@ spezielle felder und sonderfälle:
 						if(trim($curRawValue)=="") {
 							$currentRow[$dbFieldName] = "'0000-00-00'";
 						}else{
-							if($this->chkDate($curRawValue, 1, $retDate)) {
+							if($chkDate->chkDate($curRawValue, 1, $retDate)) {
 								$currentRow[$dbFieldName] = "'".$retDate."'";
 							}else $arrValidityErr[] = array($tableName, $tableRow["id"]);
 						}
@@ -1277,7 +1281,7 @@ error_log("\nerr540: ".print_r($arrValidityErr,true)."\n", 3, "/var/log/copronet
 				}
 				if($rec["FieldName"] == "ex_activeempl_daterange") {
 					$tmparr = explode("-",$rec["ComparativeValues"]);
-					if(count($tmparr)==2 && $chkDate->chkDate($tmparr[0], 1, $retDateFrom) && $this->chkDate($tmparr[1], 1, $retDateTo)) {
+					if(count($tmparr)==2 && $chkDate->chkDate($tmparr[0], 1, $retDateFrom) && $chkDate->chkDate($tmparr[1], 1, $retDateTo)) {
 						$rec["ComparativeValues"] = $retDateFrom."@".$retDateTo;
 					}else{
 						$errFields[] = "ex_activeempl_daterange";
@@ -1460,6 +1464,24 @@ error_log("\nerr540: ".print_r($arrValidityErr,true)."\n", 3, "/var/log/copronet
 		return $response;
 	}
 
+
+	private function array_diff_assoc_recursive($array1, $array2) {
+		$difference=array();
+		foreach($array1 as $key => $value) {
+			if( is_array($value) ) {
+				if( !isset($array2[$key]) || !is_array($array2[$key]) ) {
+					$difference[$key] = $value;
+				} else {
+					$new_diff = $this->array_diff_assoc_recursive($value, $array2[$key]);
+					if( !empty($new_diff) )
+					$difference[$key] = $new_diff;
+				}
+			} else if( !array_key_exists($key,$array2) || $array2[$key] !== $value ) {
+				$difference[$key] = $value;
+			}
+		}
+		return $difference;
+	}
 
 
 }
