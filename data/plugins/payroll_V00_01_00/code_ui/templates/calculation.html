@@ -2,8 +2,12 @@
 	<div id="tbCalcOvRow1" class="ui-widget-header ui-corner-all">
 		<button id="prlCalcOvBtnNew"><wgui:text id="prlCalcOvBtnNew"/></button>
 		<button id="prlCalcOvBtnSettings"><wgui:text id="prlCalcOvBtnSettings"/></button>
-		<wgui:text id="prlCalcOvYear"/> <select id="prlCalcOvYear"></select>
-		<wgui:text id="prlCalcOvPeriod"/> <select id="prlCalcOvMajorPeriod">
+			&nbsp;&nbsp;
+		<wgui:text id="prlCalcOvYear"/> 
+			<select id="prlCalcOvYear"></select>
+			&nbsp;&nbsp;
+		<wgui:text id="prlCalcOvPeriod"/> 
+			<select id="prlCalcOvMajorPeriod">
 				<optgroup label="<wgui:text id="prlCalcOvMajorPeriods"/>">
 					<option value="1">01 - <wgui:text id="prlCalcOvMonth01"/></option>
 					<option value="2">02 - <wgui:text id="prlCalcOvMonth02"/></option>
@@ -25,7 +29,14 @@
 					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
 				</optgroup>
 			</select>
-		Status:
+			&nbsp;&nbsp;
+		<wgui:text id="txtZahlstelle"/>:
+			<select id="prlBankSourceReport" style="width: 120px;">
+					<option value="0" selected="selected">--- <wgui:text id="prlPayout_filter_mode_ALL"/> ---</option>
+					<option value="1"></option>
+					<option value="2"></option>
+					<option value="3"></option>
+			</select>
 	</div>
 	<div id="tbCalcOvRow2" class="ui-widget-header ui-corner-all">
 		<button id="prlCalcOvBtnEdit"><wgui:text id="prlCalcOvBtnEdit"/></button>
