@@ -4,11 +4,12 @@ class testPlugin_UI {
 		global $aafwConfig;
 
 		switch($functionName) {
-		case 'testPlugin.sysLoader': // <-- FIX vorgegebener Name. Wird während des Login-Prozesses automatisch aufgerufen. Damit lassen sich Plugin-spezifische CSS- und JS-Dateien laden
+		case 'testPlugin.sysLoader': // <-- FIX vorgegebener Name. Wird während des Login-Prozesses automatisch aufgerufen. 
+			//Damit lassen sich Plugin-spezifische CSS- und JS-Dateien laden
 //			communication_interface::cssFileInclude('plugins/testPlugin_V00_00_01/code_ui/css/test.css','all');
 			communication_interface::jsFileInclude('plugins/testPlugin_V00_00_01/code_ui/js/test.js','text/javascript','testPlugin');
 			break;
-		case 'testPlugin.helloWorld': // hier ein Beispiel für die Anzeige einer Message-Box
+		case 'testPlugin.helloWorld': // hier ein Beispiel faer die Anzeige einer Message-Box
 			$objWindow = new wgui_window("payroll", "infoBox");
 			$objWindow->windowTitle("Mein Titel");
 			$objWindow->windowWidth(450);
@@ -17,7 +18,7 @@ class testPlugin_UI {
 			$objWindow->showInfo(); //alternativ: showQuestion(), showAlert()
 			break;
 		case 'testPlugin.largerWindow':
-			// Wenn keine Daten ans Template übergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
+			// Wenn keine Daten ans Template Uebergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
 			// In diesem Beispiel werden die Formulardaten direkt ins Template "generiert"
 			$data["meinName"] = "Mein Name ist Hase";
 			$data["DatenFuerLoop"] = array();
@@ -33,11 +34,11 @@ class testPlugin_UI {
 			$objWindow->windowIcon("users24x24.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
 			$objWindow->windowWidth(550);
 			$objWindow->windowHeight(225);
-			$objWindow->loadContent("testdatei",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu übergebende Daten / 3. Parameter: Name des Template-Blocks
+			$objWindow->loadContent("testdatei",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu aebergebende Daten / 3. Parameter: Name des Template-Blocks
 			$objWindow->showWindow();
 			break;
 		case 'testPlugin.largerWindowBL':
-			//In diesem Beispiel werden die Formulardaten mittels JavaScript eingefügt. Hier mit der Funktion 'testPlgLoad' in der Datei 'test.js'.
+			//In diesem Beispiel werden die Formulardaten mittels JavaScript eingefaegt. Hier mit der Funktion 'testPlgLoad' in der Datei 'test.js'.
 			$fb = blFunctionCall('testPlugin.braucheDaten');
 			if($fb["success"]) {
 				$data["DatenFuerLoop"] = $fb["data"];
@@ -52,7 +53,7 @@ class testPlugin_UI {
 				$objWindow->resizable(false);
 				$objWindow->fullscreen(false);
 				$objWindow->modal(true);
-				$objWindow->loadContent("testdatei",$data,"TestWindowZwei"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu übergebende Daten / 3. Parameter: Name des Template-Blocks
+				$objWindow->loadContent("testdatei",$data,"TestWindowZwei"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu aebergebende Daten / 3. Parameter: Name des Template-Blocks
 //				$objWindow->addEventFunction_onResize("");
 				$objWindow->showWindow();
 

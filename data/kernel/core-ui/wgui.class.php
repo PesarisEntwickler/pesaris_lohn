@@ -1,6 +1,6 @@
 <?php
-//require_once(""../common-functions/configuration.php");
-//require_once("kernel/common-functions/configuration.php");
+//require_once('../common-functions/configuration.php');
+//require_once('kernel/common-functions/configuration.php');
 /*******************************************************************************
 * Module:   Axerios wgui                                                       *
 * Version:  0.01                                                               *
@@ -35,12 +35,16 @@ function wgui($cPluginName="",$cTemplate="",$cLanguage="de")
 	$this->templateName = $cTemplate;
 	$this->guiLanguage = strtolower($cLanguage);
 //	$this->cachePath = CORE_WGUI_CACHE;
-	$this->cachePath = 'plugins/'.$cPluginName."_".$aafwConfig["plugins"][$cPluginName]["currentVersion"].'/code_ui/cache/';
-// die Sprache muessen wir nicht uebergeben. Stattdessen muessen wir die Templateart ('webbrowser' oder 'mobile') und den Namen des Plugins uebergeben. Sub-Plugins muessen ebenfalls beruecksichtigt werden (wie? ev. mit Pfadangabe 'plugin1.subPlugin')
+	$currentPluginVersion = session_control::getPluginVersion($cPluginName);
+	$this->cachePath = 'plugins/'.$cPluginName."_".$currentPluginVersion.'/code_ui/cache/';
+// die Sprache muessen wir nicht uebergeben. Stattdessen muessen wir die Templateart ('webbrowser' oder 'mobile')
+// und dem Namen des Plugins uebergeben. 
+// Sub-Plugins muessen ebenfalls beruecksichtigt werden
+// (wie? ev. mit Pfadangabe 'plugin1.subPlugin')
 // /home/dwm/server-web/axerios/aafw/kernel/cache/templates-webbrowser
 // /home/dwm/server-web/axerios/aafw/kernel/cache/templates-mobile
-	$this->templatePath = 'plugins/'.$cPluginName."_".$aafwConfig["plugins"][$cPluginName]["currentVersion"].'/code_ui/templates/';
-	$this->mediaPath = 'plugins/'.$cPluginName."_".$aafwConfig["plugins"][$cPluginName]["currentVersion"].'/code_ui/media/';
+	$this->templatePath = 'plugins/'.$cPluginName."_".$currentPluginVersion.'/code_ui/templates/';
+	$this->mediaPath = 'plugins/'.$cPluginName."_".$currentPluginVersion.'/code_ui/media/';
 	$this->translations = null;
 }
 
@@ -177,7 +181,7 @@ function processTemplate($data,$subTemplate="")
 			$source .= "\n--sourcecode--return \$retval;\n--sourcecode--}\n";
 		}
 
-		//unnoetige 'extract' entfernen
+		//unnötige 'extract' entfernen
 		preg_match_all('/function [_a-zA-Z0-9]+\(\$[_a-zA-Z0-9]+\) \{(.*?)return \$retval;/s', $source, $matches);
 		foreach($matches[0] as $hit) {
 			$referenceString = str_replace("\$var_$templateName","",$hit);
