@@ -19,7 +19,7 @@ require_once("database_manager.php");
 class system_database_manager extends database_manager {
 
 	private static $host = CORE_DB_HOST;
-//	private static $dbName = CORE_DB_DBNAME;
+//  private static $dbName = CORE_DB_DBNAME;
 	private static $dbName = "appcustomers";
 	private static $userName = CORE_DB_USERNAME;
 	private static $password = CORE_DB_PASSWORD;
@@ -67,16 +67,16 @@ class system_database_manager extends database_manager {
 	 * @return true if the database was selected successully, false otherwise
 	 */
 	private static function selectDatabaseIfNecessary() {
-		
-		if (strcasecmp(database_manager::$lastDatabaseSelected, system_database_manager::$dbName) != 0) {
+        
+            if (strcasecmp(database_manager::$lastDatabaseSelected, system_database_manager::$dbName) != 0) {
 //			logError("connection established.");
 			if (database_manager::selectDatabase(system_database_manager::$dbName, system_database_manager::$instance->connection)) {
-				database_manager::$lastDatabaseSelected = system_database_manager::$dbName;
-			}
-			else {
-				return false;
-			}
-		}
+                database_manager::$lastDatabaseSelected = system_database_manager::$dbName;
+            }
+            else {
+                return false;
+            }
+        }
 		
 		return true;
 	}

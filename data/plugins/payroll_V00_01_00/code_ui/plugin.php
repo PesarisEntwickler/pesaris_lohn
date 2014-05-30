@@ -1902,10 +1902,88 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 //communication_interface::alert(microtime(true) - $now); //TODO: PROFILING STOP
 				break;
 			case 3: //FIBU-Kontierungen drucken
-				$docPathID = blFunctionCall('payroll.calculationReport','finAccJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
+                if(isset($functionParameters[0]["selectedReportType"])) {
+                    $docPathID = blFunctionCall('payroll.calculationReport','finAccJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"], "selectedReportType"=>$functionParameters[0]["selectedReportType"], "company"=>$functionParameters[0]["company"], "cost_center"=>$functionParameters[0]["cost_center"]));
+					communication_interface::jsExecute("$('#modalContainer').mb_close();");
+				}else{
+                    $fireScripts = false;
+
+                    //show report selection window
+                    $objWindow = new wgui_window("payroll", "ReportSelector");
+                    $objWindow->windowTitle("FIBU-Journale: Report Auswahl");
+                    $objWindow->windowIcon("calculator20.png");
+                    $objWindow->windowWidth(480);
+                    $objWindow->windowHeight(160);
+                    $objWindow->dockable(false);
+                    $objWindow->buttonMaximize(false);
+                    $objWindow->resizable(false);
+                    $objWindow->fullscreen(false);
+                    $objWindow->modal(true);
+                    $objWindow->loadContent("calculation",$data,"prlCalcReportSelector");
+                    $objWindow->showWindow();
+                    
+                    communication_interface::jsExecute("
+                    prlRepSelCFG = {
+                        'saveCB':function(){
+                            cb('payroll.prlCalcOvOutput', {
+                                'functionNumber':4, 
+                                'year':".$functionParameters[0]["year"].", 
+                                'majorPeriod':".$functionParameters[0]["majorPeriod"].",
+                                'minorPeriod':".$functionParameters[0]["minorPeriod"].", 
+                                'selectedReportType':$('#prlRepSelReportType').val(), 
+                                'company':$('#prlRepSelFilterFirma').val(), 
+                                'cost_center':$('#prlRepSelFilterKst').val()
+                                });
+                            $('#prlRepSelSave').prop('disabled', true);
+                         }, 
+                         'cancelCB':'', 
+                         'errWrongCompanyFormat':'".$objWindow->getText("prlRepSelErrWrongCompanyFormat")."', 
+                         'errWrongKstFormat':'".$objWindow->getText("prlRepSelErrWrongKstFormat")."'
+                       };");
+                    communication_interface::jsExecute("prlRepSelInit();");
+                }
 				break;
 			case 4: //BEBU-Kontierungen drucken
-				$docPathID = blFunctionCall('payroll.calculationReport','mgmtAccJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
+                if(isset($functionParameters[0]["selectedReportType"])) {
+					$docPathID = blFunctionCall('payroll.calculationReport','mgmtAccJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"], "selectedReportType"=>$functionParameters[0]["selectedReportType"], "company"=>$functionParameters[0]["company"], "cost_center"=>$functionParameters[0]["cost_center"]));
+					communication_interface::jsExecute("$('#modalContainer').mb_close();");
+				}else{
+                    $fireScripts = false;
+
+                    //show report selection window
+                    $objWindow = new wgui_window("payroll", "ReportSelector");
+                    $objWindow->windowTitle("BEBU-Journale: Report Auswahl");
+                    $objWindow->windowIcon("calculator20.png");
+                    $objWindow->windowWidth(480);
+                    $objWindow->windowHeight(160);
+                    $objWindow->dockable(false);
+                    $objWindow->buttonMaximize(false);
+                    $objWindow->resizable(false);
+                    $objWindow->fullscreen(false);
+                    $objWindow->modal(true);
+                    $objWindow->loadContent("calculation",$data,"prlCalcReportSelector");
+                    $objWindow->showWindow();
+                
+                    communication_interface::jsExecute("
+                    prlRepSelCFG = {
+                        'saveCB':function(){
+                            cb('payroll.prlCalcOvOutput', {
+                                'functionNumber':4, 
+                                'year':".$functionParameters[0]["year"].", 
+                                'majorPeriod':".$functionParameters[0]["majorPeriod"].",
+                                'minorPeriod':".$functionParameters[0]["minorPeriod"].", 
+                                'selectedReportType':$('#prlRepSelReportType').val(), 
+                                'company':$('#prlRepSelFilterFirma').val(), 
+                                'cost_center':$('#prlRepSelFilterKst').val()
+                                });
+                            $('#prlRepSelSave').prop('disabled', true);
+                         }, 
+                         'cancelCB':'', 
+                         'errWrongCompanyFormat':'".$objWindow->getText("prlRepSelErrWrongCompanyFormat")."', 
+                         'errWrongKstFormat':'".$objWindow->getText("prlRepSelErrWrongKstFormat")."'
+                       };");
+                    communication_interface::jsExecute("prlRepSelInit();");
+                }
 				break;
 			case 5: //Lohnkonto drucken
 				if(isset($functionParameters[0]["employees"])) {
@@ -1960,7 +2038,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			}
 			if($fireScripts) {
 				communication_interface::jsExecute("$('#dlForm input[name=param]').val('".str_replace("'","\\'",serialize(array("tmpPathID"=>$docPathID)))."');");
-				communication_interface::jsExecute("$('#dlForm').attr('action','/getfile.php');");
+				communication_interface::jsExecute("$('#dlForm').attr('action','getfile.php');");
 				communication_interface::jsExecute("$('#dlForm').attr('target','dlFrame');");
 				communication_interface::jsExecute("$('#dlForm').submit();");
 			}
@@ -2400,7 +2478,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		case 'payroll.dbRestore':
 			if(!isset($functionParameters[0]["start"])) {
 				$customerDbName = session_control::getSessionInfo("db_name");
-				$tmpBaseDir = "/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName."/backup/";
+				$tmpBaseDir = $aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName."/backup/";
 				$files = scandir($tmpBaseDir);
 				$fileList = "";
 				foreach($files as $fn) {
@@ -2417,16 +2495,17 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->showInfo();
 			}else{
 				$customerDbName = session_control::getSessionInfo("db_name");
-				$tmpBaseDir = "/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName."/backup/";
+				$tmpBaseDir = $aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName."/backup/";
 				if(!file_exists($tmpBaseDir.$functionParameters[0]["backup"].".sql")) {
 					communication_interface::alert("Error: File does not exist!");
 					break;
 				}
 //communication_interface::alert("restore... ".$functionParameters[0]["backup"]);
 //TODO: ACHTUNG nur fuer SRV2 gueltig!!!
-				exec("/usr/local/bin/mysql --comments -u backup -p63i7E24ce ".$customerDbName." < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
+                
+				exec($aafwConfig["paths"]["utilities"]["mysql"]." --comments -u backup -p63i7E24ce ".$customerDbName." < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
 //TODO: ACHTUNG nur fuer SRV1 gueltig!!!
-//				exec("mysql --comments -u backup -p63i7E24ce btest < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
+//				exec($aafwConfig["paths"]["utilities"]["mysql"]." --comments -u backup -p63i7E24ce btest < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
 
 				$objWindow = new wgui_window("payroll", "infoBox");
 				$objWindow->windowTitle("Wiederherstellung abgeschlossen");
@@ -3437,6 +3516,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 	}
 
 	private function doDbBackup($suffix="") {
+        global $aafwConfig;
 		$fileName = date("Ymd-His");
 		$ret = blFunctionCall("payroll.getPeriodInformation");
 		if($ret["success"]) {
@@ -3445,13 +3525,13 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 
 		//Pruefen, ob Mandanten-Verzeichnis existiert -> falls nicht -> anlegen
 		$customerDbName = session_control::getSessionInfo("db_name");
-		if(!file_exists("/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName)) mkdir("/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName, 0777);
+		if(!file_exists($aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName)) mkdir($aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName, 0777);
 		//Pruefen, ob tmp-Verzeichnis im Mandanten-Verzeichnis existiert -> falls nicht -> anlegen
-		if(!file_exists("/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName."/backup")) mkdir("/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName."/backup", 0777);
+		if(!file_exists($aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName."/backup")) mkdir($aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName."/backup", 0777);
 		//Pruefen, ob User-Verzeichnis im tmp-Verzeichnis existiert -> falls nicht -> anlegen
-		$tmpBaseDir = "/usr/local/www/apache22/data-hidden/CUSTOMER/".$customerDbName."/backup/";
+		$tmpBaseDir = $aafwConfig["paths"]["plugin"]["customerDir"].$customerDbName."/backup/";
 
-		exec("/usr/local/bin/mysqldump --opt -u backup -p63i7E24ce ".$customerDbName." > ".$tmpBaseDir.$fileName.".sql");
+		exec($aafwConfig["paths"]["plugin"]["mysqldump"]." --opt -u backup -p63i7E24ce ".$customerDbName." > ".$tmpBaseDir.$fileName.".sql");
 
 		return $fileName;
 	}

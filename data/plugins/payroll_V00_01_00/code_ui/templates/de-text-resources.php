@@ -465,6 +465,12 @@ $textResourceMap["prlPayout_filter_mode_SELECT"] = "Auswahl";
 $textResourceMap["prlPayout_payroll_company_ID"] = "Firma";
 $textResourceMap["prlPayoutBtnSave"] = "Fortfahren";
 /*
+****** Reports ******
+*/
+$textResourceMap["prlRepSelErrWrongKstFormat"] = "Bitte eine korrekte Kostenstelle eingeben (max. 15 Zeichen) oder das Feld leer lassen.";
+$textResourceMap["prlRepSelErrWrongCompanyFormat"] = "Bitte eine korrekte Firma eingeben (Ganze Zahl) oder das Feld leer lassen.";
+
+/*
 ****** Enter accounting data ******
 */
 $textResourceMap["prlAccEtrTitle"] = "Verbuchen FIBU/BEBU";

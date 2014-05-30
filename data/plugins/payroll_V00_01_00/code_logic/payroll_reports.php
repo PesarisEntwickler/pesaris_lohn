@@ -2,6 +2,7 @@
 class payroll_BL_reports {
 	
 	public function CalculationJournal($param) {
+        global $aafwConfig;
 		ini_set('memory_limit', '512M');
 //$now = microtime(true); //TODO: PROFILING START
 //$param = array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"])
@@ -62,13 +63,14 @@ class payroll_BL_reports {
 //$now = microtime(true); //TODO: PROFILING START
 
 //		system("cp ./data.xml /usr/local/www/apache22/data/plugins/payroll_V00_01_00/code_logic/compileme.tex");
-		system("xsltproc /usr/local/www/apache22/data-hidden/GLOBAL/templates/CalculationJournal.xslt ./data.xml > ./compileme.tex");
+        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."CalculationJournal.xslt ./data.xml > ./compileme.tex");
+        
 //communication_interface::alert("xslt: ".(microtime(true) - $now)); //TODO: PROFILING STOP
 //error_log("\nxslt: ".(microtime(true) - $now)."\n", 3, "/var/log/copronet-application.log");
 
 //$now = microtime(true); //TODO: PROFILING START
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
+        system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
 		system("chmod 666 *");
 //file_put_contents($newTmpPath."/debug.txt", (microtime(true) - $now) ); //TODO: PROFILING STOP
 //communication_interface::alert("pdflatex: ".(microtime(true) - $now)); //TODO: PROFILING STOP
@@ -103,6 +105,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
 
 	private function AccountingJournal($param,$ReportName,$entryTable) {
+        global $aafwConfig;
 		ini_set('memory_limit', '512M');
 		$periodLabels["de"] = array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
 
@@ -117,8 +120,6 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$system_database_manager = system_database_manager::getInstance();
 		$fp = $fm->setFile("data.xml")->fopen("w");
 
-		fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Employees>\n");
-
 		//TODO: $param Werte gegen intrusion sichern !!!!!
 		$result = $system_database_manager->executeQuery("SELECT id FROM payroll_period WHERE payroll_year_ID=".$param["year"]." AND major_period=".$param["majorPeriod"]." AND minor_period=".$param["minorPeriod"], "payroll_report_".$ReportName);
 		if(count($result)>0) $payrollPeriodID = $result[0]["id"];
@@ -127,36 +128,602 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$isCurrentPeriod = false;
 		$result = $system_database_manager->executeQuery("SELECT payroll_period_ID FROM payroll_calculation_current LIMIT 1", "payroll_report_".$ReportName);
 		if(count($result)>0) $isCurrentPeriod = $result[0]["payroll_period_ID"]==$payrollPeriodID ? true : false;
-
-		$result = $system_database_manager->executeQuery("SELECT emp.`id` as EmployeeID, emp.`EmployeeNumber`, emp.`payroll_company_ID`, emp.`Lastname`, emp.`Firstname`, accetry.`payroll_account_ID`, acclbl.`label`, accetry.`account_no`, accetry.`counter_account_no`, accetry.`cost_center`, accetry.`amount_local`, accetry.`debitcredit`, accetry.`entry_text` FROM `".$entryTable."` accetry INNER JOIN `payroll_employee` emp ON emp.`id`=accetry.`payroll_employee_ID` INNER JOIN `payroll_account_label` acclbl ON acclbl.`payroll_account_ID`=accetry.`payroll_account_ID` AND acclbl.`payroll_year_ID`=".$param["year"]." AND acclbl.`language`='".session_control::getSessionInfo("language")."' WHERE accetry.`payroll_period_ID`=".$payrollPeriodID." ORDER BY emp.`Lastname`, emp.`Firstname`, emp.`id`, accetry.`payroll_account_ID`", "payroll_report_".$ReportName);
-		$lastEmployeeID = 0;
-		$entryCollector = array();
-		$singleEmployeeData = "";
-		foreach($result as $row) {
-			if($row["EmployeeID"] != $lastEmployeeID) {
-				//the employee changed!
-				if($singleEmployeeData != "") {
-					//there are data for writing to the XML file
-					fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
-				}
-				$lastEmployeeID = $row["EmployeeID"];
-				$entryCollector = array();
-				$singleEmployeeData = "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$row["EmployeeNumber"]."</EmployeeNumber>\n\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t<Firstname>".$row["Firstname"]."</Firstname>\n\t\t\t<Lastname>".$row["Lastname"]."</Lastname>\n\t\t\t<Entries>\n";
-			}
-			$entryCollector[] = "\t\t\t\t<Entry>\n\t\t\t\t\t<AccountNumber>".$row["payroll_account_ID"]."</AccountNumber>\n\t\t\t\t\t<AccountName>".$row["label"]."</AccountName>\n\t\t\t\t\t<MainAccountNumber>".$row["account_no"]."</MainAccountNumber>\n\t\t\t\t\t<CounterAccountNumber>".$row["counter_account_no"]."</CounterAccountNumber>\n\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t<amount>".$row["amount_local"]."</amount>\n\t\t\t\t\t<debitcredit>".$row["debitcredit"]."</debitcredit>\n\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t</Entry>\n";
-		}
-		if($singleEmployeeData != "") {
-			fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
-		}
-		fwrite($fp, "\t</Employees>\n</Report>\n");
-		$fm->fclose();
-
+        
+        //Query bereitstellen und Reportvorlage definieren
+        $reportTemplate = "";
+        switch ($param["selectedReportType"])
+        {
+            case 0:
+                // Auswertung nach Mitarbeiter
+                $reportTemplate = $ReportName;
+                
+                fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Employees>\n");
+                
+                $query = "SELECT 
+                                emp.`id` as EmployeeID, 
+                                emp.`EmployeeNumber`, 
+                                emp.`payroll_company_ID`, 
+                                emp.`Lastname`, 
+                                emp.`Firstname`, 
+                                accetry.`payroll_account_ID`, 
+                                acclbl.`label`, 
+                                accetry.`account_no`, 
+                                accetry.`counter_account_no`, 
+                                accetry.`cost_center`, 
+                                accetry.`amount_local`, 
+                                accetry.`debitcredit`, 
+                                accetry.`entry_text` 
+                            FROM 
+                                `".$entryTable."` accetry 
+                                    INNER JOIN 
+                                `payroll_employee` emp ON emp.`id`=accetry.`payroll_employee_ID` 
+                                    INNER JOIN 
+                                `payroll_account_label` acclbl ON acclbl.`payroll_account_ID`=accetry.`payroll_account_ID` 
+                                AND acclbl.`payroll_year_ID`=".$param["year"]." 
+                                AND acclbl.`language`='".session_control::getSessionInfo("language")."' 
+                            WHERE accetry.`payroll_period_ID`=".$payrollPeriodID." 
+                            ORDER BY 
+                                emp.`Lastname`, 
+                                emp.`Firstname`, 
+                                emp.`id`, 
+                                accetry.`payroll_account_ID`";
+                $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                $lastEmployeeID = 0;
+                $entryCollector = array();
+                $singleEmployeeData = "";
+                foreach($result as $row) {
+                    if($row["EmployeeID"] != $lastEmployeeID) {
+                        //the employee changed!
+                        if($singleEmployeeData != "") {
+                            //there are data for writing to the XML file
+                            fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
+                        }
+                        $lastEmployeeID = $row["EmployeeID"];
+                        $entryCollector = array();
+                        $singleEmployeeData = "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$row["EmployeeNumber"]."</EmployeeNumber>\n\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t<Firstname>".$row["Firstname"]."</Firstname>\n\t\t\t<Lastname>".$row["Lastname"]."</Lastname>\n\t\t\t<Entries>\n";
+                    }
+                    $entryCollector[] = "\t\t\t\t<Entry>\n\t\t\t\t\t<AccountNumber>".$row["payroll_account_ID"]."</AccountNumber>\n\t\t\t\t\t<AccountName>".$row["label"]."</AccountName>\n\t\t\t\t\t<MainAccountNumber>".$row["account_no"]."</MainAccountNumber>\n\t\t\t\t\t<CounterAccountNumber>".$row["counter_account_no"]."</CounterAccountNumber>\n\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t<amount>".$row["amount_local"]."</amount>\n\t\t\t\t\t<debitcredit>".$row["debitcredit"]."</debitcredit>\n\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t</Entry>\n";
+                }
+                if($singleEmployeeData != "") {
+                    fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
+                }
+                fwrite($fp, "\t</Employees>\n</Report>\n");
+                $fm->fclose();
+                break;
+        	case 1:
+                // Auswertung nach Firma / Konto / Gegenkonto / Kst
+                $ReportTemplate = "AccountingJournal[Company][Account][Counter_account][Cost_center]"; 
+                
+                fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+                
+                $query = "  SELECT 
+                                emp.payroll_company_ID,
+                                comp.company_shortname,
+                                accetry.account_no,
+                                accetry.counter_account_no,
+                                accetry.cost_center,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_company comp ON comp.id = emp.payroll_company_ID
+									INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"])."
+                            GROUP BY    emp.payroll_company_ID, 
+                                        accetry.account_no, 
+                                        accetry.counter_account_no, 
+                                        accetry.cost_center, 
+                                        accetry.entry_text
+                            ORDER BY    emp.payroll_company_ID , 
+                                        accetry.account_no , 
+                                        accetry.counter_account_no , 
+                                        accetry.cost_center";
+                $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                $lastPayrollCompanyID = 0;
+                $runningSumDebitAmount = 0;
+                $runningSumCreditAmount = 0;
+                $corporationDebitAmount = 0;
+                $corporationCreditAmount = 0;
+                $entryCollector = array();
+                $singleEmployeeData = "";
+                foreach($result as $row) {
+                    if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                        //the employee changed!
+                        if($singleEmployeeData != "") {
+                            //there are data for writing to the XML file
+                            fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                        }
+                        $runningSumDebitAmount = 0;
+                        $runningSumCreditAmount = 0;
+                        $lastPayrollCompanyID = $row["payroll_company_ID"];
+                        $entryCollector = array();
+                        $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                    }
+                    $runningSumDebitAmount += $row["debit_amount"];
+                    $runningSumCreditAmount += $row["credit_amount"];
+                    $corporationDebitAmount += $row["debit_amount"];
+                    $corporationCreditAmount += $row["credit_amount"];
+                    $entryCollector[] = "\t\t\t\t\t<Entry>\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                }
+                if($singleEmployeeData != "") {
+                    fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                }
+                fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                $fm->fclose();
+                break;
+             case 2:
+                 // Auswertung nach Firma / Kst / Konto / Gegenkonto
+                 $ReportTemplate = "AccountingJournal[Company][Cost_center][Account][Counter_account]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+                 
+                 $query = "  SELECT 
+                                emp.payroll_company_ID,
+                                comp.company_shortname,
+                                accetry.account_no,
+                                accetry.counter_account_no,
+                                accetry.cost_center,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_company comp ON comp.id = emp.payroll_company_ID
+									INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"]).
+                            ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
+                            GROUP BY    emp.payroll_company_ID, 
+                                        accetry.cost_center, 
+                                        accetry.account_no, 
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text
+                            ORDER BY    emp.payroll_company_ID , 
+                                        accetry.cost_center,
+                                        accetry.account_no , 
+                                        accetry.counter_account_no";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $lastPayrollCompanyID = 0;
+                 $runningSumDebitAmount = 0;
+                 $runningSumCreditAmount = 0;
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $entryCollector = array();
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                         //the employee changed!
+                         if($singleEmployeeData != "") {
+                             //there are data for writing to the XML file
+                             fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                         }
+                         $runningSumDebitAmount = 0;
+                         $runningSumCreditAmount = 0;
+                         $lastPayrollCompanyID = $row["payroll_company_ID"];
+                         $entryCollector = array();
+                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                     }
+                     $runningSumDebitAmount += $row["debit_amount"];
+                     $runningSumCreditAmount += $row["credit_amount"];
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     $entryCollector[] = "\t\t\t\t\t<Entry>\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                 }
+                 if($singleEmployeeData != "") {
+                     fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                 }
+                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 3:
+                 // Auswertung nach Firma / Konto / Gegenkonto
+                 $ReportTemplate = "AccountingJournal[Company][Account][Counter_account]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+                 
+                 $query = "  SELECT 
+                                emp.payroll_company_ID,
+                                comp.company_shortname,
+                                accetry.account_no,
+                                accetry.counter_account_no,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_company comp ON comp.id = emp.payroll_company_ID
+									INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"])."
+                            GROUP BY    emp.payroll_company_ID, 
+                                        accetry.account_no, 
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text
+                            ORDER BY    emp.payroll_company_ID , 
+                                        accetry.account_no , 
+                                        accetry.counter_account_no";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $lastPayrollCompanyID = 0;
+                 $runningSumDebitAmount = 0;
+                 $runningSumCreditAmount = 0;
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $entryCollector = array();
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                         //the employee changed!
+                         if($singleEmployeeData != "") {
+                             //there are data for writing to the XML file
+                             fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                         }
+                         $runningSumDebitAmount = 0;
+                         $runningSumCreditAmount = 0;
+                         $lastPayrollCompanyID = $row["payroll_company_ID"];
+                         $entryCollector = array();
+                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                     }
+                     $runningSumDebitAmount += $row["debit_amount"];
+                     $runningSumCreditAmount += $row["credit_amount"];
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     $entryCollector[] = "\t\t\t\t\t<Entry>\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                 }
+                 if($singleEmployeeData != "") {
+                     fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                 }
+                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 4:
+                 // Auswertung nach Firma / Kst
+                 $ReportTemplate = "AccountingJournal[Company][Cost_center]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+                 
+                 $query = "  SELECT 
+                                emp.payroll_company_ID,
+                                comp.company_shortname,
+                                accetry.cost_center,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_company comp ON comp.id = emp.payroll_company_ID
+									INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"]).
+                            ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
+                            GROUP BY    emp.payroll_company_ID, 
+                                        accetry.cost_center, 
+                                        accetry.entry_text
+                            ORDER BY    emp.payroll_company_ID , 
+                                        accetry.cost_center";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $lastPayrollCompanyID = 0;
+                 $runningSumDebitAmount = 0;
+                 $runningSumCreditAmount = 0;
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $entryCollector = array();
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                         //the employee changed!
+                         if($singleEmployeeData != "") {
+                             //there are data for writing to the XML file
+                             fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                         }
+                         $runningSumDebitAmount = 0;
+                         $runningSumCreditAmount = 0;
+                         $lastPayrollCompanyID = $row["payroll_company_ID"];
+                         $entryCollector = array();
+                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                     }
+                     $runningSumDebitAmount += $row["debit_amount"];
+                     $runningSumCreditAmount += $row["credit_amount"];
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     $entryCollector[] = "\t\t\t\t\t<Entry>\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                 }
+                 if($singleEmployeeData != "") {
+                     fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                 }
+                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 5:
+                 // Auswertung nach Firma / Konto
+                 $ReportTemplate = "AccountingJournal[Company][Account]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+                 
+                 $query = "  SELECT 
+                                emp.payroll_company_ID,
+                                comp.company_shortname,
+                                accetry.account_no,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_company comp ON comp.id = emp.payroll_company_ID
+									INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"])."
+                            GROUP BY    emp.payroll_company_ID, 
+                                        accetry.account_no, 
+                                        accetry.entry_text
+                            ORDER BY    emp.payroll_company_ID , 
+                                        accetry.account_no";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $lastPayrollCompanyID = 0;
+                 $runningSumDebitAmount = 0;
+                 $runningSumCreditAmount = 0;
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $entryCollector = array();
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                         //the employee changed!
+                         if($singleEmployeeData != "") {
+                             //there are data for writing to the XML file
+                             fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                         }
+                         $runningSumDebitAmount = 0;
+                         $runningSumCreditAmount = 0;
+                         $lastPayrollCompanyID = $row["payroll_company_ID"];
+                         $entryCollector = array();
+                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                     }
+                     $runningSumDebitAmount += $row["debit_amount"];
+                     $runningSumCreditAmount += $row["credit_amount"];
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     $entryCollector[] = "\t\t\t\t\t<Entry>\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                 }
+                 if($singleEmployeeData != "") {
+                     fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                 }
+                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 6:
+                 // Auswertung nach Konto / Gegenkonto / Kst
+                 $ReportTemplate = "AccountingJournal[Account][Counter_account][Cost_center]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+                 
+                 $query = "  SELECT 
+                                accetry.account_no,
+                                accetry.counter_account_no,
+                                accetry.cost_center,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID."
+                            GROUP BY    accetry.account_no, 
+                                        accetry.counter_account_no, 
+                                        accetry.cost_center, 
+                                        accetry.entry_text
+                            ORDER BY    accetry.account_no , 
+                                        accetry.counter_account_no , 
+                                        accetry.cost_center";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     fwrite($fp, "\t\t\t<Entry>\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                 }
+                 fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 7:
+                 // Auswertung nach Kst / Konto / Gegenkonto
+                 $ReportTemplate = "AccountingJournal[Cost_center][Account][Counter_account]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+                 
+                 $query = "  SELECT 
+                                accetry.account_no,
+                                accetry.counter_account_no,
+                                accetry.cost_center,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
+                            GROUP BY    accetry.cost_center, 
+                                        accetry.account_no, 
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text
+                            ORDER BY    accetry.cost_center , 
+                                        accetry.account_no , 
+                                        accetry.counter_account_no";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     fwrite($fp, "\t\t\t<Entry>\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                 }
+                 fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 8:
+                 // Auswertung nach Konto / Gegenkonto
+                 $ReportTemplate = "AccountingJournal[Account][Counter_account]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+                 
+                 $query = "  SELECT 
+                                accetry.account_no,
+                                accetry.counter_account_no,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID."
+                            GROUP BY    accetry.account_no, 
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text
+                            ORDER BY    accetry.account_no , 
+                                        accetry.counter_account_no";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     fwrite($fp, "\t\t\t<Entry>\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                 }
+                 fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 9:
+                 // Auswertung nach Kst
+                 $ReportTemplate = "AccountingJournal[Cost_center]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+                 
+                 $query = "  SELECT 
+                                accetry.cost_center,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.debitcredit,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
+                            GROUP BY    accetry.cost_center, 
+                                        accetry.entry_text
+                            ORDER BY    accetry.cost_center";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     fwrite($fp, "\t\t\t<Entry>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                 }
+                 fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+             case 10:
+                 // Auswertung nach Konto
+                 $ReportTemplate = "AccountingJournal[Account]"; 
+                 
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+                 
+                 $query = "  SELECT 
+                                accetry.account_no,
+                                SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
+	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
+                                accetry.entry_text
+                            FROM
+                                ".$entryTable." accetry
+                                    INNER JOIN
+                                payroll_employee emp ON emp.id = accetry.payroll_employee_ID
+                                    INNER JOIN
+                                payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
+                                    AND acclbl.payroll_year_ID = ".$param["year"]."
+                                    AND acclbl.language = '".session_control::getSessionInfo("language")."'
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID."
+                            GROUP BY    accetry.account_no, 
+                                        accetry.entry_text
+                            ORDER BY    accetry.account_no";
+                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
+                 $corporationDebitAmount = 0;
+                 $corporationCreditAmount = 0;
+                 $singleEmployeeData = "";
+                 foreach($result as $row) {
+                     $corporationDebitAmount += $row["debit_amount"];
+                     $corporationCreditAmount += $row["credit_amount"];
+                     fwrite($fp, "\t\t\t<Entry>\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                 }
+                 fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 $fm->fclose();
+                 break;
+        }
+        
 		chdir($newTmpPath);
-
-		system("xsltproc /usr/local/www/apache22/data-hidden/GLOBAL/templates/".$ReportName.".xslt ./data.xml > ./compileme.tex");
-
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
+        
+        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"].$ReportTemplate.".xslt ./data.xml > ./compileme.tex");
+        
+		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+        
 		system("chmod 666 *");
 
 //		system("rm compileme.aux");
@@ -164,8 +731,9 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 		return $newTmpDirName;
 	}
-
+    
 	public function PayrollAccountJournal($param) {
+        global $aafwConfig;
 		ini_set('memory_limit', '512M');
 
 		//mandatory und validity checks...
@@ -279,12 +847,12 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 //		system("cp ./data.xml /usr/local/www/apache22/data-hidden/CUSTOMER/development/tmp/1/test/"); //TODO: Diese Zeile wieder loeschen...
 
-		system("xsltproc /usr/local/www/apache22/data-hidden/GLOBAL/templates/PayrollAccountJournal.xslt ./data.xml > ./compileme.tex");
+        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."PayrollAccountJournal.xslt ./data.xml > ./compileme.tex");
 
 //		system("cp ./compileme.tex /usr/local/www/apache22/data-hidden/CUSTOMER/development/tmp/1/test/"); //TODO: Diese Zeile wieder loeschen...
 
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
+        system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
 		system("chmod 666 *");
 
 //		system("rm compileme.aux");
@@ -294,6 +862,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
 
 	public function Payslip($param) {
+        global $aafwConfig;
 		$payrollPeriodID = $param["payroll_period_ID"];
 		$uid = session_control::getSessionInfo("id");
 		$language = session_control::getSessionInfo("language");
@@ -488,9 +1057,11 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 		chdir($newTmpPath);
 
-		system("xsltproc /usr/local/www/apache22/data-hidden/GLOBAL/templates/Payslip.xslt ./data.xml > ./compileme.tex");
-
-		system("pdflatex -interaction=batchmode compileme.tex >/dev/null");
+        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."Payslip.xslt ./data.xml > ./compileme.tex");
+        
+		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+		//system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+        
 		system("chmod 666 *");
 
 		return $newTmpDirName;

@@ -11,7 +11,8 @@ class session_control {
 
 	private function __construct() {
 		$this->isDebug = false;
-		$this->sessionCachePath = "/usr/local/www/apache22/data/kernel/cache/sessions/";
+        global $aawConfig;
+		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
 //		$this->sessionCachePath = "kernel/cache/sessions/"; // <--- relativer Pfad hat Probleme im Destruktor bereitet... darum nur absoluten Pfad verwenden!
 	}
 
@@ -100,9 +101,9 @@ class session_control {
 //			return false;
 //		}
 
-//$system_database_manager->selectDatabase()
-//		$system_database_manager->overrideDatabaseName($customerID);
-		$result = $system_database_manager->executeQuery("SELECT `databaseName` FROM `customer` WHERE `id`='".addslashes($customerID)."' AND `active`=1", "authenticate employee login");
+        //$system_database_manager->selectDatabase()
+        //		$system_database_manager->overrideDatabaseName($customerID);
+        $result = $system_database_manager->executeQuery("SELECT `databaseName` FROM `customer` WHERE `id`='".addslashes($customerID)."' AND `active`=1", "authenticate employee login");
 		if(count($result) > 0) {
 			$dbName = $result[0]["databaseName"];
 			$system_database_manager->selectDB($dbName);

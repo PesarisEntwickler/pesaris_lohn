@@ -2280,6 +2280,70 @@ function prlPsSelInit() {
 }
 /*
 ********************************************
+** FIBU / BEBU Report Selector
+********************************************
+*/
+var prlRepSelCFG = {};
+
+function prlRepSelOnReportTypeChange(elem) {
+
+    if (elem.value >= 1 && elem.value <= 5) {
+        document.getElementById('hiddenDiv_Company').style.display = "block";
+    }
+    else {
+        document.getElementById('hiddenDiv_Company').style.display = "none";
+    }
+    if (elem.value == 2 || elem.value == 4 || elem.value == 7 || elem.value == 9) {
+        document.getElementById('hiddenDiv_CostCenter').style.display = "block";
+    }
+    else {
+        document.getElementById('hiddenDiv_CostCenter').style.display = "none";
+    }
+}
+
+function prlRepSelSave() {
+    var company = $("#prlRepSelFilterFirma").val();
+    var kst = $("#prlRepSelFilterKst").val();
+
+    $('#prlRepSelErr').text("");
+    
+    var emptyRgx = /^\s?$/;
+    var companyRgx = /^[0-9]{1,11}$/;
+    var kstRgx = /^[A-Za-z0-9]{0,15}$/;
+    var errors = "";
+
+    if (document.getElementById('hiddenDiv_Company').style.display != "none" && !emptyRgx.test(company) && !companyRgx.test(company)) {
+        errors += prlRepSelCFG.errWrongCompanyFormat;
+    }
+    if (document.getElementById('hiddenDiv_CostCenter').style.display != "none" && !emptyRgx.test(kst) != null && !kstRgx.test(kst)) {
+        errors += prlRepSelCFG.errWrongKstFormat;
+    }
+
+    if (!emptyRgx.test(errors)) {
+        $('#prlRepSelErr').text(errors);
+        return;
+    }
+
+    //if (typeof (prlPsSelCFG.saveCB) == "string")
+    //    cb(prlRepSelCFG.saveCB, x.val());
+    //else
+    prlRepSelCFG.saveCB();
+}
+
+function prlRepSelCancel() {
+    if (prlRepSelCFG.cancelCB == '') $('#modalContainer').mb_close();
+    else cb(prlRepSelCFG.cancelCB);
+}
+
+function prlRepSelInit() {
+    $('#prlRepSelSave').bind('click', function () { prlRepSelSave(); });
+    $('#prlRepSelCancel').bind('click', function () { prlRepSelCancel(); });
+    //$('#prlPsSelLst').bind('click', function () { $('#prlPsSelErr').text(''); });
+    $('#prlRepSelReportType').bind('change', function () { prlRepSelOnReportTypeChange(this) });
+}
+
+/*
+********************************************
 ** Configuration: Financial and management accounting
 ********************************************
 */
