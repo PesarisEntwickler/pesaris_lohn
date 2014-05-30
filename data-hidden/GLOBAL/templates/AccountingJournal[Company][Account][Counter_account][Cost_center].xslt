@@ -326,7 +326,7 @@
     </xsl:choose>
     &amp;
     <xsl:value-of select="EntryText"/>\\
-    <xsl:if test="@doPageBreak = 'true'">
+    <xsl:if test="@doPageBreak = 'true' and following-sibling::*[1][self::Entry]">
       \\
       <xsl:choose>
         <xsl:when test="/Report/@lang = 'fr'">
@@ -338,7 +338,7 @@
         <xsl:otherwise>
           <xsl:text>Übertrag</xsl:text>
         </xsl:otherwise>
-      </xsl:choose>&amp;&amp;&amp;<xsl:value-of select="format-number(@carryForwardDebit,&quot;#'##0.00&quot;,'apodot')"/>&amp;<xsl:value-of select="format-number(@carryForwardCredit,&quot;#'##0.00&quot;,'apodot')"/>&amp; \\
+      </xsl:choose>&amp;&amp;&amp;<xsl:value-of select="format-number(RunningSumDebitAmount,&quot;#'##0.00&quot;,'apodot')"/>&amp;<xsl:value-of select="format-number(RunningSumCreditAmount,&quot;#'##0.00&quot;,'apodot')"/>&amp; \\
       \pagebreak
     </xsl:if>
   </xsl:template>

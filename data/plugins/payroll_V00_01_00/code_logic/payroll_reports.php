@@ -256,7 +256,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                     	
                     $entryCollector[] = "\t\t\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$runningSumDebitAmount."\" carryForwardCredit=\"".$runningSumCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
                                         ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
@@ -334,7 +334,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      $entryCollector[] = "\t\t\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$runningSumDebitAmount."\" carryForwardCredit=\"".$runningSumCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
                                         ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
@@ -407,7 +407,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      $entryCollector[] = "\t\t\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$runningSumDebitAmount."\" carryForwardCredit=\"".$runningSumCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
                                         ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
@@ -478,7 +478,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      $entryCollector[] = "\t\t\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$runningSumDebitAmount."\" carryForwardCredit=\"".$runningSumCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
                                         ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
@@ -548,7 +548,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      $entryCollector[] = "\t\t\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$runningSumDebitAmount."\" carryForwardCredit=\"".$runningSumCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
                                         ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
@@ -599,10 +599,10 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      fwrite($fp, "\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$corporationDebitAmount."\" carryForwardCredit=\"".$corporationCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
@@ -648,10 +648,10 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      fwrite($fp, "\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$corporationDebitAmount."\" carryForwardCredit=\"".$corporationCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
@@ -693,10 +693,10 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      fwrite($fp, "\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$corporationDebitAmount."\" carryForwardCredit=\"".$corporationCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
@@ -737,10 +737,10 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      fwrite($fp, "\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$corporationDebitAmount."\" carryForwardCredit=\"".$corporationCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                                  ">\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
@@ -779,10 +779,10 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                      $corporationCreditAmount += $row["credit_amount"];
                      fwrite($fp, "\t\t\t<Entry ".
                                              ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\" carryForwardDebit=\"".$corporationDebitAmount."\" carryForwardCredit=\"".$corporationCreditAmount."\""
+                                                 "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t</Entry>\n");
+                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
