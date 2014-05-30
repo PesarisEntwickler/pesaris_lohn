@@ -24,7 +24,7 @@ function dispatcher($functionName)
 	global $aafwConfig;
 	global $SYS_PLUGIN;
 	$objResponse = new xajaxResponse();
-	communication_interface::setResponseHandle(&$objResponse);
+    communication_interface::setResponseHandle($objResponse);
 
 	$pf = explode(".", $functionName);
 	if(sizeof($pf) < 2) {
