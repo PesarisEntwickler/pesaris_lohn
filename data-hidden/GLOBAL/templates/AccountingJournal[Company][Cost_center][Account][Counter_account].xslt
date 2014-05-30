@@ -41,15 +41,33 @@
 
 
   <xsl:template match="Header">
-    \fancyhead[LO,LE]{\fontsize{18pt}{18pt}\textbf{<xsl:choose>
-      <xsl:when test="/Report/@lang = 'fr'">
-        <xsl:text>BEBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
-      </xsl:when>
-      <xsl:when test="/Report/@lang = 'it'">
-        <xsl:text>BEBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+    \fancyhead[LO,LE]{\fontsize{18pt}{18pt}\textbf{
+    <xsl:choose>
+      <xsl:when test="AccountType = 'payroll_mgmt_acc_entry'">
+        <xsl:choose>
+          <xsl:when test="/Report/@lang = 'fr'">
+            <xsl:text>BEBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+          </xsl:when>
+          <xsl:when test="/Report/@lang = 'it'">
+            <xsl:text>BEBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>BEBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>BEBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+        <xsl:choose>
+          <xsl:when test="/Report/@lang = 'fr'">
+            <xsl:text>FIBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+          </xsl:when>
+          <xsl:when test="/Report/@lang = 'it'">
+            <xsl:text>FIBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>FIBU Journal: Auswertung nach Firma / Kst / Konto / Gegenkonto</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>}\\
     \vspace{2mm}
@@ -309,6 +327,21 @@
     </xsl:choose>
     &amp;
     <xsl:value-of select="EntryText"/>\\
+    <xsl:if test="@doPageBreak = 'true'">
+      \\
+      <xsl:choose>
+        <xsl:when test="/Report/@lang = 'fr'">
+          <xsl:text>Übertrag</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Report/@lang = 'it'">
+          <xsl:text>Übertrag</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>Übertrag</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>&amp;&amp;&amp;<xsl:value-of select="format-number(@carryForwardDebit,&quot;#'##0.00&quot;,'apodot')"/>&amp;<xsl:value-of select="format-number(@carryForwardCredit,&quot;#'##0.00&quot;,'apodot')"/>&amp; \\
+      \pagebreak
+    </xsl:if>
   </xsl:template>
 
 

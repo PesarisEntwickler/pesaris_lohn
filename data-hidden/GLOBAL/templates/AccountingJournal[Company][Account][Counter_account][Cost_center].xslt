@@ -9,7 +9,6 @@
     \nonstopmode
     \documentclass[15pt,a4paper]{article}
     \usepackage[utf8]{inputenc}
-    \usepackage{fp}
     \usepackage{german,longtable}
     \usepackage[landscape, top=20mm, bottom=25mm, left=10mm, right=10mm]{geometry}
     \usepackage{fancyhdr}
@@ -20,12 +19,9 @@
     \renewcommand{\familydefault}{\sfdefault}
     \setlength{\headheight}{70.18pt}
     \setlength{\headsep}{3mm}
-    \setlength{\footskip}{1mm}
+    \setlength{\footskip}{5mm}
 
     \pagestyle{fancy}
-
-    \FPset\subTotalDebit{0}
-    \FPset\subTotalCredit{0}
 
     <xsl:apply-templates select="Report/Header"/>
 
@@ -36,48 +32,41 @@
     \setlength\LTleft{0pt}
     \setlength\LTright{0pt}
 
-    \newcommand{\sumSubTotalDebit}[1]{%
-    \FPadd\0\subTotalDebit{#1}\global\let\subTotalDebit\0%
-    }
-
-    \newcommand{\resetSubTotalDebit}{%
-    \FPset\subTotalDebit{0}%
-    }
-
-    \newcommand{\printSubTotalDebit}{%
-    \FPeval{\result}{round(subTotalDebit,2)}\result%
-    }
-
-    \newcommand{\sumSubTotalCredit}[1]{%
-    \FPadd\0\subTotalCredit{#1}\global\let\subTotalCredit\0%
-    }
-
-    \newcommand{\resetSubTotalCredit}{%
-    \FPset\subTotalCredit{0}%
-    }
-
-    \newcommand{\printSubTotalCredit}{%
-    \FPeval{\result}{round(subTotalCredit,2)}\result%
-    }
-
     \begin{document}
     <xsl:apply-templates select="Report/Corporation"/>
-
     \end{document}
   </xsl:template>
 
 
 
   <xsl:template match="Header">
-    \fancyhead[LO,LE]{\fontsize{18pt}{18pt}\textbf{<xsl:choose>
-      <xsl:when test="/Report/@lang = 'fr'">
-        <xsl:text>BEBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
-      </xsl:when>
-      <xsl:when test="/Report/@lang = 'it'">
-        <xsl:text>BEBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+    \fancyhead[LO,LE]{\fontsize{18pt}{18pt}\textbf{
+    <xsl:choose>
+      <xsl:when test="AccountType = 'payroll_mgmt_acc_entry'">
+        <xsl:choose>
+          <xsl:when test="/Report/@lang = 'fr'">
+            <xsl:text>BEBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+          </xsl:when>
+          <xsl:when test="/Report/@lang = 'it'">
+            <xsl:text>BEBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>BEBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>BEBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+        <xsl:choose>
+          <xsl:when test="/Report/@lang = 'fr'">
+            <xsl:text>FIBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+          </xsl:when>
+          <xsl:when test="/Report/@lang = 'it'">
+            <xsl:text>FIBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>FIBU Journal: Auswertung nach Firma / Konto / Gegenkonto / Kst</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>}\\
     \vspace{2mm}
@@ -298,49 +287,18 @@
     </xsl:choose>}\\
     \hline
     \endhead
-    \midrule
-    <xsl:choose>
-      <xsl:when test="/Report/@lang = 'fr'">
-        <xsl:text>Übertrag</xsl:text>
-      </xsl:when>
-      <xsl:when test="/Report/@lang = 'it'">
-        <xsl:text>Übertrag</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>Übertrag</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>&amp;&amp;&amp;\text{\printSubTotalDebit}&amp;\printSubTotalCredit \\
-    \endfoot
-    \bottomrule
-    \endlastfoot
     <!--DETAILS-->
     <xsl:apply-templates select="Entries/Entry"/>
     <!--FOOTER-->
     \hline
     \textbf{<xsl:value-of select="CompanyID"/> / <xsl:value-of select="CompanyName"/>}&amp;&amp;&amp;\textbf{<xsl:value-of select="format-number(CompanyDebitAmount,&quot;#'##0.00&quot;,'apodot')"/>}&amp;\textbf{<xsl:value-of select="format-number(CompanyCreditAmount,&quot;#'##0.00&quot;,'apodot')"/>}&amp; \\
     \end{longtable}
-    \resetSubTotalDebit
-    \resetSubTotalCredit
     \pagebreak
   </xsl:template>
 
 
 
   <xsl:template match="Entry">
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \\
-    \sumSubTotalDebit{<xsl:value-of select="DebitAmount"/>}
-    \sumSubTotalCredit{<xsl:value-of select="CreditAmount"/>}
     <xsl:value-of select="Account"/>
     &amp;
     <xsl:value-of select="CounterAccount"/>
@@ -368,6 +326,21 @@
     </xsl:choose>
     &amp;
     <xsl:value-of select="EntryText"/>\\
+    <xsl:if test="@doPageBreak = 'true'">
+      \\
+      <xsl:choose>
+        <xsl:when test="/Report/@lang = 'fr'">
+          <xsl:text>Übertrag</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Report/@lang = 'it'">
+          <xsl:text>Übertrag</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>Übertrag</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>&amp;&amp;&amp;<xsl:value-of select="format-number(@carryForwardDebit,&quot;#'##0.00&quot;,'apodot')"/>&amp;<xsl:value-of select="format-number(@carryForwardCredit,&quot;#'##0.00&quot;,'apodot')"/>&amp; \\
+      \pagebreak
+    </xsl:if>
   </xsl:template>
 
 

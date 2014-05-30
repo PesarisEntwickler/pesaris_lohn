@@ -1913,7 +1913,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
                     $objWindow->windowTitle("FIBU-Journale: Report Auswahl");
                     $objWindow->windowIcon("calculator20.png");
                     $objWindow->windowWidth(480);
-                    $objWindow->windowHeight(160);
+                    $objWindow->windowHeight(200);
                     $objWindow->dockable(false);
                     $objWindow->buttonMaximize(false);
                     $objWindow->resizable(false);
@@ -1926,7 +1926,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
                     prlRepSelCFG = {
                         'saveCB':function(){
                             cb('payroll.prlCalcOvOutput', {
-                                'functionNumber':4, 
+                                'functionNumber':3, 
                                 'year':".$functionParameters[0]["year"].", 
                                 'majorPeriod':".$functionParameters[0]["majorPeriod"].",
                                 'minorPeriod':".$functionParameters[0]["minorPeriod"].", 
@@ -1955,7 +1955,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
                     $objWindow->windowTitle("BEBU-Journale: Report Auswahl");
                     $objWindow->windowIcon("calculator20.png");
                     $objWindow->windowWidth(480);
-                    $objWindow->windowHeight(160);
+                    $objWindow->windowHeight(200);
                     $objWindow->dockable(false);
                     $objWindow->buttonMaximize(false);
                     $objWindow->resizable(false);
