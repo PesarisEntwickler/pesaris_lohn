@@ -1,0 +1,38 @@
+Harald Müller
+079 700 14 14
+Hallo auch von ascami. Unser erster Filechange und checkin.
+
+20140521 HM: Neuer Workspace aufgesetzt. 
+(Workspace/Projekt mit Direktintegration von GIT)
+
+
+https://github.com/PesarisEntwickler/pesaris_lohn.git/trunk
+
+GITHub – online:
+------------------------------------------------
+Der Account heisst: „PesarisEntwickler“
+Und das Repository dort ist „pesaris_lohn“
+https://github.com/PesarisEntwickler
+Passwort ist: „schowiederäVersion“
+
+
+==========================================================
+
+Von: Daniel Müller [mailto:daniel.mueller@pesaris.com] 
+Gesendet: Montag, 26. Mai 2014 09:35
+An: Harald G. Mueller
+Cc: 'Pascal Moulin'
+Betreff: Neuer DB-Benutzer
+
+Hallo Harald
+
+Bitte verwende für den Datenbank-Zugriff nur noch folgenden Benutzer:
+
+Benutzername: remoteadmin
+Passwort: h3iD$N4b
+
+Damit müsste es auch klappen, die Stored Procedures anzuschauen und bei Bedarf zu verändern.
+Darf ich Dich bitten diese Zugangsdaten auch an Ascami weiterzuleiten.
+
+Danke und Gruss
+Daniel
