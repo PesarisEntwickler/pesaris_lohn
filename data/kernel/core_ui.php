@@ -1,6 +1,5 @@
 <?php
 /*
-$aafwConfig["plugins"]["testPlugin"]["currentVersion"] = "V00_00_01";
 $aafwConfig["communication"]["functionCalls"]["remoteMode"] = false;
 $aafwConfig["communication"]["functionCalls"]["remoteServices"] = array("http://192.168.1.200/axerios/aafw/nuncius.php"); //array("https://www.pesaris.com/", "https://mebea.pesaris.com/");
 */
@@ -126,13 +125,4 @@ function uiFireEvent($fncName) {
 	return $answer;
 }
 
-/*
-$time_start = microtime(true);
-
-echo functionCall("testPlugin.kuckuck", "hallo erst mal");
-
-$time_end = microtime(true);
-$time = $time_end - $time_start;
-echo "<br><br>$time<br><br>";
-*/
 ?>

@@ -32,7 +32,7 @@ $aafwConfig["plugins"]["baseLayout"]["currentVersion"] = "V00_01_00";
 $aafwConfig["plugins"]["pim"]["currentVersion"] = "V00_01_00"; //pim = Personal information manager (contacts, schedule, notes)
 $aafwConfig["plugins"]["acc"]["currentVersion"] = "V00_01_00"; //acc = Accounting
 $aafwConfig["plugins"]["payroll"]["currentVersion"] = "V00_01_00";
-//$aafwConfig["plugins"]["testPlugin"]["currentVersion"] = "V00_00_01";
+
 
 //Core functions
 $aafwConfig["international"]["default"]["language"] = "de";
