@@ -28,7 +28,7 @@ class payroll_UI {
 			$objWindow->windowIcon("users24x24.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
 			$objWindow->windowWidth(550);
 			$objWindow->windowHeight(225);
-			$objWindow->loadContent("testdatei",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu uebergebende Daten / 3. Parameter: Name des Template-Blocks
+			$objWindow->loadContent("auszahlen",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu uebergebende Daten / 3. Parameter: Name des Template-Blocks
 			$objWindow->showWindow();
 			break;
 
