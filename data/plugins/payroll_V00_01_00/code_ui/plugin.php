@@ -11,6 +11,27 @@ class payroll_UI {
 			communication_interface::cssFileInclude('plugins/payroll_V00_01_00/code_ui/css/payroll.css','all');
 			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/payroll.js','text/javascript','payroll');
 			break;
+		case 'testPlugin.largerWindow':
+			// Wenn keine Daten ans Template Uebergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
+			// In diesem Beispiel werden die Formulardaten direkt ins Template "generiert"
+			$data["meinName"] = "Mein Name ist Hase";
+			$data["DatenFuerLoop"] = array();
+			$data["DatenFuerLoop"][] = array("id"=>"1","bezeichnung"=>"Option 1","selected"=>"0");
+			$data["DatenFuerLoop"][] = array("id"=>"2","bezeichnung"=>"Option 2","selected"=>"0");
+			$data["DatenFuerLoop"][] = array("id"=>"3","bezeichnung"=>"Option 3","selected"=>"0");
+			$data["DatenFuerLoop"][] = array("id"=>"4","bezeichnung"=>"Option 4","selected"=>"1"); //Option 4 soll ausgewaehlt werden
+			$data["DatenFuerLoop"][] = array("id"=>"5","bezeichnung"=>"Option 5","selected"=>"0");
+			$data["meineCheckbox"] = 1;
+
+			$objWindow = new wgui_window("testPlugin", "TestWindow1"); //1. Parameter: immer Name des aufrufenden Plugins / 2. Parameter: wird im HTML als "id" gesetzt, damit ist das Fenster per JS, resp. jQuery ansprechbar
+			$objWindow->windowTitle($objWindow->getText("MeinTitel1"));
+			$objWindow->windowIcon("users24x24.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
+			$objWindow->windowWidth(550);
+			$objWindow->windowHeight(225);
+			$objWindow->loadContent("testdatei",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu uebergebende Daten / 3. Parameter: Name des Template-Blocks
+			$objWindow->showWindow();
+			break;
+
 		case 'payroll.prlPsoEmployeeOverview':
 
 //			$numberformat_thousands_sep = session_control::getSessionSettings("CORE", "numberformat_thousands_sep");
@@ -1383,7 +1404,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 		case 'payroll.prlCalcOverview':
 			$data = array();
 			$objWindow = new wgui_window("payroll", "prlCalcOverview");
-			$objWindow->windowTitle("Lohn bearbeiten"); //sprintf($objWindow->getText("payrollfin_title_main"), $curFiscalyear)
+			$objWindow->windowTitle($objWindow->getText("txtLohnBearbeiten")); //sprintf($objWindow->getText("payrollfin_title_main"), $curFiscalyear)
 			$objWindow->windowIcon("calculator32.png");
 			$objWindow->windowWidth(850); //750
 			$objWindow->windowHeight(550); //450
@@ -3063,6 +3084,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					communication_interface::jsExecute("$('#prlPmtSpltNo').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
 				}
 				break;
+
 			default:
 				communication_interface::alert("case payroll.paymentSplit\n Unterfunktion nicht gefunden\nAction=[".$functionParameters[0]["action"]."]");
 				break;
@@ -3081,9 +3103,10 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		switch($eventName) {
 		case 'core.bootLoadMenu':
 			uiFunctionCall('baseLayout.appMenuAddSection','payroll','Lohnbuchhaltung');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten','plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png','prlCalcOvOpen();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm','plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png','prlPsoOpenEmployeeOverview();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Firmenstamm','plugins/payroll_V00_01_00/code_ui/media/icons/config20.png','prlCfgOpenMainWindow();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten','plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png', 'prlCalcOvOpen();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahlen',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen\');return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm', 'plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png',  'prlPsoOpenEmployeeOverview();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Firmenstamm',    'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
 			break;
 		case 'core.bootComplete':
 			blFunctionCall('payroll.onBootComplete');

@@ -1,0 +1,29 @@
+<wgui:block name="TestWindowEins">
+	<wgui:text id="feldBezeichnungText"/> <input type="text" id="bla" value="<wgui:var name="meinName"/>" /><br/>
+
+	<wgui:text id="feldBezeichnungSelect"/> <select>
+	<wgui:loop name="selectLoop" varname="DatenFuerLoop">
+		<option value="<wgui:loopvar loopname="selectLoop" varname="id"/>"<wgui:switch name="swtsel" varname="selectLoop|selected"><wgui:case switchname="swtsel" condition="1"> selected</wgui:case switchname="swtsel"></wgui:switch name="swtsel"> ><wgui:loopvar loopname="selectLoop" varname="bezeichnung"/></option>
+	</wgui:loop name="selectLoop">
+	</select><br/>
+
+	<input type="checkbox" 
+			<wgui:switch name="swtopt" varname="meineCheckbox">
+				<wgui:case switchname="swtopt" condition="1"> checked</wgui:case switchname="swtopt">
+			</wgui:switch name="swtopt">
+	 />
+</wgui:block name="TestWindowEins">
+<wgui:block name="TestWindowZwei">
+	<wgui:text id="feldBezeichnungText"/> <input type="text" id="prfx2_meinText" value="" /><br/>
+
+	<wgui:text id="feldBezeichnungSelect"/> <select id="prfx2_meinSelect">
+	<wgui:loop name="selectLoop" varname="DatenFuerLoop">
+		<option value="<wgui:loopvar loopname="selectLoop" varname="id"/>"><wgui:loopvar loopname="selectLoop" varname="country_name"/></option>
+	</wgui:loop name="selectLoop">
+	</select><br/>
+
+	<input type="checkbox" id="prfx2_meineCheckbox" /><br/>
+
+	<button onclick="testPlgSave('prfx2_','payOut.largerWindowSave');">Senden</button>
+</wgui:block name="TestWindowZwei">
+

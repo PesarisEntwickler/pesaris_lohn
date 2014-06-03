@@ -27,6 +27,9 @@ $textResourceMap["txtN"] = "Nein";
 
 $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
 
+$textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
+
+
 /* ****** PAYMENTS ****** */
 $textResourceMap["txtBestehendeBankverbindungen"] = "Bestehende Bankverbindungen";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
