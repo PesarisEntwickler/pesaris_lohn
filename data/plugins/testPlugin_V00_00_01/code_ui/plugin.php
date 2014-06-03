@@ -4,12 +4,11 @@ class testPlugin_UI {
 		global $aafwConfig;
 
 		switch($functionName) {
-		case 'testPlugin.sysLoader': // <-- FIX vorgegebener Name. Wird waehrend des Login-Prozesses automatisch aufgerufen. 
-			//Damit lassen sich Plugin-spezifische CSS- und JS-Dateien laden
+		case 'testPlugin.sysLoader': // <-- FIX vorgegebener Name. Wird während des Login-Prozesses automatisch aufgerufen. Damit lassen sich Plugin-spezifische CSS- und JS-Dateien laden
 //			communication_interface::cssFileInclude('plugins/testPlugin_V00_00_01/code_ui/css/test.css','all');
 			communication_interface::jsFileInclude('plugins/testPlugin_V00_00_01/code_ui/js/test.js','text/javascript','testPlugin');
 			break;
-		case 'testPlugin.helloWorld': // hier ein Beispiel fuer die Anzeige einer Message-Box
+		case 'testPlugin.helloWorld': // hier ein Beispiel für die Anzeige einer Message-Box
 			$objWindow = new wgui_window("payroll", "infoBox");
 			$objWindow->windowTitle("Mein Titel");
 			$objWindow->windowWidth(450);
@@ -18,14 +17,14 @@ class testPlugin_UI {
 			$objWindow->showInfo(); //alternativ: showQuestion(), showAlert()
 			break;
 		case 'testPlugin.largerWindow':
-			// Wenn keine Daten ans Template Uebergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
+			// Wenn keine Daten ans Template übergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
 			// In diesem Beispiel werden die Formulardaten direkt ins Template "generiert"
 			$data["meinName"] = "Mein Name ist Hase";
 			$data["DatenFuerLoop"] = array();
 			$data["DatenFuerLoop"][] = array("id"=>"1","bezeichnung"=>"Option 1","selected"=>"0");
 			$data["DatenFuerLoop"][] = array("id"=>"2","bezeichnung"=>"Option 2","selected"=>"0");
 			$data["DatenFuerLoop"][] = array("id"=>"3","bezeichnung"=>"Option 3","selected"=>"0");
-			$data["DatenFuerLoop"][] = array("id"=>"4","bezeichnung"=>"Option 4","selected"=>"1"); //Option 4 soll ausgewaehlt werden
+			$data["DatenFuerLoop"][] = array("id"=>"4","bezeichnung"=>"Option 4","selected"=>"1"); //Option 4 soll ausgewählt werden
 			$data["DatenFuerLoop"][] = array("id"=>"5","bezeichnung"=>"Option 5","selected"=>"0");
 			$data["meineCheckbox"] = 1;
 
@@ -34,11 +33,11 @@ class testPlugin_UI {
 			$objWindow->windowIcon("users24x24.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
 			$objWindow->windowWidth(550);
 			$objWindow->windowHeight(225);
-			$objWindow->loadContent("testdatei",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu uebergebende Daten / 3. Parameter: Name des Template-Blocks
+			$objWindow->loadContent("testdatei",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu übergebende Daten / 3. Parameter: Name des Template-Blocks
 			$objWindow->showWindow();
 			break;
 		case 'testPlugin.largerWindowBL':
-			//In diesem Beispiel werden die Formulardaten mittels JavaScript eingefuegt. Hier mit der Funktion 'testPlgLoad' in der Datei 'test.js'.
+			//In diesem Beispiel werden die Formulardaten mittels JavaScript eingefügt. Hier mit der Funktion 'testPlgLoad' in der Datei 'test.js'.
 			$fb = blFunctionCall('testPlugin.braucheDaten');
 			if($fb["success"]) {
 				$data["DatenFuerLoop"] = $fb["data"];
@@ -53,10 +52,7 @@ class testPlugin_UI {
 				$objWindow->resizable(false);
 				$objWindow->fullscreen(false);
 				$objWindow->modal(true);
-										//1. Parameter: Name der Template-Datei 
-													// 2. Parameter: an die Datei zu uebergebende Daten 
-															// 3. Parameter: Name des Template-Blocks
-				$objWindow->loadContent("testdatei",$data,"TestWindowZwei"); 
+				$objWindow->loadContent("testdatei",$data,"TestWindowZwei"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu übergebende Daten / 3. Parameter: Name des Template-Blocks
 //				$objWindow->addEventFunction_onResize("");
 				$objWindow->showWindow();
 
@@ -83,7 +79,7 @@ class testPlugin_UI {
 		case 'core.bootLoadMenu':
 			uiFunctionCall('baseLayout.appMenuAddSection','testPlugin','Test Plugin');
 			uiFunctionCall('baseLayout.appMenuAddItem','testPlugin','menutestpluginhello','Hello world','plugins/baseLayout_V00_01_00/code_ui/media/icons/key24x24.png','cb(\'testPlugin.helloWorld\');return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','testPlugin','menutestpluginwl','Ein groesseres Fenster','plugins/baseLayout_V00_01_00/code_ui/media/icons/key24x24.png','cb(\'testPlugin.largerWindow\');return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','testPlugin','menutestpluginwl','Ein grösseres Fenster','plugins/baseLayout_V00_01_00/code_ui/media/icons/key24x24.png','cb(\'testPlugin.largerWindow\');return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','testPlugin','menutestpluginwl2','Funktionsaufruf BL','plugins/baseLayout_V00_01_00/code_ui/media/icons/key24x24.png','cb(\'testPlugin.largerWindowBL\');return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','testPlugin','menutestpluginalert','JS ALERT','plugins/baseLayout_V00_01_00/code_ui/media/icons/key24x24.png','cb(\'testPlugin.alert\');return false;');
 			break;

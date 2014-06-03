@@ -12,7 +12,8 @@ class session_control {
 	private function __construct() {
 		$this->isDebug = false;
         global $aawConfig;
-		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
+//		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
+		$this->sessionCachePath = "/usr/local/www/apache22/data/kernel/cache/sessions/";
 //		$this->sessionCachePath = "kernel/cache/sessions/"; // <--- relativer Pfad hat Probleme im Destruktor bereitet... darum nur absoluten Pfad verwenden!
 	}
 
@@ -160,7 +161,7 @@ class session_control {
 //		registerEvent("myPlugin.myFunctionName", "core.loader");
 		require_once("system_database_manager.php");
 		$system_database_manager = system_database_manager::getInstance();
-		require_once("kernel/core_ui.php");
+		require_once("/usr/local/www/apache22/data/kernel/core_ui.php");
 		//$core_ui = core_ui::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT name FROM core_plugins ORDER BY sort_order", "loader");
 		$out = "";

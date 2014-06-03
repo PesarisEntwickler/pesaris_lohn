@@ -18,7 +18,7 @@ internationalization
 	getDefaultCountry()
 ->falls ein "maschineller User" (z.B. eine Kasse) mit dem System kommuniziert, muss der Text zwar in Deutsch sein,
 aber die Nummern u.U. ohne Tausenderseparator und Dezimalstellen mit Punkt anstatt Komma getrennt.
-Das koennte man z.B. mit einem Pseudo-Locale 'de-xx' loesen, oder?
+Das könnte man z.B. mit einem Pseudo-Locale 'de-xx' lösen, oder?
 
 Date	-> erweitert 'Internatonal'
 	mysqlQueryDateFormat	IN:FieldName	[UNIX, USER, MYSQL]
@@ -30,7 +30,7 @@ Number	-> erweitert 'Internatonal'
 	convertNumber		(SYS<->USER)
 	formatNumber		
 	isValidNumber		INT, UINT, FLOAT, UFLOAT
-->koennte man nicht beispielsweise mit ARRAY_WALK eine Massenformatierung in einem Array laufen lassen?
+->könnte man nicht beispielsweise mit ARRAY_WALK eine Massenformatierung in einem Array laufen lassen?
 
 Translation('de-de', 'testPlugin')	-> erweitert 'Internatonal' [beide Parameter optional -> wenn nicht angegeben, wird angenommen USER-LOCALES und CORE]
 	addSource

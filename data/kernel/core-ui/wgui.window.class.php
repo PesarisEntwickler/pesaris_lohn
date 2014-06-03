@@ -61,13 +61,13 @@ class wgui_window extends wgui
 
 	function minimize($windowID="")
 	{
-		// In JS einbauen -> Abfrage nach State ( jQuery.fn.mb_getState(attr) ) -> wenn NICHT ICONIZED, dann mb_iconize() ausfuehren, sonst nicht!
+		// In JS einbauen -> Abfrage nach State ( jQuery.fn.mb_getState(attr) ) -> wenn NICHT ICONIZED, dann mb_iconize() ausführen, sonst nicht!
 		communication_interface::jsExecute('$("#'.($windowID=="" ? $this->windowID : $windowID).'").mb_iconize();');
 	}
 
 	function restore($windowID="")
 	{
-		// In JS einbauen -> Abfrage nach State ( jQuery.fn.mb_getState(attr) ) -> wenn ICONIZED, dann mb_iconize() ausfuehren, sonst nicht!
+		// In JS einbauen -> Abfrage nach State ( jQuery.fn.mb_getState(attr) ) -> wenn ICONIZED, dann mb_iconize() ausführen, sonst nicht!
 		communication_interface::jsExecute('$("#'.($windowID=="" ? $this->windowID : $windowID).'").mb_iconize();');
 	}
 
@@ -251,7 +251,7 @@ class wgui_window extends wgui
 			communication_interface::jsExecute('$("#modalContainer").mb_bringToFront();');
 //			communication_interface::jsExecute('$("#mb_overlay").fadeIn(500);');
 		}else{
-//TODO: Was ist mit AlwaysOnTop??	<-- 
+//		Was ist mit AlwaysOnTop??	<-- TODO
 //			communication_interface::jsExecute('document.getElementById(\'mainContent\').innerHTML = document.getElementById(\'mainContent\').innerHTML + \'<div id="'.$this->windowID.'" class="containerPlus draggable'.($this->resizable ? ' resizable' : '').' {buttons:\\\''.$topButtons.'\\\', icon:\\\''.$this->windowIcon.'\\\', skin:\\\'white\\\', width:\\\''.$this->width.'\\\', height:\\\''.$this->height.'\\\',dock:\\\'dock\\\',closed:\\\'false\\\',rememberMe:false,title:\\\''.$this->windowTitle.'\\\'}" style="position:absolute;top:50px;left:50px;" fullscreen="false"></div>\'');
 //			communication_interface::jsExecute('document.getElementById(\'mainContent\').innerHTML = document.getElementById(\'mainContent\').innerHTML + \'<div id="'.$this->windowID.'" class="containerPlus draggable'.($this->resizable ? ' resizable' : '').' {buttons:\\\''.$topButtons.'\\\', icon:\\\''.$this->windowIcon.'\\\', skin:\\\'white\\\', width:\\\''.$this->width.'\\\', height:\\\''.$this->height.'\\\',dock:\\\'dock\\\',closed:\\\'false\\\',rememberMe:false,title:\\\''.$this->windowTitle.'\\\'}" style="position:absolute;top:50px;left:50px;" fullscreen="false"></div>\'');
 			communication_interface::jsExecute('$(\'#mainContent\').append("<div id=\\"'.$this->windowID.'\\" class=\\"containerPlus draggable'.($this->resizable ? ' resizable' : '').' {buttons:\\\''.$topButtons.'\\\', icon:\\\''.$this->windowIcon.'\\\', skin:\\\'default\\\', width:\\\''.$this->width.'\\\', height:\\\''.$this->height.'\\\',dock:\\\'dock\\\',closed:\\\'false\\\',rememberMe:false,title:\\\''.$this->windowTitle.'\\\'}\\" style=\\"position:absolute;top:50px;left:50px;\\" fullscreen=\\"false\\"></div>");');

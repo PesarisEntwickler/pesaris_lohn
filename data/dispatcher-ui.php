@@ -55,7 +55,7 @@ function dispatcher($functionName)
 				$session_control->loader($objResponse);
 				return $objResponse;
 			}else{
-				$objResponse->alert("Login fehlgeschlagen.");
+				$objResponse->alert("Login fehlgeschlagen.  ccid=". $arrArgs[0]["ccid"]. ", cuid=". $arrArgs[0]["cuid"]. ", cpwd=" . $arrArgs[0]["cpwd"]);
 				return $objResponse;
 			}
 			break;

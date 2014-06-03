@@ -24,9 +24,9 @@ function functionCall($fncName, $param=null) {
 		//now sending the function request to the remote server
 		//decoding the answer
 		$answer = unserialize($res);
-	} else {
+	}else{
 		//Call a local function
-		require_once("../plugins/".$pf[0]."_".$aafwConfig["plugins"][$pf[0]]["currentVersion"]."/code_logic/plugin.php");
+		require_once('../plugins/'.$pf[0]."_".$aafwConfig["plugins"][$pf[0]]["currentVersion"].'/code_logic/plugin.php');
 		$prs=new financialAccounting();
 		$answer = $prs->dispatcher($objResponse,$functionName,$arrArgs);
 	}

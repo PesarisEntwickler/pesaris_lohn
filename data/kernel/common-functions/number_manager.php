@@ -26,7 +26,7 @@ class number_manager extends internationalization {
 	public function __construct() {
 		// call the parent constructor and set any defaults
 		parent::__construct();
-		$this->setDefaultSystemSettings(); //TEST_DATE <- eigentlich nicht noetig, da bereits im parent die Benutzer-Einstellungen geladen werden muessten!
+		$this->setDefaultSystemSettings(); //TEST_DATE <- eigentlich nicht nötig, da bereits im parent die Benutzer-Einstellungen geladen werden müssten!
 	}
 
 	public function isValidNumber($value, $checkFormat, $maxDecimals=0) {

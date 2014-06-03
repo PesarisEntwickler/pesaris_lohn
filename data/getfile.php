@@ -4,7 +4,7 @@
 	if(!isset($_COOKIE["aafw"])) exit();
 
 	require_once("kernel/common-functions/configuration.php");
-	require_once("kernel/core-logic/system_database_manager.php");
+	require_once('kernel/core-logic/system_database_manager.php');
 	require_once("kernel/core-logic/session_control.php");
 	require_once("kernel/common-functions/file_manager.php");
 	$session_control = session_control::getInstance();

@@ -58,7 +58,7 @@ class baseLayout_UI {
 		case 'baseLayout.userManager':
 				$objWindow = new wgui_window("baseLayout", "userManager");
 //				$objWindow->windowTitle("Benutzerverwaltung");
-				$objWindow->windowTitle($objWindow->getText("blUserAdmTitle")); // <--- wenn Text dynamisch eingefuegt wird, wird das Template nicht korrekt kompiliert... (ohne Labels...)
+				$objWindow->windowTitle($objWindow->getText("blUserAdmTitle")); // <--- wenn Text dynamisch eingefügt wird, wird das Template nicht korrekt kompiliert... (ohne Labels...)
 				$objWindow->windowIcon("users48x48.png");
 				$objWindow->windowWidth(600);
 				$objWindow->windowHeight(400);
@@ -134,7 +134,7 @@ class baseLayout_UI {
 			break;
 		case 'baseLayout.groupEditor':
 			$mapConfigMenu = uiFunctionCall('coreFunctions.getPermissionMenu');
-			$modulePermissionMenu = '<option id="top">--Modul waehlen--</option>';
+			$modulePermissionMenu = '<option id="top">--Modul wählen--</option>';
 			foreach($mapConfigMenu as $mainMenuItemName => $mainMenuItem) {
 				if(count($mainMenuItem["subitems"])>0) {
 					//there are submenu items
@@ -171,7 +171,7 @@ class baseLayout_UI {
 				$windowTitle = "blGroupEditorTitleNew";
 			}
 /*
-<button id="btnGroupDataSubmit" onclick="cb('baseLayout.saveGroupEditorData',xajax.getFormValues('groupEditForm',1));"><wgui:text id="btnSave"/></button>
+<button id="btnGroupDataSubmit" onclick="cb('baseLayout.saveGroupEditorData',xajax.getFormValues('groupEditForm',1));">Speichern</button>
 <wgui:var name="id"/>
 <wgui:var name="name"/>
 <wgui:var name="description"/>
@@ -216,12 +216,12 @@ class baseLayout_UI {
 				case 106:
 					$tabIndex = 0;
 					$fieldName = "name";
-					$errTxt = "Ungueltige Eingabe in Feld 'Gruppenname'.";
+					$errTxt = "Ungültige Eingabe in Feld 'Gruppenname'.";
 					break;
 				case 111:
 					$tabIndex = 0;
 					$fieldName = "description";
-					$errTxt = "Ungueltige Eingabe in Feld 'Beschreibung'.";
+					$errTxt = "Ungültige Eingabe in Feld 'Beschreibung'.";
 					break;
 				default:
 					$fieldName = "";
@@ -292,7 +292,7 @@ class baseLayout_UI {
 				case 106:
 					$tabIndex = 0;
 					$fieldName = "uid";
-					$errTxt = "Ungueltige Eingabe in Feld 'Benutzername'.";
+					$errTxt = "Ungültige Eingabe in Feld 'Benutzername'.";
 					break;
 				case 110:
 					$tabIndex = 0;
@@ -302,7 +302,7 @@ class baseLayout_UI {
 				case 111:
 					$tabIndex = 0;
 					$fieldName = "full_name";
-					$errTxt = "Ungueltige Eingabe in Feld 'Nachname, Vorname'.";
+					$errTxt = "Ungültige Eingabe in Feld 'Nachname, Vorname'.";
 					break;
 				case 115:
 					$tabIndex = 0;
@@ -312,7 +312,7 @@ class baseLayout_UI {
 				case 116:
 					$tabIndex = 0;
 					$fieldName = "email";
-					$errTxt = "Ungueltige Eingabe in Feld 'E-Mailadresse'.";
+					$errTxt = "Ungültige Eingabe in Feld 'E-Mailadresse'.";
 					break;
 				case 130:
 					$tabIndex = 0;
@@ -322,7 +322,7 @@ class baseLayout_UI {
 				case 131:
 					$tabIndex = 0;
 					$fieldName = "timeout_minutes";
-					$errTxt = "Ungueltige Eingabe in Feld 'Autom. abmelden nach'.";
+					$errTxt = "Ungültige Eingabe in Feld 'Autom. abmelden nach'.";
 					break;
 				default:
 					$fieldName = "";
@@ -360,9 +360,9 @@ class baseLayout_UI {
 			switch(count($functionParameters)) {
 			case 1:
 				$objWindow = new wgui_window("baseLayout", "modalWindow");
-				$objWindow->windowTitle("Benutzer loeschen");
+				$objWindow->windowTitle("Benutzer löschen");
 	//			$objWindow->windowHeight(300);
-				$objWindow->setContent("<br/>Bitte bestaetigen Sie die Loeschung.<br/><br/><button onclick=\"cb('baseLayout.deleteUser',".$functionParameters[0].",1);\">Loeschen</button><button onclick=\"$('#modalContainer').mb_close();\">Abbrechen</button>");
+				$objWindow->setContent("<br/>Bitte bestätigen Sie die Löschung.<br/><br/><button onclick=\"cb('baseLayout.deleteUser',".$functionParameters[0].",1);\">Löschen</button><button onclick=\"$('#modalContainer').mb_close();\">Abbrechen</button>");
 				$objWindow->showQuestion();
 				break;
 			case 2:
@@ -510,10 +510,10 @@ class baseLayout_UI {
 			communication_interface::assign('appUser', 'innerHTML', $session_control->getSessionInfo("uid"));
 			break;
 		case 'baseLayout.titleBar_addItem':
-			//links oder rechts anhaengen?
+			//links oder rechts anhängen?
 			break;
 		case 'baseLayout.applicationMenu_addItem':
-			//oben oder unten anhaengen? Oberhalb oder unterhalb von welcher ID?
+			//oben oder unten anhängen? Oberhalb oder unterhalb von welcher ID?
 			break;
 		case 'baseLayout.fireLoadIncludes':
 			if(session_control::getSessionSettings("baseLayout", "bootStatus")=="fireLoadIncludes") break; //TODO: Testen, ob das den IE-Bug behebt...
@@ -569,11 +569,11 @@ class baseLayout_UI {
 
 			$jsDatepickerConfig = "$.datepicker.regional['de'] = {\n";
 			$jsDatepickerConfig .= "closeText: 'schließen',\n";
-			$jsDatepickerConfig .= "prevText: '&#x3c;zurueck',\n";
+			$jsDatepickerConfig .= "prevText: '&#x3c;zurück',\n";
 			$jsDatepickerConfig .= "nextText: 'Vor&#x3e;',\n";
 			$jsDatepickerConfig .= "currentText: 'heute',\n";
-			$jsDatepickerConfig .= "monthNames: ['Januar','Februar','Maerz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],\n";
-			$jsDatepickerConfig .= "monthNamesShort: ['Jan','Feb','Mrz','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],\n";
+			$jsDatepickerConfig .= "monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],\n";
+			$jsDatepickerConfig .= "monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],\n";
 			$jsDatepickerConfig .= "dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],\n";
 			$jsDatepickerConfig .= "dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],\n";
 			$jsDatepickerConfig .= "dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],\n";
@@ -647,7 +647,7 @@ class baseLayout_UI {
 //return;
 			if(!$blUserSettingsFull["success"]) {
 				switch($blUserSettingsFull["errCode"]) {
-				case 101: //uebermittelte ID nicht numerisch!
+				case 101: //übermittelte ID nicht numerisch!
 					$err = "blChPwdErrOldPW"; //k
 					break;
 				default:

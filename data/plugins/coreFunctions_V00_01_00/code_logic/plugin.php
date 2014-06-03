@@ -67,7 +67,7 @@ class coreFunctions_BL {
 
 			//hat der angemeldete Nutzer die Berechtigung sein eigenes PW zu ändern?
 			//hat der angemeldete Nutzer die Berechtigung das PW eines anderen Nutzers zu ändern?
-			//enthalten die aebermittelten Passwörter ungaeltige Zeichen
+			//enthalten die übermittelten Passwörter ungültige Zeichen
 
 			///////////////////////////////////////////////////
 			// The "old" passwords must correspond with the current password set in the database

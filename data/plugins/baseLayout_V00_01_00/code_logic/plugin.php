@@ -29,15 +29,15 @@ class baseLayout_BL {
 			$permissions["systemUser"]["userDetailDisplay"]["type"] = "bool";
 			$permissions["systemUser"]["userDetailDisplay"]["default"] = true;
 
-			$permissions["systemUser"]["userAdd"]["title"] = "Benutzer hinzufuegen";
+			$permissions["systemUser"]["userAdd"]["title"] = "Benutzer hinzufügen";
 			$permissions["systemUser"]["userAdd"]["type"] = "bool";
 			$permissions["systemUser"]["userAdd"]["default"] = true;
 
-			$permissions["systemUser"]["userEdit"]["title"] = "Benutzer aendern";
+			$permissions["systemUser"]["userEdit"]["title"] = "Benutzer ändern";
 			$permissions["systemUser"]["userEdit"]["type"] = "bool";
 			$permissions["systemUser"]["userEdit"]["default"] = true;
 
-			$permissions["systemUser"]["userDelete"]["title"] = "Benutzer loeschen";
+			$permissions["systemUser"]["userDelete"]["title"] = "Benutzer löschen";
 			$permissions["systemUser"]["userDelete"]["type"] = "bool";
 			$permissions["systemUser"]["userDelete"]["default"] = true;
 
@@ -49,15 +49,15 @@ class baseLayout_BL {
 			$permissions["systemUser"]["groupDetailDisplay"]["type"] = "bool";
 			$permissions["systemUser"]["groupDetailDisplay"]["default"] = true;
 
-			$permissions["systemUser"]["groupAdd"]["title"] = "Gruppe hinzufuegen";
+			$permissions["systemUser"]["groupAdd"]["title"] = "Gruppe hinzufügen";
 			$permissions["systemUser"]["groupAdd"]["type"] = "bool";
 			$permissions["systemUser"]["groupAdd"]["default"] = true;
 
-			$permissions["systemUser"]["groupEdit"]["title"] = "Gruppe aendern";
+			$permissions["systemUser"]["groupEdit"]["title"] = "Gruppe ändern";
 			$permissions["systemUser"]["groupEdit"]["type"] = "bool";
 			$permissions["systemUser"]["groupEdit"]["default"] = true;
 
-			$permissions["systemUser"]["groupDelete"]["title"] = "Gruppe loeschen";
+			$permissions["systemUser"]["groupDelete"]["title"] = "Gruppe löschen";
 			$permissions["systemUser"]["groupDelete"]["type"] = "bool";
 			$permissions["systemUser"]["groupDelete"]["default"] = true;
 

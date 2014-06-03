@@ -37,10 +37,7 @@ function wgui($cPluginName="",$cTemplate="",$cLanguage="de")
 //	$this->cachePath = CORE_WGUI_CACHE;
 	$currentPluginVersion = session_control::getPluginVersion($cPluginName);
 	$this->cachePath = 'plugins/'.$cPluginName."_".$currentPluginVersion.'/code_ui/cache/';
-// die Sprache muessen wir nicht uebergeben. Stattdessen muessen wir die Templateart ('webbrowser' oder 'mobile')
-// und dem Namen des Plugins uebergeben. 
-// Sub-Plugins muessen ebenfalls beruecksichtigt werden
-// (wie? ev. mit Pfadangabe 'plugin1.subPlugin')
+// die Sprache müssen wir nicht übergeben. Stattdessen müssen wir die Templateart ('webbrowser' oder 'mobile') und den Namen des Plugins übergeben. Sub-Plugins müssen ebenfalls berücksichtigt werden (wie? ev. mit Pfadangabe 'plugin1.subPlugin')
 // /home/dwm/server-web/axerios/aafw/kernel/cache/templates-webbrowser
 // /home/dwm/server-web/axerios/aafw/kernel/cache/templates-mobile
 	$this->templatePath = 'plugins/'.$cPluginName."_".$currentPluginVersion.'/code_ui/templates/';
@@ -210,7 +207,7 @@ function processTemplate($data,$subTemplate="")
 		$out = str_replace("\"\".","",$out);
 		$out = preg_replace("/(\\\\n){2,}/", "\\n", $out); // sucht nach '\n' das mehr als 2x hintereinander vorkommt und ersetzt es durch ein einziges '\n'
 
-		// Anfuerungs- und Schlusszeichen bei Variabeln wurden auch escaped. Diese muessen wir wieder unescapen!
+		// Anfürungs- und Schlusszeichen bei Variabeln wurden auch escaped. Diese müssen wir wieder unescapen!
 		preg_match_all('/(\\\"\.)?\$([_a-zA-Z0-9])+(\[\\\"[_a-zA-Z0-9]+\\\"\])*(\.\\\")?/', $out, $matches);
 		foreach($matches[0] as $hit) $out = str_replace($hit,str_replace("\\\"","\"",$hit),$out);
 

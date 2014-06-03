@@ -11,8 +11,7 @@ class file_manager {
 	private $coreUserID;
 
 	function __construct() {
-        global $aafwConfig;
-        $this->rootPath = $aafwConfig["paths"]["file_manager"]["rootPath"];
+		$this->rootPath = "/usr/local/www/apache22/data-hidden/";
 		$this->currentSpace = "";
 		$this->currentPath = $this->rootPath;
 		$this->additionalPath = "";
@@ -89,8 +88,8 @@ class file_manager {
 
 	public function setPath($pathName) {
 		if(!preg_match("/^[-\/_.0-9a-zA-Z]{1,250}$/", $pathName)) return false;
-		if(substr($pathName, -1)!="/") $pathName .= "/"; // fehlende '/' am Ende muessen hinzugefuegt werden
-		if(substr($pathName, 0, 1)=="/") $pathName = substr($pathName, 1); // fuehrende '/' muessen geloescht werden
+		if(substr($pathName, -1)!="/") $pathName .= "/"; // fehlende '/' am Ende müssen hinzugefügt werden
+		if(substr($pathName, 0, 1)=="/") $pathName = substr($pathName, 1); // führende '/' müssen gelöscht werden
 		$this->additionalPath = $pathName;
 		return $this;
 	}
@@ -184,8 +183,8 @@ class file_manager {
 	public function moveTo($destDir) {
 		if($this->additionalPath=="" || $destDir=="") return false;
 		if(!preg_match("/^[-\/_.0-9a-zA-Z]{1,250}$/", $destDir)) return false;
-		if(substr($destDir, -1)!="/") $destDir .= "/"; // fehlende '/' am Ende muessen hinzugefuegt werden
-		if(substr($destDir, 0, 1)=="/") $destDir = substr($destDir, 1); // fuehrende '/' muessen geloescht werden
+		if(substr($destDir, -1)!="/") $destDir .= "/"; // fehlende '/' am Ende müssen hinzugefügt werden
+		if(substr($destDir, 0, 1)=="/") $destDir = substr($destDir, 1); // führende '/' müssen gelöscht werden
 		if(!file_exists($this->currentPath.$this->additionalPath)) return false;
 
 		if($this->currentFileName=="") {
@@ -215,7 +214,7 @@ class file_manager {
 				if($curDir!="") {
 					$wholePath .= $curDir."/";
 					if(!file_exists($wholePath)) {
-						mkdir($wholePath, 0777); //0777 scheint gar nichts zu bringen... daher ist die naechste Zeile mit chmod noetig!
+						mkdir($wholePath, 0777); //0777 scheint gar nichts zu bringen... daher ist die nächste Zeile mit chmod nötig!
 						chmod($wholePath, 0777);
 					}
 				}
@@ -281,7 +280,7 @@ class file_manager {
 	public function createTmpDir() {
 		if($this->currentSpace != "USER") $this->userSpace();
 
-		//Ggf. alte tmp-Unterverzeichnisse > 24h loeschen
+		//Ggf. alte tmp-Unterverzeichnisse > 24h löschen
 				// ---> unix-timestamp = filectime($filename)  VERGLEICHEN MIT  time()
 		//neuer Verzeichnisname ermitteln
 		do{
