@@ -1,4 +1,4 @@
-<wgui:block name="calculationOverview">
+﻿<wgui:block name="calculationOverview">
 	<div id="tbCalcOvRow1" class="ui-widget-header ui-corner-all">
 		<button id="prlCalcOvBtnNew"><wgui:text id="prlCalcOvBtnNew"/></button>
 		<button id="prlCalcOvBtnSettings"><wgui:text id="prlCalcOvBtnSettings"/></button>
@@ -280,3 +280,30 @@
 	</div>
 	<button id="prlPrdSetSave"><wgui:text id="btnSave"/></button><button id="prlPrdSetCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlCalcOvSettings">
+<wgui:block name="prlCalcReportSelector">
+    <fieldset>
+        Auswertung nach: <select id="prlRepSelReportType">
+            <option value="0">Mitarbeiter</option>
+            <option value="1">Firma / Konto / Gegenkonto / Kst</option>
+            <option value="2">Firma / Kst / Konto / Gegenkonto</option>
+            <option value="3">Firma / Konto / Gegenkonto</option>
+            <option value="4">Firma / Kst</option>
+            <option value="5">Firma / Konto</option>
+            <option value="6">Konto / Gegenkonto / Kst</option>
+            <option value="7">Kst / Konto / Gegenkonto</option>
+            <option value="8">Konto / Gegenkonto</option>
+            <option value="9">Kst</option>
+            <option value="10">Konto</option>
+        </select>
+        <div id="hiddenDiv_Company" style="display: none;">
+            Firma: <input type="text" id="prlRepSelFilterFirma" />
+        </div>
+        <div id="hiddenDiv_CostCenter" style="display: none;">
+            Kst: <input type="text" id="prlRepSelFilterKst" />
+        </div>
+    </fieldset>
+    <button id="prlRepSelSave">OK</button><button id="prlRepSelCancel">
+        Abbrechen
+    </button>
+    <div id="prlRepSelErr"></div>
+</wgui:block name="prlCalcReportSelector">
