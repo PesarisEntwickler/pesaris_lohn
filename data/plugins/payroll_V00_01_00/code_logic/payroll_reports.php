@@ -1,7 +1,9 @@
 <?php
+
 class payroll_BL_reports {
 	
 	public function CalculationJournal($param) {
+        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
 //$now = microtime(true); //TODO: PROFILING START
@@ -105,6 +107,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
 
 	private function AccountingJournal($param,$ReportName,$entryTable) {
+        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
 		$periodLabels["de"] = array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
@@ -806,6 +809,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
     
 	public function PayrollAccountJournal($param) {
+        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
 
@@ -935,6 +939,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
 
 	public function Payslip($param) {
+        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		$payrollPeriodID = $param["payroll_period_ID"];
 		$uid = session_control::getSessionInfo("id");
