@@ -104,5 +104,6 @@ $aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 //$aafwConfig["paths"]["utilities"]["pdflatex"] = "C:/MiKTeX/miktex/bin/pdflatex.exe";
 //$aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
+//11.06.2014
 
 ?>
