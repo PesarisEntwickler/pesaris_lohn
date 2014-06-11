@@ -12,8 +12,8 @@ class session_control {
 	private function __construct() {
 		$this->isDebug = false;
         global $aawConfig;
-//		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
-		$this->sessionCachePath = "/usr/local/www/apache22/data/kernel/cache/sessions/";
+		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
+        //$this->sessionCachePath = "/usr/local/www/apache22/data/kernel/cache/sessions/";
 //		$this->sessionCachePath = "kernel/cache/sessions/"; // <--- relativer Pfad hat Probleme im Destruktor bereitet... darum nur absoluten Pfad verwenden!
 	}
 
@@ -105,14 +105,14 @@ class session_control {
         //$system_database_manager->selectDatabase()
         //		$system_database_manager->overrideDatabaseName($customerID);
         $result = $system_database_manager->executeQuery("SELECT `databaseName` FROM `customer` WHERE `id`='".addslashes($customerID)."' AND `active`=1", "authenticate employee login");
-		if(count($result) > 0) {
-			$dbName = $result[0]["databaseName"];
-			$system_database_manager->selectDB($dbName);
-			$system_database_manager->defaultDatabaseName($dbName);
-		}else{
-			return false;
-		}
-
+        if(count($result) > 0) {
+            $dbName = $result[0]["databaseName"];
+            $system_database_manager->selectDB($dbName);
+            $system_database_manager->defaultDatabaseName($dbName);
+        }else{
+            return false;
+        }
+       
 		$result = $system_database_manager->executeQuery("SELECT id, full_name, email, plugin_settings, uid, language FROM core_user WHERE uid='".addslashes($userID)."' AND pwd=PASSWORD('".addslashes($password)."')", "authenticate employee login");
 		if(count($result) > 0) {
 			$sessionControl = session_control::getInstance();
@@ -161,7 +161,8 @@ class session_control {
 //		registerEvent("myPlugin.myFunctionName", "core.loader");
 		require_once("system_database_manager.php");
 		$system_database_manager = system_database_manager::getInstance();
-		require_once("/usr/local/www/apache22/data/kernel/core_ui.php");
+        global $aafwConfig;
+		require_once($aafwConfig["paths"]["session_control"]["rootPathData"]."kernel/core_ui.php");
 		//$core_ui = core_ui::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT name FROM core_plugins ORDER BY sort_order", "loader");
 		$out = "";
