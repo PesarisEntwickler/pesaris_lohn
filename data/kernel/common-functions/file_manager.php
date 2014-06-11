@@ -11,7 +11,8 @@ class file_manager {
 	private $coreUserID;
 
 	function __construct() {
-		$this->rootPath = "/usr/local/www/apache22/data-hidden/";
+		global $aafwConfig;
+        $this->rootPath = $aafwConfig["paths"]["file_manager"]["rootPath"];
 		$this->currentSpace = "";
 		$this->currentPath = $this->rootPath;
 		$this->additionalPath = "";
