@@ -72,8 +72,8 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
 //$aafwConfig["paths"]["reports"]["templates"] = "/usr/local/www/apache22/data-hidden/GLOBAL/templates/";
 
-//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc.exe";
-//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex.exe";
+//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc";
+//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex";
 //$aafwConfig["paths"]["utilities"]["stdout"] = "/dev/null";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "mysql";
 
@@ -118,7 +118,5 @@ $aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 //$aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
 ////$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "C:/Users/Harald G. Mueller/HM/XAMPP/mysql/data";
-
-
 
 ?>
