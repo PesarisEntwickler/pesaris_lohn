@@ -11,7 +11,7 @@ class file_manager {
 	private $coreUserID;
 
 	function __construct() {
-        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php"); 
+        require_once(getcwd()."/kernel/common-functions/configuration.php");
 		global $aafwConfig;
         $this->rootPath = $aafwConfig["paths"]["file_manager"]["rootPath"];
 		$this->currentSpace = "";
