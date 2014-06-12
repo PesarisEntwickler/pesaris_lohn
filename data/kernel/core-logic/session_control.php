@@ -10,7 +10,7 @@ class session_control {
 
 	private function __construct() {
 		$this->isDebug = false;
-        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php");
+        require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
         //$this->sessionCachePath = "/usr/local/www/apache22/data/kernel/cache/sessions/";
@@ -161,7 +161,7 @@ class session_control {
 //		registerEvent("myPlugin.myFunctionName", "core.loader");
 		require_once("system_database_manager.php");
 		$system_database_manager = system_database_manager::getInstance();
-        require_once("/usr/local/www/apache22/data/kernel/common-functions/configuration.php");
+        require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		require_once($aafwConfig["paths"]["session_control"]["rootPathData"]."kernel/core_ui.php");
 		//$core_ui = core_ui::getInstance();
