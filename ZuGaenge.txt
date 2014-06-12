@@ -1,0 +1,79 @@
+Harald Müller
+079 700 14 14
+
+
+https://github.com/PesarisEntwickler/pesaris_lohn.git/trunk
+
+GITHub – online:
+------------------------------------------------
+https://github.com/PesarisEntwickler
+Der Account heisst: „PesarisEntwickler“
+Und das Repository dort ist „pesaris_lohn“
+Passwort ist: „schowiederäVersion“
+
+
+==========================================================
+
+Von: Daniel Müller [mailto:daniel.mueller@pesaris.com] 
+Gesendet: Montag, 26. Mai 2014 09:35
+An: Harald G. Mueller
+Cc: 'Pascal Moulin'
+Betreff: Neuer DB-Benutzer
+
+Hallo Harald
+
+Bitte verwende für den Datenbank-Zugriff nur noch folgenden Benutzer:
+
+Benutzername: remoteadmin
+Passwort: h3iD$N4b
+
+Damit müsste es auch klappen, die Stored Procedures anzuschauen und bei Bedarf zu verändern.
+Darf ich Dich bitten diese Zugangsdaten auch an Ascami weiterzuleiten.
+
+Danke und Gruss
+Daniel
+
+
+GoogleDrive
+=============
+https://drive.google.com/folderview?id=0B73eFeXGXIsHZkdEV2YyZzlnSHM&usp=sharing
+
+
+Zugang
+==========================
+
+https://srv2.copronet.ch/
+==========================
+Mandant "dev-lohn".
+1.	User "ascami1", Passwort "lynx"
+2.	User "ascami2", Passwort "lynx"
+3.	User "h.pluess", Passwort gleich wie auf SRV1
+4.	User "r.kreutzmann", Passwort gleich wie auf SRV1
+
+Harald
+--------------------------
+Home:	dev-lohn
+User:	webdev
+Pass:	penner 
+
+
+sFTP-Zugang
+==========================
+Host:	srv2.copronet.ch
+Port:	(nix - default)
+Prot:	sFTP-SSH
+Conn:	Normal
+User:	webdev
+Pass:	h3rM$8fQ
+
+
+MySQL
+==========================
+Conn:	TCP
+Host:	srv2.copronet.ch
+User:	harald
+Pass:	d4$15Tets
+Data:	lohndev
+Port:	3306	
+
+

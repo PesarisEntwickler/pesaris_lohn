@@ -11,7 +11,8 @@ class payroll_UI {
 			communication_interface::cssFileInclude('plugins/payroll_V00_01_00/code_ui/css/payroll.css','all');
 			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/payroll.js','text/javascript','payroll');
 			break;
-		case 'testPlugin.largerWindow':
+		case 'payroll.auszahlen.openwindow':
+			//communication_interface::alert("payroll.auszahlen.openwindow"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
 			// Wenn keine Daten ans Template Uebergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
 			// In diesem Beispiel werden die Formulardaten direkt ins Template "generiert"
 			$data["meinName"] = "Mein Name ist Hase";
@@ -23,12 +24,13 @@ class payroll_UI {
 			$data["DatenFuerLoop"][] = array("id"=>"5","bezeichnung"=>"Option 5","selected"=>"0");
 			$data["meineCheckbox"] = 1;
 
-			$objWindow = new wgui_window("testPlugin", "TestWindow1"); //1. Parameter: immer Name des aufrufenden Plugins / 2. Parameter: wird im HTML als "id" gesetzt, damit ist das Fenster per JS, resp. jQuery ansprechbar
-			$objWindow->windowTitle($objWindow->getText("MeinTitel1"));
-			$objWindow->windowIcon("users24x24.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
+			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
+			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenPeriodenwahl"));
+			$objWindow->windowIcon("auszahlen32.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
 			$objWindow->windowWidth(550);
-			$objWindow->windowHeight(225);
-			$objWindow->loadContent("auszahlen",$data,"TestWindowEins"); //1. Parameter: Name der Template-Datei / 2. Parameter: an die Datei zu uebergebende Daten / 3. Parameter: Name des Template-Blocks
+			$objWindow->windowHeight(225);  
+			$objWindow->modal(false);
+			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenPeriodenwahl"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 			$objWindow->showWindow();
 			break;
 
@@ -36,7 +38,6 @@ class payroll_UI {
 
 //			$numberformat_thousands_sep = session_control::getSessionSettings("CORE", "numberformat_thousands_sep");
 //			$numberformat_dec_point = session_control::getSessionSettings("CORE", "numberformat_dec_point");
-
 
 			$data = array();
 			$objWindow = new wgui_window("payroll", "employeeOverview");
@@ -3104,7 +3105,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		case 'core.bootLoadMenu':
 			uiFunctionCall('baseLayout.appMenuAddSection','payroll','Lohnbuchhaltung');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten','plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png', 'prlCalcOvOpen();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahlen',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen\');return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahlen',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen.openwindow\');return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm', 'plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png',  'prlPsoOpenEmployeeOverview();return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Firmenstamm',    'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
 			break;

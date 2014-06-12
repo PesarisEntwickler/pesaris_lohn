@@ -26,8 +26,13 @@ $textResourceMap["txtY"] = "Ja";
 $textResourceMap["txtN"] = "Nein";
 
 $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
-
 $textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
+
+/* ********* AUSZAHLEN *********** */
+$textResourceMap["txtTitelAuszahlenPeriodenwahl"] = "Auszahlen Periodenwahl";
+$textResourceMap["feldBezeichnungText"] = "a Textbox:";
+$textResourceMap["feldBezeichnungSelect"] = "a Select:";
+$textResourceMap["MeinTitel2"] = "Titel two";
 
 
 /* ****** PAYMENTS ****** */
@@ -72,9 +77,8 @@ $textResourceMap["txtTableHeadersPaymentSplit"] =
 														"<li>Periode</li>" .
 														"<li></li>" .
 													"</ul>";
-
 $textResourceMap["txtLoeschungBestaetigen"] = "L&ouml;schung best&auml;tigen";
- 
+  
 /*
 ********* EMPLOYEES ***********
 */

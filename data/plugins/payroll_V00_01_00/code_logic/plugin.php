@@ -34,10 +34,12 @@ class payroll_BL {
 		require_once('payroll_finMgmtAccounting.php');
 		$finMgmtAccounting = new finMgmtAccounting();
 				
+		require_once('payroll_auszahlen.php');
+		$auszahlen = new auszahlen();
+				  
 		switch($functionName) {
-		case 'testPlugin.braucheDaten':
-			return $this->braucheDaten();
-			break;
+		case 'payroll.auszahlen.braucheDaten':
+			return $auszahlen->auszahlDaten();
 		case 'payroll.onBootComplete':
 			return $variousFunctions->onBootComplete();
 		case 'payroll.getLanguageList':
@@ -399,23 +401,6 @@ class payroll_BL {
 		return $response;
 	}
 	
-	public function braucheDaten() {
-		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT core_intl_country.id, core_intl_country_names.country_name FROM core_intl_country,core_intl_country_names WHERE core_intl_country.id=core_intl_country_names.core_intl_country_ID AND core_intl_country_names.country_name_language='de' ORDER BY core_intl_country_names.country_name", "pim_getCountryList");
-		
-		if(count($result) == 0) {
-			$retval["success"] 	= false;
-			$retval["errCode"]  = 10;
-			$retval["errText"]  = "Keine Daten gefunden.";
-		}else{
-			$retval["success"] 	= true;
-			$retval["errCode"]  = 0;
-			$retval["data"] 	= $result;
-		}
-
-		return $retval;
-	}
-
 }
 $SYS_PLUGIN["bl"]["payroll"] = new payroll_BL();
 ?>
