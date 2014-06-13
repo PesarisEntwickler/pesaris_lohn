@@ -327,6 +327,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                          }
                          $runningSumDebitAmount = 0;
                          $runningSumCreditAmount = 0;
+                         $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
                          $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
@@ -400,6 +401,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                          }
                          $runningSumDebitAmount = 0;
                          $runningSumCreditAmount = 0;
+                         $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
                          $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
@@ -471,6 +473,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                          }
                          $runningSumDebitAmount = 0;
                          $runningSumCreditAmount = 0;
+                         $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
                          $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
@@ -541,6 +544,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                          }
                          $runningSumDebitAmount = 0;
                          $runningSumCreditAmount = 0;
+                         $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
                          $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
