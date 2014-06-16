@@ -1,19 +1,63 @@
 <wgui:block name="wguiBlockAuszahlenPeriodenwahl">
-	<div class="ui-tabs ui-widget-content ui-corner-all">	eins,
-		<wgui:text id="feldBezeichnungText"/>
-		<br/>
-		<textarea name="user_eingabe" cols="50" rows="10">
-		<wgui:loop name="selectLoop" varname="DatenFuerLoop">
+	<br/>
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<table width="100%">
+			<tr>
+				<td>
+					<wgui:text id="txtAuswahlPeriode"/>:
+				</td>
+				<td>
+				</td>
+				<td>
+					<wgui:text id="txtFilesDerPeriode"/>:
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<select id="ausz_PeriodenSelect" name="ausz_PeriodenSelect" size="6" style="width: 140px;">
+						<wgui:loop name="selectLoop" varname="DirectoriesLoop">
+							<option value="<wgui:loopvar loopname="selectLoop" varname="id"/>"<wgui:switch name="swtsel" varname="selectLoop|selected"><wgui:case switchname="swtsel" condition="1"> selected</wgui:case switchname="swtsel"></wgui:switch name="swtsel">>
+								<wgui:loopvar loopname="selectLoop" varname="bezeichnung"/>
+							</option>
+						</wgui:loop name="selectLoop">
+					</select>
+				</td>
+				<td>
+ 					<button id="btnAuszahlenBerechnen" class="PesarisButton"><wgui:var name="btnNeuNochmals"/></button>
+				</td>
+				<td>
+					<div class="prlPeriodenFileWrapper">
+						<wgui:loop name="fileLoop" varname="PeriodenFiles">
+							<a href='<wgui:var name="aktuellePeriode4ListingDir"/>/<wgui:loopvar loopname="fileLoop" varname="fileName"/>' target="_blank">				
+									 											   <wgui:loopvar loopname="fileLoop" varname="fileName"/>
+							</a>
+							<br/>	
+						</wgui:loop name="fileLoop">
+					</div> 
+				</td>
+			</tr>
+		</table>		
 		
-			value="<wgui:loopvar loopname="selectLoop" varname="id"/>"
-			<wgui:switch name="swtsel" varname="selectLoop|selected">
-			<wgui:case switchname="swtsel" condition="1"> selected</wgui:case switchname="swtsel">
-			</wgui:switch name="swtsel">>
-			<wgui:loopvar loopname="selectLoop" varname="bezeichnung"/>
-			
-		</wgui:loop name="selectLoop">
-		</textarea>
+		<!--
+				<div class="prlPmtSpltHeader">
+					<wgui:text id="txtTableHeadersAuszahlenPeriodenFiles"/>
+				</div>
+				<div class="prlPmtSpltScroll">
+				<ul>
+					<wgui:loop name="FileLoop" varname="PeriodenFiles">
+		 				<li style="padding: 0; margin: 0;" rid='<wgui:loopvar loopname="FileLoop" varname="fileName"/>'>
+							<div><wgui:loopvar loopname="FileLoop" varname="fileName"/></div>
+							<div><wgui:loopvar loopname="FileLoop" varname="fileEndg"/></div>
+							<div>-</div>
+						</li>
+					</wgui:loop name="FileLoop">
+				</ul>
+				</div>
+		 -->		
+
 	</div>
+
+   <button id="btnAuszahlenCancel" class="PesarisButton"><wgui:text id="btnClose"/></button>
 </wgui:block name="wguiBlockAuszahlenPeriodenwahl">
 <wgui:block name="TestWindowZwei">
 	zwei

@@ -11,29 +11,89 @@ class payroll_UI {
 			communication_interface::cssFileInclude('plugins/payroll_V00_01_00/code_ui/css/payroll.css','all');
 			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/payroll.js','text/javascript','payroll');
 			break;
+		case 'payroll.auszahlen.berechnen':
+			communication_interface::alert("payroll.auszahlen.berechnen"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
+			break;
 		case 'payroll.auszahlen.openwindow':
 			//communication_interface::alert("payroll.auszahlen.openwindow"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
 			// Wenn keine Daten ans Template Uebergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
 			// In diesem Beispiel werden die Formulardaten direkt ins Template "generiert"
 			$data["meinName"] = "Mein Name ist Hase";
-			$data["DatenFuerLoop"] = array();
-			$data["DatenFuerLoop"][] = array("id"=>"1","bezeichnung"=>"Option 1","selected"=>"0");
-			$data["DatenFuerLoop"][] = array("id"=>"2","bezeichnung"=>"Option 2","selected"=>"0");
-			$data["DatenFuerLoop"][] = array("id"=>"3","bezeichnung"=>"Option 3","selected"=>"0");
-			$data["DatenFuerLoop"][] = array("id"=>"4","bezeichnung"=>"Option 4","selected"=>"1"); //Option 4 soll ausgewaehlt werden
-			$data["DatenFuerLoop"][] = array("id"=>"5","bezeichnung"=>"Option 5","selected"=>"0");
 			$data["meineCheckbox"] = 1;
+
+			$mandant = "MAND".str_pad(session_control::getSessionInfo("id"), 5, "0", STR_PAD_LEFT);
+			$fm = new file_manager();
+			$fm->customerSpace()->setPath($mandant)->makeDir();  
+			$fm->customerSpace()->setPath($mandant);  
+			
+			$PeriodeDieserMonat   = "Periode-".date("Y-m");
+			$PeriodeDieserMonat_1 = "Periode-".date("Y-m", strtotime("-1 months"));
+			$PeriodeDieserMonat_2 = "Periode-".date("Y-m", strtotime("-2 months"));
+			$PeriodeDieserMonat_3 = "Periode-".date("Y-m", strtotime("-3 months"));
+			//TODO: Herausfinden, welche die jetztige Periode ist, ich nehme mal den aktuellen Monat
+			$aktuellePeriode4ListingDir = $mandant."/".$PeriodeDieserMonat;
+			$data["aktuellePeriode4ListingDir"] = $aktuellePeriode4ListingDir;
+			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->makeDir();  //neue (die heutige) Periode anlegen
+			$fm->customerSpace()->setPath($mandant."/".$PeriodeDieserMonat_1)->makeDir();  //letzte Periode anlegen
+			$fm->customerSpace()->setPath($mandant."/".$PeriodeDieserMonat_2)->makeDir();  //vorletzte Periode anlegen
+			$fm->customerSpace()->setPath($mandant."/".$PeriodeDieserMonat_3)->makeDir();  //vor vorletzte Periode anlegen
+
+
+			 
+			//Bestehenden Periodendirectories lesen
+			$dirlist = $fm->customerSpace()->setPath($mandant)->listDir(1);  
+			$data["DirectoriesLoop"] = array();
+			$id = 1;
+			foreach($dirlist as $dirrow) {
+				$selected="0";
+				if (strcasecmp ( $dirrow , $PeriodeDieserMonat ) == 0 ) {
+					$selected="1";
+				}
+				$data["DirectoriesLoop"][] = array("id"=>$id,"bezeichnung"=>$dirrow,"selected"=>$selected);
+				$id++;				
+			}
+			
+			//Auslisten der Files aus dem Directory
+			$fm->customerSpace()->setPath($mandant);  
+			$filelist = $fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->listDir();  
+			$nochmals = true;
+   			if (count($filelist) < 1) {
+				$nochmals = false;//Directory ist neu ->> Perioden-Files sind noch nicht angelegt
+   			}
+			//communication_interface::alert("session_control::getSessionInfo_ID=".session_control::getSessionInfo("id"). ",  mandant: ".$mandant. " \n ".count($filelist). "---- ".$aktuellePeriode4ListingDir); 
+
+			$data["PeriodenFiles"] = array();
+			foreach($filelist as $row) {
+				if(strtolower(substr($row,-4))==".pdf") {
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf");
+				} 
+			}
+			foreach($filelist as $row) {
+				if(strtolower(substr($row,-4))==".dta") {
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta");
+				} 
+			}
+			//communication_interface::alert(count($filelist)." ---  mandant=$mandant  ");
 
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenPeriodenwahl"));
 			$objWindow->windowIcon("auszahlen32.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
-			$objWindow->windowWidth(550);
-			$objWindow->windowHeight(225);  
-			$objWindow->modal(false);
+			$objWindow->windowWidth(650);
+			$objWindow->windowHeight(240);
+			$objWindow->modal(true);	
+//			$objWindow->dockable(true);
+			$objWindow->buttonMaximize(true);
+			$objWindow->resizable(true);
+			$data["btnNeuNochmals"] = $objWindow->getText("btnNeuBerechnen");
+			if ($nochmals) {
+				$data["btnNeuNochmals"] = $objWindow->getText("btnNochmalBerechnen");
+			}
 			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenPeriodenwahl"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 			$objWindow->showWindow();
+			
+			communication_interface::jsExecute("prlAuszahlenInit();");
+			
 			break;
-
 		case 'payroll.prlPsoEmployeeOverview':
 
 //			$numberformat_thousands_sep = session_control::getSessionSettings("CORE", "numberformat_thousands_sep");
@@ -158,11 +218,10 @@ prlVlFldDefFP
 				//nur ausfuehren, wenn Window noch nicht geoeffnet ist
 				$data = array();
 				$objWindow = new wgui_window("payroll", "employeeForm");
-//				$objWindow->windowTitle("Mitarbeiterdaten bearbeiten (<span id="#prlVlTitle"></span>)"); //Mitarbeiterdaten erfassen / aendern		 id='#prlVlTitle'
 				$objWindow->windowTitle("Mitarbeiterdaten bearbeiten"); //Mitarbeiterdaten erfassen / aendern
 				$objWindow->windowIcon("employee-edit32.png");
-				$objWindow->windowWidth(830); //710
-				$objWindow->windowHeight(550); //470
+				$objWindow->windowWidth(830); // 710
+				$objWindow->windowHeight(490); // 470
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -229,6 +288,7 @@ prlVlFldDefFP
 									$arrFieldsOfInterest = array();
 									$greatRowCollector = array();
 //									$arrDateFields = array();
+									$curAuxField = 0;
 									$arrFieldsOfInterest[] = "id";
 									foreach($fieldDefRecs["data"] as $childRow) {
 										if($childRow["childOf"]==$row["fieldName"]) {
@@ -239,12 +299,13 @@ prlVlFldDefFP
 									}
 									foreach($employeeData["auxiliaryTables"][$row["fieldName"]] as $auxTblRow) {
 										$singleRowCollector = array();
-										foreach($arrFieldsOfInterest as $curAuxField)
+										foreach($arrFieldsOfInterest as $curAuxField) {
 											if($arrDateFields[$curAuxField]) {
 												$singleRowCollector[] = "'".$this->convertMySQL2Date($auxTblRow[$curAuxField])."'";
 											}else{
 												$singleRowCollector[] = "'".str_replace("'","\\'",$auxTblRow[$curAuxField])."'";
 											}
+										}
 										$greatRowCollector[] = "[".implode(",", $singleRowCollector)."]";
 									}
 									$fieldCollector .= ($fieldCollector=="" ? "" : ",")."['".$row["fieldName"]."',[".implode(",", $greatRowCollector)."]]";
@@ -1245,8 +1306,8 @@ communication_interface::alert("Fehler: ".$ret["errText"]);
 //				$objWindow->windowTitle("Mitarbeiterdaten bearbeiten (<span id="#prlVlTitle"></span>)"); //Mitarbeiterdaten erfassen / aendern		 id='#prlVlTitle'
 				$objWindow->windowTitle("Lohnart bearbeiten"); //Mitarbeiterdaten erfassen / aendern
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(850); //710
-				$objWindow->windowHeight(550); //470
+				$objWindow->windowWidth(850); //710  
+				$objWindow->windowHeight(480);     
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -2563,7 +2624,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->windowTitle("Berechnungsdaten vorbereiten");
 				$objWindow->windowWidth(480);
 				$objWindow->windowHeight(200);
-				$objWindow->setContent("<br/>Das Bearbeiten der Berechnung laeuft.<br/><br/>Bitte warten... <img src=\"/web/img/working.gif\"><br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>Abbrechen</button>");
+				$objWindow->setContent("<br/>Das Bearbeiten der Berechnung laeuft.<br/><br/>Bitte warten... <img src=\"/web/img/working.gif\"><br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>Schliessen</button>");
 				$objWindow->showInfo();
 				communication_interface::jsExecute("cb('payroll.prepareCalculation',{'stage':3,'wageCodeChange':".$sp["wageCodeChange"].",'wageCodeChange':".$sp["wageCodeChange"].",'wageBaseChange':".$sp["wageBaseChange"].",'insuranceChange':".$sp["insuranceChange"].",'modifierChange':".$sp["modifierChange"].",'workdaysChange':".$sp["workdaysChange"].",'pensiondaysChange':".$sp["pensiondaysChange"]."});");
 				break;
@@ -3520,6 +3581,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 
 	private function getDateRegexPattern() {
 		$pattern = array("","");
+		$dateformat_medium = session_control::getSessionSettings("CORE", "dateformat_medium");
 		switch(preg_replace("/[-\/.]+/", "", str_replace("%", "", strtoupper( $dateformat_medium )))) {
 		case 'YMD':
 			$pattern[0] = "(19|20)?\d\d";

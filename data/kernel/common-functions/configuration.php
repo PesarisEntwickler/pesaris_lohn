@@ -72,8 +72,8 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
 //$aafwConfig["paths"]["reports"]["templates"] = "/usr/local/www/apache22/data-hidden/GLOBAL/templates/";
 
-//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc";
-//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex";
+//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc.exe";
+//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex.exe";
 //$aafwConfig["paths"]["utilities"]["stdout"] = "/dev/null";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "mysql";
 

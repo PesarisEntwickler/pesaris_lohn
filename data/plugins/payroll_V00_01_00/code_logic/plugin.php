@@ -69,7 +69,7 @@ class payroll_BL {
 		case 'payroll.saveCurrencyList':
 			return $variousFunctions->saveCurrencyList($functionParameters[0]);
 		case 'payroll.prepareCalculation':
-			return $this->prepareCalculation($functionParameters[0]);
+			return $variousFunctions->prepareCalculation($functionParameters[0]);
 //		case 'payroll.getpayrollountFormOverview':
 //			require_once('payroll-fin.php');
 //			$payrollfin = new payroll_BL_fin();

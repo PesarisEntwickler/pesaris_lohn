@@ -3802,3 +3802,18 @@ function prl_BankSourceEdit_btnSave() {
 	});
 	cb('payroll.paymentSplit', {'action':'GUI_bank_source_save', 'empId':prlPmtSplt.empId, 'data':r});
 }
+
+function prlAuszahlenInit() {
+	$('#btnAuszahlenCancel').bind('click', function() {
+		$('#modalContainer').mb_close();
+	});  
+	$('#btnAuszahlenBerechnen').bind('click', function(e) {
+		//var pFunctionNumber = $(this).attr('fnc');
+		//var pYear = $('#prlCalcOvYear').val();
+		//cb('payroll.prlCalcOvOutput',param);
+		cb('payroll.auszahlen.berechnen',param);
+		return false;
+	});
+	
+	
+}

@@ -14,13 +14,15 @@ $textResourceMap["btnAdd"] 			= "Hinzuf&uuml;gen";
 $textResourceMap["btnPlusAdd"] 		= "+ Hinzuf&uuml;gen";
 $textResourceMap["btnSaveAssign"] 	= "&Uuml;bernehmen";
 $textResourceMap["btnDiscard"] 		= "Entfernen";
-$textResourceMap["btnOpen"] 		= "&Ouml;ffnen";
 $textResourceMap["btnFortFahren"] 	= "Fortfahren";
 $textResourceMap["btnBack"] 		= "&lt;&lt; Zur&uuml;ck";
 $textResourceMap["btnNext"] 		= "Weiter &gt;&gt;";
 $textResourceMap["btnNeueBankverbindung"] = "Neue Bankverbindung &gt;";
 $textResourceMap["btnNeueZahlstelle"] = "Neue Zahlstelle &gt;";
 $textResourceMap["btnReihenfolgespeichern"] = "Reihenfolge speichern";
+
+$textResourceMap["btnNeuBerechnen"] = "Dateien neu berechnen >";
+$textResourceMap["btnNochmalBerechnen"] = "Dateien nochmals berechnen >";
 
 $textResourceMap["txtY"] = "Ja";
 $textResourceMap["txtN"] = "Nein";
@@ -29,10 +31,16 @@ $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
 $textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
 
 /* ********* AUSZAHLEN *********** */
-$textResourceMap["txtTitelAuszahlenPeriodenwahl"] = "Auszahlen Periodenwahl";
-$textResourceMap["feldBezeichnungText"] = "a Textbox:";
-$textResourceMap["feldBezeichnungSelect"] = "a Select:";
+$textResourceMap["txtTitelAuszahlenPeriodenwahl"] = "Auszahlen. Reports und Zahlungsdateien";
+$textResourceMap["txtAuswahlPeriode"] = "Periodenwahl";
+$textResourceMap["txtFilesDerPeriode"] = "Dateien der Periode";
 $textResourceMap["MeinTitel2"] = "Titel two";
+
+$textResourceMap["txtTableHeadersAuszahlenPeriodenFiles"] = 
+				"<ul>" .
+					"<li>Datei</li>" .
+					"<li>&nbsp;</li>" .
+				"</ul>";
 
 
 /* ****** PAYMENTS ****** */
