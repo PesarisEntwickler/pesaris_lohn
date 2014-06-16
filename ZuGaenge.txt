@@ -77,3 +77,16 @@ Data:	lohndev
 Port:	3306	
 
 
+Logfile
+==========================
+Via PuTTY auf anmelden
+
+srv2.copronet.ch
+UID: prldev
+PWD: A6$LuTc81
+
+tail -n 10 /var/log/httpd-error.log
+(Anzahl der letzten 20 Zeilen)
+
+Session beenden: "exit" + ENTER eingeben.
+
