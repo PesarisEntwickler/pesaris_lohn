@@ -1,7 +1,7 @@
 <?php
 class changeManager {
 	
-	private function changeManager($event, $param) {
+	public function changeManager($event, $param) {
 		$singleEmployeeChange = false;
 		$insuranceChange = false;
 		$filterChange = false;

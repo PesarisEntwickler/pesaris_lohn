@@ -239,13 +239,13 @@ class finMgmtAccounting{
 		// FIBU
 		/////////////////
 		if($finAccProcess) {
-			//Zuerst nur die FIBU-Daten der betroffenen MA loeschenâ€¦
+			//Zuerst nur die FIBU-Daten der betroffenen MA loeschen…
 			$system_database_manager->executeUpdate("DELETE accetry FROM payroll_fin_acc_entry accetry INNER JOIN `payroll_tmp_change_mng` emplList ON accetry.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." WHERE accetry.`payroll_period_ID`=".$payrollPeriodID, "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦dann die Records neu anlegen (ebenfalls nur fuer die betroffenen MA)â€¦
+			//…dann die Records neu anlegen (ebenfalls nur fuer die betroffenen MA)…
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_fin_acc_entry`(`payroll_period_ID`, `payroll_employee_ID`, `payroll_account_ID`, `account_no`, `counter_account_no`, `cost_center`, `amount_local`, `debitcredit`, `entry_text`, `amount_quantity`) SELECT calc.`payroll_period_ID`, calc.`payroll_employee_ID`, accasng.`payroll_account_ID`, accasng.`account_no`, accasng.`counter_account_no`, accasng.`cost_center`, IF(accasng.`invert_value`=1, calc.`amount`*-1, calc.`amount`), accasng.`debitcredit`, accasng.`entry_text`, 0 FROM payroll_fin_acc_assign accasng INNER JOIN `payroll_calculation_current` calc ON calc.`payroll_account_ID`=accasng.`payroll_account_ID` AND calc.`payroll_period_ID`=".$payrollPeriodID." INNER JOIN `payroll_tmp_change_mng` emplList ON calc.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." INNER JOIN (SELECT ep.`id`, aa.`payroll_account_ID`, MIN(aa.`processing_order`) as po FROM payroll_fin_acc_assign aa INNER JOIN `payroll_tmp_change_mng` el ON el.`core_user_ID`=".$uid." INNER JOIN `payroll_employee` ep ON ep.`id`=el.`numID` WHERE (aa.`payroll_employee_ID`=0 OR aa.`payroll_employee_ID`=ep.`id`) AND (aa.`cost_center`='' OR aa.`cost_center`=ep.`CostCenter`) AND (aa.`payroll_company_ID`=0 OR aa.`payroll_company_ID`=ep.`payroll_company_ID`) GROUP BY ep.`id`, aa.`payroll_account_ID`) tx ON tx.`payroll_account_ID`=accasng.`payroll_account_ID` AND tx.`po`=accasng.`processing_order` AND calc.`payroll_employee_ID`=tx.`id`", "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦und das Datum (Buchungsdatum) in payroll_period_employee anpassen plus die ID des Benutzers speichern, der die Verbuchung durchgefaehrt hatâ€¦
+			//…und das Datum (Buchungsdatum) in payroll_period_employee anpassen plus die ID des Benutzers speichern, der die Verbuchung durchgefaehrt hat…
 			$system_database_manager->executeUpdate("UPDATE `payroll_period_employee` prdemp INNER JOIN `payroll_tmp_change_mng` emplList ON prdemp.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." SET prdemp.`fin_acc_date`='".$finAccDate."', prdemp.`core_user_ID_fin_acc`=".$uid.", prdemp.`processing`=3 WHERE prdemp.`payroll_period_ID`=".$payrollPeriodID, "payroll_processFinMgmtAccountingEntry");
 		}
 
@@ -255,39 +255,99 @@ class finMgmtAccounting{
 		//TODO: Wenn Flag $mgmtAccQuantity=TRUE, dann muessen die nachfolgenden Statements 2x durchlaufen werden, allerdings einmal mit amount und einmal mit quantity
 		if($mgmtAccProcess) {
 
-			//Zuerst nur die BEBU-Daten der betroffenen MA loeschenâ€¦
+			//Zuerst nur die BEBU-Daten der betroffenen MA loeschen…
 			$system_database_manager->executeUpdate("DELETE accspl FROM `payroll_mgmt_acc_entry` accspl INNER JOIN `payroll_tmp_change_mng` emplList ON accspl.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." WHERE accspl.`payroll_period_ID`=".$payrollPeriodID, "payroll_processFinMgmtAccountingEntry");
-//			$system_database_manager->executeUpdate("DELETE accspl FROM `payroll_tmp_mgmt_acc_split` accspl INNER JOIN `payroll_tmp_change_mng` emplList ON accspl.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." WHERE accspl.`payroll_period_ID`=".$payrollPeriodID, "payroll_processFinMgmtAccountingEntry");
 			$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_mgmt_acc_split`", "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦dann die Records in einer temporÃ¤ren MEMORY-Table neu anlegen. Zuerst LOA mit expliziter Ãœbersteuerung der Kostenstelleâ€¦
+			//…dann die Records in einer temporären MEMORY-Table neu anlegen. Zuerst LOA mit expliziter Übersteuerung der Kostenstelle…
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_mgmt_acc_split`(`payroll_period_ID`,`payroll_company_ID`,`payroll_employee_ID`,`cost_center`,`payroll_account_ID`,`amount_initial`,`amount_available`,`amount`,`processing_order`,`invert_value`,`amount_quantity`,`processing_done`,`having_rounding`,`rounding`) SELECT ".$payrollPeriodID.",emp.`payroll_company_ID`,empacc.`payroll_employee_ID`,empacc.`CostCenter`,empacc.`payroll_account_ID`,0,0,calc.`amount`,0,0,0,1,0,0 FROM `payroll_employee_account` empacc INNER JOIN `payroll_tmp_change_mng` emplList ON empacc.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." INNER JOIN `payroll_employee` emp ON emp.`id`=emplList.`numID` INNER JOIN `payroll_calculation_current` calc ON calc.`payroll_employee_ID`=emplList.`numID` AND calc.`payroll_account_ID`=empacc.`payroll_account_ID` AND calc.`payroll_period_ID`= ".$payrollPeriodID." WHERE empacc.`CostCenter`!=''", "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦als NÃ¤chstes ebenfalls Records in temporÃ¤rer MEMORY-Table anlegen, aber jetzt die aebrigen %-Verteilungen. Wichtig: Bereits verarbeitete LOA ausschliessen, 100%-Zuweisungen koennen direkt verarbeitet und die enspr. Records abgeschlossen/fixiert werden...
+			//…als Nächstes ebenfalls Records in temporärer MEMORY-Table anlegen, aber jetzt die aebrigen %-Verteilungen. Wichtig: Bereits verarbeitete LOA ausschliessen, 100%-Zuweisungen koennen direkt verarbeitet und die enspr. Records abgeschlossen/fixiert werden...
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_mgmt_acc_split`(`payroll_period_ID`,`payroll_company_ID`,`payroll_employee_ID`,`cost_center`,`payroll_account_ID`,`amount_initial`,`amount_available`,`amount`,`processing_order`,`invert_value`,`amount_quantity`,`processing_done`,`having_rounding`,`rounding`) SELECT calc.`payroll_period_ID`, emp.`payroll_company_ID`, emp.`id`, IF(accasng.`payroll_employee_ID`=0 AND emp.`CostCenter`!='', emp.`CostCenter`,accasng.`cost_center`), calc.`payroll_account_ID`, calc.`amount`,calc.`amount`, IF(accasng.`amount`=100,IF(accasng.`invert_value`=1, calc.`amount`*-1, calc.`amount`), accasng.`amount`) ,accasng.`processing_order`,accasng.`invert_value`,0,IF(accasng.`amount`=100,1,0),0,0 FROM `payroll_mgmt_acc_split` accasng INNER JOIN `payroll_calculation_current` calc ON calc.`payroll_account_ID`=accasng.`payroll_account_ID` AND calc.`payroll_period_ID`=".$payrollPeriodID." INNER JOIN `payroll_tmp_change_mng` emplList ON calc.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." INNER JOIN `payroll_employee` emp ON emp.`id`=emplList.`numID` LEFT JOIN `payroll_tmp_mgmt_acc_split` tas ON tas.`payroll_period_ID`=calc.`payroll_period_ID` AND tas.`payroll_employee_ID`=calc.`payroll_employee_ID` AND tas.`payroll_account_ID`=calc.`payroll_account_ID` AND tas.`processing_done`=1 INNER JOIN (SELECT ep.`id`, aa.`payroll_account_ID`, MIN(aa.`processing_order`) as po FROM `payroll_mgmt_acc_split` aa INNER JOIN `payroll_tmp_change_mng` el ON el.`core_user_ID`=".$uid." INNER JOIN `payroll_employee` ep ON ep.`id`=el.`numID` WHERE (aa.`payroll_employee_ID`=0 OR aa.`payroll_employee_ID`=ep.`id`) AND (aa.`payroll_company_ID`=0 OR aa.`payroll_company_ID`=ep.`payroll_company_ID`) GROUP BY ep.`id`, aa.`payroll_account_ID`) tx ON tx.`payroll_account_ID`=accasng.`payroll_account_ID` AND tx.`po`=accasng.`processing_order` AND calc.`payroll_employee_ID`=tx.`id` WHERE tas.`processing_done` IS NULL", "payroll_processFinMgmtAccountingEntry");
+/*
+Hinweis:
+Im Query auf Zeile 266 liefert der zum INSERT gehörende SELECT zu viele Duplikate. Mit SELECT DISTINCT könnte das behoben werden.
+Aus "...,`rounding`) SELECT calc.`payroll_period_ID`,..." müsste demnach "...,`rounding`) SELECT DISTINCT calc.`payroll_period_ID`,..." werden.
 
-			//â€¦100%er wurden im obigen Statement verarbeitet. Hier werden nun %-Verteilungen <100%...
+Eleganter wäre aber ein überarbeiten der JOIN-Bedingungen, damit es gar nicht erst zu den Duplikaten kommt.
+*/
+			//…100%er wurden im obigen Statement verarbeitet. Hier werden nun %-Verteilungen <100%...
 			$system_database_manager->executeUpdate("UPDATE `payroll_tmp_mgmt_acc_split` SET `amount`=`amount`/100*`amount_available` WHERE `processing_done`=0", "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦Werte rundenâ€¦
+			//…Werte runden…
 			if($mgmtAccRound) {
 				$system_database_manager->executeUpdate("UPDATE `payroll_tmp_mgmt_acc_split` SET `amount`=ROUND(`amount`/0.05)*0.05 WHERE `having_rounding`=1 AND `processing_done`=0", "payroll_processFinMgmtAccountingEntry");
-//				$system_database_manager->executeUpdate("UPDATE `payroll_tmp_mgmt_acc_split` SET `amount`=ROUND(`amount`/`rounding`)*`rounding` WHERE `having_rounding`=1 AND `processing_done`=0", "payroll_processFinMgmtAccountingEntry");
 			}
 
-			//â€¦Falls es einen Restbetrag gibt, wird dieser nun noch entsprechend zugewiesenâ€¦
+			//…Falls es einen Restbetrag gibt, wird dieser nun noch entsprechend zugewiesen…
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_mgmt_acc_split`(`payroll_period_ID`,`payroll_company_ID`,`payroll_employee_ID`,`cost_center`,`payroll_account_ID`,`amount_initial`,`amount_available`,`amount`,`processing_order`,`invert_value`,`amount_quantity`,`processing_done`,`having_rounding`,`rounding`,`remainder`) SELECT accsplt.`payroll_period_ID`,accsplt.`payroll_company_ID`,accsplt.`payroll_employee_ID`,IF(x1.`remainder`=1,accsplt.`cost_center`,empl.`CostCenter`),accsplt.`payroll_account_ID`,accsplt.`amount_initial`,accsplt.`amount_available`, x1.`amount_initial`-x1.`amount_sum`, 0,0,accsplt.`amount_quantity`,1,accsplt.`having_rounding`,accsplt.`rounding`,accsplt.`remainder` FROM payroll_tmp_mgmt_acc_split accsplt INNER JOIN (SELECT `payroll_employee_ID`, `payroll_account_ID`, `amount_initial`, SUM(`amount`) as amount_sum, MAX(`amount`) as amount_max, `remainder` FROM payroll_tmp_mgmt_acc_split WHERE processing_done=0 GROUP BY payroll_employee_ID, payroll_account_ID) x1 ON accsplt.`payroll_employee_ID`=x1.`payroll_employee_ID` AND accsplt.`payroll_account_ID`=x1.`payroll_account_ID` AND accsplt.`amount`=x1.amount_max INNER JOIN `payroll_employee` empl ON empl.`id`=accsplt.`payroll_employee_ID` WHERE accsplt.`processing_done`=0", "payroll_processFinMgmtAccountingEntry");
 
 
-			//â€¦"0.00" BetrÃ¤ge loeschen (TODO: Ist das OK?)â€¦
+			//…"0.00" Beträge loeschen (TODO: Ist das OK?)…
 			$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_mgmt_acc_split` WHERE `amount`=0", "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦Records der temporÃ¤ren Tabelle in eine InnoDB Tabelle speichernâ€¦
+			//…Records der temporären Tabelle in eine InnoDB Tabelle speichern…
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_mgmt_acc_entry`(`payroll_period_ID`, `payroll_employee_ID`, `payroll_account_ID`, `account_no`, `counter_account_no`, `cost_center`, `amount_local`, `debitcredit`, `entry_text`, `amount_quantity`) SELECT calc.`payroll_period_ID`, calc.`payroll_employee_ID`, accasng.`payroll_account_ID`, accasng.`account_no`, accasng.`counter_account_no`, calc.`cost_center`, IF(accasng.`invert_value`=1, calc.`amount`*-1, calc.`amount`), accasng.`debitcredit`, accasng.`entry_text`, 0 FROM payroll_mgmt_acc_assign accasng INNER JOIN (SELECT `payroll_period_ID`, `payroll_employee_ID`, `payroll_account_ID`, `cost_center`, SUM(`amount`) as `amount` FROM payroll_tmp_mgmt_acc_split GROUP BY `payroll_employee_ID`,`payroll_account_ID`,`cost_center`) calc ON calc.`payroll_account_ID`=accasng.`payroll_account_ID` AND calc.`payroll_period_ID`=".$payrollPeriodID." INNER JOIN `payroll_tmp_change_mng` emplList ON calc.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." INNER JOIN (SELECT ep.`id`, aa.`payroll_account_ID`, MIN(aa.`processing_order`) as po FROM payroll_mgmt_acc_assign aa INNER JOIN `payroll_tmp_change_mng` el ON el.`core_user_ID`=".$uid." INNER JOIN `payroll_employee` ep ON ep.`id`=el.`numID` WHERE (aa.`payroll_employee_ID`=0 OR aa.`payroll_employee_ID`=ep.`id`) AND (aa.`cost_center`='' OR aa.`cost_center`=ep.`CostCenter`) AND (aa.`payroll_company_ID`=0 OR aa.`payroll_company_ID`=ep.`payroll_company_ID`) GROUP BY ep.`id`, aa.`payroll_account_ID`) tx ON tx.`payroll_account_ID`=accasng.`payroll_account_ID` AND tx.`po`=accasng.`processing_order` AND calc.`payroll_employee_ID`=tx.`id`", "payroll_processFinMgmtAccountingEntry");
+/*
+Hinweis:
+Im Query auf Zeile 290 werden die Resultate der temporären Tabelle (`payroll_tmp_mgmt_acc_split`) in die BEBU-Buchungstabelle `payroll_mgmt_acc_entry` geschrieben.
+Die Daten in der temp. Tbl `payroll_tmp_mgmt_acc_split` sind -- soweit ich das beurteilen kann -- korrekt. Beim Query auf Zeile 290 gibt es aber vermutlich beim joinen
+noch ein Fehler, den es zu beheben gibt, denn nach dem Zusammenführen der verschiedenen Tabellen via JOIN, sind die Daten falsch (es gibt Duplikate!).
+
+Fürs Debugging können in der SQL-Workbench die obigen Queries zusammen ausgeführt werden und nach jeder änderung können die Resultate in `payroll_tmp_mgmt_acc_split` überprüft werden:
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+DELETE FROM payroll_tmp_change_mng WHERE core_user_id=1;
+INSERT INTO payroll_tmp_change_mng(core_user_id, numID, alphID) SELECT 1, payroll_employee_ID, '' FROM payroll_period_employee;
+
+-- Zuerst nur die BEBU-Daten der betroffenen MA loeschen…
+DELETE accspl FROM `payroll_mgmt_acc_entry` accspl INNER JOIN `payroll_tmp_change_mng` emplList ON accspl.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=1 WHERE accspl.`payroll_period_ID`=78;
+DELETE FROM `payroll_tmp_mgmt_acc_split`;
+-- …dann die Records in einer temporären MEMORY-Table neu anlegen. Zuerst LOA mit expliziter Übersteuerung der Kostenstelle…
+INSERT INTO `payroll_tmp_mgmt_acc_split`(`payroll_period_ID`,`payroll_company_ID`,`payroll_employee_ID`,`cost_center`,`payroll_account_ID`,`amount_initial`,`amount_available`,`amount`,`processing_order`,`invert_value`,`amount_quantity`,`processing_done`,`having_rounding`,`rounding`) 
+	SELECT 78,emp.`payroll_company_ID`,empacc.`payroll_employee_ID`,empacc.`CostCenter`,empacc.`payroll_account_ID`,0,0,calc.`amount`,0,0,0,1,0,0 
+	FROM `payroll_employee_account` empacc 
+	INNER JOIN `payroll_tmp_change_mng` emplList ON empacc.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=1 
+	INNER JOIN `payroll_employee` emp ON emp.`id`=emplList.`numID` 
+	INNER JOIN `payroll_calculation_current` calc ON calc.`payroll_employee_ID`=emplList.`numID` AND calc.`payroll_account_ID`=empacc.`payroll_account_ID` AND calc.`payroll_period_ID`=78 
+	WHERE empacc.`CostCenter`!='';
+-- …als Nächstes ebenfalls Records in temporärer MEMORY-Table anlegen, aber jetzt die aebrigen %-Verteilungen. Wichtig: Bereits verarbeitete LOA ausschliessen, 100%-Zuweisungen koennen direkt verarbeitet und die enspr. Records abgeschlossen/fixiert werden...
+INSERT INTO `payroll_tmp_mgmt_acc_split`(`payroll_period_ID`,`payroll_company_ID`,`payroll_employee_ID`,`cost_center`,`payroll_account_ID`,`amount_initial`,`amount_available`,`amount`,`processing_order`,`invert_value`,`amount_quantity`,`processing_done`,`having_rounding`,`rounding`) 
+	SELECT DISTINCT calc.`payroll_period_ID`, emp.`payroll_company_ID`, emp.`id`, IF(accasng.`payroll_employee_ID`=0 AND emp.`CostCenter`!='', emp.`CostCenter`,accasng.`cost_center`), calc.`payroll_account_ID`, calc.`amount`,calc.`amount`, IF(accasng.`amount`=100,IF(accasng.`invert_value`=1, calc.`amount`*-1, calc.`amount`), accasng.`amount`) ,accasng.`processing_order`,accasng.`invert_value`,0,IF(accasng.`amount`=100,1,0),0,0 
+	FROM `payroll_mgmt_acc_split` accasng 
+	INNER JOIN `payroll_tmp_change_mng` emplList ON emplList.`core_user_ID`=1 
+	INNER JOIN `payroll_calculation_current` calc ON calc.`payroll_account_ID`=accasng.`payroll_account_ID` AND calc.`payroll_employee_ID`=emplList.`numID` AND calc.`payroll_period_ID`=78 
+	INNER JOIN `payroll_employee` emp ON emp.`id`=emplList.`numID` 
+	LEFT JOIN `payroll_tmp_mgmt_acc_split` tas ON tas.`payroll_period_ID`=calc.`payroll_period_ID` AND tas.`payroll_employee_ID`=calc.`payroll_employee_ID` AND tas.`payroll_account_ID`=calc.`payroll_account_ID` AND tas.`processing_done`=1 
+	INNER JOIN (SELECT ep.`id`, aa.`payroll_account_ID`, MIN(aa.`processing_order`) as po FROM `payroll_mgmt_acc_split` aa INNER JOIN `payroll_tmp_change_mng` el ON el.`core_user_ID`=1 INNER JOIN `payroll_employee` ep ON ep.`id`=el.`numID` WHERE (aa.`payroll_employee_ID`=0 OR aa.`payroll_employee_ID`=ep.`id`) AND (aa.`payroll_company_ID`=0 OR aa.`payroll_company_ID`=ep.`payroll_company_ID`) GROUP BY ep.`id`, aa.`payroll_account_ID`) tx ON tx.`payroll_account_ID`=accasng.`payroll_account_ID` AND tx.`po`=accasng.`processing_order` AND calc.`payroll_employee_ID`=tx.`id` AND tx.`id`=emplList.`numID` 
+	WHERE tas.`processing_done` IS NULL;
+-- …100%er wurden im obigen Statement verarbeitet. Hier werden nun %-Verteilungen <100%...
+UPDATE `payroll_tmp_mgmt_acc_split` SET `amount`=`amount`/100*`amount_available` WHERE `processing_done`=0;
+-- …Falls es einen Restbetrag gibt, wird dieser nun noch entsprechend zugewiesen…
+INSERT INTO `payroll_tmp_mgmt_acc_split`(`payroll_period_ID`,`payroll_company_ID`,`payroll_employee_ID`,`cost_center`,`payroll_account_ID`,`amount_initial`,`amount_available`,`amount`,`processing_order`,`invert_value`,`amount_quantity`,`processing_done`,`having_rounding`,`rounding`,`remainder`) SELECT accsplt.`payroll_period_ID`,accsplt.`payroll_company_ID`,accsplt.`payroll_employee_ID`,IF(x1.`remainder`=1,accsplt.`cost_center`,empl.`CostCenter`),accsplt.`payroll_account_ID`,accsplt.`amount_initial`,accsplt.`amount_available`, x1.`amount_initial`-x1.`amount_sum`, 0,0,accsplt.`amount_quantity`,1,accsplt.`having_rounding`,accsplt.`rounding`,accsplt.`remainder` FROM payroll_tmp_mgmt_acc_split accsplt INNER JOIN (SELECT `payroll_employee_ID`, `payroll_account_ID`, `amount_initial`, SUM(`amount`) as amount_sum, MAX(`amount`) as amount_max, `remainder` FROM payroll_tmp_mgmt_acc_split WHERE processing_done=0 GROUP BY payroll_employee_ID, payroll_account_ID) x1 ON accsplt.`payroll_employee_ID`=x1.`payroll_employee_ID` AND accsplt.`payroll_account_ID`=x1.`payroll_account_ID` AND accsplt.`amount`=x1.amount_max INNER JOIN `payroll_employee` empl ON empl.`id`=accsplt.`payroll_employee_ID` WHERE accsplt.`processing_done`=0;
+-- …"0.00" Beträge loeschen (TODO: Ist das OK?)…
+DELETE FROM `payroll_tmp_mgmt_acc_split` WHERE `amount`=0;
+-- …Records der temporären Tabelle in eine InnoDB Tabelle speichern…
+INSERT INTO `payroll_mgmt_acc_entry`(`payroll_period_ID`, `payroll_employee_ID`, `payroll_account_ID`, `account_no`, `counter_account_no`, `cost_center`, `amount_local`, `debitcredit`, `entry_text`, `amount_quantity`) 
+	SELECT calc.`payroll_period_ID`, calc.`payroll_employee_ID`, accasng.`payroll_account_ID`, accasng.`account_no`, accasng.`counter_account_no`, calc.`cost_center`, IF(accasng.`invert_value`=1, calc.`amount`*-1, calc.`amount`), accasng.`debitcredit`, accasng.`entry_text`, 0 
+	FROM payroll_mgmt_acc_assign accasng 
+	INNER JOIN (SELECT `payroll_period_ID`, `payroll_employee_ID`, `payroll_account_ID`, `cost_center`, SUM(`amount`) as `amount` 
+		FROM payroll_tmp_mgmt_acc_split 
+		GROUP BY `payroll_employee_ID`,`payroll_account_ID`,`cost_center`) calc ON calc.`payroll_account_ID`=accasng.`payroll_account_ID` AND calc.`payroll_period_ID`=78 
+		INNER JOIN `payroll_tmp_change_mng` emplList ON calc.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=1 INNER JOIN (SELECT ep.`id`, aa.`payroll_account_ID`, MIN(aa.`processing_order`) as po FROM payroll_mgmt_acc_assign aa INNER JOIN `payroll_tmp_change_mng` el ON el.`core_user_ID`=1 INNER JOIN `payroll_employee` ep ON ep.`id`=el.`numID` WHERE (aa.`payroll_employee_ID`=0 OR aa.`payroll_employee_ID`=ep.`id`) AND (aa.`cost_center`='' OR aa.`cost_center`=ep.`CostCenter`) AND (aa.`payroll_company_ID`=0 OR aa.`payroll_company_ID`=ep.`payroll_company_ID`) 
+	GROUP BY ep.`id`, aa.`payroll_account_ID`) tx ON tx.`payroll_account_ID`=accasng.`payroll_account_ID` AND tx.`po`=accasng.`processing_order` AND calc.`payroll_employee_ID`=tx.`id`;
+
+SELECT * FROM `payroll_tmp_mgmt_acc_split`;
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+*/
 
 			$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_mgmt_acc_split`", "payroll_processFinMgmtAccountingEntry");
 
-			//â€¦und das Datum (Buchungsdatum) in payroll_period_employee anpassen plus die ID des Benutzers speichern, der die Verbuchung durchgefaehrt hatâ€¦
+			//…und das Datum (Buchungsdatum) in payroll_period_employee anpassen plus die ID des Benutzers speichern, der die Verbuchung durchgefaehrt hat…
 			$system_database_manager->executeUpdate("UPDATE payroll_period_employee prdemp INNER JOIN `payroll_tmp_change_mng` emplList ON prdemp.`payroll_employee_ID`=emplList.`numID` AND emplList.`core_user_ID`=".$uid." SET prdemp.`mgmt_acc_date`='".$mgmtAccDate."', prdemp.`core_user_ID_mgmt_acc`=".$uid.", prdemp.`processing`=3 WHERE prdemp.`payroll_period_ID`=".$payrollPeriodID, "payroll_processFinMgmtAccountingEntry");
 		}
 

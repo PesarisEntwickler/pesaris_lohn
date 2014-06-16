@@ -651,6 +651,9 @@ class employee {
 			return $response;
 		}
 
+		require_once('chkDate.php');
+		$chkDate = new chkDate("", 9,&$ret);
+
 		$system_database_manager = system_database_manager::getInstance();
 		///////////////////////////////////////////////////
 		// in case of a new record, all mandatory fields
@@ -710,7 +713,7 @@ class employee {
 			}
 		}
 //		$arrTableFieldName = array_unique($arrTableFieldName); //remove duplicate field names (if any)
-
+		$tableset = array();
 		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_employee_field_def WHERE `read-only`=0", "payroll_saveEmployeeDetail");
 		foreach($result as $row) {
 			if(in_array($row["fieldName"], $arrFormFieldName)) {
@@ -1056,9 +1059,10 @@ error_log("\nerr540: ".print_r($arrValidityErr,true)."\n", 3, "/var/log/copronet
 		}else $affectedFields["payroll_employee_children"] = array();
 
 		require_once('changeManager.php');
-		$changeManager = new changeManager();				
+		$changeManager = new changeManager("","");				
 		$changeManager->changeManager("EmployeeChange", array("payroll_employee_ID" => array($id), "affectedFields" => $affectedFields, "activeTransaction"=>true, "chageMode"=>$changeMode)); //Bei INSERT+DELETE sind alle Fields affected, nur bei UPDATE muessen wir genau ermitteln, welche Felder geändert wurden
 
+		$system_database_manager = system_database_manager::getInstance();
 		$system_database_manager->executeUpdate("COMMIT", "payroll_saveEmployeeDetail");
 
 		$response["success"] = true;
