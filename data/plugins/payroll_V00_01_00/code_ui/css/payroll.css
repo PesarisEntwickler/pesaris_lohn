@@ -1367,6 +1367,14 @@ ul.prlPrdSetDate {
 	width:180px;
 }
 
+.prlPeriodenFileWrapper { 
+	border:1px solid #999;
+	width:250px;
+	background-color: #F4F4F4;
+	padding: 3px 6px;
+}
+
+
 .ui-autocomplete {
 	font-size:11px;
 	white-space:nowrap;
