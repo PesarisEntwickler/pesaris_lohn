@@ -43,8 +43,8 @@
 	<div id="prlVlEditTab" style="border: 1px solid rgb(136, 170, 238); padding: 20px; position: absolute; top: 50%; left: 50%; width: 350px; height: 80px; margin-left: -175px; margin-top: -40px; background-color: rgb(238, 238, 238); display: block;">
 		Name des Reiters:<input type="text" id="etName" value="" style="width:200px;"/><br/>
 		<input type="hidden" id="etTarget" value=""/>
-		<button onclick="$('li[ptab-assignment='+$('#etTarget').val()+'] a').text($('#etName').val());$('#prlVlEditTab').hide();"><wgui:text id="btnChange"/></button><button onclick="$('#prlVlEditTab').hide();"><wgui:text id="btnCancel"/></button>
-		<button onclick="prlVlRemoveTab($('#etTarget').val());$('#prlVlEditTab').hide();" style="margin-left:60px;"><wgui:text id="btnDelete"/></button>
+		<button class="PesarisButton" onclick="$('li[ptab-assignment='+$('#etTarget').val()+'] a').text($('#etName').val());$('#prlVlEditTab').hide();"><wgui:text id="btnChange"/></button><button class="PesarisButton" onclick="$('#prlVlEditTab').hide();"><wgui:text id="btnCancel"/></button>
+		<button class="PesarisButton" onclick="prlVlRemoveTab($('#etTarget').val());$('#prlVlEditTab').hide();" style="margin-left:60px;"><wgui:text id="btnDelete"/></button>
 	</div>
 </wgui:block name="employeeForm">
 <wgui:block name="employeeEditFormDlg1">
@@ -56,15 +56,15 @@
 		<option value="<wgui:loopvar loopname="layoutLoop" varname="id"/>"><wgui:loopvar loopname="layoutLoop" varname="FormName"/></option>
 	</wgui:loop name="layoutLoop">
 	</select><br/>
-	<button onclick='if($("#layoutChooser").val()>0) cb("payroll.prlVlEditForm",{"f":"takeAction","w":"edit","id":$("#layoutChooser").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#layoutChooser").val()>0) cb("payroll.prlVlEditForm",{"f":"takeAction","w":"delete","id":$("#layoutChooser").val(),"commit":0});'><wgui:text id="btnDelete"/></button>
+	<button class="PesarisButton" onclick='if($("#layoutChooser").val()>0) cb("payroll.prlVlEditForm",{"f":"takeAction","w":"edit","id":$("#layoutChooser").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#layoutChooser").val()>0) cb("payroll.prlVlEditForm",{"f":"takeAction","w":"delete","id":$("#layoutChooser").val(),"commit":0});'><wgui:text id="btnDelete"/></button>
 	</fieldset>
-	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
 </wgui:block name="employeeEditFormDlg1">
 <wgui:block name="employeeEditFormDlg2">
 	<label for="layoutName" style="display:inline-block;width:100px;"><wgui:text id="prlVlEditDlg2LblName"/></label><input type="text" id="layoutName" style="width:300px;margin-top:10px;margin-bottom:10px;" value="<wgui:var name="LayoutName"/>"/><br/>
 	<input type="checkbox" id="layoutTemporary" style="margin-bottom:10px;" onclick="if($(this).is(':checked')) { $('#layoutGlobal').removeAttr('checked');$('#layoutGlobal').attr('disabled', 'disabled');}else{ $('#layoutGlobal').removeAttr('disabled');}"<wgui:var name="tempChecked"/>/><label for="layoutTemporary"><wgui:text id="prlVlEditDlg2LblTemporary"/></label><br/>
 	<input type="checkbox" id="layoutGlobal" style="margin-bottom:30px;"<wgui:var name="globalChecked"/>/><label for="layoutGlobal"><wgui:text id="prlVlEditDlg2LblGlobal"/></label><br/>
-	<button onclick='cb("payroll.prlVlEditForm",{"f":"layoutOv"});' style="margin-right:20px;"><wgui:text id="btnBack"/></button><button onclick='if($.trim($("#layoutName").val())!="") cb("payroll.prlVlEditForm",{"f":"takeAction","w":"showEditor","id":<wgui:var name="id"/>,"name":$("#layoutName").val(), "temp":$("#layoutTemporary").is(":checked") ? 1 : 0, "global":$("#layoutGlobal").is(":checked") ? 1 : 0});'><wgui:text id="btnNext"/></button><button onclick='$("#modalContainer").mb_close();' style="margin-left:100px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='cb("payroll.prlVlEditForm",{"f":"layoutOv"});' style="margin-right:20px;"><wgui:text id="btnBack"/></button><button onclick='if($.trim($("#layoutName").val())!="") cb("payroll.prlVlEditForm",{"f":"takeAction","w":"showEditor","id":<wgui:var name="id"/>,"name":$("#layoutName").val(), "temp":$("#layoutTemporary").is(":checked") ? 1 : 0, "global":$("#layoutGlobal").is(":checked") ? 1 : 0});'><wgui:text id="btnNext"/></button><button onclick='$("#modalContainer").mb_close();' style="margin-left:100px;"><wgui:text id="btnCancel"/></button>
 </wgui:block name="employeeEditFormDlg2">
 <wgui:block name="selectEmployeeForm">
 	<label for="layoutChooser" style="display:inline-block;width:150px;margin-top:20px;"><wgui:text id="prlVlSelectFormLblLayout"/></label><select id="layoutChooser" style="width:300px;margin-bottom:10px;">
