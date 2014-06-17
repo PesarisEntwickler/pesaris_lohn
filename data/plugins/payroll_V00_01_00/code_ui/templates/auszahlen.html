@@ -1,4 +1,5 @@
 <wgui:block name="wguiBlockAuszahlenPeriodenwahl">
+  <form>
 	<br/>
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 		<table width="100%">
@@ -14,7 +15,7 @@
 			</tr>
 			<tr>
 				<td>
-					<select id="ausz_PeriodenSelect" name="ausz_PeriodenSelect" size="6" style="width: 140px;">
+					<select id="ausz_PeriodenSelect" name="ausz_PeriodenSelect" size="5" style="width: 140px;">
 						<wgui:loop name="selectLoop" varname="DirectoriesLoop">
 							<option value="<wgui:loopvar loopname="selectLoop" varname="id"/>"<wgui:switch name="swtsel" varname="selectLoop|selected"><wgui:case switchname="swtsel" condition="1"> selected</wgui:case switchname="swtsel"></wgui:switch name="swtsel">>
 								<wgui:loopvar loopname="selectLoop" varname="bezeichnung"/>
@@ -23,13 +24,13 @@
 					</select>
 				</td>
 				<td>
- 					<button id="btnAuszahlenBerechnen" class="PesarisButton"><wgui:var name="btnNeuNochmals"/></button>
+ 					<button id="btnAuszahlenBerechnen" name="btnAuszahlenBerechnen" class="PesarisButton"><wgui:var name="btnNeuNochmals"/></button>
 				</td>
 				<td>
-					<div class="prlPeriodenFileWrapper">
+					<div class="prlPeriodenFileWrapper" id="prlPeriodenFileWrapper">
 						<wgui:loop name="fileLoop" varname="PeriodenFiles">
-							<a href='<wgui:var name="aktuellePeriode4ListingDir"/>/<wgui:loopvar loopname="fileLoop" varname="fileName"/>' target="_blank">				
-									 											   <wgui:loopvar loopname="fileLoop" varname="fileName"/>
+							<a href='<wgui:loopvar loopname="fileLoop" varname="technFilename"/>' target='_blank'>				
+									 <wgui:loopvar loopname="fileLoop" varname="fileName"/>
 							</a>
 							<br/>	
 						</wgui:loop name="fileLoop">
@@ -37,7 +38,6 @@
 				</td>
 			</tr>
 		</table>		
-		
 		<!--
 				<div class="prlPmtSpltHeader">
 					<wgui:text id="txtTableHeadersAuszahlenPeriodenFiles"/>
@@ -56,8 +56,9 @@
 		 -->		
 
 	</div>
+  </form>
+   <button id="btnAuszahlenClose" name="btnAuszahlenClose" class="PesarisButton"><wgui:text id="btnClose"/></button> 
 
-   <button id="btnAuszahlenCancel" class="PesarisButton"><wgui:text id="btnClose"/></button>
 </wgui:block name="wguiBlockAuszahlenPeriodenwahl">
 <wgui:block name="TestWindowZwei">
 	zwei

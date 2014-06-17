@@ -4,44 +4,47 @@ class payroll_UI {
 		global $aafwConfig;
 		
 		$txtLoeschungBestaetigen = "L&ouml;schung best&auml;tigen";
+		$auszahlDir = "payments";
 
-//communication_interface::alert("test sysListener(functionName=".$functionName.", functionParameters=".$functionParameters.")");
+		//communication_interface::alert("payroll.auszahlen.openwindow"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
+		//communication_interface::alert("test sysListener(functionName=".$functionName.", functionParameters=".$functionParameters.")");
 		switch($functionName) {
 		case 'payroll.sysLoader':
 			communication_interface::cssFileInclude('plugins/payroll_V00_01_00/code_ui/css/payroll.css','all');
 			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/payroll.js','text/javascript','payroll');
 			break;
 		case 'payroll.auszahlen.berechnen':
-			communication_interface::alert("payroll.auszahlen.berechnen"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
+			communication_interface::alert("payroll.auszahlen.berechnen ".$functionParameters[0]); 
+			//zum Test
+			//$docPathID = blFunctionCall('payroll.calculationReport','GenerateAuszahlenReports',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
+			break;
+		case 'payroll.auszahlen.closewindow':
+			$webTransfer = "web/transfer/";
+			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].$webTransfer;
+			foreach (glob($absWebPath.$auszahlDir."*.*") as $filename) {
+			   unlink($filename);
+			}
 			break;
 		case 'payroll.auszahlen.openwindow':
-			//communication_interface::alert("payroll.auszahlen.openwindow"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
-			// Wenn keine Daten ans Template Uebergeben werden, sollte der Array einfach leer initialisiert werden: $data = array();
-			// In diesem Beispiel werden die Formulardaten direkt ins Template "generiert"
-			$data["meinName"] = "Mein Name ist Hase";
-			$data["meineCheckbox"] = 1;
-
-			$mandant = "MAND".str_pad(session_control::getSessionInfo("id"), 5, "0", STR_PAD_LEFT);
+			//communication_interface::alert("payroll.auszahlen.openwindow ".$functionParameters[0]); 
 			$fm = new file_manager();
-			$fm->customerSpace()->setPath($mandant)->makeDir();  
-			$fm->customerSpace()->setPath($mandant);  
+			$fm->customerSpace()->setPath($auszahlDir)->makeDir();   
 			
-			$PeriodeDieserMonat   = "Periode-".date("Y-m");
-			$PeriodeDieserMonat_1 = "Periode-".date("Y-m", strtotime("-1 months"));
-			$PeriodeDieserMonat_2 = "Periode-".date("Y-m", strtotime("-2 months"));
-			$PeriodeDieserMonat_3 = "Periode-".date("Y-m", strtotime("-3 months"));
+			$periodenPrefix = "periode-";
 			//TODO: Herausfinden, welche die jetztige Periode ist, ich nehme mal den aktuellen Monat
-			$aktuellePeriode4ListingDir = $mandant."/".$PeriodeDieserMonat;
+			$PeriodeDieserMonat   = $periodenPrefix.date("Y-m");
+			if ( isset($functionParameters[0]) && substr($functionParameters[0], 0, 7)=="periode" ) {
+				$PeriodeDieserMonat   = trim($functionParameters[0]);
+			}
+			$aktuellePeriode4ListingDir = $auszahlDir."/".$PeriodeDieserMonat;
 			$data["aktuellePeriode4ListingDir"] = $aktuellePeriode4ListingDir;
 			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->makeDir();  //neue (die heutige) Periode anlegen
-			$fm->customerSpace()->setPath($mandant."/".$PeriodeDieserMonat_1)->makeDir();  //letzte Periode anlegen
-			$fm->customerSpace()->setPath($mandant."/".$PeriodeDieserMonat_2)->makeDir();  //vorletzte Periode anlegen
-			$fm->customerSpace()->setPath($mandant."/".$PeriodeDieserMonat_3)->makeDir();  //vor vorletzte Periode anlegen
 
-
-			 
+//			$PeriodeDieserMonat_1 = $periodenPrefix.date("Y-m", strtotime("-1 months"));
+//			$fm->customerSpace()->setPath($auszahlDir."/".$PeriodeDieserMonat_1)->makeDir();  //letzte Periode anlegen
+		 
 			//Bestehenden Periodendirectories lesen
-			$dirlist = $fm->customerSpace()->setPath($mandant)->listDir(1);  
+			$dirlist = $fm->customerSpace()->setPath($auszahlDir)->listDir(1);  
 			$data["DirectoriesLoop"] = array();
 			$id = 1;
 			foreach($dirlist as $dirrow) {
@@ -54,40 +57,55 @@ class payroll_UI {
 			}
 			
 			//Auslisten der Files aus dem Directory
-			$fm->customerSpace()->setPath($mandant);  
+			$fm->customerSpace()->setPath($auszahlDir);  
 			$filelist = $fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->listDir();  
 			$nochmals = true;
    			if (count($filelist) < 1) {
 				$nochmals = false;//Directory ist neu ->> Perioden-Files sind noch nicht angelegt
    			}
-			//communication_interface::alert("session_control::getSessionInfo_ID=".session_control::getSessionInfo("id"). ",  mandant: ".$mandant. " \n ".count($filelist). "---- ".$aktuellePeriode4ListingDir); 
+			//communication_interface::alert("session_control::getSessionInfo_ID=".session_control::getSessionInfo("id"). ",  mandant: ".$auszahlDir. " \n ".count($filelist). "---- ".$aktuellePeriode4ListingDir); 
+
+			$webTransfer = "web/transfer/";
+			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].$webTransfer;
+			$absDataPath = $aafwConfig["paths"]["plugin"]["customerDir"].session_control::getSessionInfo("db_name")."/".$aktuellePeriode4ListingDir."/";
 
 			$data["PeriodenFiles"] = array();
 			foreach($filelist as $row) {
 				if(strtolower(substr($row,-4))==".pdf") {
-					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf");
+					$technFilename = $auszahlDir."_".$PeriodeDieserMonat."_".$row;
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf", "technFilename"=>"/".$webTransfer.$technFilename);
+					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
 			}
 			foreach($filelist as $row) {
 				if(strtolower(substr($row,-4))==".dta") {
-					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta");
+					$technFilename = $auszahlDir."_".$PeriodeDieserMonat."_".$row;
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta", "technFilename"=>"/".$webTransfer.$technFilename);
+					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
 			}
-			//communication_interface::alert(count($filelist)." ---  mandant=$mandant  ");
-
+			//communication_interface::alert(count($filelist)." ---  mandant=$auszahlDir  ");
+			
+			$zip = new ZipArchive;
+			if ($zip->open($absDataPath.'test.zip') === TRUE) {
+				foreach($filelist as $row) {
+					if(strtolower(substr($row,-4))!=".zip") {
+					    $zip->addFile($absDataPath.$row, $row);
+					}
+				}
+			    $zip->close();
+			}
+			$objWindow = null;
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
-			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenPeriodenwahl"));
-			$objWindow->windowIcon("auszahlen32.png"); //anstatt der 24x24 Pixel sollte ein Icon mit 32x32 Pixeln verwendet werden
-			$objWindow->windowWidth(650);
-			$objWindow->windowHeight(240);
-			$objWindow->modal(true);	
-//			$objWindow->dockable(true);
-			$objWindow->buttonMaximize(true);
-			$objWindow->resizable(true);
 			$data["btnNeuNochmals"] = $objWindow->getText("btnNeuBerechnen");
 			if ($nochmals) {
 				$data["btnNeuNochmals"] = $objWindow->getText("btnNochmalBerechnen");
 			}
+			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenPeriodenwahl"));
+			$objWindow->windowIcon("auszahlen32.png");
+			$objWindow->windowWidth(650);
+			$objWindow->windowHeight(250); 
+			$objWindow->modal(true);	
 			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenPeriodenwahl"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 			$objWindow->showWindow();
 			

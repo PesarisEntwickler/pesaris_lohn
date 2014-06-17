@@ -1,3 +1,29 @@
+
+function prlAuszahlenInit() {
+	$('#btnAuszahlenClose').bind('click', function() {
+		cb('payroll.auszahlen.closewindow');
+		$('#modalContainer').mb_close();
+	});  
+	$('#btnAuszahlenBerechnen').bind('click', function() {
+		cb('payroll.auszahlen.berechnen');
+		return false;
+	});
+	$( "select" )
+	  .click(function () {
+	    var str = "";
+	    $( "select option:selected" ).each(function() {
+	      str += $( this ).text() + " ";
+	    });
+	    //$( "#prlPeriodenFileWrapper" ).text( str );
+		cb('payroll.auszahlen.openwindow', str);  
+	  })
+	  .change();	
+	$('li[eid='+elementId+'] input').bind('change', function() {
+		prlVlValidation(elementId, $(this).val());
+		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
+	});
+}
+
 /*
 *************************************
 ** Employee Overview
@@ -3803,17 +3829,4 @@ function prl_BankSourceEdit_btnSave() {
 	cb('payroll.paymentSplit', {'action':'GUI_bank_source_save', 'empId':prlPmtSplt.empId, 'data':r});
 }
 
-function prlAuszahlenInit() {
-	$('#btnAuszahlenCancel').bind('click', function() {
-		$('#modalContainer').mb_close();
-	});  
-	$('#btnAuszahlenBerechnen').bind('click', function(e) {
-		//var pFunctionNumber = $(this).attr('fnc');
-		//var pYear = $('#prlCalcOvYear').val();
-		//cb('payroll.prlCalcOvOutput',param);
-		cb('payroll.auszahlen.berechnen',param);
-		return false;
-	});
-	
-	
-}
+

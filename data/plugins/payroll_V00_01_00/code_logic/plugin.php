@@ -157,6 +157,8 @@ class payroll_BL {
 				$reports = new payroll_BL_reports();
 
 				switch($functionParameters[0]) {
+				case 'GenerateAuszahlenReports':
+					return $reports->GenerateAuszahlenReports($functionParameters[1]);
 				case 'calculationJournal':
 					return $reports->CalculationJournal($functionParameters[1]);
 				case 'finAccJournal':
