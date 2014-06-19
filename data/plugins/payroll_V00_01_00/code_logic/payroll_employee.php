@@ -652,7 +652,7 @@ class employee {
 		}
 
 		require_once('chkDate.php');
-		$chkDate = new chkDate("", 9,&$ret);
+		$chkDate = new chkDate("", 9,null);
 
 		$system_database_manager = system_database_manager::getInstance();
 		///////////////////////////////////////////////////

@@ -318,7 +318,7 @@ prlVlFldDefFP
 									foreach($employeeData["auxiliaryTables"][$row["fieldName"]] as $auxTblRow) {
 										$singleRowCollector = array();
 										foreach($arrFieldsOfInterest as $curAuxField) {
-											if($arrDateFields[$curAuxField]) {
+											if(isset($arrDateFields[$curAuxField])) {
 												$singleRowCollector[] = "'".$this->convertMySQL2Date($auxTblRow[$curAuxField])."'";
 											}else{
 												$singleRowCollector[] = "'".str_replace("'","\\'",$auxTblRow[$curAuxField])."'";
