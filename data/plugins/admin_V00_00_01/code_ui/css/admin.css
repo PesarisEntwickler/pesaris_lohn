@@ -1,0 +1,210 @@
+/*form { margin:0; }
+
+#loginStatus {
+	font-family:Arial,Helvetica,Sans-serif;
+	line-height:10px;
+	position:absolute;
+	left:100%;
+	top:3px;
+	margin-left:-280px;
+	z-index:4;
+	width:200px;
+	height:32px;
+	background-color: #FFF;
+	border:1px solid black;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+}
+
+#loginStatus table {
+	font-size:10px;
+	margin-top:2px;
+	margin-left:2px;
+}
+
+#loginStatus table td {
+	padding-right:5px;
+}
+
+#btnLogout {
+	position:absolute;
+	top:3px;
+	z-index:4;
+	left:100%;
+	margin-left:-40px;
+	cursor:pointer;
+}
+
+#appLogo {
+	position:absolute;
+	top:1px;
+	left:18px;
+	z-index:4;
+}
+
+.appMenu {
+	margin-top:0;
+	margin-left:-20px;
+	font-family: verdana;
+	font-size: 12px;
+	padding: 0;
+	list-style: none;
+}
+
+.appMenu li {
+	background-repeat:no-repeat;
+	background-position:0px;
+}
+
+.appMenu li a {
+	padding-left:17px;
+	text-decoration:none;
+	font-weight:bold;
+	color:#666;
+}
+
+.appMenu li.appMenuDisabledItem a {
+	padding-left:17px;
+	text-decoration:none;
+	font-weight:bold;
+	color:#666;
+	cursor:default;
+}
+
+.appMenu li a:hover {
+	color:#000;
+}
+
+.appMenu li.appMenuDisabledItem a:hover {
+	color:#666;
+}
+
+.appMenuDisabledItem {
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+}
+
+/* slickgrid */
+/*.cell-selection {
+      border-right-color: silver;
+      border-right-style: solid;
+      background: #f5f5f5;
+      color: gray;
+      text-align: right;
+      font-size: 10px;
+    }
+
+    .slick-row.selected .cell-selection {
+      background-color: red; /* show default selected row background */
+    }
+
+/*.slick-row:hover {
+	background-color:#a1d6ff;
+}
+
+.ui-button .ui-icon.p-icon-add {
+	background-image: url(css/icon-collection.png);
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+	width:20px;
+	height:17px;
+}
+.ui-button .ui-icon.p-icon-dbfilter {
+	background-image: url(css/icon-collection.png);
+	background-repeat: no-repeat;
+	background-position: -62px 0px;
+	width:20px;
+	height:17px;
+	margin-left:-9px;
+}
+.ui-button .ui-icon.p-icon-tblfilter {
+	background-image: url(css/icon-collection.png);
+	background-repeat: no-repeat;
+	background-position: -30px 0px;
+	width:20px;
+	height:17px;
+	margin-left:-10px;
+}
+.ui-button .ui-icon.p-icon-savesettings {
+	background-image: url(css/icon-collection.png);
+	background-repeat: no-repeat;
+	background-position: -93px 0px;
+	width:20px;
+	height:17px;
+	margin-left:-11px;
+}
+.txtCenter {
+	text-align:center;
+}*/
+
+/* admin spezific */
+#divShowCustomer {
+	clear: none;
+	float: left;
+	padding-right: 10px;
+}
+.break {
+	clear: both;
+	float: none;
+}
+.nonbreak {
+	clear: none;
+	float: left;
+}
+.nosigns ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;	
+}
+.nosigns li {
+	padding: 0;
+	list-style-type: none;
+}
+
+#admNewCustomer fieldset {
+    display: table-column;
+	width: 92%;
+	padding-left: 1%;
+}
+#admNewCustomer label {
+	width: 95%;
+}
+#admNewCustomer span {
+	padding-right: 5px;
+	float: left;
+}
+.spanRight {
+	width: 200px;
+	text-align: right;
+}
+#admNewCustomer input[type=text] {
+	width: 250px;
+}
+#admNewCustomer button {
+	width: 150px;
+}
+
+#admPlugins fieldset {
+    display: inline;
+	width: 92%;
+	padding-left: 1%;
+}
+#admPlugins label {
+	width: 95%;
+}
+#admPlugins span {
+	padding-right: 5px;
+	float: left;
+}
+.spanRightPlugin {
+	width: 150px;
+	text-align: right;
+}
+.spanLeft {
+	width: 150px;
+	text-align: left;
+}
+#admPlugins input[type=text] {
+	width: 150px;
+	padding-left: 2px;
+}

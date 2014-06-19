@@ -1,0 +1,59 @@
+<wgui:block name="showStandardCustomersWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div id="toolbar" class="ui-widget-header ui-corner-all">
+			<button id="prlPsoBtnNew"><wgui:text id="showNewStandardCustomer"/></button>
+		</div>
+		<div id="standardCustomersGrid" style="width:450px;height:250px;"></div>
+	</div>
+</wgui:block name="showStandardCustomersWindow">
+
+<wgui:block name="showStandardCustomerWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all"> 
+		<div id="nonbreak" style="width: 100px;"><wgui:text id="feldBezeichnungCustomer" /></div>
+		<div id="nonbreak"><input type="text" id="customerName" value="<wgui:var name="customerName" />" /></div>
+		<div id="break" style="line-height: 5px;">&nbsp;</div>
+		<div id="nonbreak" style="width: 100px;"><wgui:text id="feldBezeichnungDbName" /></div>
+		<div id="nonbreak"><input type="text" id="customerDB" value="<wgui:var name="customerDB" />" disabled /></div>
+		<div id="break" style="line-height: 5px;">&nbsp;</div>
+		<div id="nonbreak" style="width: 100px;"><wgui:text id="feldBezeichnungPlugins" /></div>
+		<div id="nonbreak">
+			<wgui:loop name="showPlugins" varname="plugins">
+			<!--<option value="<wgui:loopvar loopname="showCostumer"/>-->
+				<div id="break">
+					<div id="break"><input type="checkbox" id="pluginsStandardCustomer" name="pluginsStandardCustomer" value="<wgui:loopvar loopname="showPlugins" varname="pluginID" />" onclick="javascript:showPluginsByCustomer( '<wgui:loopvar loopname="showPlugins" varname="pluginName" />' );" /><wgui:loopvar loopname="showPlugins" varname="pluginName" /></div>
+				</div>
+			<!--</option>-->
+			</wgui:loop name="showPlugins">
+		</div>
+		<div id="break" style="line-height: 5px;">&nbsp;</div>
+	</div>
+	<div id="break" style="line-height: 5px;">&nbsp;</div>
+	<div id="break"><button id="admCustomerEdit" onclick="editCustomer();"><wgui:text id="admCustomerEdit"/></button></div>
+	<div id="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showStandardCustomerWindow">
+
+<wgui:block name="showNewStandardCustomerWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div id="nonbreak" style="width: 100px;"><wgui:text id="feldBezeichnungNewCustomer" /></div>
+		<div id="nonbreak"><input type="text" id="newStandardCustomer" /></div>
+		<div id="break" style="line-height: 5px;">&nbsp;</div>
+		<div id="nonbreak" style="width: 100px;"><wgui:text id="feldBezeichnungDbName" /></div>
+		<div id="nonbreak"><input type="text" id="newStandardDBName" value="" /></div>
+		<div id="break" style="line-height: 5px;">&nbsp;</div>
+		<div id="nonbreak" style="width: 100px;"><wgui:text id="feldBezeichnungPlugins" /></div>
+		<div id="nonbreak">
+			<wgui:loop name="showPlugins" varname="plugins">
+			<!--<option value="<wgui:loopvar loopname="showCostumer"/>-->
+				<div id="nonbreak" style="width: 30px;"><input type="checkbox" id="pluginsStandardCustomer" name="pluginsStandardCustomer" value="<wgui:loopvar loopname="showPlugins" varname="pluginID" />" /></div>
+				<div id="nonbreak"><wgui:loopvar loopname="showPlugins" varname="pluginName" /></div>
+				<div id="break" style="line-height: 3px;">&nbsp;</div>
+			<!--</option>-->
+			</wgui:loop name="showPlugins">
+		</div>
+		<div id="break" style="line-height: 5px;">&nbsp;</div>
+	</div>
+	<div id="break" style="line-height: 5px;">&nbsp;</div>
+	<div id="break"><button id="admCustomerSave" onclick="saveStandardCustomer();"><wgui:text id="admCustomerSave"/></button></div>
+	<div id="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showNewStandardCustomerWindow">
+

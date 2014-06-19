@@ -1,0 +1,222 @@
+<wgui:block name="showCustomersWindow">
+	<input type="hidden" value="<wgui:text id="admCustomer"/>" id="admCustomer" />
+	<input type="hidden" value="<wgui:text id="admCustomerDB"/>" id="admCustomerDB" />
+	<input type="hidden" value="<wgui:text id="admCustomerName"/>" id="admCustomerName" />
+	<input type="hidden" value="<wgui:text id="admCustomerStreet"/>" id="admCustomerStreet" />
+	<input type="hidden" value="<wgui:text id="admCustomerPlace"/>" id="admCustomerPlace" />
+	<div class="ui-tabs ui-widget-content ui-corner-all" style="height: 92%;">
+		<div id="toolbar" class="ui-widget-header ui-corner-all">
+			<button id="prlPsoBtnNew" onclick="javascript:admShowNewCustomer();"><wgui:text id="showNewCustomer"/></button>
+		</div>
+		<div id="customersGrid" style="width:100%;height:100%;"></div>
+	</div>
+</wgui:block name="showCustomersWindow">
+
+<wgui:block name="showCustomerWindow">
+	<div id="admPlugins">
+		<div class="ui-tabs ui-widget-content ui-corner-all">
+			<div id="divErrorMessage" style="display:none;color: #ff0000;font-weight: bold"></div>
+			<input type="hidden" id="newCustomerDB" />
+			<fieldset>
+				<legend><wgui:text id="admCustomerDetail"/></legend>
+				<label for="customerID"><span class="spanRight"><wgui:text id="admCustomer" /></span><span id="customerID"></span><br /></label>
+				<label for="customerDB"><span class="spanRight"><wgui:text id="admCustomerDB" /></span><span id="customerDB"></span><br /></label>
+				<label for="customerDB"><span class="spanRight"><wgui:text id="admCustomerName" /></span><span id="customerName"></span><br /></label>
+				<label id="customerAddress1Label"><span class="spanRight"><wgui:text id="admCustomerAddress1" /></span><span id="customerAddress1"></span><br /></label>
+				<label id="customerAddress2Label"><span class="spanRight"><wgui:text id="admCustomerAddress2" /></span><span id="customerAddress2"></span><br /></label>
+				<label id="customerAddress3Label"><span class="spanRight"><wgui:text id="admCustomerAddress3" /></span><span id="customerAddress3"></span><br /></label>
+				<label for="customerStreet"><span class="spanRight"><wgui:text id="admCustomerStreet" /></span><span id="customerStreet"></span><br /></label>
+				<label for="customerPlz"><span class="spanRight"><wgui:text id="admCustomerPlace" /></span><span id="customerPlz"></span>&nbsp;<span id="customerPlace"></span><br /></label>
+				<label for="customerCountry"><span class="spanRight"><wgui:text id="admCustomerCountry" /></span><span id="customerCountry"></span><br /></label>
+				<label for="customerPhone"><span class="spanRight"><wgui:text id="admCustomerPhone" /></span><span id="customerPhone"></span><br /></label>
+				<label for="customerEmail"><span class="spanRight"><wgui:text id="admCustomerEMail" /></span><span id="customerEmail"></span><br /></label>
+			</fieldset>
+			<br />
+			<fieldset>
+				<legend><wgui:text id="admPlugins"/></legend>
+				<div id="customerPlugins"></div>
+			</fieldset>
+		</div>
+	</div>
+</wgui:block name="showCustomerWindow">
+
+<wgui:block name="showNewCustomerWindow">
+	<div id="admNewCustomer">
+		<input type="hidden" id="errorMessageEmptyFields" value="<wgui:text id="admEmptyFields"/>" />
+		<input type="hidden" id="errorMessageMandatoryFields" value="<wgui:text id="admMandatoryFields"/>" />
+		<input type="hidden" id="errorMessageCustomerExists" value="<wgui:text id="admCustomerExists"/>" />
+		<input type="hidden" id="errorMessagePassword" value="<wgui:text id="admPasswordError"/>" />
+		<input type="hidden" id="errorMessagePlugin" value="<wgui:text id="admPluginEmpty"/>" />
+		<input type="hidden" id="textNoGroups" value="<wgui:text id="admNoGroups"/>" />
+		<input type="hidden" id="textLikeUp" value="<wgui:text id="admLikeUp"/>" />
+		<input type="hidden" id="buttonTextCreate" value="<wgui:text id="admCustomerCreate"/>" />
+		<input type="hidden" id="buttonTextContinue" value="<wgui:text id="admCustomerContinue"/>" />
+		<input type="hidden" id="buttonTextCreateInExecution" value="<wgui:text id="admCustomerCreateExecution"/>" />
+		<div class="ui-tabs ui-widget-content ui-corner-all">
+			<div id="divErrorMessage" style="display:none;color: #ff0000;font-weight: bold"></div>
+			<div id="newCustomerFirstStep">
+				<input type="hidden" id="newCustomerDB" />
+				<fieldset>
+					<label for="newCustomer"><span class="spanRight"><wgui:text id="admNewCustomer" /></span><input type="text" id="newCustomer" /></label>
+				</fieldset>
+				<br />
+				<fieldset>
+					<legend><wgui:text id="admNewUser"/></legend>
+					<label for="newUserId"><span class="spanRight"><wgui:text id="admNewUserUid" /></span><input type="text" id="newUserId" /><br /></label>
+					<label for="newUserPassword"><span class="spanRight"><wgui:text id="admNewUserPassword" /></span><input type="password" id="newUserPassword" /><br /></label>
+					<label for="newUserPasswordRepeat"><span class="spanRight"><wgui:text id="admNewUserPasswordRepeat" /></span><input type="password" id="newUserPasswordRepeat" /><br /></label>
+					<label for="newUserName"><span class="spanRight"><wgui:text id="admNewUserName" /></span><input type="text" id="newUserName" /><br /></label>
+					<label for="newUserEmail"><span class="spanRight"><wgui:text id="admNewUserEMail" /></span><input type="text" id="newUserEmail" /><br /></label>
+				</fieldset>
+				<br />
+				<fieldset>
+					<legend><wgui:text id="admAddExistingUsers"/></legend>
+					<label for="newUserId"><span class="spanRight"><wgui:text id="admCustomersForExistingUsers" /></span><select id="customersForExistingUsers" /></select><br /></label>
+				</fieldset>
+				<br />
+			</div>
+			
+			<div id="newCustomerSecondStep" style="display: none">
+				<fieldset>
+					<legend><wgui:text id="admNewCustomer"/></legend>
+					<label for="newCustomerName"><span class="spanRight"><wgui:text id="admCustomerName" /></span><input type="text" id="newCustomerName" /><br /></label>
+					<label for="newCustomerAddress1"><span class="spanRight"><wgui:text id="admCustomerAddress1" /></span><input type="text" id="newCustomerAddress1" /><br /></label>
+					<label for="newCustomerAddress2"><span class="spanRight"><wgui:text id="admCustomerAddress2" /></span><input type="text" id="newCustomerAddress2" /><br /></label>
+					<label for="newCustomerAddress3"><span class="spanRight"><wgui:text id="admCustomerAddress3" /></span><input type="text" id="newCustomerAddress3" /><br /></label>
+					<label for="newCustomerStreet"><span class="spanRight"><wgui:text id="admCustomerStreet" /></span><input type="text" id="newCustomerStreet" /><br /></label>
+					<label for="newCustomerPlz"><span class="spanRight"><wgui:text id="admCustomerPlace" /></span><input type="text" id="newCustomerPlz" style="width:50px;" /><input type="text" id="newCustomerPlace" style="width:195px;" /><br /></label>
+					<label for="newCustomerCountry"><span class="spanRight"><wgui:text id="admCustomerCountry" /></span><select id="newCustomerCountry" style="width:250px;"></select><br /></label>
+					<label for="newCustomerPhone"><span class="spanRight"><wgui:text id="admCustomerPhone" /></span><input type="text" id="newCustomerPhone" /><br /></label>
+					<label for="newCustomerEmail"><span class="spanRight"><wgui:text id="admCustomerEMail" /></span><input type="text" id="newCustomerEmail" /><br /></label>
+				</fieldset>
+				<br />
+			</div>
+			
+			<div id="newCustomerThirdStep" style="display: none">
+				<input type="hidden" id="totalPluginsNewCustomer" />
+				<fieldset>
+					<legend><wgui:text id="admNewCustomerPlugins"/></legend>
+					<div id="pluginsForNewCustomer"></div>
+				</fieldset>
+				<br />
+			</div>
+			
+			<div id="newCustomerFourthStep" style="display: none">
+				<input type="hidden" id="numberOfGroups" />
+				<input type="hidden" id="pluginSpecialFieldsOpen" />
+				<input type="hidden" id="january" value="<wgui:text id="admJanuary" />" />
+				<input type="hidden" id="february" value="<wgui:text id="admFebruary" />" />
+				<input type="hidden" id="march" value="<wgui:text id="admMarch" />" />
+				<input type="hidden" id="april" value="<wgui:text id="admApril" />" />
+				<input type="hidden" id="may" value="<wgui:text id="admMay" />" />
+				<input type="hidden" id="june" value="<wgui:text id="admJune" />" />
+				<input type="hidden" id="july" value="<wgui:text id="admJuly" />" />
+				<input type="hidden" id="august" value="<wgui:text id="admAugust" />" />
+				<input type="hidden" id="september" value="<wgui:text id="admSeptember" />" />
+				<input type="hidden" id="october" value="<wgui:text id="admOctober" />" />
+				<input type="hidden" id="november" value="<wgui:text id="admNovember" />" />
+				<input type="hidden" id="december" value="<wgui:text id="admDecember" />" />
+				<div class="break" style="font-weight: bold;"><span><wgui:text id="admPlugin" /></span><span id="titleNewCustomerFourthStep" style="text-align: left"></span></div>
+				<div class="break" style="line-height: 5pt;">&nbsp;</div>
+				<div id="specialFieldsPlugin_payroll" style="display: none;">
+					<fieldset>
+						<legend><wgui:text id="admSpecialFields"/></legend>
+						<span style="width:250px;"><wgui:text id="admPayrollYear" /></span>
+						<div class="nonbreak" style="padding-right: 5px;">
+							<select id="payrollMonth"></select>
+						</div>
+						<div class="nonbreak">
+							<select id="payrollYear"></select>
+						</div>
+						<div class="break" style="line-height: 10pt;">&nbsp;</div>
+						<div class="nonbreak" style="width:250px;"><span style="width:250px;"><wgui:text id="admLanugages" /></div>
+						<div class="nonbreak" id="payrollLanguages" style="width:200px"></div>
+					</fieldset>
+					<br />
+				</div>
+				<fieldset>
+					<legend><wgui:text id="admNewDataPerPlugin"/></legend>
+					<select id="customersPerPlugin"></select>
+				</fieldset>
+				<br />
+				<fieldset>
+					<legend><wgui:text id="admNewDataPerPluginGroups"/></legend>
+					<div style="height: 150px;overflow: auto;" id="pluginGroups"></div>
+				</fieldset>
+				<br />
+			</div>
+			
+			<div id="newCustomerFifthStep" style="display: none">
+				<div class="break"><wgui:text id="admAbstract" /></div>
+				<br />
+				<fieldset>
+					<legend><wgui:text id="admCustomer"/></legend>
+					<label for="newCustomerDisplay"><span class="spanRight"><wgui:text id="admCustomer" /></span><span id="newCustomerDisplay"></span><br /></label>
+					<label for="newCustomerDBDisplay"><span class="spanRight"><wgui:text id="admCustomerDB" /></span><span id="newCustomerDBDisplay"></span><br /></label>
+					<label for="newCustomerNameDisplay"><span class="spanRight"><wgui:text id="admCustomerName" /></span><span id="newCustomerNameDisplay"></span><br /></label>
+					<label id="newCustomerAddress1Label"><span class="spanRight"><wgui:text id="admCustomerAddress1" /></span><span id="newCustomerAddress1Display"></span><br /></label>
+					<label id="newCustomerAddress2Label"><span class="spanRight"><wgui:text id="admCustomerAddress2" /></span><span id="newCustomerAddress2Display"></span><br /></label>
+					<label id="newCustomerAddress3Label"><span class="spanRight"><wgui:text id="admCustomerAddress3" /></span><span id="newCustomerAddress3Display"></span><br /></label>
+					<label for="newCustomerStreetDisplay"><span class="spanRight"><wgui:text id="admCustomerStreet" /></span><span id="newCustomerStreetDisplay"></span><br /></label>
+					<label for="newCustomerPlzDisplay"><span class="spanRight"><wgui:text id="admCustomerPlace" /></span><span style="width: 30px;" id="newCustomerPlzDisplay"></span><span id="newCustomerPlaceDisplay"></span><br /></label>
+					<label for="newCustomerPhoneDisplay"><span class="spanRight"><wgui:text id="admCustomerPhone" /></span><span id="newCustomerPhoneDisplay"></span><br /></label>
+					<label for="newCustomerEmailDisplay"><span class="spanRight"><wgui:text id="admCustomerEMail" /></span><span id="newCustomerEmailDisplay"></span><br /></label>
+				</fieldset>
+				<br />
+				<fieldset>
+					<legend><wgui:text id="admUser"/></legend>
+					<label for="newUserIdDisplay"><span class="spanRight"><wgui:text id="admNewUserUid" /></span><span id="newUserIdDisplay"></span><br /></label>
+					<label for="newUserPasswordDisplay"><span class="spanRight"><wgui:text id="admNewUserPassword" /></span><span id="newUserPasswordDisplay"></span><br /></label>
+					<label for="newUserNameDisplay"><span class="spanRight"><wgui:text id="admNewUserName" /></span><span id="newUserNameDisplay"></span><br /></label>
+					<label for="newUserEmailDisplay"><span class="spanRight"><wgui:text id="admNewUserEMail" /></span><span id="newUserEmailDisplay"></span><br /></label>
+				</fieldset>
+				<br />
+				<fieldset>
+					<legend><wgui:text id="admCustomerPlugins"/></legend>
+					<div id="selectedPlugins"></div>
+				</fieldset>
+				<br />
+			</div>
+			
+			<div id="newCustomerSixthStep" style="display: none">
+				<fieldset>
+					<legend><wgui:text id="admCustomerCreateInExecution"/></legend>
+					<div class="break" style="text-align: center"><img src="/plugins/admin_V00_00_01/code_ui/media/icons/upload.gif" /></div>
+				</fieldset>
+				<br />
+			</div>
+		</div>
+		<div class="break" style="line-height: 5px;">&nbsp;</div>
+		<div class="nonbreak" style="padding-right: 10px;"><button id="admCustomerBack" disabled="disabled"><wgui:text id="admCustomerBack"/></button></div>
+		<div class="nonbreak" style="padding-right: 10px;"><button id="admCustomerContinue" onclick="adminNewCustomerFirstStep();"><wgui:text id="admCustomerContinue"/></button></div>
+		<div class="nonbreak" style="padding-right: 10px;"><button id="admCustomerCancel" onclick="adminCancelNewCustomer();"><wgui:text id="admCustomerCancel"/></button></div>
+		
+	</div>
+</wgui:block name="showNewCustomerWindow">
+
+<wgui:block name="showPluginDataByCustomersWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admPlugin" /></div>
+		<div class="nonbreak" id="pluginName">&nbsp;</div>
+		<div class="break" style="line-height: 5px;">&nbsp;</div>
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admPluginGroups" /></div>
+		<div class="nonbreak"><div id="pluginDataGroups" class="break"></div>
+			<!--<wgui:loop name="showPluginGroups" varname="pluginGroups">
+				<input type="hidden" value="<wgui:loopvar loopname="showPluginGroups" varname="groupID"/>" />
+				<div class="nonbreak"><wgui:loopvar loopname="showPluginGroups" varname="groupName"/></div>
+				<div class"nonbreak">
+					<select id="pluginGroupData_<wgui:loopvar loopname="showPluginGroups" varname="groupID"/>">
+						<wgui:loop name="pluginGroupData" varname="pluginGroupData">
+							
+						</wgui:loop name="pluginGroupData">
+					</select>
+				</div>
+				<div class="break" style="height: 3px;">&nbsp;</div>
+			</wgui:loop name="showPluginGroups">-->
+		</div>
+		<div class="break" style="line-height: 5px;">&nbsp;</div>
+	</div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+	<div class="break"><button id="admSavePluginByCustomer" onclick="saveCustomer();"><wgui:text id="admSavePluginByCustomer"/></button></div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showPluginDataByCustomersWindow">

@@ -1,0 +1,9 @@
+
+var o = $('#pluginGroups');
+$.each( admPluginGroups, function(key, val) {
+	alert( key+' , '+val['groupID']+' '+val['groupName'] );
+	$.each(val, function() {
+		o.append( $('<li></li>').html(this.groupID+' / '+this.groupName) );
+	});
+});
+

@@ -1,0 +1,220 @@
+<wgui:block name="showPluginsWindow">
+	<input type="hidden" id="pluginIDName" value="<wgui:text id="admPluginIDName" />" />
+	<input type="hidden" id="pluginNameName" value="<wgui:text id="admPluginNameName" />" />
+	<input type="hidden" id="tablePrefaceName" value="<wgui:text id="admTablePrefaceName" />" />
+	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<button id="prlPsoBtnNew">Neues Plugin</button>
+	</div>
+	<div id="pluginsGrid" style="width:500px;height:250px;"></div>
+</wgui:block name="showPluginsWindow">
+
+<!-- plugin detail anzeigen -->
+<wgui:block name="showPluginWindow">
+	<!-- name und tabellen preface anzeigen -->
+	<input type="hidden" value="<wgui:var name="tablePreface" />" id="tablePreface" />
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div id="admPlugins" style="height:450px;overflow: auto">
+			<fieldset>
+				<legend><wgui:text id="admPlugin"/></legend>
+				<label for="pluginName"><span class="spanRightPlugin"><wgui:text id="admPluginName" /></span><input type="text" id="pluginName" value="<wgui:var name="pluginName" />" disabled /><br /></label>
+				<label for="tablePreface"><span class="spanRightPlugin"><wgui:text id="admPluginTablePreface" /></span><input type="text" id="tablePreface" value="<wgui:var name="tablePreface" />" disabled /><br /></label>
+			</fieldset>
+			<br />
+			<fieldset>
+				<legend><wgui:text id="admPluginVersions"/></legend>
+				<div class="nonbreak" style="width: 100px;">&nbsp;</div>
+				<div class="nonbreak" style="width: 170px;"><wgui:text id="admVersionName" /></div>
+				<div class="nonbreak" style="width: 80px;"><wgui:text id="admVersionCurrent" /></div>
+				<div class="nonbreak"><wgui:text id="admVersionStatus" /></div>
+				<div class="break" style="line-height: 5px;">&nbsp;</div>
+				<!-- versionen anzeigen -->
+				<wgui:loop name="showVersions" varname="versions">
+					<div class="break">
+						<div class="nonbreak" style="width: 100px;">&nbsp;</div>
+						<div class="nonbreak" style="width: 170px;"><wgui:loopvar loopname="showVersions" varname="version" /></div>
+						<div class="nonbreak" style="width: 80px;"><wgui:loopvar loopname="showVersions" varname="current" /></div>
+						<div class="nonbreak" style="width: 80px;"><wgui:loopvar loopname="showVersions" varname="status" /></div>
+						<div class="nonbreak" style="width: 20px;"><a href="javascript:admShowPluginVersion( <wgui:var name="pluginID" /> , <wgui:loopvar loopname="showVersions" varname="versionID" /> )">D</a></div>
+						<div class="nonbreak"><a href="javascript:deletePluginVersion()" style="color: #ff0000;">X</a></div>
+					</div>
+				</wgui:loop name="showVersions">
+				<div class="break" style="line-height: 10px;">&nbsp;</div>
+				<div class="nonbreak" style="width: 100px;"><wgui:text id="admNewVersion" /></div>
+				<div class="nonbreak" style="width: 170px;"><input type="text" id="newVersion" /></div>
+				<div class="nonbreak" style="width: 80px;"><input type="checkbox" id="newVersionCurrent" /></div>
+				<div class="nonbreak">
+					<select id="newVersionStatus">
+						<option value="active"><wgui:text id="admActive" /></option>
+						<option value="inactive"><wgui:text id="admInactive" /></option>
+						<option value="archived"><wgui:text id="admArchived" /></option>
+					</select>
+				</div>
+				<div class="break" style="line-height: 5px;">&nbsp;</div>
+			</fieldset>
+			<div class="break"><button id="admNewPluginVersionSave" onclick="savePluginVersion( <wgui:var name="pluginID" /> );"><wgui:text id="admNewPluginVersionSave"/></button></div>
+			<div class="break">&nbsp;</div>
+			<fieldset>
+				<legend><wgui:text id="admPluginGroups"/></legend>
+				<div class="nonbreak" style="width: 100px;">&nbsp;</div>
+				<div class="nonbreak" id="pluginGroupsByPlugin">
+					<!--<wgui:loop name="showGroups" varname="pluginGroups">
+						<div class="break">
+							<div class="nonbreak" style="width: 250px;"><wgui:loopvar loopname="showGroups" varname="groupName" /></div>
+							<div class="nonbreak" style="width: 20px;"><a href="javascript:showPluginGroup( <wgui:var name="pluginID" /> , <wgui:loopvar loopname="showGroups" varname="groupID" /> )">D</a></div>
+							<div class="nonbreak" style="width: 20px;"><a href="javascript:deletePluginGroup( <wgui:var name="pluginID" /> , <wgui:loopvar loopname="showGroups" varname="groupID" /> )" style="color:#ff0000;">X</a></div>
+						</div>
+					</wgui:loop name="showGroups">-->
+				</div>
+				<div class="break">&nbsp;</div>
+				<div class="nonbreak" style="width: 100px;"><wgui:text id="admNewGroup" /></div>
+				<div class="nonbreak" style="width: 200px;"><input type="text" id="newPluginGroup" /></div>
+			</fieldset>
+			<div class="break"><button id="admNewPluginGroupSave" onclick="admSavePluginGroup( <wgui:var name="pluginID" /> );"><wgui:text id="admNewPluginGroupSave"/></button></div>
+		</div>
+	</div>
+	
+	<!-- gruppen anzeigen -->
+	<div class="break" style="line-height: 2px;">&nbsp;</div>
+	
+</wgui:block name="showPluginWindow">
+
+<wgui:block name="showNewPluginWindow">
+	<!-- name und tabellen preface anzeigen -->
+	<input type="hidden" value="<wgui:var name="tablePreface" />" id="tablePreface" />
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div id="admPlugins" style="height:450px;overflow: auto">
+			<fieldset>
+				<legend><wgui:text id="admPlugin"/></legend>
+				<label for="pluginName"><span class="spanRightPlugin"><wgui:text id="admPluginName" /></span><input type="text" id="pluginName" /><br /></label>
+				<label for="tablePreface"><span class="spanRightPlugin"><wgui:text id="admPluginTablePreface" /></span><input type="text" id="tablePreface" /><br /></label>
+				<label for="mandatory"><span class="spanRightPlugin"><wgui:text id="admPluginMandatory" /></span><input type="text" id="mandatory" /><br /></label>
+				<label for="status"><span class="spanRightPlugin"><wgui:text id="admPluginStatus" /></span><select id="status"></select><br /></label>
+			</fieldset>
+			<br />
+			<fieldset>
+				<legend><wgui:text id="admVersion"/></legend>
+				<label for="admPluginVersion"><span class="spanRightPlugin"><wgui:text id="admPluginVersion" /></span><input type="text" id="versionName" /><br /></label>
+				<label for="admVersionCurrent"><span class="spanRightPlugin"><wgui:text id="admVersionCurrent" /></span>
+					<div class="nonbreak" style="width:30px;"><input type="radio" id="versionCurrent" name="versionCurrent" value="1" checked="checked" /></div>
+					<div class="nonbreak" style="width:20px;"><wgui:text id="admYes" /></div>
+					<div class="nonbreak" style="width:30px;"><input type="radio" id="versionCurrent" name="versionCurrent" value="0" /></div>
+					<div class="nonbreak"><wgui:text id="admNo" /></div>
+					<div class="break" style="line-height: 1px;">&nbsp;</div>
+				</label>
+				<label for="admStandardCustomerDB"><span class="spanRightPlugin"><wgui:text id="admStandardCustomerDB" /></span>
+					<select id="standardCustomerDB">"></select>
+				<br /></label>
+			</fieldset>
+			<br />
+			<div class="break"><button id="admNewPluginSave" onclick="admSaveNewPlugin();"><wgui:text id="admSave"/></button></div>
+		</div>
+	</div>
+	
+</wgui:block name="showNewPluginWindow">
+
+<!-- plugin version detail anzeigen -->
+<wgui:block name="showPluginVersionWindow">
+	<input type="hidden" id="pluginID" value="<wgui:var name="pluginID" />" />
+	<input type="hidden" id="versionID" value="<wgui:var name="versionID" />" />
+	<!-- text values -->
+	<input type="hidden" id="noTables" value="<wgui:text id="admNoTables" />" />
+	<input type="hidden" id="txtAssign" value="<wgui:text id="admTxtAssign" />" />
+	<!-- name und tabellen preface anzeigen -->
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div id="admPlugins" style="height:400px;overflow: auto">
+			<fieldset>
+				<legend><wgui:text id="admPluginVersionDetail"/></legend>
+				<label for="versionName"><span class="spanRightPlugin"><wgui:text id="admPluginVersion"/></span><input type="text" id="versionName" disabled /></label><br />
+				<label for="pluginName"><span class="spanRightPlugin"><wgui:text id="admPluginVersionStatus"/></span><input type="text" id="versionStatus" disabled /></label><br />
+				<label for="pluginName"><span class="spanRightPlugin"><wgui:text id="admPluginVersionCurrent"/></span><input type="text" id="versionCurrent" disabled /></label><br />
+			</fieldset>
+			<br />
+			<!-- tabellen anzeigen -->
+			<fieldset style="height:100px;overflow: auto">
+				<legend><wgui:text id="admPluginGroupsWithTables"/></legend>
+				<div class="nonbreak">
+					<div id="pluginGroups"></div>
+				</div>
+			</fieldset>
+			<br />
+			<fieldset style="height:100px;overflow: auto">
+				<legend><wgui:text id="admAvailableVersionTables"/></legend>
+				<div class="nonbreak">
+					<ul id="availableTables"></ul>
+				</div>
+			</fieldset>
+			<br />
+			<!-- mandanten einlesen -->
+			<fieldset>
+				<legend><wgui:text id="admGetVersionTables"/></legend>
+				<div class="nonbreak" style="width:150px;">
+					<select id="customerForGetTables">
+						<wgui:loop name="showCustomers" varname="customers">
+							<option value="<wgui:loopvar loopname="showCustomers" varname="customerDB" />"><wgui:loopvar loopname="showCustomers" varname="customerDB"/></option>
+						</wgui:loop name="showCustomers">
+					</select>
+				</div>
+				<div class="nonbreak"><button id="admGetPluginTables" onclick="getVersionTablesFromDB( <wgui:var name="pluginID" /> , <wgui:var name="versionID" /> , '<wgui:var name="tablePreface" />' );"><wgui:text id="admGetPluginTables"/></button></div>
+			</fieldset>
+		</div>
+	</div>
+</wgui:block name="showPluginVersionWindow">
+
+<wgui:block name="showTablesByGroupWindow">
+	<input type="hidden" id="tableNumbers" />
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admPluginGroup" /></div>
+		<div class="nonbreak"><wgui:var name="groupName"/></div>
+		<div class="break">&nbsp;</div>
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admTables" /></div>
+		<div class="nonbreak" style="width: 330px;"><ul id="admVersionTablesByGroup" class="nosigns"></ul></div>
+		<div class="break">&nbsp;</div>
+	</div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+	<div class="nonbreak"><button id="admSaveTablesByGroup" onclick="saveTablesByGroup( <wgui:var name="pluginID" /> , <wgui:var name="versionID" /> , <wgui:var name="groupID" /> );"><wgui:text id="admSaveTablesByGroup"/></button></div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showTablesByGroupWindow">
+
+<wgui:block name="showPluginGroupWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admPluginGroup" /></div>
+		<div class="nonbreak"><input type="text" id="editPluginGroup" value="<wgui:var name="groupName"/>" /></div>
+		<div class="break" style="line-height: 5px;">&nbsp;</div>
+	</div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+	<div class="nonbreak"><button id="admNewPluginGroupEdit" onclick="editPluginGroup( <wgui:var name="pluginID" /> , <wgui:var name="groupID" /> );"><wgui:text id="admNewPluginGroupEdit"/></button></div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showPluginGroupWindow">
+
+<wgui:block name="showAssignPluginTablesToGroupWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<input type="hidden" id="totalTablesForGroup" />
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admPluginGroup" /></div>
+		<div id="groupName" class="nonbreak"></div>
+		<div class="break" style="line-height: 5px;">&nbsp;</div>
+		<div class="nonbreak" style="width: 150px;"><wgui:text id="admAvailableVersionTables" /></div>
+		<div class="nonbreak"><div id="availableTablesForGroup"></div></div>
+		<div class="break" style="line-height: 5px;">&nbsp;</div>
+	</div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+	<div class="nonbreak"><button id="admAssignPluginTableToGroup" onclick="admAssignPluginTablesToGroup( <wgui:var name="versionID" /> , <wgui:var name="groupID" /> );"><wgui:text id="admAssignPluginTablesToGroup"/></button></div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showAssignPluginTablesToGroupWindow">
+
+<wgui:block name="showVersionTablesWindow">
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+		<div id="admPlugins">
+			<fieldset style="height:280px;overflow: auto">
+				<legend><wgui:text id="admGetVersionTables"/></legend>
+				<div class="nonbreak" style="width: 280px;font-weight: bold;"><wgui:text id="admTable" /></div>
+				<div class="nonbreak" style="width: 100px;font-weight: bold;"><wgui:text id="admTableData" /></div>
+				<div class="nonbreak" style="font-weight: bold;"><wgui:text id="admTableInputGroupID" /></div>
+				<div class="break" style="line-height: 10px;">&nbsp;</div>
+				<div id="versionTables"></div>
+			</fieldset>
+		</div>
+	</div>
+	<div class="nonbreak"><button id="admSaveVersionTables" onclick="saveVersionTables( <wgui:var name="pluginID" /> , <wgui:var name="versionID" /> );"><wgui:text id="admSaveVersionTables"/></button></div>
+	<div class="break" style="line-height: 5px;">&nbsp;</div>
+</wgui:block name="showVersionTablesWindow">
+

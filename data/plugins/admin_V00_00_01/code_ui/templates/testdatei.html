@@ -1,0 +1,21 @@
+<wgui:block name="windowUserGroup">
+	<wgui:text id="feldBezeichnungUserGroup"/> <select>
+	<wgui:loop name="selectLoop" varname="userGroup">
+		<option value="<wgui:loopvar loopname="selectLoop" varname="idUser"/>">
+			<wgui:loopvar loopname="selectLoop" varname="userName"/>&nbsp;/&nbsp;
+			<wgui:loopvar loopname="selectLoop" varname="groupName"/>
+		</option>
+	</wgui:loop name="selectLoop">
+	</select>
+</wgui:block name="windowUserGroup">
+<wgui:block name="windowShowUsers">
+	<wgui:text id="feldBezeichnungCustomers"/>
+	<select id="selectCustomer" onchange="javascript:showCustomer();">
+		<wgui:loop name="selectCustomer" varname="customers">
+			<option value="<wgui:loopvar loopname="selectCustomer" varname="idCustomer"/>"><wgui:loopvar loopname="selectCustomer" varname="customerDB"/></option>
+		</wgui:loop name="selectCustomer">
+	</select>
+</wgui:block name="windowShowUsers">
+<wgui:block name="windowShowError">
+	<wgui:text id="error"/>
+</wgui:block name="windowShowError">
