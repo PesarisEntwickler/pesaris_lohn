@@ -2,9 +2,9 @@
 putenv("PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/root/bin");
 
 define("CORE_DB_HOST", "localhost");
-define("CORE_DB_DBNAME", "development");
-define("CORE_DB_USERNAME", "webuser");
-define("CORE_DB_PASSWORD", "w4tZuP3h");
+define("CORE_DB_DBNAME", "lohndev");
+define("CORE_DB_USERNAME", "root");
+define("CORE_DB_PASSWORD", "");
 define("CORE_WGUI_CACHE", "");
 
 define("DATE_FORMAT_USER", 1);
@@ -62,55 +62,8 @@ $aafwConfig["international"]["de-de"]["numbers"]["dec_point"] = ",";
 $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 
 
-// Enable corresponding Environment
-
-
-//Core Paths SRV1
-
-//$aafwConfig["paths"]["file_manager"]["rootPath"] = "/usr/local/www/apache22/data-hidden/";
-//$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "/usr/local/www/apache22/data/kernel/cache/sessions/";
-//$aafwConfig["paths"]["plugin"]["customerDir"] = "/usr/local/www/apache22/data-hidden/CUSTOMER/";
-//$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
-//$aafwConfig["paths"]["reports"]["templates"] = "/usr/local/www/apache22/data-hidden/GLOBAL/templates/";
-
-//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc.exe";
-//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex.exe";
-//$aafwConfig["paths"]["utilities"]["stdout"] = "/dev/null";
-//$aafwConfig["paths"]["utilities"]["mysql"] = "mysql";
-
-
-//Core Paths SRV2
-/*
-$aafwConfig["paths"]["file_manager"]["rootPath"] = "/usr/local/www/apache22/data-hidden/";
-$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "/usr/local/www/apache22/data/kernel/cache/sessions/";
-$aafwConfig["paths"]["plugin"]["customerDir"] = "/usr/local/www/apache22/data-hidden/CUSTOMER/";
-$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
-$aafwConfig["paths"]["reports"]["templates"] = "/usr/local/www/apache22/data-hidden/GLOBAL/templates/";
-
-$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc.exe";
-$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex.exe";
-$aafwConfig["paths"]["utilities"]["stdout"] = "/dev/null";
-$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
-*/
-
-//Core Paths Windows Ascami
-
-//$aafwConfig["paths"]["file_manager"]["rootPath"] = "E:/VS/Projects/Presida/pesarisLohn/data-hidden/";
-//$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "E:/VS/Projects/Presida/pesarisLohn/data/kernel/cache/sessions/";
-//$aafwConfig["paths"]["plugin"]["customerDir"] = "E:/VS/Projects/Presida/pesarisLohn/data-hidden/CUSTOMER/";
-//$aafwConfig["paths"]["plugin"]["mysqldump"] = "E:/VS/Projects/Presida/pesarisLohn/mysqldump";
-//$aafwConfig["paths"]["reports"]["templates"] = "E:/VS/Projects/Presida/pesarisLohn/data-hidden/GLOBAL/templates/";
-
-//$aafwConfig["paths"]["utilities"]["xsltproc"] = "E:/xsltproc/xsltproc.exe";
-//$aafwConfig["paths"]["utilities"]["pdflatex"] = "E:/MiKTeX/miktex/bin/pdflatex.exe";
-//$aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
-//$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
-
-
-
-//Core Paths Windows industryBilling (Harald)
-
 $aafwConfig["paths"]["file_manager"]["rootPath"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/";
+$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data/";
 $aafwConfig["paths"]["session_control"]["sessionCachePath"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data/kernel/cache/sessions/";
 $aafwConfig["paths"]["plugin"]["customerDir"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/CUSTOMER/";
 $aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/mysqldump";
@@ -119,7 +72,6 @@ $aafwConfig["paths"]["reports"]["templates"] = "C:/Users/Harald G. Mueller/HM/wo
 $aafwConfig["paths"]["utilities"]["xsltproc"] = "C:/Users/Harald G. Mueller/HM/XSLT/bin/xsltproc.exe";
 $aafwConfig["paths"]["utilities"]["pdflatex"] = "C:/Program Files (x86)/MiKTeX 2.9/miktex/bin/pdflatex.exe";
 $aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
-//$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 $aafwConfig["paths"]["utilities"]["mysql"] = "C:/Users/Harald G. Mueller/HM/XAMPP/mysql/data";
 
 ?>
