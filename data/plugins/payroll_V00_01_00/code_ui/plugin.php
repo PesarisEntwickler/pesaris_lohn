@@ -6,8 +6,8 @@ class payroll_UI {
 		$txtLoeschungBestaetigen = "L&ouml;schung best&auml;tigen";
 		$auszahlDir = "payments";
 
-		//communication_interface::alert("payroll.auszahlen.openwindow"); //alert sollte nur zu Debug-Zwecken eingesetzt werden
-		//communication_interface::alert("test sysListener(functionName=".$functionName.", functionParameters=".$functionParameters.")");
+		//error_log("\n", 3, "/var/log/copronet-application.log");
+		//communication_interface::alert(""); //alert sollte nur zu Debug-Zwecken eingesetzt werden
 		switch($functionName) {
 		case 'payroll.sysLoader':
 			communication_interface::cssFileInclude('plugins/payroll_V00_01_00/code_ui/css/payroll.css','all');
@@ -25,8 +25,33 @@ class payroll_UI {
 			   unlink($filename);
 			}
 			break;
-		case 'payroll.auszahlen.openwindow':
-			//communication_interface::alert("payroll.auszahlen.openwindow ".$functionParameters[0]); 
+		case 'payroll.auszahlen.openGenerateWindow':
+			$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
+			$data["btnBerechnen"] = $objWindow->getText("btnNeuBerechnen");
+//			if ($nochmals) {
+//				$data["btnBerechnen"] = $objWindow->getText("btnNochmalBerechnen");
+//			}
+			$period = blFunctionCall('payroll.auszahlen.getActualPeriod');
+			communication_interface::alert("payroll.auszahlen.getActualPeriod ".$period["data"][0]['payroll_period_ID']); 
+//			if($formList["success"]) {
+//				$data["filter_list"] = $formList["data"];
+//			}else{
+//				$data["filter_list"] = array();
+//			}
+			$data["period"] = $period["data"][0]['payroll_year_ID'];
+			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenGenerate"));
+			$objWindow->windowIcon("auszahlen32.png");
+			$objWindow->windowWidth(500);
+			$objWindow->windowHeight(235); 
+			$objWindow->modal(true);	
+			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
+			$objWindow->showWindow();
+			
+			communication_interface::jsExecute("prlAuszahlenHistoryWindowInit();");
+			
+			break;
+		case 'payroll.auszahlen.openHistoryWindow':
+			//communication_interface::alert("payroll.auszahlen.openHistoryWindow ".$functionParameters[0]); 
 			$fm = new file_manager();
 			$fm->customerSpace()->setPath($auszahlDir)->makeDir();   
 			
@@ -84,7 +109,6 @@ class payroll_UI {
 					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
 			}
-			//communication_interface::alert(count($filelist)." ---  mandant=$auszahlDir  ");
 			
 			$zip = new ZipArchive;
 			if ($zip->open($absDataPath.'test.zip') === TRUE) {
@@ -97,25 +121,19 @@ class payroll_UI {
 			}
 			$objWindow = null;
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
-			$data["btnNeuNochmals"] = $objWindow->getText("btnNeuBerechnen");
-			if ($nochmals) {
-				$data["btnNeuNochmals"] = $objWindow->getText("btnNochmalBerechnen");
-			}
-			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenPeriodenwahl"));
+//			$data["btnNeuNochmals"] = $objWindow->getText("btnNeuBerechnen");
+			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenHistory"));
 			$objWindow->windowIcon("auszahlen32.png");
-			$objWindow->windowWidth(650);
-			$objWindow->windowHeight(250); 
+			$objWindow->windowWidth(500);
+			$objWindow->windowHeight(235); 
 			$objWindow->modal(true);	
-			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenPeriodenwahl"); //Template-Datei, zu uebergebende Daten , Template-Blocks
+			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenHistoryWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 			$objWindow->showWindow();
 			
-			communication_interface::jsExecute("prlAuszahlenInit();");
+			communication_interface::jsExecute("prlAuszahlenHistoryWindowInit();");
 			
 			break;
 		case 'payroll.prlPsoEmployeeOverview':
-
-//			$numberformat_thousands_sep = session_control::getSessionSettings("CORE", "numberformat_thousands_sep");
-//			$numberformat_dec_point = session_control::getSessionSettings("CORE", "numberformat_dec_point");
 
 			$data = array();
 			$objWindow = new wgui_window("payroll", "employeeOverview");
@@ -133,38 +151,8 @@ class payroll_UI {
 			$objWindow->addEventFunction_onResize("prlPsoGrid.resizeCanvas();"); //prlPsoGrid.render();
 			$objWindow->showWindow();
 
-/*
-			$psoDbFilter = session_control::getSessionSettings("payroll", "psoDbFilter");
-//communication_interface::alert(print_r($settings,true));
-			//Get employee list and prepare data in order to fill the client-side table
-			$defaultTblColumns = array("EmployeeNumber", "Lastname", "Firstname", "Street", "`ZIP-Code`", "City", "Sex");
-			$queryOption["columns"] = $defaultTblColumns;
-			$queryOption["prepend_id"] = true;
-			$queryOption["query_filter"] = $psoDbFilter;
-			$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
-
-			$tblData = "prlPsoData = [";
-			$firstPass = true;
-			if($employeeList["success"]) {
-				foreach($employeeList["data"] as $row) {
-					$tblData .= $firstPass ? "{" : ", {";
-					$tblRow = "";
-					foreach($row as $fieldName=>$fieldValue) {
-						if($fieldName=="Sex") $fieldValue = $fieldValue=="F" ? "w" : "m"; //TODO: Werte dynamisch ersetzen!
-						$tblRow .= ($tblRow == "" ? "" : ", ")."'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
-					}
-					$tblData .= $tblRow."}";
-					$firstPass = false;
-				}
-			}
-			$tblData .= "];";
-
-			communication_interface::jsExecute('prlPsoColumns = [{id: "EmployeeNumber", name: "Pers.Nr.", field: "EmployeeNumber", sortable: true, resizable: true, width: 60},{id: "Lastname", name: "Nachname", field: "Lastname", sortable: true, resizable: true},{id: "Firstname", name: "Vorname", field: "Firstname", sortable: true, resizable: true},{id: "Street", name: "Strasse", field: "Street", sortable: true, resizable: true, width: 150},{id: "ZIP-Code", name: "PLZ", field: "ZIP-Code", sortable: true, resizable: true, width: 50},{id: "City", name: "Ort", field: "City", sortable: true, resizable: true},{id: "Sex", name: "m/w", field: "Sex", sortable: true, width: 40, cssClass: "txtCenter"}];');
-*/
 			$this->emplOverviewPopulateTable(array("updateTable"=>false));
 
-//			communication_interface::jsExecute("prlPsoData[0] = {id: 666,EmployeeNumber: 678466,Lastname: 'Mueller',Firstname: 'Daniel',Street: 'Tiefenmattstrasse 2a',Zip: 4434,City: 'Hoelstein',Sex: 'm'};");
-//			communication_interface::jsExecute($tblData);
 			communication_interface::jsExecute("prlPsoInit();");
 
 			$settings = session_control::getSessionSettings("payroll", "psoSettings");
@@ -173,12 +161,9 @@ class payroll_UI {
 			}else $settings = unserialize($settings);
 			$settings = json_encode($settings);
 			communication_interface::jsExecute("prlPsoSetSettings(".$settings.");");
-//			communication_interface::alert($settings);
 			break;
 		case 'payroll.psoSetDBFilter':
 			if(isset($functionParameters[0]["dbFilter"])) {
-//				$settings = session_control::getSessionSettings("payroll", "psoSettings");
-//				$settings["dbFilter"] = isset($functionParameters[0]["dbFilter"]) ? $functionParameters[0]["dbFilter"] : "";
 				session_control::setSessionSettings("payroll", "psoDbFilter", $functionParameters[0]["dbFilter"], false); //true = save permanently
 				$this->emplOverviewPopulateTable(array("updateTable"=>true));
 				communication_interface::jsExecute("$('#modalContainer').mb_close();");
@@ -206,8 +191,6 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.psoSaveSettings':
-//			$settings = session_control::getSessionSettings("payroll", "psoSettings");
-//			$functionParameters[0]["dbFilter"] = isset($settings["dbFilter"]) ? $settings["dbFilter"] : "";
 			$psoDbFilter = session_control::getSessionSettings("payroll", "psoDbFilter");
 			session_control::setSessionSettings("payroll", "psoDbFilter", $psoDbFilter, true); //true = save permanently
 
@@ -218,15 +201,6 @@ class payroll_UI {
 			$objWindow->showInfo();
 			break;
 		case 'payroll.prlVlOpenForm':
-//$now = microtime(true); //TODO: PROFILING START
-/*
-	$functionParameters[0]["id"]		<--- employee ID
-	$functionParameters[0]["dirty"]
-	$functionParameters[0]["mode"]		<--- wenn 1 dann DesignMode=true... hier muss reagiert werden. Meldung, Window schliessen und neu im non-DeignMode oeffnen
-	$functionParameters[0]["wndStatus"]
-	$functionParameters[0]["fldDefFP"]	<--- hier wird der "Fingerabdruck der zuletzt uebermittelten FieldDef gespeichert. Falls dieser vom aktuellen "Fingerabdruck" abweicht, muss die FieldDef neu generiert und uebermittelt werden
-prlVlFldDefFP
-*/
 			$currentFormId = session_control::getSessionSettings("payroll", "psoCurrentEmplForm");
 			if($currentFormId!="") {
 				$formDetail = blFunctionCall('payroll.getEmployeeFormDetail',$currentFormId);
@@ -249,7 +223,6 @@ prlVlFldDefFP
 
 				communication_interface::jsExecute("prlVlDirty = false;");
 				communication_interface::jsExecute("prlVlDesignMode = false;");
-	//	communication_interface::alert($functionParameters[0]["id"]."/".$functionParameters[0]["dirty"]."/".$functionParameters[0]["mode"]."/".$functionParameters[0]["wndStatus"]);
 				if($functionParameters[0]["fldDefFP"]=="") { //TODO: Dieser Check muss in Zukunft noch etwas "rafinierter" gemacht werden
 					communication_interface::jsExecute($this->getEmplFieldDef());
 					communication_interface::jsExecute("prlVlFldDefFP = 'X';"); //TODO: in Zukunft nicht nur 'X', sondern echten Fingerprint uebermitteln
@@ -258,10 +231,7 @@ prlVlFldDefFP
 
 				if($formDetail["success"]) {
 					communication_interface::jsExecute('prlVlCreateForm('.$formDetail["data"][0]["FormElements"].');');
-					//error_log($formDetail["data"][0]["FormElements"]."\n", 3, "/var/log/copronet-application.log");
 				}
-
-	//			communication_interface::jsExecute("prlVlFill( [['FirstName','Hansruedi'], ['LastName','Meier'], ['Street','Hofmattstrasse 23'], ['ZipCity', {'zip':'4444', 'city':'Musterdorf'}], ['Apprentice',true], ['DateOfBirth','21.11.1979'], ['Age','32'], ['Salary','5678.90'], ['SV-AS-Number','712.2789.7612.83'], ['Country','CH'], ['tbl_education',[ [456, '21.04.2008', '22.04.2008', 'Schreibmaschinenkurs', 'bei Digicomp'], [788, '01.09.2009', '20.09.2009', 'Englisch (Anfaenger)', 'Intensivkurs, ganztaetig'], [4561, '21.01.2010', '31.01.2010', 'English, Level 2', ''] ]] ] );");
 				communication_interface::jsExecute("$('#prlVlTabContainer').height( $('#employeeForm .o').height() - $('#prlVlTabs .o').height() - 40 );");
 				communication_interface::jsExecute("$('#employeeForm .n').html('Mitarbeiterdaten bearbeiten (<span id=\"prlVlTitle\"></span>)');");
 			}
@@ -349,7 +319,6 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 			}
 */
 			communication_interface::jsExecute("prlVlRid = ".$functionParameters[0]["id"].";"); //set record ID of current employee (on client side)
-//communication_interface::alert(microtime(true) - $now); //TODO: PROFILING STOP
 			break;
 		case 'payroll.prlVlLoadFormData':
 			//wenn Form bereits geladen ist und nur die Daten geaendert werden sollen
@@ -361,10 +330,8 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 			if($ret["success"]) {
 				communication_interface::jsExecute("$('#employeeForm').mb_close();");
 
-				//TODO: HIER WERDEN DATEN NEU IN UEBERSICHTSTABELLE GELADEN. 
+				//HIER WERDEN DATEN NEU IN UEBERSICHTSTABELLE GELADEN. 
 				//DAS IST NOCH NICHT OPTIMAL GELOEST, DA *ALLE* DATEN NACH JEDER AENDERUNG AN DEN CLIENT GESCHICKT WERDEN!!
-//				$queryOption["columns"] = array("EmployeeNumber", "Firstname", "Lastname");
-//				$queryOption["prepend_id"] = true;
 				$queryOption["query_filter"] = "";
 				$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
 				$tblData = "prlPsoData = [";
@@ -1534,19 +1501,48 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			break;
 		case 'payroll.prlCalcOvProcess':
 			switch($functionParameters[0]["functionNumber"]) {
+			case 5: //Auszahldaten erzeugen 
+				//communication_interface::alert("Auszahldaten erzeugen");
+				$data = array();
+
+				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
+				if($ret["success"]) $data["employeeFilter_list"] = $ret["data"];
+
+
+				$formList = blFunctionCall('payroll.getEmployeeFilterList',array("FilterForEmplOverview"=>true, "FilterForCalculation"=>false));
+				if($formList["success"]) {
+					$data["filter_list"] = $formList["data"];
+				}else{
+					$data["filter_list"] = array();
+				}
+				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
+				$data["btnBerechnen"] = $objWindow->getText("btnNeuBerechnen");
+				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+				$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
+				$data["period"] = "periode-".$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
+				$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenGenerate").": ".$data["period"]);
+				$objWindow->windowIcon("auszahlen32.png");
+				$objWindow->windowWidth(550);
+				$objWindow->windowHeight(295); 
+				$objWindow->modal(true);	
+				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
+				$objWindow->showWindow();
+				
+				communication_interface::jsExecute("prlAuszahlenHistoryWindowInit();");
+				break;
 			case 1: //Lohn berechnen
 				blFunctionCall('payroll.calculate');
 				$this->prlCalcOvPopulateTable(array("updateTable"=>true));
 				break;
-			case 4: //Auszahlen
+			case 4: //Fixieren
 				if(!isset($functionParameters[0]["subFunction"])) {
 					$prdValidity = blFunctionCall('payroll.checkPeriodValidity');
 					if($prdValidity["processedCount"] == $prdValidity["payoutCount"]) {
 						$objWindow = new wgui_window("payroll", "infoBox");
-						$objWindow->windowTitle("Fixieren/Auszahlen");
+						$objWindow->windowTitle($objWindow->getText("prlPayoutTitle"));
 						$objWindow->windowWidth(420);
 						$objWindow->windowHeight(170);
-						$objWindow->setContent("<br/>In dieser Abrechnungsperiode wurden bereits alle Mitarbeiter fixiert/ausbezahlt.<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+						$objWindow->setContent("<br/>".$objWindow->getText("prlPayout_all")."<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 						$objWindow->showInfo();
 						break;
 					}
@@ -3184,7 +3180,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		case 'core.bootLoadMenu':
 			uiFunctionCall('baseLayout.appMenuAddSection','payroll','Lohnbuchhaltung');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten','plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png', 'prlCalcOvOpen();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahlen',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen.openwindow\');return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahldaten',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen.openHistoryWindow\');return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm', 'plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png',  'prlPsoOpenEmployeeOverview();return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Firmenstamm',    'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
 			break;

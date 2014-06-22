@@ -29,7 +29,7 @@
 					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
 				</optgroup>
 			</select>
-			&nbsp;&nbsp;
+<!-- 			&nbsp;&nbsp;
 		<wgui:text id="txtZahlstelle"/>:
 			<select id="prlBankSourceReport" style="width: 120px;">
 					<option value="0" selected="selected">--- <wgui:text id="prlPayout_filter_mode_ALL"/> ---</option>
@@ -37,7 +37,7 @@
 					<option value="2"></option>
 					<option value="3"></option>
 			</select>
-	</div>
+ -->	</div>
 	<div id="tbCalcOvRow2" class="ui-widget-header ui-corner-all">
 		<button id="prlCalcOvBtnEdit"><wgui:text id="prlCalcOvBtnEdit"/></button>
 		<button id="prlCalcOvBtnAddEmpl"><wgui:text id="prlCalcOvBtnAddEmpl"/></button>
@@ -47,17 +47,18 @@
 		<button id="prlCalcOvBtnProcess"><wgui:text id="prlCalcOvBtnProcess"/></button>
 		<button id="prlCalcOvBtnOutput"><wgui:text id="prlCalcOvBtnOutput"/></button>
 		<ul id="prlCalcOvProcessMenu">
-			<li><a href="#" fnc="1">Berechnen</a></li>
-			<li><a href="#" fnc="4">Fixieren/Auszahlen</a></li>
-			<li><a href="#" fnc="2">Verbuchen</a></li>
-			<li><a href="#" fnc="3">Periode abschliessen</a></li>
+			<li><a href="#" fnc="3"><wgui:text id="txtCalcMenupunkt_PeriodeAbschliessen"/></a></li>
+			<li><a href="#" fnc="1"><wgui:text id="txtCalcMenupunkt_Berechnen"/></a></li>
+			<li><a href="#" fnc="4"><wgui:text id="txtCalcMenupunkt_Fixieren"/>...</a></li>
+			<li><a href="#" fnc="2"><wgui:text id="txtCalcMenupunkt_Verbuchen"/>...</a></li>
+			<li><a href="#" fnc="5"><wgui:text id="txtTitelAuszahlenGenerate"/>...</a></li>
 		</ul>
 		<ul id="prlCalcOvOutputMenu">
-			<li><a href="#" fnc="2">Kontroll-Journal</a></li>
-			<li><a href="#" fnc="3">FIBU-Kontierungen</a></li>
-			<li><a href="#" fnc="4">BEBU-Kontierungen</a></li>
-			<li><a href="#" fnc="1">Lohnabrechnungen</a></li>
-			<li><a href="#" fnc="5">Lohnkonto</a></li>
+			<li><a href="#" fnc="2"><wgui:text id="txtCalcMenupunkt_KontrollJournal"/></a></li>
+			<li><a href="#" fnc="3"><wgui:text id="txtCalcMenupunkt_FIBUKontierungen"/></a></li>
+			<li><a href="#" fnc="4"><wgui:text id="txtCalcMenupunkt_BEBUKontierungen"/></a></li>
+			<li><a href="#" fnc="1"><wgui:text id="txtCalcMenupunkt_Lohnabrechnungen"/></a></li>
+			<li><a href="#" fnc="5"><wgui:text id="txtCalcMenupunkt_Lohnkonto"/></a></li>
 		</ul>
 	</div>
 	<div id="gridCalcOv" style="width:600px;height:500px;"></div>
@@ -129,14 +130,14 @@
 <wgui:block name="calculationFinalizeWarning">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 		<br/>
-		Beim Abschliessen der Periode sind Warnungen aufgetreten:<br/>
+		<wgui:text id="txtCalcWarnungen"/>:<br/>
 		<select id="prlCalcFinWarnList" size="4">
 		<wgui:loop name="warningLoop" varname="warningList">
 			<option><wgui:loopvar loopname="warningLoop" varname="msg"/></option>
 		</wgui:loop name="warningLoop">
 		</select>
 	</div>
-	<button id="prlCalcFinProceed">Fortfahren</button><button id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
+	<button id="prlCalcFinProceed"><wgui:text id="btnFortFahren"/></button><button id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="calculationFinalizeWarning">
 <wgui:block name="calculationFinalize">
 	<div style="height:100px;" class="ui-tabs ui-widget-content ui-corner-all">
@@ -230,7 +231,7 @@
 						<ul>
 							<li></li>
 							<li><wgui:text id="prlCalcOvSetTitHourlyWage"/></li>
-							<li><wgui:text id="prlCalcOvSetTitWage"/></li>
+							<li><wgui:text id="txtMohnatslohn"/></li>
 							<li><wgui:text id="prlCalcOvSetTitSalary"/></li>
 						</ul>
 					</li>

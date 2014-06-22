@@ -27,40 +27,40 @@
 </wgui:block name="GUI_paymentSplitOverview">
 <wgui:block name="paymentSplitEdit">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit PesarisWGUI">
-		<label for="prlPmtSplt_period">G&uuml;ltig f&uuml;r:</label>
+		<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
 				<select id="prlPmtSplt_period">
-					<option value="">alle Abrechnungsperioden</option>
-					<option value="MAP">alle Hauptzahltage</option>
-					<option value="MPB">alle Gratifikationen</option>
-					<option value="MIP">alle Zwischenzahltage</option>
-					<option value="1">Januar</option>
-					<option value="2">Februar</option>
-					<option value="3">M&auml;rz</option>
-					<option value="4">April</option>
-					<option value="5">Mai</option>
-					<option value="6">Juni</option>
-					<option value="7">Juli</option>
-					<option value="8">August</option>
-					<option value="9">September</option>
-					<option value="10">Oktober</option>
-					<option value="11">November</option>
-					<option value="12">Dezember</option>
-					<option value="13">13. Monatslohn</option>
-					<option value="14">14. Monatslohn</option>
-					<option value="15">Gratifikation 1</option>
-					<option value="16">Gratifikation 2</option>
+					<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
+					<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
+					<option value="MPB"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvBonuses"/></option>
+					<option value="MIP"><wgui:text id="txtAlle"/><wgui:text id="txtZwischenzahltage"/></option>
+					<option value="1"><wgui:text id="prlCalcOvMonth01"/></option>
+					<option value="2"><wgui:text id="prlCalcOvMonth02"/></option>
+					<option value="3"><wgui:text id="prlCalcOvMonth03"/></option>
+					<option value="4"><wgui:text id="prlCalcOvMonth04"/></option>
+					<option value="5"><wgui:text id="prlCalcOvMonth05"/></option>
+					<option value="6"><wgui:text id="prlCalcOvMonth06"/></option>
+					<option value="7"><wgui:text id="prlCalcOvMonth07"/></option>
+					<option value="8"><wgui:text id="prlCalcOvMonth08"/></option>
+					<option value="9"><wgui:text id="prlCalcOvMonth09"/></option>
+					<option value="10"><wgui:text id="prlCalcOvMonth10"/></option>
+					<option value="11"><wgui:text id="prlCalcOvMonth11"/></option>
+					<option value="12"><wgui:text id="prlCalcOvMonth12"/></option>
+					<option value="13">13. <wgui:text id="txtMohnatslohn"/></option>
+					<option value="14">14. <wgui:text id="txtMohnatslohn"/></option>
+					<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
+					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
 				</select><br/>
-		<label for="prlPmtSplt_split_mode">Zuteilkriterium:</label>
+		<label for="prlPmtSplt_split_mode"><wgui:text id="txtZuteilkriterium"/>:</label>
 				<select id="prlPmtSplt_split_mode">
 					<option value="2">%</option>
-					<option value="3">Betrag</option>
-					<option value="1">Lohnart</option>
+					<option value="3"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtBetrag"/></option>
+					<option value="1"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtLohnart"/></option>
 				</select><br/>
 		<label for="prlPmtSplt_amount" smd2="Prozent (%):" smd3="Betrag:"></label>
 				<input type="text" id="prlPmtSplt_amount"/><br/>
-		<label for="prlPmtSplt_payroll_account_ID">Lohnart:</label><input type="text" id="prlPmtSplt_payroll_account_ID"/><br/>
-		<label for="prlPmtSplt_payroll_currency_ID">W&auml;hrung:</label><select id="prlPmtSplt_payroll_currency_ID"><option value="CHF">CHF</option><option value="EUR">EUR</option></select><br/>
-		<label for="prlPmtSplt_payroll_bank_source_ID">Zahlstelle:</label><select id="prlPmtSplt_payroll_bank_source_ID"><option value="0"><wgui:text id="txtStandardVerwenden"/></option>
+		<label for="prlPmtSplt_payroll_account_ID"><wgui:text id="txtLohnart"/>:</label><input type="text" id="prlPmtSplt_payroll_account_ID"/><br/>
+		<label for="prlPmtSplt_payroll_currency_ID"><wgui:text id="txtWaehrung"/>:</label><select id="prlPmtSplt_payroll_currency_ID"><option value="CHF">CHF</option><option value="EUR">EUR</option></select><br/>
+		<label for="prlPmtSplt_payroll_bank_source_ID"><wgui:text id="txtZahlstelle"/>:</label><select id="prlPmtSplt_payroll_bank_source_ID"><option value="0"><wgui:text id="txtStandardVerwenden"/></option>
 			<wgui:loop name="bankSrcLoop" varname="bank_source_list">
 				<option value='<wgui:loopvar loopname="bankSrcLoop" varname="id"/>'><wgui:loopvar loopname="bankSrcLoop" varname="description"/></option>
 			</wgui:loop name="bankSrcLoop">

@@ -40,6 +40,10 @@ class payroll_BL {
 		switch($functionName) {
 		case 'payroll.auszahlen.braucheDaten':
 			return $auszahlen->auszahlDaten();
+		case 'payroll.auszahlen.getActualPeriod':
+			return $auszahlen->getActualPeriod();
+		case 'payroll.auszahlen.getActualPeriodenDaten':
+			return $auszahlen->getActualPeriodenDaten($functionParameters[0]);
 		case 'payroll.onBootComplete':
 			return $variousFunctions->onBootComplete();
 		case 'payroll.getLanguageList':

@@ -21,17 +21,23 @@ $textResourceMap["btnNeueBankverbindung"] = "Neue Bankverbindung &gt;";
 $textResourceMap["btnNeueZahlstelle"] = "Neue Zahlstelle &gt;";
 $textResourceMap["btnReihenfolgespeichern"] = "Reihenfolge speichern";
 
-$textResourceMap["btnNeuBerechnen"] = "Dateien neu berechnen >";
-$textResourceMap["btnNochmalBerechnen"] = "Dateien nochmals berechnen >";
+$textResourceMap["btnNeuBerechnen"] = "Dateien erzeugen >";
 
 $textResourceMap["txtY"] = "Ja";
 $textResourceMap["txtN"] = "Nein";
+
+$textResourceMap["txtWaehrung"] = "W&auml;hrung";
+$textResourceMap["txtLohnart"] = "Lohnart";
+$textResourceMap["txtBetrag"] = "Betrag";
+$textResourceMap["txtZuteilkriterium"] = "Zuteilkriterium";
+
 
 $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
 $textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
 
 /* ********* AUSZAHLEN *********** */
-$textResourceMap["txtTitelAuszahlenPeriodenwahl"] = "Auszahlen. Reports und Zahlungsdateien";
+$textResourceMap["txtTitelAuszahlenGenerate"] = "Auszahldaten erzeugen";
+$textResourceMap["txtTitelAuszahlenHistory"] = "Auszahldaten";
 $textResourceMap["txtAuswahlPeriode"] = "Periodenwahl";
 $textResourceMap["txtFilesDerPeriode"] = "Dateien der Periode";
 $textResourceMap["MeinTitel2"] = "Titel two";
@@ -42,7 +48,6 @@ $textResourceMap["txtTableHeadersAuszahlenPeriodenFiles"] =
 					"<li>&nbsp;</li>" .
 				"</ul>";
 
-
 /* ****** PAYMENTS ****** */
 $textResourceMap["txtBestehendeBankverbindungen"] = "Bestehende Bankverbindungen";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
@@ -51,7 +56,6 @@ $textResourceMap["txtBankverbindungAuswaehlen"] = "-- Bankverbindung ausw&auml;h
 $textResourceMap["txtDestinationBankLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Bankverbindung l&ouml;schen wollen?";
 $textResourceMap["txtZahlstelleLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Zahlstelle l&ouml;schen wollen?";
 $textResourceMap["txtZahlSplittLoeschenSicher"] = "Sind Sie sicher, dass Sie den gew&auml;hlten Auszahlungssplit l&ouml;schen wollen?";
-
 $textResourceMap["txtZahlstelle"] = "Zahlstelle";
 $textResourceMap["txtZahlstelleBearbeiten"] = "Zahlstelle bearbeiten";
 $textResourceMap["txtZahlstelleBestehend"] = "Bestehende Zahlstellen";
@@ -74,6 +78,12 @@ $textResourceMap["txtZahlstelleBez4"] = "Kontoinhaber Zeile 4";
 
 $textResourceMap["txtAllgemein"] = "Allgemein";
 $textResourceMap["txtBezeichnung"] = "Bezeichnung";
+
+$textResourceMap["txtGueltigFuer"] = "G&uuml;ltig f&uuml;r";
+$textResourceMap["txtAlle"] = "alle&nbsp;";
+
+$textResourceMap["txtAbrechnungsperioden"] = "Abrechnungsperioden";
+$textResourceMap["txtZwischenzahltage"] = "Zwischenzahltage";
 
 $textResourceMap["txtAuszkritInReihenfolge"] = "Die Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet.";
 $textResourceMap["txtTableHeadersPaymentSplit"] = 
@@ -102,6 +112,7 @@ $textResourceMap["prlPsoBtnFormEdit"] = "Bearbeitungsmasken verwalten";
 
 $textResourceMap["prlPsoDFltLblFilter"] = "Personalfilter:";
 $textResourceMap["prlPsoDFltAllEmployees"] = "-- Alle Mitarbeiter --";
+$textResourceMap["prlPsoDFltAllEmployeesRestliche"] = "-- Alle (restlichen) Mitarbeiter --";
 
 
 $textResourceMap["prlVlAlertCloseWnd_Title"] = "Fenster schliessen?";
@@ -396,7 +407,7 @@ $textResourceMap["prlCalcOvPeriod"] = "Periode:";
 $textResourceMap["prlCalcOvMajorPeriods"] = "Hauptzahltage";
 $textResourceMap["prlCalcOvMonth01"] = "Januar";
 $textResourceMap["prlCalcOvMonth02"] = "Februar";
-$textResourceMap["prlCalcOvMonth03"] = "Maerz";
+$textResourceMap["prlCalcOvMonth03"] = "M&auml;rz";
 $textResourceMap["prlCalcOvMonth04"] = "April";
 $textResourceMap["prlCalcOvMonth05"] = "Mai";
 $textResourceMap["prlCalcOvMonth06"] = "Juni";
@@ -455,7 +466,7 @@ $textResourceMap["prlCalcOvSetTbSettings"] = "Einstellungen";
 $textResourceMap["prlCalcOvSetTbMsg"] = "Mitteilungen";
 $textResourceMap["prlCalcOvSetDates"] = "Datumswerte";
 $textResourceMap["prlCalcOvSetTitHourlyWage"] = "Stundenlohn";
-$textResourceMap["prlCalcOvSetTitWage"] = "Monatslohn";
+$textResourceMap["txtMohnatslohn"] = "Monatslohn";
 $textResourceMap["prlCalcOvSetTitSalary"] = "Gehalt";
 $textResourceMap["prlCalcOvSetFrom"] = "von";
 $textResourceMap["prlCalcOvSetTo"] = "bis";
@@ -466,10 +477,21 @@ $textResourceMap["prlCalcOvSetMsgLanguage"] = "Sprache:";
 $textResourceMap["prlCalcOvSetMsg"] = "Mitteilung:";
 $textResourceMap["prlCalcOvSetAllEmpl"] = "global (alle Mitarbeiter)";
 
+$textResourceMap["txtCalcMenupunkt_Berechnen"] = "Berechnen";
+$textResourceMap["txtCalcMenupunkt_Fixieren"] = "Fixieren";
+$textResourceMap["txtCalcMenupunkt_Verbuchen"] = "Verbuchen";
+$textResourceMap["txtCalcMenupunkt_PeriodeAbschliessen"] = "Periode abschliessen";
+$textResourceMap["txtCalcMenupunkt_KontrollJournal"] = "Kontroll-Journal";
+$textResourceMap["txtCalcMenupunkt_FIBUKontierungen"] = "FIBU-Kontierungen";
+$textResourceMap["txtCalcMenupunkt_BEBUKontierungen"] = "BEBU-Kontierungen";
+$textResourceMap["txtCalcMenupunkt_Lohnabrechnungen"] = "Lohnabrechnungen";
+$textResourceMap["txtCalcMenupunkt_Lohnkonto"] = "Lohnkonto";
+$textResourceMap["txtCalcWarnungen"] = "Beim Abschliessen der Periode sind Warnungen aufgetreten";
+
 /*
 ****** Process payment (payout) ******
 */
-$textResourceMap["prlPayoutTitle"] = "Fixieren/Auszahlen";
+$textResourceMap["prlPayoutTitle"] = "Fixieren f&uuml;r Auszahlen";
 $textResourceMap["prlPayoutTitleSelection"] = "Fixieren/Auszahlen: Mitarbeiter w&auml;hlen";
 $textResourceMap["prlPayout_payment_date"] = "Auszahlungsdatum";
 $textResourceMap["prlPayout_interest_date"] = "Valuta-Datum";
@@ -478,6 +500,7 @@ $textResourceMap["prlPayout_filter_mode_ALL"] = "Alle";
 $textResourceMap["prlPayout_filter_mode_COMPANY"] = "Firma";
 $textResourceMap["prlPayout_filter_mode_SELECT"] = "Auswahl";
 $textResourceMap["prlPayout_payroll_company_ID"] = "Firma";
+$textResourceMap["prlPayout_all"] = "In dieser Abrechnungsperiode wurden bereits alle Mitarbeiter fixiert/ausbezahlt.";
 $textResourceMap["prlPayoutBtnSave"] = "Fortfahren";
 /*
 ****** Reports ******
@@ -520,6 +543,7 @@ $textResourceMap["prlPsSelErrMissingSelection"] = "Bitte zuerst einen Mitarbeite
 $textResourceMap["prlUtlEfcTitle"] = "Personalfilter bearbeiten";
 $textResourceMap["prlUtlEfcBtnNew"] = "Neuer Filter erstellen";
 $textResourceMap["prlUtlEfcLgndExistingFilter"] = "Bestehende Personalfilter";
+$textResourceMap["prlUtlEfcLgndExistingFilterAnwenden"] = "Bestehende Personalfilter anwenden";
 $textResourceMap["prlUtlEfcLblFilter"] = "Filter:";
 $textResourceMap["prlUtlEfcOptChooseFilter"] = "-- Filter auswaehlen --";
 

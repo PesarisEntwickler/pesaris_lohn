@@ -1,4 +1,4 @@
-<wgui:block name="wguiBlockAuszahlenPeriodenwahl">
+<wgui:block name="wguiBlockAuszahlenHistoryWindow">
   <form>
 	<br/>
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -6,8 +6,6 @@
 			<tr>
 				<td>
 					<wgui:text id="txtAuswahlPeriode"/>:
-				</td>
-				<td>
 				</td>
 				<td>
 					<wgui:text id="txtFilesDerPeriode"/>:
@@ -23,10 +21,12 @@
 						</wgui:loop name="selectLoop">
 					</select>
 				</td>
+<!-- 				
 				<td>
  					<button id="btnAuszahlenBerechnen" name="btnAuszahlenBerechnen" class="PesarisButton"><wgui:var name="btnNeuNochmals"/></button>
 				</td>
-				<td>
+				
+ -->				<td>
 					<div class="prlPeriodenFileWrapper" id="prlPeriodenFileWrapper">
 						<wgui:loop name="fileLoop" varname="PeriodenFiles">
 							<a href='<wgui:loopvar loopname="fileLoop" varname="technFilename"/>' target='_blank'>				
@@ -59,9 +59,35 @@
   </form>
    <button id="btnAuszahlenClose" name="btnAuszahlenClose" class="PesarisButton"><wgui:text id="btnClose"/></button> 
 
-</wgui:block name="wguiBlockAuszahlenPeriodenwahl">
-<wgui:block name="TestWindowZwei">
-	zwei
+</wgui:block name="wguiBlockAuszahlenHistoryWindow">
+
+
+<wgui:block name="wguiBlockAuszahlenGenerateWindow">
+
+	<input type="text" id="fldAktuellePeriode" value='<wgui:var name="period"/>' disabled="disabled"/>
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+<!-- 	<label for="prlPsoDFilter" style="display:inline-block;width:150px;margin-top:4px;"><wgui:text id="prlPsoDFltLblFilter"/></label>
+	<select id="prlPsoDFilter" style="width:300px;margin-bottom:10px;" size="5" multiple="multiple" ><option value=""><wgui:text id="prlPsoDFltAllEmployeesRestliche"/></option>
+	<wgui:loop name="filterLoop" varname="filter_list">
+		<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="FilterName"/></option>
+	</wgui:loop name="filterLoop">
+	</select><br/>
+ -->	
 	
-</wgui:block name="TestWindowZwei">
+	<fieldset>
+		<legend><wgui:text id="prlUtlEfcLgndExistingFilterAnwenden"/></legend>
+<!-- 			<label for="prlUtlEfc_id" style="display:inline-block;width:100px;"><wgui:text id="prlUtlEfcLblFilter"/></label>
+ -->			<select id="prlUtlEfc_id" style="width:300px;margin-bottom:10px;" size="7" multiple="multiple"><option value="0"><wgui:text id="prlUtlEfcOptChooseFilter"/></option>
+			<wgui:loop name="empfltLoop" varname="employeeFilter_list">
+				<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>"><wgui:loopvar loopname="empfltLoop" varname="FilterName"/></option>
+			</wgui:loop name="empfltLoop">
+			</select><br/>
+	</fieldset>
+
+ 		<button id="btnAuszahlenBerechnen" name="btnAuszahlenBerechnen" class="PesarisButton"><wgui:var name="btnBerechnen"/></button>
+	</div>
+
+  <button id="btnAuszahlenClose" name="btnAuszahlenClose" class="PesarisButton"><wgui:text id="btnClose"/></button> 
+	
+</wgui:block name="wguiBlockAuszahlenGenerateWindow">
 

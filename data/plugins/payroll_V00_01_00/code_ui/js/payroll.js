@@ -1,5 +1,5 @@
 
-function prlAuszahlenInit() {
+function prlAuszahlenHistoryWindowInit() {
 	$('#btnAuszahlenClose').bind('click', function() {
 		cb('payroll.auszahlen.closewindow');
 		$('#modalContainer').mb_close();
@@ -14,8 +14,7 @@ function prlAuszahlenInit() {
 	    $( "select option:selected" ).each(function() {
 	      str += $( this ).text() + " ";
 	    });
-	    //$( "#prlPeriodenFileWrapper" ).text( str );
-		cb('payroll.auszahlen.openwindow', str);  
+		cb('payroll.auszahlen.openHistoryWindow', str);  
 	  })
 	  .change();	
 	$('li[eid='+elementId+'] input').bind('change', function() {
@@ -23,7 +22,16 @@ function prlAuszahlenInit() {
 		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
 	});
 }
-
+function prlAuszahlenGenerateWindowInit() {
+	$('#btnAuszahlenClose').bind('click', function() {
+		cb('payroll.auszahlen.closewindow');
+		$('#modalContainer').mb_close();
+	});  
+	$('#btnAuszahlenBerechnen').bind('click', function() {
+		cb('payroll.auszahlen.berechnen');
+		return false;
+	});
+}
 /*
 *************************************
 ** Employee Overview
