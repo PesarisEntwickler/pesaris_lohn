@@ -19,9 +19,8 @@ class auszahlen {
 	}
 
 	public function getActualPeriodenDaten($periodenID) {
-		//communication_interface::alert("periodenID=".$periodenID);
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_period WHERE id=79 ;", "");		
+		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_period WHERE id=".$periodenID." ; ", "");		
 		if(count($result) < 1) {
 			$response["success"] = false;
 			$response["errCode"] = 102;
@@ -32,6 +31,23 @@ class auszahlen {
 			$response["data"] = $result;
 		}
 		return $response;
+	}
+	
+	public function getZahlstellenDaten($param) {
+		$companyID = session_control::getSessionInfo("id");
+		$system_database_manager = system_database_manager::getInstance();
+		$resBankSrc = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_source, payroll_bank_source_type WHERE payroll_bank_source.source_type = payroll_bank_source_type.type_id AND payroll_company_ID = ".$companyID, "payroll_getZahlstellenListe"); 
+		if(count($resBankSrc) != 0) {
+			$response["success"] = true;
+			$response["errCode"] = 0;
+			$response["data"] = $resBankSrc;
+		}else{
+			$response["success"] = false;
+			$response["errCode"] = 102;
+			$response["errText"] = "no data found";
+		}
+		return $response;
+		
 	}
 
 	public function auszahlDaten() {

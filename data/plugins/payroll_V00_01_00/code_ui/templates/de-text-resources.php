@@ -18,6 +18,7 @@ $textResourceMap["btnFortFahren"] 	= "Fortfahren";
 $textResourceMap["btnBack"] 		= "&lt;&lt; Zur&uuml;ck";
 $textResourceMap["btnNext"] 		= "Weiter &gt;&gt;";
 $textResourceMap["btnNeueBankverbindung"] = "Neue Bankverbindung &gt;";
+$textResourceMap["txtBestehendeBankverbindungen"] = "Bestehende Bankverbindungen";
 $textResourceMap["btnNeueZahlstelle"] = "Neue Zahlstelle &gt;";
 $textResourceMap["btnReihenfolgespeichern"] = "Reihenfolge speichern";
 
@@ -34,9 +35,15 @@ $textResourceMap["txtZuteilkriterium"] = "Zuteilkriterium";
 
 $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
 $textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
-
+$textResourceMap["txtLoeschungBestaetigen"] = "L&ouml;schung best&auml;tigen";
+$textResourceMap["txtBackupAusfuehren"] = "Backup ausfuehren";
+$textResourceMap["txtBackupAbgeschlossen"] = "Backup abgeschlossen";
+$textResourceMap["txtBerechnungsdatenVorbereiten"] = "Berechnungsdaten vorbereiten";
+$textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abgeschlossen";
+$textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
+ 
 /* ********* AUSZAHLEN *********** */
-$textResourceMap["txtTitelAuszahlenGenerate"] = "Auszahldaten erzeugen";
+$textResourceMap["txtAuszahlungVorbereiten"] = "Auszahlung erstellen";
 $textResourceMap["txtTitelAuszahlenHistory"] = "Auszahldaten";
 $textResourceMap["txtAuswahlPeriode"] = "Periodenwahl";
 $textResourceMap["txtFilesDerPeriode"] = "Dateien der Periode";
@@ -49,9 +56,18 @@ $textResourceMap["txtTableHeadersAuszahlenPeriodenFiles"] =
 				"</ul>";
 
 /* ****** PAYMENTS ****** */
-$textResourceMap["txtBestehendeBankverbindungen"] = "Bestehende Bankverbindungen";
+$textResourceMap[""] = "";
+$textResourceMap["txtBerechnungsdatenVorbereiten"] = "Berechnungsdaten vorbereiten";
+$textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabrechnungs-Vorlagen";
+$textResourceMap["txtLayoutBearbeiten"] = "Layout bearbeiten";
+$textResourceMap["txtVorlageLoeschen"] = "Vorlage loeschen";
+$textResourceMap["txtWaehrungenBearbeiten"] = "W&auml;hrungen bearbeiten";
+$textResourceMap["txtUebersichtZahlungssplit"] = "&Uuml;bersicht Zahlungssplit";
+$textResourceMap["txtZahlungssplitMutieren"] = "Zahlungssplit mutieren";
+$textResourceMap["txtBankverbindungAuswaehlenTitel"] = "Bankverbindung ausw&auml;hlen";
+$textResourceMap["txtBankverbindungBearbeiten"] = "Bankverbindung bearbeiten";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
-$textResourceMap["txtBankverbindungAuswaehlen"] = "-- Bankverbindung ausw&auml;hlen --";
+$textResourceMap["txtBankverbindungAuswaehlen"] = "Bankverbindung ausw&auml;hlen";
 
 $textResourceMap["txtDestinationBankLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Bankverbindung l&ouml;schen wollen?";
 $textResourceMap["txtZahlstelleLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Zahlstelle l&ouml;schen wollen?";
@@ -59,7 +75,7 @@ $textResourceMap["txtZahlSplittLoeschenSicher"] = "Sind Sie sicher, dass Sie den
 $textResourceMap["txtZahlstelle"] = "Zahlstelle";
 $textResourceMap["txtZahlstelleBearbeiten"] = "Zahlstelle bearbeiten";
 $textResourceMap["txtZahlstelleBestehend"] = "Bestehende Zahlstellen";
-$textResourceMap["txtZahlstelleAuswaehlen"] = "-- Zahlstellen ausw&auml;hlen --";
+$textResourceMap["txtZahlstelleAuswaehlen"] = "Zahlstellen ausw&auml;hlen";
 $textResourceMap["txtZahlstelleBezeichnung"] = "Zahlstellen Bezeichnung";
 $textResourceMap["txtZahlstellenTyp"] = "Zahlstellen-Typ";
 $textResourceMap["txtCarrier1"] = "DTA";
@@ -87,16 +103,15 @@ $textResourceMap["txtZwischenzahltage"] = "Zwischenzahltage";
 
 $textResourceMap["txtAuszkritInReihenfolge"] = "Die Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet.";
 $textResourceMap["txtTableHeadersPaymentSplit"] = 
-													"<ul>" .
-														"<li>Zahlstelle</li>" .
-														"<li>Bankverbindung</li>" .
-														"<li>Split-Modus</li>" .
-														"<li>Betrag</li>" .
-														"<li>Periode</li>" .
-														"<li></li>" .
-													"</ul>";
-$textResourceMap["txtLoeschungBestaetigen"] = "L&ouml;schung best&auml;tigen";
-  
+		"<ul>" .
+			"<li>Zahlstelle</li>" .
+			"<li>Bankverbindung</li>" .
+			"<li>Split-Modus</li>" .
+			"<li>Betrag</li>" .
+			"<li>Periode</li>" .
+			"<li></li>" .
+		"</ul>";
+ 
 /*
 ********* EMPLOYEES ***********
 */
@@ -111,8 +126,8 @@ $textResourceMap["prlPsoBtnForm"] = "Bearbeitungsmaske auswaehlen";
 $textResourceMap["prlPsoBtnFormEdit"] = "Bearbeitungsmasken verwalten";
 
 $textResourceMap["prlPsoDFltLblFilter"] = "Personalfilter:";
-$textResourceMap["prlPsoDFltAllEmployees"] = "-- Alle Mitarbeiter --";
-$textResourceMap["prlPsoDFltAllEmployeesRestliche"] = "-- Alle (restlichen) Mitarbeiter --";
+$textResourceMap["prlPsoDFltAllEmployees"] = "Alle Mitarbeiter";
+$textResourceMap["prlPsoDFltAllEmployeesRestliche"] = "Alle (restlichen) Mitarbeiter";
 
 
 $textResourceMap["prlVlAlertCloseWnd_Title"] = "Fenster schliessen?";
@@ -151,10 +166,12 @@ $textResourceMap["prlCfgLoacBtnFldMod"] = "Feld-Modifikatoren";
 $textResourceMap["txtAbrechnungsdatenvorbereiten"] = "Abrechnungsdaten vorbereiten";
 $textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabrechnungs-Vorlagen konfigurieren";
 $textResourceMap["txtPersonalstammfelderverwalten"] = "Personalstammfelder verwalten";
-$textResourceMap["txtLohnartkopieren"] = "Lohnart kopieren...";
+$textResourceMap["txtLohnartkopieren"] = "Lohnart kopieren";
 $textResourceMap["txtDBBackup"] = "DB Backup erstellen";
 $textResourceMap["txtDBRestore"] = "DB Wiederherstellung";
 $textResourceMap["txtFremdwaehrungenVerwalten"] = "Fremdw&auml;hrungen verwalten";
+$textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abgeschlossen";
+$textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
 
 
 $textResourceMap["prlFldModBtnNew"] = "Neuer Feld-Modifikator";
@@ -532,7 +549,7 @@ $textResourceMap["prlAccEtr_mgmt_acc_date"] = "Verbuchungsdatum";
 //EmployeeSelector
 $textResourceMap["prlPsSelFormTitle"] = "Mitarbeiter hinzuf&uuml;gen";
 $textResourceMap["prlPsSelLblFilter"] = "Filter:";
-$textResourceMap["prlPsSelAllEmployees"] = "-- Alle Mitarbeiter --";
+$textResourceMap["prlPsSelAllEmployees"] = "-- Alle Mitarbeiter ---";
 $textResourceMap["prlPsSelLblQFilter"] = "Schnellsuche:";
 $textResourceMap["prlPsSelBtnSelectAll"] = "&lt; Alle auswaehlen";
 $textResourceMap["prlPsSelBtnDeselectAll"] = "&lt; Auswahl aufheben";

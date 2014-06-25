@@ -4,17 +4,13 @@ function prlAuszahlenHistoryWindowInit() {
 		cb('payroll.auszahlen.closewindow');
 		$('#modalContainer').mb_close();
 	});  
-	$('#btnAuszahlenBerechnen').bind('click', function() {
-		cb('payroll.auszahlen.berechnen');
-		return false;
-	});
 	$( "select" )
 	  .click(function () {
 	    var str = "";
 	    $( "select option:selected" ).each(function() {
 	      str += $( this ).text() + " ";
 	    });
-		cb('payroll.auszahlen.openHistoryWindow', str);  
+		/*  cb('payroll.auszahlen.openHistoryWindow', str);  */
 	  })
 	  .change();	
 	$('li[eid='+elementId+'] input').bind('change', function() {
@@ -28,8 +24,7 @@ function prlAuszahlenGenerateWindowInit() {
 		$('#modalContainer').mb_close();
 	});  
 	$('#btnAuszahlenBerechnen').bind('click', function() {
-		cb('payroll.auszahlen.berechnen');
-		return false;
+		cb('payroll.auszahlen.berechnen', 'berechne es mal');
 	});
 }
 /*

@@ -79,7 +79,7 @@
 	<button onclick='cb("payroll.prlVlEditForm",{"f":"takeAction","w":"delete","id":<wgui:var name="FormId"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button><button onclick='cb("payroll.prlVlEditForm",{"f":"layoutOv"});'>Nein</button>
 </wgui:block name="deleteEmployeeForm">
 <wgui:block name="selectDBFilterForm">
-	<label for="prlPsoDFilter" style="display:inline-block;width:150px;margin-top:20px;"><wgui:text id="prlPsoDFltLblFilter"/></label><select id="prlPsoDFilter" style="width:300px;margin-bottom:10px;"><option value=""><wgui:text id="prlPsoDFltAllEmployees"/></option>
+	<label for="prlPsoDFilter" style="display:inline-block;width:150px;margin-top:20px;"><wgui:text id="prlPsoDFltLblFilter"/></label><select id="prlPsoDFilter" style="width:300px;margin-bottom:10px;"><option value="">-- <wgui:text id="prlPsoDFltAllEmployees"/> --</option>
 	<wgui:loop name="filterLoop" varname="filter_list">
 		<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="FilterName"/></option>
 	</wgui:loop name="filterLoop">

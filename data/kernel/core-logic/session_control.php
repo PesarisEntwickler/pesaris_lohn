@@ -182,10 +182,11 @@ class session_control {
 	}
 
 	public function getSessionSettings($pluginName, $settingName="") {
-		//error_log("\n". date("Ymd-H:i:s ", time())."getSessionSettings($pluginName, $settingName)", 3, "__harald.log");
+		error_log("\n". date("Ymd-H:i:s ", time())."INFO getSessionSettings($pluginName, $settingName)", 3, "__harald.log");
 		$sessionControl = session_control::getInstance();
 		if (isset($sessionControl->sessionInfo["SETTINGS"][$pluginName])) {
 			$settingName = $sessionControl->sessionInfo["SETTINGS"][$pluginName][$settingName];
+			error_log("\n". date("Ymd-H:i:s ", time())."INFO  isset(sessionInfo  ($pluginName) ) --> settingName=".$settingName, 3, "__harald.log");
 		} 
 		return $settingName;
 /*

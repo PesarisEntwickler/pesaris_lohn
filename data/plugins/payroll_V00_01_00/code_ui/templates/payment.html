@@ -91,7 +91,7 @@
 		<legend><wgui:text id="txtBestehendeBankverbindungen"/></legend>
 		<label for="prlFormCfg_id" style="display:inline-block;width:150px;"><wgui:text id="txtBankverbindung"/>:</label>
 				<select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;">
-					<option value="0"><wgui:text id="txtBankverbindungAuswaehlen"/></option>
+					<option value="0">-- <wgui:text id="txtBankverbindungAuswaehlen"/> --</option>
 					<wgui:loop name="bankLoop" varname="bank_list">
 						<option value='<wgui:loopvar loopname="bankLoop" varname="id"/>'>
 							<wgui:loopvar loopname="bankLoop" varname="description"/>
@@ -189,7 +189,7 @@
 		<legend><wgui:text id="txtZahlstelleBestehend"/></legend>
 		<label for="prlFormCfg_id" style="display:inline-block;width:150px;"><wgui:text id="txtZahlstelle"/>:</label>
 		<select id="prlFormCfg_id" style="width:300px;margin-bottom:0px;">
-			<option value="0"><wgui:text id="txtZahlstelleAuswaehlen"/></option>
+			<option value="0">-- <wgui:text id="txtZahlstelleAuswaehlen"/> --</option>
 			<wgui:loop name="bankLoop" varname="list_of_zahlstellen">
 				<option value='<wgui:loopvar loopname="bankLoop" varname="id"/>'><wgui:loopvar loopname="bankLoop" varname="description"/></option>
 			</wgui:loop name="bankLoop">

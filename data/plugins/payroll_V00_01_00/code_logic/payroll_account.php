@@ -215,7 +215,7 @@ class account {
 		$errFields = array_unique($errFields); //remove duplicate field names (if any)
 //error_log("\n\n".print_r($sqlFieldCollector,true)."\n\n", 3, "/var/log/copronet-application.log");
 		if(count($errFields)>0) {
-error_log("\nerr20: ".print_r($errFields,true)."\n", 3, "/var/log/copronet-application.log");
+//error_log("\nerr20: ".print_r($errFields,true)."\n", 3, "/var/log/copronet-application.log");
 			$response["success"] = false;
 			$response["errCode"] = 20;
 			$response["errText"] = "invalid or missing fields";
@@ -243,7 +243,7 @@ jsonItem["inploa"] = ip;
 		$errFields = array_unique($errFields); //remove duplicate field names (if any)
 		$errSections = array_unique($errSections); //remove duplicate field names (if any)
 		if(count($errFields)>0) {
-error_log("\nerr30: ".print_r($errSections,true).print_r($errFields,true)."\n", 3, "/var/log/copronet-application.log");
+//error_log("\nerr30: ".print_r($errSections,true).print_r($errFields,true)."\n", 3, "/var/log/copronet-application.log");
 			$response["success"] = false;
 			$response["errCode"] = 30;
 			$response["errText"] = "invalid or missing fields in input/output assignments";

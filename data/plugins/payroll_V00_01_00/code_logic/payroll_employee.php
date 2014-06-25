@@ -916,7 +916,7 @@ spezielle felder und sonderfälle:
 			}
 		}
 		if(count($arrMandatoryErr)>0) {
-error_log("\nerr530: ".print_r($arrMandatoryErr,true)."\n", 3, "/var/log/copronet-application.log");
+//error_log("\nerr530: ".print_r($arrMandatoryErr,true)."\n", 3, "/var/log/copronet-application.log");
 			$response["success"] = false;
 			$response["errCode"] = 530;
 			$response["errText"] = "mandatory table fields are empty";
@@ -924,7 +924,7 @@ error_log("\nerr530: ".print_r($arrMandatoryErr,true)."\n", 3, "/var/log/coprone
 			return $response;
 		}
 		if(count($arrValidityErr)>0) {
-error_log("\nerr540: ".print_r($arrValidityErr,true)."\n", 3, "/var/log/copronet-application.log");
+//error_log("\nerr540: ".print_r($arrValidityErr,true)."\n", 3, "/var/log/copronet-application.log");
 			$response["success"] = false;
 			$response["errCode"] = 540;
 			$response["errText"] = "validity check failed (table content)";

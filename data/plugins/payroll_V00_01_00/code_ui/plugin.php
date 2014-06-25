@@ -39,7 +39,7 @@ class payroll_UI {
 //				$data["filter_list"] = array();
 //			}
 			$data["period"] = $period["data"][0]['payroll_year_ID'];
-			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenGenerate"));
+			$objWindow->windowTitle($objWindow->getText("txtAuszahlungVorbereiten"));
 			$objWindow->windowIcon("auszahlen32.png");
 			$objWindow->windowWidth(500);
 			$objWindow->windowHeight(235); 
@@ -56,17 +56,20 @@ class payroll_UI {
 			$fm->customerSpace()->setPath($auszahlDir)->makeDir();   
 			
 			$periodenPrefix = "periode-";
-			//TODO: Herausfinden, welche die jetztige Periode ist, ich nehme mal den aktuellen Monat
-			$PeriodeDieserMonat   = $periodenPrefix.date("Y-m");
+			//Die jetztige Periode ist
+			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+			$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
+			$data["period"] = $periodenPrefix.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
+
+			$PeriodeDieserMonat   = $data["period"];
 			if ( isset($functionParameters[0]) && substr($functionParameters[0], 0, 7)=="periode" ) {
 				$PeriodeDieserMonat   = trim($functionParameters[0]);
 			}
+			communication_interface::alert("gewählter Monat:".$PeriodeDieserMonat);
 			$aktuellePeriode4ListingDir = $auszahlDir."/".$PeriodeDieserMonat;
 			$data["aktuellePeriode4ListingDir"] = $aktuellePeriode4ListingDir;
 			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->makeDir();  //neue (die heutige) Periode anlegen
 
-//			$PeriodeDieserMonat_1 = $periodenPrefix.date("Y-m", strtotime("-1 months"));
-//			$fm->customerSpace()->setPath($auszahlDir."/".$PeriodeDieserMonat_1)->makeDir();  //letzte Periode anlegen
 		 
 			//Bestehenden Periodendirectories lesen
 			$dirlist = $fm->customerSpace()->setPath($auszahlDir)->listDir(1);  
@@ -119,7 +122,7 @@ class payroll_UI {
 				}
 			    $zip->close();
 			}
-			$objWindow = null;
+
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 //			$data["btnNeuNochmals"] = $objWindow->getText("btnNeuBerechnen");
 			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenHistory"));
@@ -1508,22 +1511,20 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
 				if($ret["success"]) $data["employeeFilter_list"] = $ret["data"];
 
+				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenDaten",array("arrZahlstellen"=>true));
+				if($ret["success"]) $data["zahlstellen_list"] = $ret["data"];
 
-				$formList = blFunctionCall('payroll.getEmployeeFilterList',array("FilterForEmplOverview"=>true, "FilterForCalculation"=>false));
-				if($formList["success"]) {
-					$data["filter_list"] = $formList["data"];
-				}else{
-					$data["filter_list"] = array();
-				}
 				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 				$data["btnBerechnen"] = $objWindow->getText("btnNeuBerechnen");
+				
 				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
 				$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
 				$data["period"] = "periode-".$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
-				$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenGenerate").": ".$data["period"]);
+								
+				$objWindow->windowTitle($objWindow->getText("txtAuszahlungVorbereiten").": ".$data["period"]);
 				$objWindow->windowIcon("auszahlen32.png");
 				$objWindow->windowWidth(550);
-				$objWindow->windowHeight(295); 
+				$objWindow->windowHeight(390); 
 				$objWindow->modal(true);	
 				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 				$objWindow->showWindow();
@@ -2537,7 +2538,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->windowTitle($objWindow->getText("prlUtlEfcTitle"));
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(570);
-				$objWindow->windowHeight(245);
+				$objWindow->windowHeight(340);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -2556,7 +2557,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		case 'payroll.dbBackup':
 			if(!isset($functionParameters[0]["start"])) {
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Backup ausfuehren");
+				$objWindow->windowTitle($objWindow->getText("txtBackupAusfuehren"));
 				$objWindow->windowWidth(470);
 				$objWindow->windowHeight(200);
 				$objWindow->setContent("<br/>Der Backup-Prozess kann, je nach Datenmenge, mehrere Sekunden oder sogar Minuten in Anspruch nehmen. Unterbrechen Sie bitte den Vorgang nicht, nachdem Sie das Backup gestartet haben.<br/><br/><button onclick='cb(\"payroll.dbBackup\", {\"start\":\"yes\"}); $(this).prop(\"disabled\", true);'>Backup starten</button><button onclick='$(\"#modalContainer\").mb_close();'>Abbrechen</button>");
@@ -2565,7 +2566,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$fileName = $this->doDbBackup("M");
 
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Backup abgeschlossen");
+				$objWindow->windowTitle($objWindow->getText("txtBackupAbgeschlossen"));
 				$objWindow->windowWidth(470);
 				$objWindow->windowHeight(200);
 				$objWindow->setContent("<br/>Das Backup mit der Bezeichnung '".$fileName."' wurde abgeschlossen. Bitte merken Sie sich diese Bezeichung, damit Sie bei Bedarf die Datenbank auf den richtigen Zeitpunkt zuruecksetzen koennen.<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
@@ -2585,7 +2586,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					}
 				}
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Daten wiederherstellen");
+				$objWindow->windowTitle($objWindow->getText("txtDatenWiederherstellen"));
 				$objWindow->windowWidth(570);
 				$objWindow->windowHeight(240);
 				$objWindow->setContent("<br/>Die Daten aus folgendem Backup wiederherstellen:<br/><select id=\"dbrstbkp\">".$fileList."</select><br/><br/> Die Wiederherstellung kann, je nach Datenmenge, mehrere Sekunden oder sogar Minuten in Anspruch nehmen. Unterbrechen Sie bitte den Vorgang nicht, nachdem Sie die Wiederherstellung gestartet haben.<br/><br/><button onclick='cb(\"payroll.dbRestore\", {\"start\":\"yes\", \"backup\":$(\"#dbrstbkp\").val()}); $(this).prop(\"disabled\", true);'>Wiederherstellung starten</button><button onclick='$(\"#modalContainer\").mb_close();'>Abbrechen</button>");
@@ -2605,7 +2606,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 //				exec($aafwConfig["paths"]["utilities"]["mysql"]." --comments -u backup -p63i7E24ce btest < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
 
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Wiederherstellung abgeschlossen");
+				$objWindow->windowTitle($objWindow->getText("txtWiederherstellungAbgeschlossen"));
 				$objWindow->windowWidth(470);
 				$objWindow->windowHeight(200);
 				$objWindow->setContent("<br/>Die Wiederherstellung ist abgeschlossen. Um sicher zu gehen, dass saemtliche Daten neu geladen werden, melden Sie sich bitte von System ab und anschliessend loggen Sie sich neu ein.<br/><br/><button onclick='cb(\"core.logout\");'>Logout</button>"); //$(\"#modalContainer\").mb_close();
@@ -2626,7 +2627,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			case 1:
 				//question dialog
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Berechnungsdaten vorbereiten");
+				$objWindow->windowTitle($objWindow->getText("txtBerechnungsdatenVorbereiten"));
 				$objWindow->windowWidth(480);
 				$objWindow->windowHeight(200);
 				$objWindow->setContent("<br/>Ihre letzte Aenderung koennte Einfluss auch die Berechnungsdaten haben. Moechten Sie die Berechnungsdaten neu vorbereiten lassen?<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
@@ -2635,7 +2636,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			case 2:
 				//progress dialog
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Berechnungsdaten vorbereiten");
+				$objWindow->windowTitle($objWindow->getText("txtBerechnungsdatenVorbereiten"));
 				$objWindow->windowWidth(480);
 				$objWindow->windowHeight(200);
 				$objWindow->setContent("<br/>Das Bearbeiten der Berechnung laeuft.<br/><br/>Bitte warten... <img src=\"/web/img/working.gif\"><br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>Schliessen</button>");
@@ -2654,7 +2655,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				switch($functionParameters[0]["f"]) {
 				case 'templateOv':
 					$objWindow = new wgui_window("payroll", "infoBox");
-					$objWindow->windowTitle("Lohnabrechnungs-Vorlagen");
+					$objWindow->windowTitle($objWindow->getText("txtLohnabrechnungsVorlagen"));
 					$objWindow->windowWidth(500);
 					$objWindow->windowHeight(240);
 
@@ -2678,7 +2679,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 							foreach($formList["AvailablePDF"] as $row) $data["template_list"][] = array("template"=>$row);
 
 							$objWindow = new wgui_window("payroll", "editPayslipCfg");
-							$objWindow->windowTitle("Layout bearbeiten"); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten")); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("config32.png");
 							$objWindow->windowWidth(850);
 							$objWindow->windowHeight(480);
@@ -2714,7 +2715,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 								if($templateList["success"]) {
 									foreach($templateList["data"] as $row) if($row["id"]==$functionParameters[0]["id"]) $data["TemplateName"] = $row["payslip_name"]; 
 									$objWindow = new wgui_window("payroll", "infoBox");
-									$objWindow->windowTitle("Vorlage loeschen");
+									$objWindow->windowTitle($objWindow->getText("txtVorlageLoeschen"));
 									$objWindow->windowWidth(370);
 									$objWindow->windowHeight(180);
 									$data["TemplateId"] = $functionParameters[0]["id"];
@@ -2766,7 +2767,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				if($res["success"]) foreach($res["data"] as $row) if(!in_array($row["core_intl_currency_ID"], $tmpCncyAssigned)) $data["currency_list"][] = $row;
 
 				$objWindow = new wgui_window("payroll", "prlCurrencyEdit");
-				$objWindow->windowTitle("W&auml;hrungen bearbeiten");
+				$objWindow->windowTitle($objWindow->getText("txtWaehrungenBearbeiten"));
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(320);
 				$objWindow->windowHeight(230);
@@ -2811,7 +2812,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				}
 			}else{
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle("Lohnart kopieren");
+				$objWindow->windowTitle($objWindow->getText("txtLohnartkopieren"));
 				$objWindow->windowWidth(300);
 				$objWindow->windowHeight(150);
 				$objWindow->setContent('<div class="ui-tabs ui-widget-content ui-corner-all"><label for="prlFormCfg_srcAcc">von:</label><input type="text" id="prlFormCfg_srcAcc"/><br/><label for="prlFormCfg_destAcc">nach:</label><input type="text" id="prlFormCfg_destAcc"/><br/></div><button id="prlFormCfgSave">Lohnart kopieren</button><button id="prlFormCfgCancel">Abbrechen</button><br/>');
@@ -2869,7 +2870,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				}
 
 				$objWindow = new wgui_window("payroll", "GUI_paymentSplitOverview");
-				$objWindow->windowTitle("&Uuml;bersicht Zahlungssplit");
+				$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit"));
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(820);
 				$objWindow->windowHeight(350);
@@ -2896,7 +2897,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$data["bank_destination_list"] = $res["bankDestination"];
 
 				$objWindow = new wgui_window("payroll", "paymentSplitEdit");
-				$objWindow->windowTitle("Zahlungssplit mutieren");
+				$objWindow->windowTitle($objWindow->getText("txtZahlungssplitMutieren"));
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(600);
 				$objWindow->windowHeight(300);
@@ -2987,7 +2988,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$data["bank_list"] = $res["bankDestination"];
 
 				$objWindow = new wgui_window("payroll", "destinationBankOverview");
-				$objWindow->windowTitle("Bankverbindung ausw&auml;hlen");
+				$objWindow->windowTitle($objWindow->getText("txtBankverbindungAuswaehlenTitel"));
 				$objWindow->windowWidth(570);
 				$objWindow->windowHeight(260);
 				$objWindow->loadContent("payment",$data,"destinationBankOverview");
@@ -3018,7 +3019,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 //`urgency` varchar(1) NOT NULL,	-> wird noch nicht verwendet
 
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
-				$objWindow->windowTitle("Bankverbindung bearbeiten");
+				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten"));
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(940);
 				$objWindow->windowHeight(470);
@@ -3080,7 +3081,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				//communication_interface::alert("GUI_bank_source_Overview > empId: ".$payrollEmployeeID);
 
 				$objWindow = new wgui_window("payroll", "GUItemplate_bank_source_Overview");
-				$objWindow->windowTitle("Zahlstellen ausw&auml;hlen");
+				$objWindow->windowTitle($objWindow->getText("txtZahlstelleAuswaehlen"));
 				$objWindow->windowWidth(570);
 				$objWindow->windowHeight(250);
 				$objWindow->loadContent("payment",$data,"GUItemplate_bank_source_Overview");
@@ -3113,7 +3114,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				}
 
 				$objWindow = new wgui_window("payroll", "GUI_bank_source_Edit");
-				$objWindow->windowTitle("Zahlstelle bearbeiten");
+				$objWindow->windowTitle($objWindow->getText("txtZahlstelleBearbeiten"));
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(480);
 				$objWindow->windowHeight(385);
