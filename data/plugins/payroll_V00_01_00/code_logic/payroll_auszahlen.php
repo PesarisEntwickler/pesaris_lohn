@@ -35,6 +35,7 @@ class auszahlen {
 	
 	public function getZahlstellenDaten($param) {
 		$companyID = session_control::getSessionInfo("id");
+		$companyID = 600;//TODO hm !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		$system_database_manager = system_database_manager::getInstance();
 		$resBankSrc = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_source, payroll_bank_source_type WHERE payroll_bank_source.source_type = payroll_bank_source_type.type_id AND payroll_company_ID = ".$companyID, "payroll_getZahlstellenListe"); 
 		if(count($resBankSrc) != 0) {

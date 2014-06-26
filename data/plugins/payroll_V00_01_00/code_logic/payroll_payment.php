@@ -426,7 +426,8 @@ class payroll_BL_payment {
 			$sqlFIELDS = array();
 			$sqlVALUES = array();
 			unset($fieldCfg["id"]);
-			$fieldCfg["payroll_company_ID"] = session_control::getSessionInfo("id");//TODO HM:bin unsicher, ob das richtig ist (id=FirmenNummer?)
+			$fieldCfg["payroll_company_ID"] = session_control::getSessionInfo("id");//TODO HM:bin unsicher, ob das richtig ist (id=FirmenNummer?). 
+			//Wenn man die id aus der SessionInfo holt, bekommt man "6", in der DB steht aber "600"
 			foreach($fieldCfg as $fieldName=>$fieldParam) {
 				$sqlFIELDS[] = "`".$fieldName."`";
 				if($fieldParam["addQuotes"]) $sqlVALUES[] = "'".addslashes($param[$fieldName])."'";

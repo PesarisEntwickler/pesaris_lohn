@@ -40,6 +40,8 @@ class payroll_BL {
 		switch($functionName) {
 		case 'payroll.auszahlen.braucheDaten':
 			return $auszahlen->auszahlDaten();
+		case 'payroll.auszahlen.GenerateFiles_Data':
+			return $auszahlen->getActualPeriod();
 		case 'payroll.auszahlen.getActualPeriod':
 			return $auszahlen->getActualPeriod();
 		case 'payroll.auszahlen.getActualPeriodenDaten':

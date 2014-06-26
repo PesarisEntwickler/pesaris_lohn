@@ -4,29 +4,47 @@ function prlAuszahlenHistoryWindowInit() {
 		cb('payroll.auszahlen.closewindow');
 		$('#modalContainer').mb_close();
 	});  
-	$( "select" )
+	$( "#ausz_PeriodenSelect" )
 	  .click(function () {
 	    var str = "";
 	    $( "select option:selected" ).each(function() {
 	      str += $( this ).text() + " ";
 	    });
-		/*  cb('payroll.auszahlen.openHistoryWindow', str);  */
-	  })
-	  .change();	
-	$('li[eid='+elementId+'] input').bind('change', function() {
-		prlVlValidation(elementId, $(this).val());
-		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
-	});
+		cb('payroll.auszahlen.openHistoryWindow', str); 
+	  });
+//	  .change();	
+//	$('li[eid='+elementId+'] input').bind('change', function() {
+//		prlVlValidation(elementId, $(this).val());
+//		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
+//	});
 }
 function prlAuszahlenGenerateWindowInit() {
-	$('#btnAuszahlenClose').bind('click', function() {
+	$('#btnAuszahlenGenerateWindowClose').bind('click', function() {
 		cb('payroll.auszahlen.closewindow');
 		$('#modalContainer').mb_close();
 	});  
-	$('#btnAuszahlenBerechnen').bind('click', function() {
-		cb('payroll.auszahlen.berechnen', 'berechne es mal');
+	$('#btnAuszahlenGenerateFiles').bind('click', function() {
+		cb('payroll.auszahlen.GenerateFiles');
 	});
+	$('#btnOK').bind('click', function() {
+		alert('btnOK');
+	});
+//	$( "select" )
+//	  .click(function () {
+//	    var str = "";
+//	    $( "select option:selected" ).each(function() {
+//	      str += $( this ).text() + " ";
+//	    });
+//		/*  cb('payroll.auszahlen.openHistoryWindow', str);  */
+//	  });
+//	  .change();	
+//	$('li[eid='+elementId+'] input').bind('change', function() {
+//		prlVlValidation(elementId, $(this).val());
+//		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
+//	});
 }
+
+
 /*
 *************************************
 ** Employee Overview

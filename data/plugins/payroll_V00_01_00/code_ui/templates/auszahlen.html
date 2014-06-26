@@ -1,5 +1,5 @@
 <wgui:block name="wguiBlockAuszahlenHistoryWindow">
-  <form>
+
 	<br/>
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 		<table width="100%">
@@ -21,12 +21,7 @@
 						</wgui:loop name="selectLoop">
 					</select>
 				</td>
-<!-- 				
 				<td>
- 					<button id="btnAuszahlenBerechnen" name="btnAuszahlenBerechnen" class="PesarisButton"><wgui:var name="btnNeuNochmals"/></button>
-				</td>
-				
- -->				<td>
 					<div class="prlPeriodenFileWrapper" id="prlPeriodenFileWrapper">
 						<wgui:loop name="fileLoop" varname="PeriodenFiles">
 							<a href='<wgui:loopvar loopname="fileLoop" varname="technFilename"/>' target='_blank'>				
@@ -56,7 +51,7 @@
 		 -->		
 
 	</div>
-  </form>
+
    <button id="btnAuszahlenClose" name="btnAuszahlenClose" class="PesarisButton"><wgui:text id="btnClose"/></button> 
 
 </wgui:block name="wguiBlockAuszahlenHistoryWindow">
@@ -102,7 +97,7 @@
  			<td colspan="2">
 				<fieldset>
 					<legend>
-						<wgui:text id="txtZahlstelle"/>
+						<wgui:text id="txtZahlstelleAuswaehlen"/>
 					</legend>
 					<select id="sel_prl_auszahlen_personalfilter" style="width:470px;margin-bottom:10px;" size="4" > 
 						<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
@@ -127,10 +122,9 @@
 	
 	<table width="100%">
 		<tr>
-			<td align="left"><button id="btnAuszahlenClose" name="btnAuszahlenClose" ><wgui:text id="btnClose"/></button></td>
-			<td align="right"><button id="btnAuszahlenBerechnen" name="btnAuszahlenBerechnen" style="width: 180px;"><wgui:var name="btnBerechnen"/></button></td>
+			<td align="left"><button id="btnAuszahlenGenerateWindowClose" name="btnAuszahlenGenerateWindowClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
+			<td align="right"><button id="btnAuszahlenGenerateFiles" name="btnAuszahlenGenerateFiles" class="PesarisButton" style="width: 180px;"><wgui:var name="btnBerechnen"/></button></td>
 		</tr>
 	</table>
-	
 </wgui:block name="wguiBlockAuszahlenGenerateWindow">
 

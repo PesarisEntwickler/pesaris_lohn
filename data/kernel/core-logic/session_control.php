@@ -14,6 +14,7 @@ class session_control {
         global $aafwConfig;
 		$this->sessionCachePath = $aafwConfig["paths"]["session_control"]["sessionCachePath"];
         //$this->sessionCachePath = "/usr/local/www/apache22/data/kernel/cache/sessions/";
+//		$this->sessionCachePath = "kernel/cache/sessions/"; // <--- relativer Pfad hat Probleme im Destruktor bereitet... darum nur absoluten Pfad verwenden!
 	}
 
 	public function __destruct() {
@@ -27,14 +28,18 @@ class session_control {
 //	}
 
 
-	 /**
-	 * Returns a reference to the session_control object
-	 *
-	 */
+	// **
+//	 * Returns a reference to the session_control object
+//	 *
+//	 *
+
 	public static function getInstance() {
 		if (session_control::$instance === 0) {
 			session_control::$instance = new session_control();
+//			session_control::$instance->logError("internationalization Instance Created");
 		}
+
+//		session_control::$instance->logError("internationalization->getInstance()");
 		return session_control::$instance;
 	}
 
@@ -57,7 +62,7 @@ class session_control {
 			//soweit so gut... jetzt muss aber noch ueberprueft werden, ob die Session nicht abgelaufen ist
 			//ggf. muss auch noch der IP-Range (gegen SUBNET-MASKE) geprueft werden
 			//ggf. muss auch noch die Uhrzeit und Wochentag geprueft werden
-			//und wenn bis hierhin alles i.O. ist, dann wird jetzt die DB ausgewaehlt
+			//und wenn bis hierhin alle i.O. ist, dann wird jetzt die DB ausgewaehlt
 			$system_database_manager = system_database_manager::getInstance();
 			$system_database_manager->selectDB($this->sessionInfo["db_name"]);
 			$system_database_manager->defaultDatabaseName($this->sessionInfo["db_name"]);
@@ -93,6 +98,12 @@ class session_control {
 		require_once("system_database_manager.php");
 		$system_database_manager = system_database_manager::getInstance();
 
+//		if(!preg_match( '/^[_a-zA-Z0-9]{2,15}$/', $customerID)) {
+//			return false;
+//		}
+
+        //$system_database_manager->selectDatabase()
+        //		$system_database_manager->overrideDatabaseName($customerID);
         $result = $system_database_manager->executeQuery("SELECT `databaseName` FROM `customer` WHERE `id`='".addslashes($customerID)."' AND `active`=1", "authenticate employee login");
         if(count($result) > 0) {
             $dbName = $result[0]["databaseName"];
@@ -144,28 +155,38 @@ class session_control {
 	}
 
 	public function loader() {
+//	public function loader(&$objResponse) {
+//		fireEvent("core.loader"); //-> class event_control
+//		fireEvent("core.cron");
+//		registerEvent("myPlugin.myFunctionName", "core.loader");
 		require_once("system_database_manager.php");
 		$system_database_manager = system_database_manager::getInstance();
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
-		require_once(getcwd()."/kernel/core_ui.php");
+		require_once($aafwConfig["paths"]["session_control"]["rootPathData"]."kernel/core_ui.php");
 		//$core_ui = core_ui::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT name FROM core_plugins ORDER BY sort_order", "loader");
 		$out = "";
 		foreach($result as $row) {
 			$out .= $row["name"]."*";
+//			$SYS_PLUGIN["ui"][$row["name"]]->loader($objResponse);
+//			uiFunctionCall($row["name"].".sysLoader", $objResponse);
 			uiFunctionCall($row["name"].".sysLoader");
 		}
+//		uiFireEvent("core.bootComplete");
+//		$objResponse->alert($out);
 	}
 
 	public function pluginExists($pluginName) {
 		$sessionControl = session_control::getInstance();
 		return isset($sessionControl->sessionInfo["plugins"][$pluginName]);
+//		return isset($this->sessionInfo["plugins"][$pluginName]);
 	}
 
 	public function getPluginVersion($pluginName) {
 		$sessionControl = session_control::getInstance();
 		return $sessionControl->sessionInfo["plugins"][$pluginName]["version"];
+//		return $this->sessionInfo["plugins"][$pluginName]["version"];
 	}
 
 	public function setSessionSettings($pluginName, $settingName, $settingValue, $setPermanently=false, $basePath="USERS", $groupID=0) {
@@ -182,13 +203,21 @@ class session_control {
 	}
 
 	public function getSessionSettings($pluginName, $settingName="") {
-		error_log("\n". date("Ymd-H:i:s ", time())."INFO getSessionSettings($pluginName, $settingName)", 3, "__harald.log");
 		$sessionControl = session_control::getInstance();
-		if (isset($sessionControl->sessionInfo["SETTINGS"][$pluginName])) {
-			$settingName = $sessionControl->sessionInfo["SETTINGS"][$pluginName][$settingName];
-			error_log("\n". date("Ymd-H:i:s ", time())."INFO  isset(sessionInfo  ($pluginName) ) --> settingName=".$settingName, 3, "__harald.log");
-		} 
+		if (isset($sessionControl)) {
+			if (isset($sessionControl->sessionInfo["SETTINGS"][$pluginName])) {
+				if (isset($sessionControl->sessionInfo["SETTINGS"][$pluginName][$settingName])) {
+					$settingName = $sessionControl->sessionInfo["SETTINGS"][$pluginName][$settingName];	
+				}
+			}
+		}
+//		return ($settingName=="" ? $sessionControl->sessionInfo["SETTINGS"][$pluginName] : $sessionControl->sessionInfo["SETTINGS"][$pluginName][$settingName]);
+//		if (isset($sessionControl->sessionInfo["SETTINGS"][$pluginName])) {
+//			$settingName = $sessionControl->sessionInfo["SETTINGS"][$pluginName][$settingName];
+//			error_log("\n". date("Ymd-H:i:s ", time())."INFO  isset(sessionInfo  ($pluginName) ) --> settingName=".$settingName, 3, "__harald.log");
+//		} 
 		return $settingName;
+
 /*
 beim Code des coreFunktion Plugins bedienen....
 
@@ -275,4 +304,12 @@ CORE:
 		return $response;
 	}
 }
+
+//$session_control = session_control::getInstance();
+//echo $session_control->validateLogin("aafw", "dwm", "samira") ? "TRUE" : "FALSE";
+
+//$sc = new session_control();
+//echo $sc->validateLogin("aafw", "dwm", "samira") ? "TRUE" : "FALSE";
+//echo session_control::validateLogin("aafw", "dwm", "samira") ? "TRUE" : "FALSE";
+//session_control::loader($test);
 ?>

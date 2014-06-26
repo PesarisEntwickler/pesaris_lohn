@@ -1156,14 +1156,14 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
 		$newTmpPath = $fm->getFullPath();
-		$fm->setFile("metadata.dat")->putContents( serialize(array("fileFormat"=>"pdf","realFileName"=>"compileme.pdf","transmissionFileName"=>"harald_daten.pdf")) );
+		//$fm->setFile("metadata.dat")->putContents( serialize(array("fileFormat"=>"pdf","realFileName"=>"compileme.pdf","transmissionFileName"=>"harald_daten.pdf")) );
 		
 		//$system_database_manager = system_database_manager::getInstance();
-		$fp = $fm->setFile("harald.txt")->fopen("w");
-		fwrite($fp, "Ich habe etwas\n\t geschrieben\n");
+		//$fp = $fm->setFile("harald.txt")->fopen("w");
+		//fwrite($fp, "Ich habe etwas\n\t geschrieben\n");
 		//$result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, empl.EmployeeNumber, empl.Firstname, empl.Lastname, empl.payroll_company_ID, empl.CodeAHV, empl.CodeALV, empl.CodeUVG, empl.CodeUVGZ1, empl.CodeUVGZ2, empl.CodeBVG, empl.CodeKTG, empl.EmploymentStatus, acc.id as AccountNumber, acclbl.label, calc.quantity, calc.rate, calc.amount, calc.code FROM ".($isCurrentPeriod ? "payroll_calculation_current" : "payroll_calculation_entry")." calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' WHERE calc.payroll_period_ID=".$payrollPeriodID." ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
-		$lastEmployeeID = 0;
-		$entryCollector = array();
+		//$lastEmployeeID = 0;
+		//$entryCollector = array();
 		$fm->fclose();
 
 		chdir($newTmpPath);

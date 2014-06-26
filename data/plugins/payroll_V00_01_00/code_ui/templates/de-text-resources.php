@@ -43,7 +43,7 @@ $textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abges
 $textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
  
 /* ********* AUSZAHLEN *********** */
-$textResourceMap["txtAuszahlungVorbereiten"] = "Auszahlung erstellen";
+$textResourceMap["txtAuszahlungErstellen"] = "Auszahlung erstellen";
 $textResourceMap["txtTitelAuszahlenHistory"] = "Auszahldaten";
 $textResourceMap["txtAuswahlPeriode"] = "Periodenwahl";
 $textResourceMap["txtFilesDerPeriode"] = "Dateien der Periode";
@@ -75,7 +75,7 @@ $textResourceMap["txtZahlSplittLoeschenSicher"] = "Sind Sie sicher, dass Sie den
 $textResourceMap["txtZahlstelle"] = "Zahlstelle";
 $textResourceMap["txtZahlstelleBearbeiten"] = "Zahlstelle bearbeiten";
 $textResourceMap["txtZahlstelleBestehend"] = "Bestehende Zahlstellen";
-$textResourceMap["txtZahlstelleAuswaehlen"] = "Zahlstellen ausw&auml;hlen";
+$textResourceMap["txtZahlstelleAuswaehlen"] = "Zahlstelle ausw&auml;hlen";
 $textResourceMap["txtZahlstelleBezeichnung"] = "Zahlstellen Bezeichnung";
 $textResourceMap["txtZahlstellenTyp"] = "Zahlstellen-Typ";
 $textResourceMap["txtCarrier1"] = "DTA";
@@ -127,7 +127,7 @@ $textResourceMap["prlPsoBtnFormEdit"] = "Bearbeitungsmasken verwalten";
 
 $textResourceMap["prlPsoDFltLblFilter"] = "Personalfilter:";
 $textResourceMap["prlPsoDFltAllEmployees"] = "Alle Mitarbeiter";
-$textResourceMap["prlPsoDFltAllEmployeesRestliche"] = "Alle (restlichen) Mitarbeiter";
+$textResourceMap["prlPsoDFltAllEmployeesRestliche"] = "Alle Mitarbeiter (alle restlichen Mitarbeiter)";
 
 
 $textResourceMap["prlVlAlertCloseWnd_Title"] = "Fenster schliessen?";
