@@ -12,11 +12,6 @@ function prlAuszahlenHistoryWindowInit() {
 	    });
 		cb('payroll.auszahlen.openHistoryWindow', str); 
 	  });
-//	  .change();	
-//	$('li[eid='+elementId+'] input').bind('change', function() {
-//		prlVlValidation(elementId, $(this).val());
-//		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
-//	});
 }
 function prlAuszahlenGenerateWindowInit() {
 	$('#btnAuszahlenGenerateWindowClose').bind('click', function() {
@@ -24,24 +19,26 @@ function prlAuszahlenGenerateWindowInit() {
 		$('#modalContainer').mb_close();
 	});  
 	$('#btnAuszahlenGenerateFiles').bind('click', function() {
-		cb('payroll.auszahlen.GenerateFiles');
+	    var str = "";
+	    if (document.getElementById('chk_payroll_auszahlen_allepersonen').checked) {
+	    	str = "ALL_EMPLOYEES";
+	    } else {
+	    	str = "SELECTED_EMPL";
+	    }
+	    $( "select option:selected" ).each(function() {
+	      str += "##" + $( this ).text();
+	    });
+		cb('payroll.auszahlen.GenerateFiles', str );
 	});
-	$('#btnOK').bind('click', function() {
-		alert('btnOK');
-	});
-//	$( "select" )
-//	  .click(function () {
-//	    var str = "";
-//	    $( "select option:selected" ).each(function() {
-//	      str += $( this ).text() + " ";
-//	    });
-//		/*  cb('payroll.auszahlen.openHistoryWindow', str);  */
-//	  });
-//	  .change();	
-//	$('li[eid='+elementId+'] input').bind('change', function() {
-//		prlVlValidation(elementId, $(this).val());
-//		cb('payroll.auszahlen.berechnen',{"fieldName":$(this).attr('id'),"value":$(this).val(),"rid":prlVlRid});
-//	});
+	$( "#sel_prl_auszahlen_zahlstellen" )
+	  .click(function () {
+		document.getElementById('btnAuszahlenGenerateFiles').disabled = false;  
+	  });
+	$( "#sel_prl_auszahlen_personalfilter" )
+	  .click(function () {
+		document.getElementById('chk_payroll_auszahlen_personengruppen').checked = true;
+		document.getElementById('chk_payroll_auszahlen_allepersonen').checked = false;
+	  });
 }
 
 

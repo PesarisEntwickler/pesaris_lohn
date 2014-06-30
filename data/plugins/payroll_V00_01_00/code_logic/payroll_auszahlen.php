@@ -44,7 +44,7 @@ class auszahlen {
 			$response["data"] = $resBankSrc;
 		}else{
 			$response["success"] = false;
-			$response["errCode"] = 102;
+			$response["errCode"] = 103;
 			$response["errText"] = "no data found";
 		}
 		return $response;
@@ -57,7 +57,24 @@ class auszahlen {
 		
 		if(count($result) == 0) {
 			$retval["success"] 	= false;
-			$retval["errCode"]  = 10;
+			$retval["errCode"]  = 104;
+			$retval["errText"]  = "Keine Daten gefunden.";
+		}else{
+			$retval["success"] 	= true;
+			$retval["errCode"]  = 0;
+			$retval["data"] 	= $result;
+		}
+		return $retval;
+	}
+
+	
+	public function getEmployeeData($idListe) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT FilterCriteria FROM payroll_empl_filter WHERE id IN (".$idListe.") ORDER BY FilterPriority;");
+		
+		if(count($result) == 0) {
+			$retval["success"] 	= false;
+			$retval["errCode"]  = 105;
 			$retval["errText"]  = "Keine Daten gefunden.";
 		}else{
 			$retval["success"] 	= true;

@@ -1,5 +1,4 @@
 <wgui:block name="wguiBlockAuszahlenHistoryWindow">
-
 	<br/>
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 		<table width="100%">
@@ -33,23 +32,6 @@
 				</td>
 			</tr>
 		</table>		
-		<!--
-				<div class="prlPmtSpltHeader">
-					<wgui:text id="txtTableHeadersAuszahlenPeriodenFiles"/>
-				</div>
-				<div class="prlPmtSpltScroll">
-				<ul>
-					<wgui:loop name="FileLoop" varname="PeriodenFiles">
-		 				<li style="padding: 0; margin: 0;" rid='<wgui:loopvar loopname="FileLoop" varname="fileName"/>'>
-							<div><wgui:loopvar loopname="FileLoop" varname="fileName"/></div>
-							<div><wgui:loopvar loopname="FileLoop" varname="fileEndg"/></div>
-							<div>-</div>
-						</li>
-					</wgui:loop name="FileLoop">
-				</ul>
-				</div>
-		 -->		
-
 	</div>
 
    <button id="btnAuszahlenClose" name="btnAuszahlenClose" class="PesarisButton"><wgui:text id="btnClose"/></button> 
@@ -59,49 +41,18 @@
 
 <wgui:block name="wguiBlockAuszahlenGenerateWindow">
 	<br/>
-	<!-- <input type="text" id="fldAktuellePeriode" value='<wgui:var name="period"/>' disabled="disabled"/> -->
-	
-	
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-<!-- 	<label for="prlPsoDFilter" style="display:inline-block;width:150px;margin-top:4px;"><wgui:text id="prlPsoDFltLblFilter"/></label>
-	<select id="prlPsoDFilter" style="width:300px;margin-bottom:10px;" size="5" multiple="multiple" ><option value="">-- <wgui:text id="prlPsoDFltAllEmployeesRestliche"/> --</option>
-	<wgui:loop name="filterLoop" varname="filter_list">
-		<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="FilterName"/></option>
-	</wgui:loop name="filterLoop">
-	</select><br/>
- -->
  	<table>
  		<tr>
- 			<td>
-				<input type="radio" name="chk_payroll_auszahlen_alle" id="chk_payroll_auszahlen_alle" value="1" checked="checked" />	
-			 	<label for="chk_payroll_auszahlen_alle" ><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</label>
- 			</td>
- 			<td>
-				<fieldset>
-					<legend>
-						<input type="radio" name="chk_payroll_auszahlen_alle" id="chk_payroll_auszahlen_alle" value="0" />
-						<wgui:text id="prlUtlEfcLgndExistingFilterAnwenden"/>
-					</legend>
-	<!-- 			<label for="prlUtlEfc_id" style="display:inline-block;width:100px;"><wgui:text id="prlUtlEfcLblFilter"/></label>	 -->
-	<!--			<select id="prlUtlEfc_id" style="width:300px;margin-bottom:10px;" size="7" multiple="multiple"> -->
-					<select id="sel_prl_auszahlen_personalfilter" style="width:300px;margin-bottom:10px;" size="7" multiple="multiple"> 
-	<!--  					<option value="0"><wgui:text id="prlUtlEfcOptChooseFilter"/></option>	 -->
-						<wgui:loop name="empfltLoop" varname="employeeFilter_list">
-							<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>"><wgui:loopvar loopname="empfltLoop" varname="FilterName"/></option>
-						</wgui:loop name="empfltLoop">
-					</select><br/>
-				</fieldset>
- 			</td>
- 		</tr>
- 		<tr>
- 			<td colspan="2">
+ 			<td colspan="3">
 				<fieldset>
 					<legend>
 						<wgui:text id="txtZahlstelleAuswaehlen"/>
 					</legend>
-					<select id="sel_prl_auszahlen_personalfilter" style="width:470px;margin-bottom:10px;" size="4" > 
+					<select id="sel_prl_auszahlen_zahlstellen" name="sel_prl_auszahlen_zahlstellen" style="width:100%;margin-bottom:8px;" size="4" > 
 						<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
 							<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="id"/>">
+								[z<wgui:loopvar loopname="zahlstellenLoop" varname="id"/>]&nbsp;
 								<wgui:loopvar loopname="zahlstellenLoop" varname="type_short"/>,
 								<wgui:loopvar loopname="zahlstellenLoop" varname="bank_source_currency_code"/>,
 								<wgui:loopvar loopname="zahlstellenLoop" varname="bank_source_IBAN"/>,
@@ -116,6 +67,31 @@
 				</fieldset>
  			</td>
  		</tr>
+ 		<tr>
+ 			<td>
+				<input type="radio" name="chk_payroll_auszahlen" id="chk_payroll_auszahlen_allepersonen" value="1" checked="checked" />	
+ 			</td>
+ 			<td>
+			 	<label for="chk_payroll_auszahlen_allepersonen" ><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</label>
+ 			</td>
+ 			<td>
+				<fieldset>
+					<legend>
+						<input type="radio" name="chk_payroll_auszahlen" id="chk_payroll_auszahlen_personengruppen" value="0" />
+						<wgui:text id="prlUtlEfcLgndExistingFilterAnwenden"/>
+					</legend>
+					<select id="sel_prl_auszahlen_personalfilter" style="width:380px;margin-bottom:8px;" size="7" multiple="multiple"> 
+	<!--  				<option value="0"><wgui:text id="prlUtlEfcOptChooseFilter"/></option>	 -->
+						<wgui:loop name="empfltLoop" varname="employeeFilter_list">
+							<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>">
+								[p<wgui:loopvar loopname="empfltLoop" varname="id"/>]&nbsp;
+								<wgui:loopvar loopname="empfltLoop" varname="FilterName"/>
+							</option>
+						</wgui:loop name="empfltLoop">
+					</select><br/>
+				</fieldset>
+ 			</td>
+ 		</tr>
  	</table>	
 
 	</div>
@@ -123,7 +99,7 @@
 	<table width="100%">
 		<tr>
 			<td align="left"><button id="btnAuszahlenGenerateWindowClose" name="btnAuszahlenGenerateWindowClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
-			<td align="right"><button id="btnAuszahlenGenerateFiles" name="btnAuszahlenGenerateFiles" class="PesarisButton" style="width: 180px;"><wgui:var name="btnBerechnen"/></button></td>
+			<td align="right"><button id="btnAuszahlenGenerateFiles" name="btnAuszahlenGenerateFiles" class="PesarisButton" style="width: 180px;" disabled="disabled"><wgui:var name="btnBerechnen"/></button></td>
 		</tr>
 	</table>
 </wgui:block name="wguiBlockAuszahlenGenerateWindow">

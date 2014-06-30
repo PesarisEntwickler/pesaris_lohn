@@ -1149,29 +1149,107 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		return $newTmpDirName;
 	}
 	
-	public function GenerateAuszahlenReports($param) {
+	public function generateAuszahlDataReports($ZahlstellenID, $Personenkreis) {
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
+		
+//		communication_interface::alert("Zahlstelle:".$ZahlstellenID." Personenkreis:".$Personenkreis);
+
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT * FROM  payroll_bank_source  " .
+														 "WHERE id = ".$ZahlstellenID);
+		$iban = $result[0]["bank_source_IBAN"];
+		$iban = str_replace(" ", "", trim($iban));
+		$dtaPersKreis = "";
+		if ($Personenkreis != "*") {
+			$dtaPersKreis = "_p".str_replace(",", "p", $Personenkreis);
+		}
+		$dtaFileName = "";
+		if (strlen($iban) < 3) {
+			$dtaFileName = date("Y-m-d").$dtaPersKreis.".dta";
+		} else {
+			$dtaFileName = $iban.$dtaPersKreis.".dta";
+		}
+
+		//Die jetztige Periode ist
+		$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+		$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
+		$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
+		$PeriodeDieserMonat   = $data["period"];
+
+		//communication_interface::alert("Zahlstelle:".$ZahlstellenID." \nDTAFile:".$dtaFileName."\nperiodeDieserMonat:".$PeriodeDieserMonat);
+		$psoDbFilter = "";
+		$defaultTblColumns = array("EmployeeNumber", "Lastname", "Firstname", "Street", "`ZIP-Code`", "City", "Sex");
+		$queryOption["columns"] = $defaultTblColumns;
+		$queryOption["prepend_id"] = true;
+		$queryOption["query_filter"] = $psoDbFilter;
+		$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
+		
+							//TODO: als "data_source" nur die Mitarbeiter der aktuellen Periode, die bereits berechnet aber noch nicht ausbezahlt wurden
+							//Get employee list and prepare data in order to fill the client-side table
+							$queryOption["columns"] = array("EmployeeNumber", "Firstname", "Lastname");
+							$queryOption["prepend_id"] = true;
+							$queryOption["query_filter"] = "";
+							$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
+							$emplData = array();
+							if($employeeList["success"]) {
+								foreach($employeeList["data"] as $row) $emplData[] = "[".$row["id"].",'".$row["EmployeeNumber"]."','".$row["Firstname"]."','".$row["Lastname"]."']";
+							}
+
+							//TODO: exclude eventuell gar nicht noetig!
+							//Get employee id's to exclude
+							$queryOption["columns"] = array("id");
+							$queryOption["prepend_id"] = false;
+							$queryOption["query_filter"] = "";
+							$queryOption["data_source"] = "current_period";
+							$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
+							$exclData = array();
+							if($employeeList["success"]) {
+								foreach($employeeList["data"] as $row) $exclData[] = $row["id"];
+							}
+		
+		
+		
+		//DTA File schreiben
+		$fm = new file_manager();
+		$fm->customerSpace()->setPath("/".AUSZAHLDIR)->makeDir();   
+		$fm->customerSpace()->setPath("/".AUSZAHLDIR."/".$PeriodeDieserMonat);  
+		$fm->setFile($dtaFileName); 
+			$c="\n01  $iban \n";
+			$c.="\n\tblabla 2";
+			$c.="\nblabla 3";
+		$fm->putContents($c); 
+		$fm->fclose(); 
+		system("chmod 666 *");
+
+
+		
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
 		$newTmpPath = $fm->getFullPath();
-		//$fm->setFile("metadata.dat")->putContents( serialize(array("fileFormat"=>"pdf","realFileName"=>"compileme.pdf","transmissionFileName"=>"harald_daten.pdf")) );
-		
-		//$system_database_manager = system_database_manager::getInstance();
-		//$fp = $fm->setFile("harald.txt")->fopen("w");
-		//fwrite($fp, "Ich habe etwas\n\t geschrieben\n");
-		//$result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, empl.EmployeeNumber, empl.Firstname, empl.Lastname, empl.payroll_company_ID, empl.CodeAHV, empl.CodeALV, empl.CodeUVG, empl.CodeUVGZ1, empl.CodeUVGZ2, empl.CodeBVG, empl.CodeKTG, empl.EmploymentStatus, acc.id as AccountNumber, acclbl.label, calc.quantity, calc.rate, calc.amount, calc.code FROM ".($isCurrentPeriod ? "payroll_calculation_current" : "payroll_calculation_entry")." calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' WHERE calc.payroll_period_ID=".$payrollPeriodID." ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
-		//$lastEmployeeID = 0;
-		//$entryCollector = array();
+		$fm->setFile("metadata.dat")->putContents( serialize(array("fileFormat"=>"pdf","realFileName"=>"compileme.pdf","transmissionFileName"=>"CalculationJournal.pdf")) );
+
+		$fp = $fm->setFile("data.xml")->fopen("w");
+		fwrite($fp, "<Report name=\"DTAJournal\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>"."</Year>\n\t\t<Period>"."</Period>\n\t</Header>\n\t<Employees>\n");
+		fwrite($fp, "Ich habe nun etwas\n\t geschrieben\n");
+		fwrite($fp, "\t</Employees>\n</Report>\n");
 		$fm->fclose();
 
 		chdir($newTmpPath);
-        
-		//communication_interface::alert("")); 
+        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."CalculationJournal.xslt ./data.xml > ./compileme.tex");
+		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
 		system("chmod 666 *");
 
-		return $newTmpDirName;
+//		return $newTmpDirName;
+       
+		communication_interface::alert("soweit so gut"); 
+		return true;
+	}
+	
+	public function generateDTAFiles($param) {
+		communication_interface::alert("Zahlstelle:".$param["ZahlstelleID"].", Personenkreis:".$param["Personenkreis"]);
+		return null;
 	}
 }
 ?>

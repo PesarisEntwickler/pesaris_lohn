@@ -4,7 +4,6 @@ class payroll_UI {
 		global $aafwConfig;
 		
 		$txtLoeschungBestaetigen = "L&ouml;schung best&auml;tigen";
-		$auszahlDir = "payments";
 
 		//error_log("\n", 3, "/var/log/copronet-application.log");
 		//communication_interface::alert(""); //alert sollte nur zu Debug-Zwecken eingesetzt werden
@@ -12,53 +11,79 @@ class payroll_UI {
 		case 'payroll.sysLoader':
 			communication_interface::cssFileInclude('plugins/payroll_V00_01_00/code_ui/css/payroll.css','all');
 			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/payroll.js','text/javascript','payroll');
-			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/auszahlen.js','text/javascript','payroll');
-			break;
-		case 'payroll.auszahlen.berechnen':
-			communication_interface::alert("payroll.auszahlen.berechnen ".$functionParameters[0]); 
-			//zum Test
-			//$docPathID = blFunctionCall('payroll.calculationReport','GenerateAuszahlenReports',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
+			//communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/auszahlen.js','text/javascript','payroll');
 			break;
 		case 'payroll.auszahlen.closewindow':
 			//communication_interface::alert("payroll.auszahlen.closewindow");
-			$webTransfer = "web/transfer/";
-			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].$webTransfer;
-			foreach (glob($absWebPath.$auszahlDir."*.*") as $filename) {
+			
+			//Loeschen aller transferierten Files
+			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].PAYMENTVIEWDIR;
+			foreach (glob($absWebPath.AUSZAHLDIR."*.*") as $filename) {
 			   unlink($filename);
 			}
 			break;
 		case 'payroll.auszahlen.GenerateFiles':
-			communication_interface::alert("payroll.auszahlen.GenerateFiles --"); 
-//			$currentFormId = session_control::getSessionSettings("payroll", "psoCurrentEmplForm");
-//			if($currentFormId!="") {
-//				$formDetail = blFunctionCall('payroll.getEmployeeFormDetail',$currentFormId);
-//			}
+			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n".$functionParameters[0]);
+			$param = $functionParameters[0];
+			$paramArray = explode("##", $param);
+			$zahlstelle = $paramArray[1];
+			$personengruppenIDListe = "**";
+			$personengruppen = substr($param, 0, 13);
+			if ("SELECTED_EMPL" == $personengruppen) {
+				$personengruppenIDListe = "";
+				for ( $index = 1, $max_count = sizeof( $paramArray ); $index < $max_count; $index++ ) {
+					$selectZeile = $paramArray[$index];
+					$tokenPos    = strpos( $selectZeile, "[p" );
+					if ( $tokenPos > 0 ) {
+						$pArray = explode("]", $selectZeile);	
+						$personengruppenID =  substr($pArray[0], $tokenPos + strlen("[p"));		
+						$personengruppenIDListe .= "," . $personengruppenID;		
+					}
+				}		
+			}
+			$personengruppenIDListe = substr($personengruppenIDListe,1);
+			$tokenPos    = strpos( $zahlstelle, "[z" );
+			$zArray = explode("]", $zahlstelle);	
+			$zahlstellenID =  substr($zArray[0], $tokenPos + strlen("[z"));	
+			
+			$hatAuszahlFiles = blFunctionCall('payroll.auszahlen.GenerateDataFiles', $zahlstellenID, $personengruppenIDListe);
+
+			if ($hatAuszahlFiles) {
+				communication_interface::alert("Dateien erzeugt fuer Zahlstelle ".$zahlstellenID." und Personenkreis ".$personengruppenIDListe);// für ZahlstellenID:$zahlstellenID, Personengruppen:$personengruppenIDListe");				
+			} else {
+				communication_interface::alert("Fehler beim Dateien erzeugen");				
+				break;
+			}
 			//Hier kein break, was bewirkt, dass dann nach der Erzeugung der Files 
 			//gleich das History-Window aufgeht, was gewünscht ist
-			//break;
+			break;
 		case 'payroll.auszahlen.openHistoryWindow':
-			$fm = new file_manager();
-			$fm->customerSpace()->setPath("/".$auszahlDir)->makeDir();   
+			//communication_interface::alert("customer_login_name  ".session_control::getSessionInfo("customer_login_name")); 
+			//communication_interface::alert("db_name ".session_control::getSessionInfo("db_name")); 
+			//$db_name = session_control::getSessionInfo("db_name");
 			
-			$periodenPrefix = "periode-";
 			//Die jetztige Periode ist
 			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
 			$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
-			$data["period"] = $periodenPrefix.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
+			$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
 
-			//communication_interface::alert("payroll.auszahlen.openHistoryWindow ".$auszahlDir); 
+			//communication_interface::alert("payroll.auszahlen.openHistoryWindow ".AUSZAHLDIR); 
 
 			$PeriodeDieserMonat   = $data["period"];
 			if ( isset($functionParameters[0]) && substr($functionParameters[0], 0, 7)=="periode" ) {
 				$PeriodeDieserMonat   = trim($functionParameters[0]);
 			}
 
-			$aktuellePeriode4ListingDir = $auszahlDir."/".$PeriodeDieserMonat;
+			$fm = new file_manager();
+			$fm->customerSpace()->setPath("/".AUSZAHLDIR)->makeDir();   
+			$aktuellePeriode4ListingDir = AUSZAHLDIR."/".$PeriodeDieserMonat;
 			$data["aktuellePeriode4ListingDir"] = $aktuellePeriode4ListingDir;
 			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->makeDir();  //neue (die heutige) Periode anlegen
+
+			//communication_interface::alert("aktuellePeriode4ListingDir ".$aktuellePeriode4ListingDir); 
 		 
 			//Bestehenden Periodendirectories lesen
-			$dirlist = $fm->customerSpace()->setPath($auszahlDir)->listDir(1);  
+			$dirlist = $fm->customerSpace()->setPath(AUSZAHLDIR)->listDir(1);  
 			$data["DirectoriesLoop"] = array();
 			$id = 1;
 			foreach($dirlist as $dirrow) {
@@ -71,45 +96,40 @@ class payroll_UI {
 			}
 			
 			//Auslisten der Files aus dem Directory
-			$fm->customerSpace()->setPath($auszahlDir);  
+			$fm->customerSpace()->setPath(AUSZAHLDIR);  
 			$filelist = $fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->listDir();  
 			$nochmals = true;
    			if (count($filelist) < 1) {
 				$nochmals = false;//Directory ist neu ->> Perioden-Files sind noch nicht angelegt
    			}
 			//communication_interface::alert("///". $PeriodeDieserMonat."///".count($filelist) ); 
-			//communication_interface::alert("session_control::getSessionInfo_ID=".session_control::getSessionInfo("id"). ",  mandant: ".$auszahlDir. " \n ".count($filelist). "---- ".$aktuellePeriode4ListingDir); 
 
-			$webTransfer = "web/transfer/";
-			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].$webTransfer;
+			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].PAYMENTVIEWDIR;
 			$absDataPath = $aafwConfig["paths"]["plugin"]["customerDir"].session_control::getSessionInfo("db_name")."/".$aktuellePeriode4ListingDir."/";
 
 			$data["PeriodenFiles"] = array();
 			foreach($filelist as $row) {
 				if(strtolower(substr($row,-4))==".pdf") {
-					$technFilename = $auszahlDir."_".$PeriodeDieserMonat."_".$row;
-					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf", "technFilename"=>"/".$webTransfer.$technFilename);
+					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
 					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
 			}
 			foreach($filelist as $row) {
 				if(strtolower(substr($row,-4))==".dta") {
-					$technFilename = $auszahlDir."_".$PeriodeDieserMonat."_".$row;
-					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta", "technFilename"=>"/".$webTransfer.$technFilename);
+					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
+					copy($absDataPath.$row, $absWebPath.$technFilename); 
+				} 
+			}
+			foreach($filelist as $row) {
+				if(strtolower(substr($row,-4))!=".dta"  &&  strtolower(substr($row,-4))!=".pdf") {
+					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
 					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
 			}
 			
-//			$zip = new ZipArchive;
-//			if ($zip->open($absDataPath.'test.zip') === TRUE) {
-//				foreach($filelist as $row) {
-//					if(strtolower(substr($row,-4))!=".zip") {
-//					    $zip->addFile($absDataPath.$row, $row);
-//					}
-//				}
-//			    $zip->close();
-//			}
-
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenHistory"));
 			$objWindow->windowIcon("auszahlen32.png");
@@ -121,6 +141,7 @@ class payroll_UI {
 			
 			communication_interface::jsExecute("prlAuszahlenHistoryWindowInit();");
 			
+			//communication_interface::alert("fertig"); 
 			break;
 		case 'payroll.prlPsoEmployeeOverview':
 
@@ -1846,12 +1867,12 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				
 				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
 				$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
-				$data["period"] = "periode-".$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
+				$data["period"] = "PERIODENPREFIX".$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
 								
 				$objWindow->windowTitle($objWindow->getText("txtAuszahlungErstellen").": ".$data["period"]);
 				$objWindow->windowIcon("auszahlen32.png");
-				$objWindow->windowWidth(580); 
-				$objWindow->windowHeight(400);
+				$objWindow->windowWidth(650); 
+				$objWindow->windowHeight(395); 
 				$objWindow->modal(true);	
 				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 				$objWindow->showWindow();
@@ -2320,7 +2341,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
 			$emplData = array();
 			if($employeeList["success"]) {
-//				foreach($employeeList["data"] as $row) $emplData[] = "[".$row["id"].",'".$row["EmployeeNumber"]."','".$row["Firstname"]."','".$row["Lastname"]."']";
 				foreach($employeeList["data"] as $row) $emplData[] = "[".$row["id"].",'".$row["EmployeeNumber"]."','".str_replace("'","\\'",$row["Firstname"])."','".str_replace("'","\\'",$row["Lastname"])."']";
 			}
 			communication_interface::jsExecute("prlPsSelALL = [ ".implode(",",$emplData)." ];");
@@ -2333,8 +2353,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			$this->prlCalcOvPopulateTable(array("updateTable"=>true));
 			break;
 		case 'payroll.FinMgmtAccOpen':
-//			communication_interface::alert("coming soon...");
-
 			//Get employee list and prepare data in order to fill the client-side employee SELECT
 			$queryOption["columns"] = array("Firstname", "Lastname");
 			$queryOption["prepend_id"] = true;

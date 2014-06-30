@@ -31,7 +31,14 @@ class employee {
 //return;
 		switch($param["data_source"]) {
 		case 'current_period':
-			$result = $system_database_manager->executeQuery("SELECT ".$columns." FROM payroll_employee INNER JOIN payroll_period_employee prdemp ON prdemp.payroll_employee_ID=payroll_employee.id AND prdemp.processing!=0 INNER JOIN payroll_period prd WHERE prd.locked=0 AND prd.finalized=0 AND prd.id=prdemp.payroll_period_ID".$orderBy, "payroll_getEmployeeList");
+			$result = $system_database_manager->executeQuery("SELECT ".$columns." " .
+															 "FROM payroll_employee " .
+															 "INNER JOIN payroll_period_employee prdemp ON prdemp.payroll_employee_ID=payroll_employee.id " .
+															 "AND prdemp.processing!=0 " .
+															 "INNER JOIN payroll_period prd " .
+															 "WHERE prd.locked=0 AND prd.finalized=0 " .
+															 "AND prd.id=prdemp.payroll_period_ID".$orderBy, 
+															"payroll_getEmployeeList");
 			break;
 		case 'calculation_overview':
 			//Kontonummern ermitteln (Brutto-, Netto-Lohn und Auszahlungsbetrag)

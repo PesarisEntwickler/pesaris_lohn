@@ -21,6 +21,10 @@ define("NUMBER_FORMAT_UDECIMAL", 12);
 define("NUMBER_FORMAT_DECIMAL_STRICT", 13);
 define("NUMBER_FORMAT_UDECIMAL_STRICT", 14);
 
+define("AUSZAHLDIR", "payments");
+define("PERIODENPREFIX", "periode-");
+define("PAYMENTVIEWDIR", "web/transfer/");
+
 //Communication in general
 $aafwConfig["communication"]["functionCalls"]["remoteMode"] = false;
 $aafwConfig["communication"]["functionCalls"]["remoteServices"] = array("nuncius.php");

@@ -3,7 +3,7 @@
 class payroll_BL {
 
 	public function sysListener($functionName, $functionParameters) {
-
+		
 		require_once('payroll_various_functions.php'); 
 		$variousFunctions = new variousFunctions();
 					
@@ -38,16 +38,21 @@ class payroll_BL {
 		$auszahlen = new auszahlen();
 				  
 		switch($functionName) {
+		case 'payroll.auszahlen.GenerateDataFiles':
+			require_once('payroll_reports.php');
+			$reports = new payroll_BL_reports();		
+			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1]);
 		case 'payroll.auszahlen.braucheDaten':
 			return $auszahlen->auszahlDaten();
-		case 'payroll.auszahlen.GenerateFiles_Data':
-			return $auszahlen->getActualPeriod();
+		case 'payroll.auszahlen.getEmployeeData':
+			return $auszahlen->getEmployeeData();
 		case 'payroll.auszahlen.getActualPeriod':
 			return $auszahlen->getActualPeriod();
 		case 'payroll.auszahlen.getActualPeriodenDaten':
 			return $auszahlen->getActualPeriodenDaten($functionParameters[0]);
 		case 'payroll.auszahlen.getZahlstellenDaten':
 			return $auszahlen->getZahlstellenDaten($functionParameters[0]);
+			
 		case 'payroll.onBootComplete':
 			return $variousFunctions->onBootComplete();
 		case 'payroll.getLanguageList':
@@ -83,6 +88,7 @@ class payroll_BL {
 //			$payrollfin = new payroll_BL_fin();
 //			return $payrollfin->getpayrollountForm($functionParameters[0], $functionParameters[1], $functionParameters[2], $functionParameters[3]); //$parampayrollountNumber, $bMonthlySummary, $bAllEntries, $arrYearMonth
 //			break;
+
 		case 'payroll.getEmployeeList':
 			return $employee->getEmployeeList($functionParameters[0]);
 		case 'payroll.getEmployeeFieldDef':
@@ -101,11 +107,21 @@ class payroll_BL {
 			return $employee->deleteEmployeeForm($functionParameters[0]);
 		case 'payroll.getEmployeeDetail':
 			return $employee->getEmployeeDetail($functionParameters[0],$functionParameters[1]);
-
 		case 'payroll.callbackEmployeeDetail':
 			return $employee->callbackEmployeeDetail($functionParameters[0]);
 		case 'payroll.saveEmployeeDetail':
 			return $employee->saveEmployeeDetail($functionParameters[0],$functionParameters[1]);
+		case 'payroll.addEmployee2Period':
+			return $employee->addEmployee2Period($functionParameters[0]);
+		case 'payroll.getEmployeeFilterList':
+			return $employee->getEmployeeFilterList($functionParameters[0]);
+		case 'payroll.getEmployeeFilterDetail':
+			return $employee->getEmployeeFilterDetail($functionParameters[0]);
+		case 'payroll.saveEmployeeFilterDetail':
+			return $employee->saveEmployeeFilterDetail($functionParameters[0]);
+		case 'payroll.deleteEmployeeFilterDetail':
+			return $employee->deleteEmployeeFilterDetail($functionParameters[0]);
+
 
 
 		case 'payroll.getPayrollAccountList':
@@ -173,17 +189,6 @@ class payroll_BL {
 		case 'payroll.savePeriodDates':
 			return $periods->savePeriodDates($functionParameters[0]);
 			
-		case 'payroll.addEmployee2Period':
-			return $employee->addEmployee2Period($functionParameters[0]);
-		case 'payroll.getEmployeeFilterList':
-			return $employee->getEmployeeFilterList($functionParameters[0]);
-		case 'payroll.getEmployeeFilterDetail':
-			return $employee->getEmployeeFilterDetail($functionParameters[0]);
-		case 'payroll.saveEmployeeFilterDetail':
-			return $employee->saveEmployeeFilterDetail($functionParameters[0]);
-		case 'payroll.deleteEmployeeFilterDetail':
-			return $employee->deleteEmployeeFilterDetail($functionParameters[0]);
-
 		case 'payroll.getFieldModifierList':
 			return $fieldmodifier->getFieldModifierList();
 		case 'payroll.getFieldModifierDetail':
@@ -250,7 +255,8 @@ class payroll_BL {
 
 				switch($functionParameters[0]) {
 				case 'GenerateAuszahlenReports':
-					return $reports->GenerateAuszahlenReports($functionParameters[1]);
+					//communication_interface::alert("generate");
+					//return $reports->GenerateAuszahlenReports($functionParameters[1]);
 				case 'calculationJournal':
 					return $reports->CalculationJournal($functionParameters[1]);
 				case 'finAccJournal':
