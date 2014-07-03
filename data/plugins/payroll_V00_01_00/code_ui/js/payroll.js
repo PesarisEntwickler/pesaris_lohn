@@ -14,8 +14,12 @@ function prlAuszahlenHistoryWindowInit() {
 	  });
 }
 function prlAuszahlenGenerateWindowInit() {
+	$('#btnAuszahlenReset').bind('click', function() {
+		cb('payroll.auszahlen.periodenReset');
+		$('#modalContainer').mb_close();
+		cb('payroll.prlCalcOvProcess',{'functionNumber':5});
+	});  
 	$('#btnAuszahlenGenerateWindowClose').bind('click', function() {
-		cb('payroll.auszahlen.closewindow');
 		$('#modalContainer').mb_close();
 	});  
 	$('#btnAuszahlenGenerateFiles').bind('click', function() {

@@ -24,6 +24,10 @@ define("NUMBER_FORMAT_UDECIMAL_STRICT", 14);
 define("AUSZAHLDIR", "payments");
 define("PERIODENPREFIX", "periode-");
 define("PAYMENTVIEWDIR", "web/transfer/");
+define("LF", "\n");
+define("CR", "\r");
+define("CRLF", "\r\n");
+define("TAB", "\t");
 
 //Communication in general
 $aafwConfig["communication"]["functionCalls"]["remoteMode"] = false;
@@ -71,6 +75,7 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //Core Paths SRV1
 
 //$aafwConfig["paths"]["file_manager"]["rootPath"] = "/usr/local/www/apache22/data-hidden/";
+//$aafwConfig["paths"]["session_control"]["rootPathData"] = "/usr/local/www/apache22/data/";
 //$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "/usr/local/www/apache22/data/kernel/cache/sessions/";
 //$aafwConfig["paths"]["plugin"]["customerDir"] = "/usr/local/www/apache22/data-hidden/CUSTOMER/";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
@@ -85,6 +90,7 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //Core Paths SRV2
 /*
 $aafwConfig["paths"]["file_manager"]["rootPath"] = "/usr/local/www/apache22/data-hidden/";
+$aafwConfig["paths"]["session_control"]["rootPathData"] = "/usr/local/www/apache22/data/";
 $aafwConfig["paths"]["session_control"]["sessionCachePath"] = "/usr/local/www/apache22/data/kernel/cache/sessions/";
 $aafwConfig["paths"]["plugin"]["customerDir"] = "/usr/local/www/apache22/data-hidden/CUSTOMER/";
 $aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";

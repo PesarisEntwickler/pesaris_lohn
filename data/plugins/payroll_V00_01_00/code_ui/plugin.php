@@ -13,9 +13,13 @@ class payroll_UI {
 			communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/payroll.js','text/javascript','payroll');
 			//communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/auszahlen.js','text/javascript','payroll');
 			break;
+		case 'payroll.auszahlen.periodenReset':
+			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+			//communication_interface::alert("payroll.auszahlen.periodenReset:".$payroll_calculation_current["data"][0]['payroll_period_ID']);
+			$payroll_period = blFunctionCall('payroll.auszahlen.resetActualPeriodenAuszahlFlag', $payroll_calculation_current["data"][0]['payroll_period_ID']);
+			break; 
 		case 'payroll.auszahlen.closewindow':
 			//communication_interface::alert("payroll.auszahlen.closewindow");
-			
 			//Loeschen aller transferierten Files
 			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].PAYMENTVIEWDIR;
 			foreach (glob($absWebPath.AUSZAHLDIR."*.*") as $filename) {
@@ -23,7 +27,7 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.auszahlen.GenerateFiles':
-			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n".$functionParameters[0]);
+//			communication_interface::alert("payroll.auszahlen.GenerateFiles\n".$functionParameters[0]);
 			$param = $functionParameters[0];
 			$paramArray = explode("##", $param);
 			$zahlstelle = $paramArray[1];
@@ -46,17 +50,21 @@ class payroll_UI {
 			$zArray = explode("]", $zahlstelle);	
 			$zahlstellenID =  substr($zArray[0], $tokenPos + strlen("[z"));	
 			
+//			communication_interface::alert("payroll.auszahlen.GenerateFiles" .
+//					"\nzahlstellenID=".$zahlstellenID .
+//					"\npersonengruppenIDListe=".$personengruppenIDListe);
+
 			$hatAuszahlFiles = blFunctionCall('payroll.auszahlen.GenerateDataFiles', $zahlstellenID, $personengruppenIDListe);
 
-			if ($hatAuszahlFiles) {
-				communication_interface::alert("Dateien erzeugt fuer Zahlstelle ".$zahlstellenID." und Personenkreis ".$personengruppenIDListe);// für ZahlstellenID:$zahlstellenID, Personengruppen:$personengruppenIDListe");				
+			if ($hatAuszahlFiles > 0) {
+				communication_interface::alert($hatAuszahlFiles." Datei erzeugt fuer Zahlstelle ".$zahlstellenID." und Personenkreis p".$personengruppenIDListe);// für ZahlstellenID:$zahlstellenID, Personengruppen:$personengruppenIDListe");				
 			} else {
 				communication_interface::alert("Fehler beim Dateien erzeugen");				
 				break;
 			}
 			//Hier kein break, was bewirkt, dass dann nach der Erzeugung der Files 
 			//gleich das History-Window aufgeht, was gewünscht ist
-			break;
+			//break;
 		case 'payroll.auszahlen.openHistoryWindow':
 			//communication_interface::alert("customer_login_name  ".session_control::getSessionInfo("customer_login_name")); 
 			//communication_interface::alert("db_name ".session_control::getSessionInfo("db_name")); 
@@ -76,11 +84,11 @@ class payroll_UI {
 
 			$fm = new file_manager();
 			$fm->customerSpace()->setPath("/".AUSZAHLDIR)->makeDir();   
-			$aktuellePeriode4ListingDir = AUSZAHLDIR."/".$PeriodeDieserMonat;
+			$aktuellePeriode4ListingDir = "/".AUSZAHLDIR."/".$PeriodeDieserMonat;
 			$data["aktuellePeriode4ListingDir"] = $aktuellePeriode4ListingDir;
-			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->makeDir();  //neue (die heutige) Periode anlegen
+			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir);  //neue (die heutige) Periode anlegen
 
-			//communication_interface::alert("aktuellePeriode4ListingDir ".$aktuellePeriode4ListingDir); 
+			//communication_interface::alert("aktuellePeriode4ListingDir 1:".$aktuellePeriode4ListingDir); 
 		 
 			//Bestehenden Periodendirectories lesen
 			$dirlist = $fm->customerSpace()->setPath(AUSZAHLDIR)->listDir(1);  
@@ -97,7 +105,7 @@ class payroll_UI {
 			
 			//Auslisten der Files aus dem Directory
 			$fm->customerSpace()->setPath(AUSZAHLDIR);  
-			$filelist = $fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->listDir();  
+			$filelist = $fm->customerSpace()->setPath($aktuellePeriode4ListingDir)->listDir(1);  
 			$nochmals = true;
    			if (count($filelist) < 1) {
 				$nochmals = false;//Directory ist neu ->> Perioden-Files sind noch nicht angelegt
@@ -1516,6 +1524,32 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			break;
 		case 'payroll.prlCalcOvProcess':
 			switch($functionParameters[0]["functionNumber"]) {
+			case 5: //Auszahldaten erzeugen 
+				//communication_interface::alert("GUI Auszahldaten erzeugen");
+				$data = array();
+				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
+				if($ret["success"]) $data["employeeFilter_list"] = $ret["data"];
+
+				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenDaten",array("arrZahlstellen"=>true));
+				if($ret["success"]) $data["zahlstellen_list"] = $ret["data"];
+
+				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
+				$data["btnBerechnen"] = $objWindow->getText("btnNeuBerechnen");
+				
+				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+				$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
+				$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
+				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl');				
+				$objWindow->windowTitle($objWindow->getText("txtAuszahlungErstellen").": ".$data["period"]);
+				$objWindow->windowIcon("auszahlen32.png");
+				$objWindow->windowWidth(680); 
+				$objWindow->windowHeight(405); 
+				$objWindow->modal(true);	
+				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
+				$objWindow->showWindow();
+				
+				communication_interface::jsExecute("prlAuszahlenGenerateWindowInit();");
+				break;
 			case 1: //Lohn berechnen
 				blFunctionCall('payroll.calculate');
 				$this->prlCalcOvPopulateTable(array("updateTable"=>true));
@@ -1852,32 +1886,6 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 
 				communication_interface::jsExecute("prlCalcFinDATA.major_period = [ ".implode(",",$prdList)." ];");
 				communication_interface::jsExecute("prlCalcFinUpdatePrd(prlCalcFinDATA.major_period);");
-				break;
-			case 5: //Auszahldaten erzeugen 
-				//communication_interface::alert("Auszahldaten erzeugen");
-				$data = array();
-				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
-				if($ret["success"]) $data["employeeFilter_list"] = $ret["data"];
-
-				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenDaten",array("arrZahlstellen"=>true));
-				if($ret["success"]) $data["zahlstellen_list"] = $ret["data"];
-
-				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
-				$data["btnBerechnen"] = $objWindow->getText("btnNeuBerechnen");
-				
-				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
-				$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
-				$data["period"] = "PERIODENPREFIX".$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
-								
-				$objWindow->windowTitle($objWindow->getText("txtAuszahlungErstellen").": ".$data["period"]);
-				$objWindow->windowIcon("auszahlen32.png");
-				$objWindow->windowWidth(650); 
-				$objWindow->windowHeight(395); 
-				$objWindow->modal(true);	
-				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
-				$objWindow->showWindow();
-				
-				communication_interface::jsExecute("prlAuszahlenGenerateWindowInit();");
 				break;
 			default:
 				communication_interface::alert("coming soon...");

@@ -21,6 +21,13 @@ define("NUMBER_FORMAT_UDECIMAL", 12);
 define("NUMBER_FORMAT_DECIMAL_STRICT", 13);
 define("NUMBER_FORMAT_UDECIMAL_STRICT", 14);
 
+define("AUSZAHLDIR", "payments");
+define("PERIODENPREFIX", "periode-");
+define("PAYMENTVIEWDIR", "web/transfer/");
+define("LF", "\n");
+define("CR", "\r");
+define("CRLF", "\r\n");
+define("TAB", "\t");
 
 //Communication in general
 $aafwConfig["communication"]["functionCalls"]["remoteMode"] = false;
@@ -72,8 +79,8 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
 //$aafwConfig["paths"]["reports"]["templates"] = "/usr/local/www/apache22/data-hidden/GLOBAL/templates/";
 
-//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc.exe";
-//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex.exe";
+//$aafwConfig["paths"]["utilities"]["xsltproc"] = "xsltproc";
+//$aafwConfig["paths"]["utilities"]["pdflatex"] = "pdflatex";
 //$aafwConfig["paths"]["utilities"]["stdout"] = "/dev/null";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "mysql";
 
@@ -108,6 +115,7 @@ $aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 //Core Paths Windows Harald
 
 //$aafwConfig["paths"]["file_manager"]["rootPath"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/";
+//$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data/";
 //$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data/kernel/cache/sessions/";
 //$aafwConfig["paths"]["plugin"]["customerDir"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/CUSTOMER/";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/mysqldump";

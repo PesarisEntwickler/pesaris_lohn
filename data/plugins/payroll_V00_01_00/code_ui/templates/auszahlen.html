@@ -49,7 +49,7 @@
 					<legend>
 						<wgui:text id="txtZahlstelleAuswaehlen"/>
 					</legend>
-					<select id="sel_prl_auszahlen_zahlstellen" name="sel_prl_auszahlen_zahlstellen" style="width:100%;margin-bottom:8px;" size="4" > 
+					<select id="sel_prl_auszahlen_zahlstellen" name="sel_prl_auszahlen_zahlstellen" style="width:100%;margin-bottom:4px;" size="4" > 
 						<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
 							<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="id"/>">
 								[z<wgui:loopvar loopname="zahlstellenLoop" varname="id"/>]&nbsp;
@@ -69,18 +69,35 @@
  		</tr>
  		<tr>
  			<td>
-				<input type="radio" name="chk_payroll_auszahlen" id="chk_payroll_auszahlen_allepersonen" value="1" checked="checked" />	
+			 	<table style="width: 100%; padding: 0; margin: 0;">
+			 		<tr>
+			 			<td><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</td>
+			 			<td style="width: 40px" align="center">
+			 				<input type="radio" 
+			 					  	name="chk_payroll_auszahlen" 
+			 					  	id="chk_payroll_auszahlen_allepersonen" 
+			 					  	value="1" 
+			 					  	checked="checked" /></td>
+			 		</tr>
+			 		<tr>
+			 			<td><wgui:text id="prlPsoDFltAllEmployeesToPay"/>:</td>
+			 			<td align="right">
+			 				<input type='text' 
+			 						id='nbzMA' 
+			 						name='nbzMA' 
+			 						value='<wgui:var name="nochNichtAusbezahlteMA"/>' 
+			 					    style='width: 40px; font-weight: bold; text-align:center; border-style: hidden;'/>
+			 			</td>
+			 		</tr>
+			 	</table>			 	
  			</td>
- 			<td>
-			 	<label for="chk_payroll_auszahlen_allepersonen" ><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</label>
- 			</td>
- 			<td>
+ 			<td style="padding: 6px 8px 0 0; margin: 0 0 0 0;">
 				<fieldset>
 					<legend>
 						<input type="radio" name="chk_payroll_auszahlen" id="chk_payroll_auszahlen_personengruppen" value="0" />
 						<wgui:text id="prlUtlEfcLgndExistingFilterAnwenden"/>
 					</legend>
-					<select id="sel_prl_auszahlen_personalfilter" style="width:380px;margin-bottom:8px;" size="7" multiple="multiple"> 
+					<select id="sel_prl_auszahlen_personalfilter" style="width:380px;margin-bottom:4px;" size="8" multiple="multiple"> 
 	<!--  				<option value="0"><wgui:text id="prlUtlEfcOptChooseFilter"/></option>	 -->
 						<wgui:loop name="empfltLoop" varname="employeeFilter_list">
 							<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>">
@@ -96,9 +113,12 @@
 
 	</div>
 	
-	<table width="100%">
+	<table style="width: 100%; padding: 0; margin: 0;">
 		<tr>
-			<td align="left"><button id="btnAuszahlenGenerateWindowClose" name="btnAuszahlenGenerateWindowClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
+			<td align="left">
+				<button id="btnAuszahlenGenerateWindowClose" name="btnAuszahlenGenerateWindowClose" class="PesarisButton"><wgui:text id="btnClose"/></button>
+				<button id="btnAuszahlenReset" name="btnAuszahlenReset" class="PesarisButton" style="width: 180px;"><wgui:text id="btnResetAuszahlung"/></button>			
+			</td>
 			<td align="right"><button id="btnAuszahlenGenerateFiles" name="btnAuszahlenGenerateFiles" class="PesarisButton" style="width: 180px;" disabled="disabled"><wgui:var name="btnBerechnen"/></button></td>
 		</tr>
 	</table>

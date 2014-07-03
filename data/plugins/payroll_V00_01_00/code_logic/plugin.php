@@ -42,14 +42,18 @@ class payroll_BL {
 			require_once('payroll_reports.php');
 			$reports = new payroll_BL_reports();		
 			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1]);
-		case 'payroll.auszahlen.braucheDaten':
-			return $auszahlen->auszahlDaten();
+		case 'payroll.auszahlen.getAuszahlMitarbeiteranzahl':
+			return $auszahlen->getAuszahlMitarbeiteranzahl();
 		case 'payroll.auszahlen.getEmployeeData':
 			return $auszahlen->getEmployeeData();
 		case 'payroll.auszahlen.getActualPeriod':
 			return $auszahlen->getActualPeriod();
+		case 'payroll.auszahlen.getActualPeriodDir':
+			return $auszahlen->getActualPeriodenDir();
 		case 'payroll.auszahlen.getActualPeriodenDaten':
 			return $auszahlen->getActualPeriodenDaten($functionParameters[0]);
+		case 'payroll.auszahlen.resetActualPeriodenAuszahlFlag':
+			return $auszahlen->resetActualPeriodenAuszahlFlag($functionParameters[0]);
 		case 'payroll.auszahlen.getZahlstellenDaten':
 			return $auszahlen->getZahlstellenDaten($functionParameters[0]);
 			
