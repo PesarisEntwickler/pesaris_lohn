@@ -14,7 +14,7 @@ class payroll_UI {
 			//communication_interface::jsFileInclude('plugins/payroll_V00_01_00/code_ui/js/auszahlen.js','text/javascript','payroll');
 			break;
 		case 'payroll.auszahlen.periodenReset':
-			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 			//communication_interface::alert("payroll.auszahlen.periodenReset:".$payroll_calculation_current["data"][0]['payroll_period_ID']);
 			$payroll_period = blFunctionCall('payroll.auszahlen.resetActualPeriodenAuszahlFlag', $payroll_calculation_current["data"][0]['payroll_period_ID']);
 			break; 
@@ -71,7 +71,7 @@ class payroll_UI {
 			//$db_name = session_control::getSessionInfo("db_name");
 			
 			//Die jetztige Periode ist
-			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+			$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 			$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
 			$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
 
@@ -1535,8 +1535,8 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 
 				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 				$data["btnBerechnen"] = $objWindow->getText("btnNeuBerechnen");
-				
-				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+//Die jetztige Periode ist				
+				$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 				$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
 				$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
 				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl');				

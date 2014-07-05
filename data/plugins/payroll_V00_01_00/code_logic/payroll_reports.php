@@ -1176,20 +1176,16 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 				"WHERE id = ".$ZahlstellenID.";");
 
 		$iban = $result_bank_source[0]["bank_source_IBAN"];
+		
+		$bs1 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc1"] )));
+		$bs2 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc2"] )));
+		$bs3 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc3"] )));
+		$bs4 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc4"] )));
+
 		$iban = str_replace(" ", "", trim($iban));
-		$dtaPersKreis = "";
-		if ($Personenkreis != "*") {
-			$dtaPersKreis = "_p".str_replace(",", "p", $Personenkreis);
-		}
-		if (strlen($iban) < 3) {
-			$dtaFileName = date("Y-m-d").$dtaPersKreis.".dta";
-		} else {
-			$dtaFileName = $iban.$dtaPersKreis.".dta";
-		}
-//		communication_interface::alert("IBAN=".$iban."\ngewaehlter Dateiname:".$dtaFileName);
 
 		//Die jetztige Periode ist
-		$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+		$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 		$period_ID = $payroll_calculation_current["data"][0]['payroll_period_ID'];
 		$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $period_ID);
 		$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
@@ -1197,49 +1193,22 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 		//communication_interface::alert("Zahlstelle:".$ZahlstellenID." \nDTAFileName:".$dtaFileName."\nperiodeDieserMonat:".$PeriodeDieserMonat."\nPersonenkreis:".$Personenkreis);
 
+		$dtaPersKreisFileNmae = "";
 		//Einschaenkung mit dem Personenfilter
 		$emplFilter = "";
-		$emplFilterDisplay = "";
 		if (substr($Personenkreis."xx",0,1)!="*") {			
-			$system_database_manager = system_database_manager::getInstance();
-			$result = $system_database_manager->executeQuery(
-					"SELECT FilterCriteria FROM payroll_empl_filter " .
-					"WHERE id IN (" .$Personenkreis. ") " .
-					"ORDER BY FilterPriority " .
-					";");
-			foreach ( $result as $row ) {
-				$emplFilter .= " AND " . $row['FilterCriteria'];      
-				$emplFilterDisplay .= " AND \n" . $row['FilterCriteria'];      
-			}
-			//$emplFilter = " WHERE ".substr($emplFilter, 4);//ersetzt das AND am Anfang mit WHERE 
-			//$emplFilterDisplay = " WHERE ".substr($emplFilterDisplay, 4);//ersetzt das AND am Anfang mit WHERE 
-			//communication_interface::alert("PersonenFilter = ".$emplFilterDisplay);    
+			$dtaPersKreisFileNmae = "_p".str_replace(",", "p", $Personenkreis);
+			$emplFilter = $auszahlen->getEmployeeFilters($Personenkreis);
 		}
-		$emplFilter .= " AND `isFullPayed` <> 'Y' AND payroll_account_ID = 8000  AND amount <> 0 ";
-		$empArray = $auszahlen->getMitarbeiterZurAuszahlung($emplFilter);
-		communication_interface::alert("PersonenFilter = ".$emplFilterDisplay."\neffected rows=".count($empArray['data']));    
-
-		//. $row['payroll_employee_ID'];      
-
-		$system_database_manager = system_database_manager::getInstance();
-		$result_calculation_current = $system_database_manager->executeQuery("
-				 SELECT * FROM 
-				  payroll_calculation_current 
-				 WHERE payroll_account_ID = 8000  
-				 AND amount <> 0		 
-				 ;");
-//		$result_bank_split_destination = $system_database_manager->executeQuery("				
-//				SELECT * FROM
-//				 payroll_payment_split AS split
-//				,payroll_bank_destination AS dest
-//				WHERE
-//				 split.payroll_employee_ID = dest.payroll_employee_ID
-//				ORDER BY 
-//				 split.payroll_employee_ID
-//				,split.processing_order
-//				,dest.destination_type 
-//				;");				
+		$emplFilter .= " AND  isFullPayed <> 'Y'  AND  payroll_account_ID = 8000  AND  amount <> 0 ";
+		$employeeList = $auszahlen->getMitarbeiterZurAuszahlung($emplFilter);
 		
+		if (strlen($iban) < 3) {
+			$dtaFileName = date("Y-m-d").$dtaPersKreisFileNmae.".dta";
+		} else {
+			$dtaFileName = $iban.$dtaPersKreisFileNmae.".dta";
+		}
+
 		//DTA File schreiben
 		$c="";
 		$trxnr=0;
@@ -1250,14 +1219,30 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$fm->setFile($dtaFileName); 
 //			$c.="\n01  IBAN:$iban \n";
 //			$c.="\n02  PERS:$emplFilter \n";
-			foreach ( $result_calculation_current as $row ) {
+			foreach ( $employeeList['data'] as $row ) {
+				//communication_interface::alert($row['amount']);      
 				$trxnr++;
 				$arrAmt = explode(".", $row['amount']);
 				$amountDTA = $arrAmt[0].",".substr(rtrim($arrAmt[1], "0")."00", 0,2);
 				$bene = $auszahlen->getBeneficiaryAddress($row['payroll_employee_ID']);
-				$auszahlen->updatePeriodenAuszahlFlag($row['payroll_period_ID'], $row['payroll_employee_ID'], "Y");
+				$bn1 = trim($bene[0]['beneAddress1']);
+				$bn2 = trim($bene[0]['beneAddress2']);
+				$bn3 = trim($bene[0]['beneAddress3']);
+				$bn4 = trim($bene[0]['beneAddress4']);
+				if (strlen($bn1) < 3) {
+					$bn1 = trim($row['Firstname']). " " . trim($row['Lastname']);
+					$bn2 = trim($row['Street']);
+					$bn3 = trim($row['ZIP-Code']). " " . trim($row['City']);
+					$bn4 = "";
+				}
+				$bn1 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn1 )));
+				$bn2 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn2 )));
+				$bn3 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn3 )));
+				$bn4 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn4 )));
+
 				//communication_interface::alert("OK".$bene[0]['bank_account']."//".$bene[0]['beneAddress1']."//".$bene[0]['beneAddress2']."//".$bene[0]['beneAddress3']."//".$bene[0]['beneAddress4']); 
-					if (count($bene)>0) {
+				if (count($bene)>0) {
+					$auszahlen->updatePeriodenAuszahlFlag($row['payroll_period_ID'], $row['payroll_employee_ID'], "Y");
 					$dtaHeader51stellen = "000000".str_pad(" ", 12)
 						."00000"
 						.date("ymd")
@@ -1276,18 +1261,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 							.str_pad(" ",14)
 						, 0, 128);						
 					$c.= CRLF.substr("02"
-							.str_pad(strtoupper( $result_bank_source[0]["bank_source_desc1"] ), 20)
-							.str_pad(strtoupper( $result_bank_source[0]["bank_source_desc2"] ), 20)
-							.str_pad(strtoupper( $result_bank_source[0]["bank_source_desc3"] ), 20)
-							.str_pad(strtoupper( $result_bank_source[0]["bank_source_desc4"] ), 20)
+							.str_pad($bs1, 20)
+							.str_pad($bs2, 20)
+							.str_pad($bs3, 20)
+							.str_pad($bs4, 20)
 							.str_pad(" ",46)
 						, 0, 128);						
 					$c.= CRLF.substr("03"
 							."/C/".str_pad($bene[0]['bank_account'],30)
-							.str_pad(strtoupper( $bene[0]['beneAddress1'] ), 24)
-							.str_pad(strtoupper( $bene[0]['beneAddress2'] ), 24)
-							.str_pad(strtoupper( $bene[0]['beneAddress3'] ), 24)
-							.str_pad(strtoupper( $bene[0]['beneAddress4'] ), 24)
+							.str_pad($bn1, 24)
+							.str_pad($bn2, 24)
+							.str_pad($bn3, 24)
+							.str_pad($bn4, 24)
 						, 0, 128);						
 					$c.= CRLF.substr("04"
 							.str_pad(strtoupper( "Salaerzahlung" ), 28)
@@ -1306,18 +1291,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$anzFiles++;
 
 
-		//Abhaken der Mitarbeiterauszahlungen mit Betrag = 0
-		$result_calculation_current = $system_database_manager->executeQuery("
-				 SELECT * FROM 
-				  payroll_calculation_current 
-				 WHERE payroll_account_ID = 8000  
-				 AND amount = 0		 
-				 ;");
-			$zeroPayment = 0;
-			foreach ( $result_calculation_current as $row ) {
-				$auszahlen->updatePeriodenAuszahlFlag($row['payroll_period_ID'], $row['payroll_employee_ID'], "0");
-				$zeroPayment++;
-			}
+//		//Abhaken der Mitarbeiterauszahlungen mit Betrag = 0
+//		$result_calculation_current = $system_database_manager->executeQuery("
+//				 SELECT * FROM 
+//				  payroll_calculation_current 
+//				 WHERE payroll_account_ID = 8000  
+//				 AND amount = 0		 
+//				 ;");
+//			$zeroPayment = 0;
+//			foreach ( $result_calculation_current as $row ) {
+//				$auszahlen->updatePeriodenAuszahlFlag($row['payroll_period_ID'], $row['payroll_employee_ID'], "0");
+//				$zeroPayment++;
+//			}
 				 
 
 //		$psoDbFilter = "";

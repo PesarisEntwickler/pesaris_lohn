@@ -2,10 +2,12 @@
 
 class auszahlen {
 	
-	public function getActualPeriod() {
+	public function getActualPeriodID() {
 		$system_database_manager = system_database_manager::getInstance();
 		//communication_interface::alert("");
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_calculation_current LIMIT 1,1;", "");		
+		$result = $system_database_manager->executeQuery(
+			"SELECT * FROM payroll_calculation_current LIMIT 1,1 ; "
+			, "");		
 		if(count($result) < 1) {
 			$response["success"] = false;
 			$response["errCode"] = 101;
@@ -20,7 +22,9 @@ class auszahlen {
 
 	public function getActualPeriodenDaten($periodenID) {
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_period WHERE id=".$periodenID." ; ", "");		
+		$result = $system_database_manager->executeQuery(
+			"SELECT * FROM payroll_period WHERE id=".$periodenID."  LIMIT 1,1 ; "
+			, "");		
 		if(count($result) < 1) {
 			$response["success"] = false;
 			$response["errCode"] = 102;
@@ -30,6 +34,13 @@ class auszahlen {
 			$response["errCode"] = 0;
 			$response["data"] = $result;
 		}
+		return $response;
+	}
+	
+	public function getActualPeriodName() {
+		$periodenID = getActualPeriodID();
+		$periodenDaten = $this->getActualPeriodenDaten($periodenID);
+		$response = PERIODENPREFIX.$periodenDaten[0]['payroll_year_ID']."-".substr("00".$periodenDaten[0]['major_period'], -2);		
 		return $response;
 	}
 	
@@ -51,6 +62,18 @@ class auszahlen {
 		
 	}
 
+	public function updatePeriodenAuszahlFlag($periodID, $MA, $flag) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeUpdate("
+			UPDATE payroll_period_employee 
+			SET isFullPayed='".$flag."' 
+			WHERE payroll_period_ID=".$periodID." 			
+			AND   payroll_employee_ID=".$MA."
+			;");
+		//communication_interface::alert("updated $periodID, $MA, $flag");
+		return true;
+	}
+	
 	public function resetActualPeriodenAuszahlFlag($periodID) {
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeUpdate("
@@ -65,7 +88,7 @@ class auszahlen {
 	
 	public function getActualPeriodenDir() {
 		global $aafwConfig;
-		$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriod');
+		$payroll_calculation_current = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 		$payroll_period = blFunctionCall('payroll.auszahlen.getActualPeriodenDaten', $payroll_calculation_current["data"][0]['payroll_period_ID']);
 		$data["period"] = PERIODENPREFIX.$payroll_period["data"][0]['payroll_year_ID']."-".substr("00".$payroll_period["data"][0]['major_period'], -2);
 		$aktuellePeriode4ListingDir = "/".AUSZAHLDIR."/".$data["period"];
@@ -84,18 +107,6 @@ class auszahlen {
 		return count($filelist);
 	}
 
-	public function updatePeriodenAuszahlFlag($periodID, $MA, $flag) {
-		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeUpdate("
-			UPDATE payroll_period_employee 
-			SET isFullPayed='".$flag."' 
-			WHERE payroll_period_ID=".$periodID." 			
-			AND   payroll_employee_ID=".$MA."
-			;");
-		//communication_interface::alert("updated $periodID, $MA, $flag");
-		return true;
-	}
-	
 	public function getAuszahlMitarbeiteranzahl() {
 		$anzMaArr = $this->getMitarbeiterZurAuszahlung("AND `isFullPayed`='N' AND payroll_account_ID = 8000  AND amount <> 0");
 		return $anzMaArr['count'];
@@ -104,10 +115,10 @@ class auszahlen {
 	public function getMitarbeiterZurAuszahlung($erweiterteWhereKlausel) {
 		$sql="
 			SELECT * FROM 
-			 lohndev.payroll_calculation_current as calc
-			,lohndev.payroll_employee as emp
-			,lohndev.payroll_employment_period as emprd
-			,lohndev.payroll_period_employee as prd
+			 payroll_calculation_current as calc
+			,payroll_employee as emp
+			,payroll_employment_period as emprd
+			,payroll_period_employee as prd
 			WHERE 
 			 emp.id = calc.payroll_employee_ID
 			 AND emp.id = emprd.payroll_employee_ID
@@ -132,9 +143,25 @@ class auszahlen {
 		
 	}
 	
+	public function getEmployeeFilters($Personenkreis) {
+		$emplFilter = "";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery(
+				"SELECT FilterCriteria FROM payroll_empl_filter " .
+				"WHERE id IN (" .$Personenkreis. ") " .
+				"ORDER BY FilterPriority " .
+				";");
+		foreach ( $result as $row ) {
+			$emplFilter .= " AND " . $row['FilterCriteria'];           
+		}  
+		return $emplFilter;	
+	}
+	
 	public function getEmployeeData($idListe) {
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT FilterCriteria FROM payroll_empl_filter WHERE id IN (".$idListe.") ORDER BY FilterPriority;");
+		$result = $system_database_manager->executeQuery(
+			"SELECT FilterCriteria FROM payroll_empl_filter WHERE id IN (".$idListe.") ORDER BY FilterPriority;"
+			);
 		
 		if(count($result) == 0) {
 			$retval["success"] 	= false;
@@ -180,10 +207,10 @@ class auszahlen {
 		return $retArray;
 	}
 	
-	function replaceUmlaute($uebergabeWort) {
-		$umlaute = array("ä","ö","ü","Ä","Ö","Ü","ß","à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
-		$ersatz = array("ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u");
-		return str_replace ($umlaute,$ersatz,$uebergabeWort);
+	public function replaceUmlaute($uebergabeWort) {
+		$umlaute = array("'","ä","ö","ü","Ä","Ö","Ü","ß","à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú","&auml;", "&ouml;", "&uuml;","&Auml;","&Ouml;","&Uuml;","&eacute;","&Eacute;");
+		$ersatz = array(" ","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u","Ae","Oe","Ue","e","E");
+		return str_replace($umlaute,$ersatz,$uebergabeWort);
 	}
 	
 	

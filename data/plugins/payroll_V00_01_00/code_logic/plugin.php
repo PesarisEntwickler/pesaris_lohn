@@ -46,8 +46,10 @@ class payroll_BL {
 			return $auszahlen->getAuszahlMitarbeiteranzahl();
 		case 'payroll.auszahlen.getEmployeeData':
 			return $auszahlen->getEmployeeData();
-		case 'payroll.auszahlen.getActualPeriod':
-			return $auszahlen->getActualPeriod();
+		case 'payroll.auszahlen.getActualPeriodID':
+			return $auszahlen->getActualPeriodID();
+		case 'payroll.auszahlen.getActualPeriodName':
+			return $auszahlen->getActualPeriodName();
 		case 'payroll.auszahlen.getActualPeriodDir':
 			return $auszahlen->getActualPeriodenDir();
 		case 'payroll.auszahlen.getActualPeriodenDaten':
