@@ -959,7 +959,7 @@ input#prlFormCfg_TaxAdminCity {
 .prlPslpCfgFSL input[type=text], .prlPslpCfgFSL select, .prlPslpCfgFSR input[type=text], .prlPslpCfgFSR select {
 	width:180px;
 }
-.prlPslpCfgFSL select[id*='_font_size'], .prlPslpCfgFSR select[id*='_font_size'] {
+.prlPslpCfgFSL select[id*='__size'], .prlPslpCfgFSR select[id*='__size'] {
 	width:50px;
 }
 .prlPslpCfgFSL input[type=text][id*='_offset_'], .prlPslpCfgFSL input[type=text][id*='_width'], .prlPslpCfgFSR input[type=text][id*='_offset_'] {
@@ -1369,9 +1369,12 @@ ul.prlPrdSetDate {
 
 .prlPeriodenFileWrapper { 
 	border:1px solid #999;
-	width:250px;
+	font-size:12px!important;
+	width: 330px;
+	height: 88px; 
 	background-color: #F4F4F4;
 	padding: 3px 6px;
+	overflow: auto;
 }
 
 

@@ -12,7 +12,7 @@
 			</tr>
 			<tr>
 				<td>
-					<select id="ausz_PeriodenSelect" name="ausz_PeriodenSelect" size="5" style="width: 140px;">
+					<select id="ausz_PeriodenSelect" name="ausz_PeriodenSelect" size="6" style="width: 160px;">
 						<wgui:loop name="selectLoop" varname="DirectoriesLoop">
 							<option value="<wgui:loopvar loopname="selectLoop" varname="id"/>"<wgui:switch name="swtsel" varname="selectLoop|selected"><wgui:case switchname="swtsel" condition="1"> selected</wgui:case switchname="swtsel"></wgui:switch name="swtsel">>
 								<wgui:loopvar loopname="selectLoop" varname="bezeichnung"/>
@@ -21,7 +21,7 @@
 					</select>
 				</td>
 				<td>
-					<div class="prlPeriodenFileWrapper" id="prlPeriodenFileWrapper">
+					<div class="prlPeriodenFileWrapper" id="prlPeriodenFileWrapper" style="width: 330px;">
 						<wgui:loop name="fileLoop" varname="PeriodenFiles">
 							<a href='<wgui:loopvar loopname="fileLoop" varname="technFilename"/>' target='_blank'>				
 									 <wgui:loopvar loopname="fileLoop" varname="fileName"/>

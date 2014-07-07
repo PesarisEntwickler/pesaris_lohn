@@ -22,6 +22,8 @@ $textResourceMap["txtBestehendeBankverbindungen"] = "Bestehende Bankverbindungen
 $textResourceMap["btnNeueZahlstelle"] = "Neue Zahlstelle &gt;";
 $textResourceMap["btnReihenfolgespeichern"] = "Reihenfolge speichern";
 $textResourceMap["btnResetAuszahlung"] = "DTA/Auszlg. zur&uuml;ksetzen";
+$textResourceMap["btnResetAuszahlungToolTip"] = "Loescht DTA- uund PDF-Files und setzt Markierung der Auszahlung zurück";
+$textResourceMap["btnAuszahlenGenerateFilesToolTip"] = "Erzeugt DTA- uund PDF-Files und setzt eine Markierung der Auszahlung";
 
 $textResourceMap["btnNeuBerechnen"] = "Dateien erzeugen >";
 

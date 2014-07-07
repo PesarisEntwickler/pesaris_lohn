@@ -44,8 +44,6 @@ class payroll_BL {
 			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1]);
 		case 'payroll.auszahlen.getAuszahlMitarbeiteranzahl':
 			return $auszahlen->getAuszahlMitarbeiteranzahl();
-		case 'payroll.auszahlen.getEmployeeData':
-			return $auszahlen->getEmployeeData();
 		case 'payroll.auszahlen.getActualPeriodID':
 			return $auszahlen->getActualPeriodID();
 		case 'payroll.auszahlen.getActualPeriodName':
@@ -54,8 +52,8 @@ class payroll_BL {
 			return $auszahlen->getActualPeriodenDir();
 		case 'payroll.auszahlen.getActualPeriodenDaten':
 			return $auszahlen->getActualPeriodenDaten($functionParameters[0]);
-		case 'payroll.auszahlen.resetActualPeriodenAuszahlFlag':
-			return $auszahlen->resetActualPeriodenAuszahlFlag($functionParameters[0]);
+		case 'payroll.auszahlen.resetActualPeriodenAuszahlFlags':
+			return $auszahlen->resetActualPeriodenAuszahlFlags($functionParameters[0]);
 		case 'payroll.auszahlen.getZahlstellenDaten':
 			return $auszahlen->getZahlstellenDaten($functionParameters[0]);
 			
