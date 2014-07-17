@@ -38,11 +38,58 @@ class auszahlen {
 		return $response;
 	}
 	
-	public function getZahlstellenDaten($param) {
-		$companyID = session_control::getSessionInfo("id");
-		$companyID = 600;//TODO hm !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	public function getCompany($companyID) {
 		$system_database_manager = system_database_manager::getInstance();
-		$resBankSrc = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_source, payroll_bank_source_type WHERE payroll_bank_source.source_type = payroll_bank_source_type.type_id AND payroll_company_ID = ".$companyID, "payroll_getZahlstellenListe"); 
+		$result_company = $system_database_manager->executeQuery("
+			SELECT * FROM  
+			payroll_company 
+			WHERE id = ".$companyID.";");
+		return array("short"=>$result_company[0]["company_shortname"]
+					, "name"=>$result_company[0]["HR-RC-Name"]
+					, "str" =>$result_company[0]["Street"]
+					, "zip" =>$result_company[0]["ZIP-Code"]
+					, "city"=>$result_company[0]["City"]
+					, "land"=>$result_company[0]["Country"]
+					, "uid" =>$result_company[0]["UID-EHRA"]
+					, "bur" =>$result_company[0]["BUR-REE-Number"]
+					);		 
+	}
+	
+	public function getZahlstelle($ZahlstellenID) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result_bank_source = $system_database_manager->executeQuery("" .
+				"SELECT * FROM  " .
+				"payroll_bank_source " .
+				"WHERE id = ".$ZahlstellenID.";");
+		
+		return array("IBAN"    =>$result_bank_source[0]["bank_source_IBAN"]
+					, "desc"   =>$result_bank_source[0]["description"]
+					, "type"   =>$result_bank_source[0]["source_type"]
+					, "line1"  =>$result_bank_source[0]["bank_source_desc1"]
+					, "line2"  =>$result_bank_source[0]["bank_source_desc2"]
+					, "line3"  =>$result_bank_source[0]["bank_source_desc3"]
+					, "line4"  =>$result_bank_source[0]["bank_source_desc4"]
+					, "company"=>$result_bank_source[0]["payroll_company_ID"]
+					, "carrier"=>$result_bank_source[0]["bank_source_carrier"]
+					, "currency"=>$result_bank_source[0]["bank_source_currency_code"]
+					);		 
+	}
+	public function getZahlstellenDaten() {
+		$system_database_manager = system_database_manager::getInstance();
+		$resBankSrc = $system_database_manager->executeQuery("
+			SELECT *
+			, payroll_bank_source.id AS zsID 
+			FROM
+			  payroll_bank_source
+			, payroll_bank_source_type 
+			, payroll_company
+			WHERE
+				payroll_company.id = payroll_bank_source.payroll_company_ID
+			AND
+			  payroll_bank_source.source_type = payroll_bank_source_type.type_id
+			ORDER BY payroll_bank_source.id
+				;", "payroll_getZahlstellenListe"
+				); 
 		if(count($resBankSrc) != 0) {
 			$response["success"] = true;
 			$response["errCode"] = 0;
@@ -59,6 +106,9 @@ class auszahlen {
 	public function updatePeriodenAuszahlFlag($periodID, $MAlist, $flag) {
 		if (substr($MAlist, 0, 1)==",") {
 			$MAlist = substr($MAlist, 1);
+		}
+		if (strlen($MAlist)<1) {
+			$MAlist = "0";
 		}
 		$sql = " 
 				UPDATE payroll_period_employee 
@@ -81,7 +131,7 @@ class auszahlen {
 			WHERE payroll_period_ID=".$periodID." 			
 			;"); 
 		$nr = $this->deleteFilesFromActualPeriod();
-		communication_interface::alert("Auszahlungssdaten (DTA) der Periode zurueckgesetzt\n".$nr." Dateien geloescht (DTA, TXT)");
+		communication_interface::alert("- Auszahlungssdaten der Periode sind zurueckgesetzt.\n- Die dta- und pdf-Dateien sind geloescht.");
 		return true;
 	}
 	
@@ -105,7 +155,7 @@ class auszahlen {
 	}
 
 	public function getAuszahlMitarbeiteranzahl() {
-		$employeeList = $this->getMitarbeiterZurAuszahlung("8000", "amount <> 0", "isFullPayed <> 'Y'","");
+		$employeeList = $this->getMitarbeiterZurAuszahlung("8000", "amount > 0.001", "isFullPayed <> 'Y'","");
 		$effectedEmployeeList = "";
 		if ($employeeList["count"]>0) {
 			foreach ( $employeeList['data'] as $row ){
@@ -179,7 +229,7 @@ class auszahlen {
 							IN (".$accountList.") 
 							AND ".$amountClause."
 					)
-				AND prdempl.isFullPayed <> 'Y'
+				AND prdempl.".$isFullPayed."
 				".$erweiterteWhereKlausel."
 				;";
 		$system_database_manager = system_database_manager::getInstance();
@@ -215,17 +265,31 @@ class auszahlen {
 		return $emplFilter;	
 	}
 	
-	public function getEmployeesCurrentPeriodAmount($accountList, $emplId) {
-		$amount = "0.00";
+	public function getEmployeesCurrentPeriod($accountList, $emplIdList) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("
+			SELECT  *
+			FROM
+			  lohndev.payroll_calculation_current 
+			, lohndev.payroll_employee			
+			WHERE payroll_employee_ID  IN (".$emplIdList.")
+				AND payroll_account_ID IN (".$accountList.")
+				AND payroll_employee.id = payroll_calculation_current.payroll_employee_ID
+		    ; ");
+		return $result;
+	}
+
+	public function getEmployeesCurrentPeriodAmount($accountList, $emplIdList) {
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("
 			SELECT amount FROM payroll_calculation_current 
-			WHERE payroll_employee_ID= ".$emplId."
+			WHERE payroll_employee_ID IN (".$emplIdList.")
 			AND   payroll_account_ID IN (".$accountList.")
 		    ; ");
+		$amount = "0.00";
 		if (count($result)>0) {
 			$arrAmt = explode(".", $result[0]['amount']);
-			$amount = $arrAmt[0].",".substr(rtrim($arrAmt[1], "0")."00", 0,2);				
+			$amount = $arrAmt[0].",".substr(rtrim($arrAmt[1], "0")."00", 0,2);	//formatiert auf 123.45			
 		}
 		return $amount;
 	}
@@ -236,37 +300,50 @@ class auszahlen {
 		$result_bank_destination = $system_database_manager->executeQuery("				
 			SELECT * FROM
 			 payroll_bank_destination
-			WHERE id = ".$employeeID."
+			WHERE payroll_employee_ID = ".$employeeID."
 			ORDER BY destination_type 
 			;");
 		$idx = 0;	 				
-		foreach ( $result_bank_destination as $row ) {
-			$retArray[$idx]['bank_account'] =  trim( $row['bank_account'] ) ;
-			$retArray[$idx]['beneAddress1'] =  $row['beneficiary1_line1'];
-			$retArray[$idx]['beneAddress2'] = $row['beneficiary1_line2'];
-			$retArray[$idx]['beneAddress3'] = $row['beneficiary1_line3'];
-			$retArray[$idx]['beneAddress4'] = $row['beneficiary1_line4'];
-			$retArray[$idx]['beneBankDescription'] = $row['description'];
-			$retArray[$idx]['beneBank1'] = $row['beneficiary_bank_line1'];
-			$retArray[$idx]['beneBank2'] = $row['beneficiary_bank_line2'];
-			$retArray[$idx]['beneBank3'] = $row['beneficiary_bank_line3'];
-			$retArray[$idx]['beneBank4'] = $row['beneficiary_bank_line4'];
-			//communication_interface::alert(
-			//				"employeeID:".$employeeID."  idx:".$idx
-			//				."\n bank_account:".$retArray[$idx]['bank_account']
-			//				."\n beneAddress1:".$retArray[$idx]['beneAddress1']
-			//				."\n beneAddress2:".$retArray[$idx]['beneAddress2']
-			//				."\n beneAddress3:".$retArray[$idx]['beneAddress3']
-			//				."\n beneAddress4:".$retArray[$idx]['beneAddress4']
-			//				);
-			$idx++;
+		$retArray['bank_account'] = "";
+		$retArray['beneAddress1'] = "";
+		$retArray['beneAddress2'] = "";
+		$retArray['beneAddress3'] = "";
+		$retArray['beneAddress4'] = "";
+		$retArray['beneBankDescription'] = "";
+		$retArray['beneBank1'] = "";
+		$retArray['beneBank2'] = "";
+		$retArray['beneBank3'] = "";
+		$retArray['beneBank4'] = "";
+		if ( count($result_bank_destination) > 0 ) {
+			$retArray['bank_account'] = trim( $result_bank_destination[0]['bank_account'] ) ;
+			$retArray['beneAddress1'] = $result_bank_destination[0]['beneficiary1_line1'];
+			$retArray['beneAddress2'] = $result_bank_destination[0]['beneficiary1_line2'];
+			$retArray['beneAddress3'] = $result_bank_destination[0]['beneficiary1_line3'];
+			$retArray['beneAddress4'] = $result_bank_destination[0]['beneficiary1_line4'];
+			$retArray['beneBankDescription'] = $result_bank_destination[0]['description'];
+			$retArray['beneBank1'] = $result_bank_destination[0]['beneficiary_bank_line1'];
+			$retArray['beneBank2'] = $result_bank_destination[0]['beneficiary_bank_line2'];
+			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
+			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
+//			communication_interface::alert(
+//							"employeeID:".$employeeID."  idx:".$idx
+//							."\n bank_account:".$retArray[$idx]['bank_account']
+//							."\n beneAddress1:".$retArray[$idx]['beneAddress1']
+//							."\n beneAddress2:".$retArray[$idx]['beneAddress2']
+//							."\n beneAddress3:".$retArray[$idx]['beneAddress3']
+//							."\n beneAddress4:".$retArray[$idx]['beneAddress4']
+//							);
 		}
 		return $retArray;
 	}
 	
 	public function replaceUmlaute($uebergabeWort) {
-		$umlaute = array("'","ä","ö","ü","Ä","Ö","Ü","ß","à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú","&auml;", "&ouml;", "&uuml;","&Auml;","&Ouml;","&Uuml;","&eacute;","&Eacute;");
-		$ersatz = array(" ","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u","Ae","Oe","Ue","e","E");
+		$umlaute = array("'","ä","ö","ü","Ä","Ö","Ü","ß","à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
+		$ersatz = array(" ","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u");
+		$uebergabeWort = str_replace($umlaute,$ersatz,$uebergabeWort);
+		
+		$umlaute = array("&auml;","&ouml;","&uuml;","&Auml;","&Ouml;","&Uuml;","&eacute;","&Eacute;","&ATILDE;&FRAC14;","&Atilde;","&atilde;","&frac14;","Ã¼","Ã¶","¶","Ã©");
+		$ersatz = array( "ae"    ,"oe"    ,"ue"    ,"AE"    ,"OE"    ,"UE"    ,"e"       ,"E"      ,"UE"              ,"UE"       ,"ue"      ,""        ,"ue","o" ,"o","e");
 		return str_replace($umlaute,$ersatz,$uebergabeWort);
 	}
 	

@@ -30,14 +30,16 @@
 			<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>"><wgui:loopvar loopname="empfltLoop" varname="FilterName"/></option>
 		</wgui:loop name="empfltLoop">
 		</select><br/>
-		<button id="prlUtlEfcBtnEdit" style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button id="btnDelete"><wgui:text id="prlUtlEfcBtnDelete"/></button>
+		<button id="prlUtlEfcBtnEdit" class="PesarisButton" style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button>
+		<button id="prlUtlEfcBtnDelete" class="PesarisButton"><wgui:text id="btnDelete"/></button>
 		</fieldset>
 	</div>
-	<button id="prlUtlEfcBtnCancel" style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button id="prlUtlEfcBtnCancel" class="PesarisButton" style="margin-top:10px;"><wgui:text id="btnClose"/></button>
 </wgui:block name="EmployeeFilterOverview">
 <wgui:block name="EmployeeFilterEditor">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlUtlEfcMain">
-		<label for="prlUtlEfc_FilterName"><wgui:text id="prlUtlEfcFilterName"/></label><input type="text" id="prlUtlEfc_FilterName"/>
+		<label for="prlUtlEfc_FilterName"><wgui:text id="prlUtlEfcFilterName"/></label>
+			&nbsp;<input type="text" id="prlUtlEfc_FilterName" style="width: 200px;"/>
 		<fieldset>
 			<legend><wgui:text id="prlUtlEfcFldset"/></legend>
 			<input type="checkbox" id="prlUtlEfc_ValidForEmplOverview"/><label for="prlUtlEfc_ValidForEmplOverview"><wgui:text id="prlUtlEfcValidForEmplOverview"/></label> <input type="checkbox" id="prlUtlEfc_ValidForCalculation"/><label for="prlUtlEfc_ValidForCalculation"><wgui:text id="prlUtlEfcValidForCalculation"/></label> <input type="checkbox" id="prlUtlEfc_GlobalFilter"/><label for="prlUtlEfc_GlobalFilter"><wgui:text id="prlUtlEfcGlobalFilter"/></label> <input type="checkbox" id="prlUtlEfc_TemporaryFilter"/><label for="prlUtlEfc_TemporaryFilter"><wgui:text id="prlUtlEfcTemporaryFilter"/></label>
@@ -64,6 +66,8 @@
 		</fieldset>
 		<div id="prlUtlEfcErr"></div>
 	</div>
-	<button id="prlUtlEfcSave"><wgui:text id="btnSave"/></button><button id="prlUtlEfcCancel"><wgui:text id="btnCancel"/></button><button id="prlUtlEfcNew"><wgui:text id="btnPlusAdd"/></button>
+	<button id="prlUtlEfcCancel" class="PesarisButton"><wgui:text id="btnClose"/></button>
+	<button id="prlUtlEfcSave" class="PesarisButton"><wgui:text id="btnSave"/></button>
+	<button id="prlUtlEfcNew"  class="PesarisButton"><wgui:text id="btnPlusAdd"/></button>
 </wgui:block name="EmployeeFilterEditor">
 

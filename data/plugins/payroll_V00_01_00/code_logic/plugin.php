@@ -55,7 +55,7 @@ class payroll_BL {
 		case 'payroll.auszahlen.resetActualPeriodenAuszahlFlags':
 			return $auszahlen->resetActualPeriodenAuszahlFlags($functionParameters[0]);
 		case 'payroll.auszahlen.getZahlstellenDaten':
-			return $auszahlen->getZahlstellenDaten($functionParameters[0]);
+			return $auszahlen->getZahlstellenDaten();
 			
 		case 'payroll.onBootComplete':
 			return $variousFunctions->onBootComplete();
@@ -93,6 +93,8 @@ class payroll_BL {
 //			return $payrollfin->getpayrollountForm($functionParameters[0], $functionParameters[1], $functionParameters[2], $functionParameters[3]); //$parampayrollountNumber, $bMonthlySummary, $bAllEntries, $arrYearMonth
 //			break;
 
+		case 'payroll.getEmployee':
+			return $employee->getEmployee($functionParameters[0]);
 		case 'payroll.getEmployeeList':
 			return $employee->getEmployeeList($functionParameters[0]);
 		case 'payroll.getEmployeeFieldDef':

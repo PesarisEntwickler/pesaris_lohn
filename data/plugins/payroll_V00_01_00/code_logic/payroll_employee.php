@@ -495,6 +495,31 @@ class employee {
 
 		return $response;
 	}
+	
+	public function getEmployee($id) {
+		if(preg_match( '/^[0-9]{1,9}$/', $id)) {
+		    //TRUE
+		}else{
+			$response["success"] = false;
+			$response["errCode"] = 19;
+			$response["errText"] = "invalid employee id";
+			return $response;
+		}
+
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_employee WHERE id=".$id, "payroll_getEmployee");
+
+		if(count($result) < 1) {
+			$response["success"] = false;
+			$response["errCode"] = 101;
+			$response["errText"] = "no data found";
+		}else{
+			$response["success"] = true;
+			$response["errCode"] = 0;
+			$response["data"] = $result;
+		}
+		return $response;
+	}
 
 	public function getEmployeeDetail($id, $queryAuxiliaryTables=false) {
 		///////////////////////////////////////////////////
@@ -655,11 +680,13 @@ class employee {
 			$response["success"] = false;
 			$response["errCode"] = 10;
 			$response["errText"] = "invalid employee id";
+			$response["fieldNames"] = array();
+			$response["tableRows"] = array();
 			return $response;
 		}
 
 		require_once('chkDate.php');
-		$chkDate = new chkDate("", 9,null);
+		$chkDate = new chkDate("2013-01-01", 9);
 
 		$system_database_manager = system_database_manager::getInstance();
 		///////////////////////////////////////////////////
@@ -679,6 +706,7 @@ class employee {
 				$response["errCode"] = 20;
 				$response["errText"] = "missing mandatory fields in submitted fieldset";
 				$response["fieldNames"] = $arrFieldName;
+				$response["tableRows"] = array();
 				return $response;
 			}
 		}
@@ -748,6 +776,7 @@ class employee {
 			$response["errCode"] = 30;
 			$response["errText"] = "mandatory fields are empty";
 			$response["fieldNames"] = $arrFieldName;
+			$response["tableRows"] = array();
 			return $response;
 		}
 //communication_interface::alert("5***"); //TODO: remove!
@@ -805,16 +834,16 @@ spezielle felder und sonderfälle:
 -> Mutationen archivieren? Hier oder erst bei Abrechnung/Fixierung?
 */
 		}
+		//communication_interface::alert("6***:".count($arrFieldName)); 
 		$arrFieldName = array_unique($arrFieldName); //remove duplicate field names (if any)
 		if(count($arrFieldName)>0) {
 			$response["success"] = false;
 			$response["errCode"] = 40;
 			$response["errText"] = "validity check failed";
 			$response["fieldNames"] = $arrFieldName;
-//error_log("\nerrCode 40: ".print_r($arrFieldName,true)."\n", 3, "/var/log/copronet-application.log");
+			$response["tableRows"] = array();
 			return $response;
 		}
-//communication_interface::alert("6***"); //TODO: remove!
 //error_log("\n".print_r($fieldset,true)."\n", 3, "/var/log/copronet-application.log");
 //error_log("\n".print_r($arrFieldName,true)."\n", 3, "/var/log/copronet-application.log");
 
@@ -826,6 +855,7 @@ spezielle felder und sonderfälle:
 				$response["errCode"] = 50;
 				$response["errText"] = "duplicate employee number";
 				$response["fieldNames"] = array("EmployeeNumber");
+				$response["tableRows"] = array();
 				return $response;
 			}
 		}
@@ -845,12 +875,14 @@ spezielle felder und sonderfälle:
 					$response["success"] = false;
 					$response["errCode"] = 500;
 					$response["errText"] = "missing table record id";
+					$response["fieldNames"] = array();
 					$response["tableRows"] = array($tableName, "");
 					return $response;
 				}else if(!preg_match('/^(remove_|new)?([0-9]{1,9})$/', $tableRow["id"], $arrIdSplit)) {
 					$response["success"] = false;
 					$response["errCode"] = 510;
 					$response["errText"] = "invalid table record id";
+					$response["fieldNames"] = array();
 					$response["tableRows"] = array($tableName, $tableRow["id"]);
 				}
 				switch($arrIdSplit[1]) {
@@ -871,7 +903,9 @@ spezielle felder und sonderfälle:
 					$curRawValue = $tableRow[$fieldName];
 					$dbFieldName = str_replace($tableName."_", "", $fieldName); //remove prefix in order to get the proper field name matching the database field name
 					// checking all submitted fields if they are mandatory
-					if(isset($fieldProperties["properties"]["mandatory"]) && $fieldProperties["properties"]["mandatory"]==1 && trim($curRawValue)=="") $arrMandatoryErr[] = array($tableName, $tableRow["id"]);
+					if(isset($fieldProperties["properties"]["mandatory"]) && $fieldProperties["properties"]["mandatory"]==1 && trim($curRawValue)=="") {
+						$arrMandatoryErr[] = array($tableName, $tableRow["id"]);
+					} 
 
 					// checking all submitted fields for validity and preparing values for inserting them into the database
 					switch($fieldProperties["properties"]["fieldType"]) {
@@ -923,19 +957,25 @@ spezielle felder und sonderfälle:
 			}
 		}
 		if(count($arrMandatoryErr)>0) {
-//error_log("\nerr530: ".print_r($arrMandatoryErr,true)."\n", 3, "/var/log/copronet-application.log");
+			error_log("\n". date("Ymd-H:i:s ", time())."INFO arrMandatoryErr: ".count($arrMandatoryErr), 3, "__harald.log");
+			error_log("\n". date("Ymd-H:i:s ", time())."INFO ".print_r($arrMandatoryErr,true), 3, "__harald.log");
+			communication_interface::alert(print_r($arrValidityErr,true));			
 			$response["success"] = false;
 			$response["errCode"] = 530;
 			$response["errText"] = "mandatory table fields are empty";
+			$response["fieldNames"] = array();
 			$response["tableRows"] = $arrMandatoryErr;
 			return $response;
 		}
 		if(count($arrValidityErr)>0) {
-//error_log("\nerr540: ".print_r($arrValidityErr,true)."\n", 3, "/var/log/copronet-application.log");
+//			error_log("\n". date("Ymd-H:i:s ", time())."INFO ".count($arrValidityErr), 3, "__harald.log");
+//			error_log("\n". date("Ymd-H:i:s ", time())."INFO ".print_r($arrValidityErr,true), 3, "__harald.log");
+//communication_interface::alert(print_r($arrValidityErr[0],true));			
 			$response["success"] = false;
 			$response["errCode"] = 540;
 			$response["errText"] = "validity check failed (table content)";
-			$response["tableRows"] = $arrValidityErr;
+			$response["fieldNames"] = array();
+			$response["tableRows"] = $arrValidityErr[0];
 			return $response;
 		}
 //error_log("\n".print_r($arrCleanTableRows,true)."\n", 3, "/var/log/copronet-application.log");
@@ -982,6 +1022,8 @@ spezielle felder und sonderfälle:
 				$response["success"] = false;
 				$response["errCode"] = 666;
 				$response["errText"] = "could not get period start and end date";
+				$response["fieldNames"] = array();
+				$response["tableRows"] = array();
 			}
 			$datePeriodStart = $resDate[0]["datePeriodStart"];
 			$datePeriodEnd = $resDate[0]["datePeriodEnd"];
@@ -1000,6 +1042,8 @@ spezielle felder und sonderfälle:
 			$response["success"] = false;
 			$response["errCode"] = 1;
 			$response["errText"] = "nothing to save";
+			$response["fieldNames"] = array();
+			$response["tableRows"] = array();
 		}
 		/// END: Save "normal" fields
 
@@ -1074,6 +1118,8 @@ spezielle felder und sonderfälle:
 
 		$response["success"] = true;
 		$response["errCode"] = 0;
+		$response["fieldNames"] = array();
+		$response["tableRows"] = array();
 		return $response;
 	}
 

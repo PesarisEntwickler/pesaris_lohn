@@ -1,9 +1,9 @@
 <?php
 class chkDate {
 	
-	public function chkDate($dateStr, $action=0, &$ret="") { //$action=1 [mysql date], $action=2 [unix date], $action=3 [day,month,year separately in a map]
+	public function chkDate($dateStr="2013-01-01", $action=0, &$ret="") { //$action=1 [mysql date], $action=2 [unix date], $action=3 [day,month,year separately in a map]
 		$fragments = array();
-		if(preg_match('/^([0-9]{1,4})[-\/.]?([0-9]{1,4})[-\/.]?([0-9]{1,4})$/', $dateStr, &$fragments)) $check = true;
+		if(preg_match('/^([0-9]{1,4})[-\/.]?([0-9]{1,4})[-\/.]?([0-9]{1,4})$/', $dateStr, $fragments)) $check = true;
 		else $check = false;
 
 		if($check && sizeof($fragments)==4) {

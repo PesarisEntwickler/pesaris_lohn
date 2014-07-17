@@ -91,24 +91,26 @@ class payroll_UI {
 				$id++;				
 			}
 			
+			$db_name = session_control::getSessionInfo("db_name");
+			
 			//Auslisten der Files aus dem Directory
 			$fm->customerSpace()->setPath($aktuellePeriode4ListingDir);
 			$filelist = $fm->listDir(0);  
 
 			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].PAYMENTVIEWDIR;
-			$absDataPath = $aafwConfig["paths"]["plugin"]["customerDir"].session_control::getSessionInfo("db_name")."/".$aktuellePeriode4ListingDir."/";
+			$absDataPath = $aafwConfig["paths"]["plugin"]["customerDir"].$db_name."/".$aktuellePeriode4ListingDir."/";
 
 			$data["PeriodenFiles"] = array();
 //			foreach($filelist as $row) {
 //				if(strtolower(substr($row,-4))==".pdf") {
-//					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+//					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
 //					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
 //					copy($absDataPath.$row, $absWebPath.$technFilename); 
 //				} 
 //			}
 //			foreach($filelist as $row) {
 //				if(strtolower(substr($row,-4))==".dta") {
-//					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+//					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
 //					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
 //					copy($absDataPath.$row, $absWebPath.$technFilename); 
 //				} 
@@ -116,7 +118,7 @@ class payroll_UI {
 			foreach($filelist as $row) {
 				if(strtolower(substr($row,-4))==".dta"  ||  strtolower(substr($row,-4))==".pdf"  ||  strtolower(substr($row,-4))==".txt") {
 					$fnArr = explode(".", $row);
-					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
 					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>$fnArr[1], "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
 					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
@@ -124,7 +126,7 @@ class payroll_UI {
 //			foreach($filelist as $row) {
 //				if(strtolower(substr($row,-4))!=".dta"  ||  strtolower(substr($row,-4))!=".pdf"  ||  strtolower(substr($row,-4))!=".txt") {
 //					$fnArr = explode(".", $row);
-//					$technFilename = AUSZAHLDIR."_".$PeriodeDieserMonat."_".$row;
+//					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
 //					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>$fnArr[1], "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
 //					copy($absDataPath.$row, $absWebPath.$technFilename); 
 //				} 
@@ -187,8 +189,8 @@ class payroll_UI {
 				$objWindow = new wgui_window("payroll", "selectDBFilterForm");
 				$objWindow->windowTitle($objWindow->getText("prlPsoBtnDFilter"));
 				$objWindow->windowIcon("employee-edit32.png");
-				$objWindow->windowWidth(550);
-				$objWindow->windowHeight(160);
+				$objWindow->windowWidth(530);
+				$objWindow->windowHeight(150);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -219,17 +221,22 @@ class payroll_UI {
 			if($functionParameters[0]["wndStatus"]==0) {
 				//nur ausfuehren, wenn Window noch nicht geoeffnet ist
 				$data = array();
+				$data["modus"] = "mitarbeiterdatenBearbeiten";
 				$objWindow = new wgui_window("payroll", "employeeForm");
-				$objWindow->windowTitle("Mitarbeiterdaten bearbeiten"); //Mitarbeiterdaten erfassen / aendern
+				$title = $objWindow->getText("txtMitarbeiterdatenBearbeiten");
+				$objWindow->windowTitle($title); //Mitarbeiterdaten erfassen / aendern
 				$objWindow->windowIcon("employee-edit32.png");
-				$objWindow->windowWidth(830); // 710
-				$objWindow->windowHeight(490); // 470
+				$objWindow->windowWidth(830);
+				$objWindow->windowHeight(520);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
 				$objWindow->fullscreen(false);
 				$objWindow->loadContent("employees",$data,"employeeForm");
 				$objWindow->showWindow();
+
+				//communication_interface::jsExecute("$('#btnBankverbindung').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
+				communication_interface::jsExecute("$('#btnBankverbindung').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':38, 'bankId':39}); });");
 
 				communication_interface::jsExecute("prlVlDirty = false;");
 				communication_interface::jsExecute("prlVlDesignMode = false;");
@@ -243,7 +250,7 @@ class payroll_UI {
 					communication_interface::jsExecute('prlVlCreateForm('.$formDetail["data"][0]["FormElements"].');');
 				}
 				communication_interface::jsExecute("$('#prlVlTabContainer').height( $('#employeeForm .o').height() - $('#prlVlTabs .o').height() - 40 );");
-				communication_interface::jsExecute("$('#employeeForm .n').html('Mitarbeiterdaten bearbeiten (<span id=\"prlVlTitle\"></span>)');");
+				communication_interface::jsExecute("$('#employeeForm .n').html('".$title." (<span id=\"prlVlTitle\"></span>)');");
 			}
 
 
@@ -298,7 +305,7 @@ class payroll_UI {
 									foreach($employeeData["auxiliaryTables"][$row["fieldName"]] as $auxTblRow) {
 										$singleRowCollector = array();
 										foreach($arrFieldsOfInterest as $curAuxField) {
-											if(isset($arrDateFields[$curAuxField])) {
+											if(isset($arrDateFields[$curAuxField])) {											
 												$singleRowCollector[] = "'".$this->convertMySQL2Date($auxTblRow[$curAuxField])."'";
 											}else{
 												$singleRowCollector[] = "'".str_replace("'","\\'",$auxTblRow[$curAuxField])."'";
@@ -334,8 +341,8 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 			//wenn Form bereits geladen ist und nur die Daten geaendert werden sollen
 			break;
 		case 'payroll.prlVlSaveFormData':
-//			communication_interface::alert("1*** ".$functionParameters[0]["rid"]."/".json_encode($functionParameters[0]["data"])); //TODO: remove!
-//error_log("\n".print_r($functionParameters[0]["data"],true)."\n", 3, "/var/log/copronet-application.log");
+			$s = json_encode($functionParameters[0]["data"]);
+//			communication_interface::alert("1*** \nrid:".$functionParameters[0]["rid"]."\ndata:".str_replace(",", "\n", $s).""); //TODO: remove!
 			$ret = blFunctionCall('payroll.saveEmployeeDetail', $functionParameters[0]["rid"], $functionParameters[0]["data"]);
 			if($ret["success"]) {
 				communication_interface::jsExecute("$('#employeeForm').mb_close();");
@@ -367,15 +374,20 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 				communication_interface::jsExecute("prlPsoGrid.invalidate();");
 
 			}else{
+				$s = serialize($ret);
+				$s = str_replace("{", "<br/> {", $s);
+				$s = str_replace("s:", "<br/> s:", $s);
+				
 				$objWindow = new wgui_window("payroll", "infoBox");
 				$objWindow->windowTitle("Speichern fehlgeschlagen");
 				$objWindow->windowWidth(420);
 				$objWindow->windowHeight(180);
-				$objWindow->setContent("<br/>Die Daten konnten nicht gespeichert werden. (err: ".$ret["errCode"].")<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+				$objWindow->setContent("<br/>Die Daten konnten nicht gespeichert werden.<br/><br/>[err: ".$ret["errCode"]." ".$ret["errText"]."]<br/><br/><br/><div align='center'><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>OK</button></div><br/><br/>".$s."");
 				$objWindow->showAlert();
 				communication_interface::jsExecute("$('#employeeForm input').css('background-color','');");
 				communication_interface::jsExecute("$('#employeeForm select').css('background-color','');");
-				foreach($ret["fieldNames"] as $fieldName) communication_interface::jsExecute("$('#employeeForm #".$fieldName."').css('background-color','#f88');");
+//				foreach($ret["fieldNames"] as $fieldName) communication_interface::jsExecute("$('#employeeForm #".$fieldName."').css('background-color','#f88');");
+//				foreach($ret["tableRows"] as $fieldName) communication_interface::jsExecute("$('#employeeForm #".$fieldName."').css('background-color','#f88');");
 			}
 			break;
 		case 'payroll.prlVlSaveFormLayout':
@@ -429,9 +441,9 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 					break;
 				case 'layoutOv':
 					$objWindow = new wgui_window("payroll", "infoBox");
-					$objWindow->windowTitle($objWindow->getText("prlVlEditDlg1Title"));
+					$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten"));
 					$objWindow->windowWidth(500);
-					$objWindow->windowHeight(250);
+					$objWindow->windowHeight(220);
 
 					$formList = blFunctionCall('payroll.getEmployeeFormList');
 					if($formList["success"]) {
@@ -439,8 +451,10 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 					}else{
 						$data["layout_list"] = array();
 					}
+					$data["modus"] = "layoutbearbeiten";
 					$objWindow->loadContent("employees",$data,"employeeEditFormDlg1");
 					$objWindow->showInfo();
+					communication_interface::jsExecute('document.getElementById("btnBankverbindung").enabled=false;');
 					break;
 				case 'takeAction':
 					if(isset($functionParameters[0]["w"])) {
@@ -461,7 +475,7 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 								$data["globalChecked"] = "";
 							}
 							$objWindow = new wgui_window("payroll", "infoBox");
-							$objWindow->windowTitle($objWindow->getText("prlVlEditDlg2Title"));
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").".");
 							$objWindow->windowWidth(500);
 							$objWindow->windowHeight(225);
 							$objWindow->loadContent("employees",$data,"employeeEditFormDlg2");
@@ -488,7 +502,7 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 						case 'showEditor':
 							$data = array();
 							$objWindow = new wgui_window("payroll", "employeeForm");
-							$objWindow->windowTitle("Layout bearbeiten"); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").";"); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("employee-edit32.png");
 							$objWindow->windowWidth(820); //710
 							$objWindow->windowHeight(550); //470
@@ -1522,7 +1536,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
 				if($ret["success"]) $data["employeeFilter_list"] = $ret["data"];
 
-				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenDaten",array("arrZahlstellen"=>true));
+				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenDaten");
 				if($ret["success"]) $data["zahlstellen_list"] = $ret["data"];
 
 				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
@@ -1531,10 +1545,13 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				$PeriodeDieserMonat = blFunctionCall('payroll.auszahlen.getActualPeriodName');
 				$data["period"] = $PeriodeDieserMonat;
 								
-				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl');				
+				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl');
+				$uebermorgen = strtotime ( '+2 day' , strtotime ( date("d.m.Y") ) ) ;
+				//$data["valutaDatum"] = $uebermorgen;				
+				$data["valutaDatum"] = date ( 'd.m.Y' , $uebermorgen );				
 				$objWindow->windowTitle($objWindow->getText("txtAuszahlungErstellen").": ".$PeriodeDieserMonat);
 				$objWindow->windowIcon("auszahlen32.png");
-				$objWindow->windowWidth(680); 
+				$objWindow->windowWidth(700); 
 				$objWindow->windowHeight(405); 
 				$objWindow->modal(true);	
 				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
@@ -2459,7 +2476,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->windowTitle($objWindow->getText("prlUtlEfcTitle"));
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(850);
-				$objWindow->windowHeight(410);
+				$objWindow->windowHeight(420);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -2546,7 +2563,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->windowTitle($objWindow->getText("prlUtlEfcTitle"));
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(570);
-				$objWindow->windowHeight(340);
+				$objWindow->windowHeight(230);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -2607,8 +2624,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					break;
 				}
 //communication_interface::alert("restore... ".$functionParameters[0]["backup"]);
-//TODO: ACHTUNG nur fuer SRV2 gueltig!!!
-                
+//TODO: ACHTUNG nur fuer SRV2 gueltig!!!           
 				exec($aafwConfig["paths"]["utilities"]["mysql"]." --comments -u backup -p63i7E24ce ".$customerDbName." < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
 //TODO: ACHTUNG nur fuer SRV1 gueltig!!!
 //				exec($aafwConfig["paths"]["utilities"]["mysql"]." --comments -u backup -p63i7E24ce btest < ".$tmpBaseDir.$functionParameters[0]["backup"].".sql"); 
@@ -2836,14 +2852,14 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		case 'payroll.paymentSplit':
 			if(!isset($functionParameters[0]["action"])) $functionParameters[0]["action"] = "ovSplit";
 			
-//communication_interface::alert("payroll.paymentSplit:".$functionName." " + print_r($functionParameters[0],true) );
-
 			$payrollEmployeeID = isset($functionParameters[0]["empId"]) ? $functionParameters[0]["empId"] : 0;
+//communication_interface::alert("payroll.paymentSplit-->payrollEmployeeID:".$payrollEmployeeID."\n\npayroll.paymentSplit:".$functionName." " + print_r($functionParameters[0],true) );
 
 			switch($functionParameters[0]["action"]) {
 			case 'ovSplit':
 				$data["paymentSplitList"] = array();
 				$res = blFunctionCall('payroll.getPaymentSplitList', array("id"=>$payrollEmployeeID));
+				$employee = blFunctionCall('payroll.getEmployee', $payrollEmployeeID);
 				if($res["success"]) {
 					foreach($res["data"] as $row) {
 						switch($row["split_mode"]) {
@@ -2872,13 +2888,13 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 						$row["dest_bank_label"] = $row["dest_bank_label"]=="" ? "-- Standard --" : $row["dest_bank_label"];
 						$data["paymentSplitList"][] = $row;
 					}//end foreach
-//		communication_interface::alert(print_r($data["paymentSplitList"],true));
+//communication_interface::alert('ovSplit:'.print_r($data["paymentSplitList"],true));
 				} else {
 					if($res["errCode"] != 101) communication_interface::alert("Error Code ".$res["errCode"]);
 				}
 
 				$objWindow = new wgui_window("payroll", "GUI_paymentSplitOverview");
-				$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit"));
+				$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit")." - ".$employee["data"][0]["EmployeeNumber"]." ".$employee["data"][0]["Lastname"].", ".$employee["data"][0]["Firstname"]);
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(820);
 				$objWindow->windowHeight(350);
@@ -2904,11 +2920,14 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$data["bank_source_list"] = $res["dbview_payroll_bank_source"];
 				$data["bank_destination_list"] = $res["bankDestination"];
 
+				$employee = blFunctionCall('payroll.getEmployee', $payrollEmployeeID );
+				//TODO Harald $employee["data"][0]["Lastname"] ???
+
 				$objWindow = new wgui_window("payroll", "paymentSplitEdit");
-				$objWindow->windowTitle($objWindow->getText("txtZahlungssplitMutieren"));
+				$objWindow->windowTitle($objWindow->getText("txtZahlungssplitMutieren")." (".$payrollEmployeeID.")");
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(600);
-				$objWindow->windowHeight(300);
+				$objWindow->windowHeight(320);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -3027,9 +3046,9 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 //`urgency` varchar(1) NOT NULL,	-> wird noch nicht verwendet
 
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
-				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten"));
+				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten")." (".$payrollEmployeeID.")");
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(940);
+				$objWindow->windowWidth(945);
 				$objWindow->windowHeight(470);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
@@ -3591,6 +3610,9 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			break;
 		case 'DMY':
 		default:
+			if (!isset($fragments[2])) {
+				return "";
+			}
 			$newDateArr[0] = $fragments[2];
 			$newDateArr[1] = $fragments[1];
 			$newDateArr[2] = $fragments[0];

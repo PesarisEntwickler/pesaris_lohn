@@ -17,6 +17,7 @@ $textResourceMap["btnDiscard"] 		= "Entfernen";
 $textResourceMap["btnFortFahren"] 	= "Fortfahren";
 $textResourceMap["btnBack"] 		= "&lt;&lt; Zur&uuml;ck";
 $textResourceMap["btnNext"] 		= "Weiter &gt;&gt;";
+$textResourceMap["btnBankverbindung"] = "Bankverbindung";
 $textResourceMap["btnNeueBankverbindung"] = "Neue Bankverbindung &gt;";
 $textResourceMap["txtBestehendeBankverbindungen"] = "Bestehende Bankverbindungen";
 $textResourceMap["btnNeueZahlstelle"] = "Neue Zahlstelle &gt;";
@@ -46,6 +47,7 @@ $textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abges
 $textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
  
 /* ********* AUSZAHLEN *********** */
+$textResourceMap["txtZahlstellenDerMitarbeiter"] = "Zahlstellen benutzen, die den Mitarbeitern hinterlegt sind";
 $textResourceMap["txtAuszahlungErstellen"] = "Auszahlung erstellen";
 $textResourceMap["txtTitelAuszahlenHistory"] = "Auszahldaten";
 $textResourceMap["txtAuswahlPeriode"] = "Periodenwahl";
@@ -118,8 +120,9 @@ $textResourceMap["txtTableHeadersPaymentSplit"] =
 /*
 ********* EMPLOYEES ***********
 */
-$textResourceMap["prlPsoSettingsSaved"] = "Die Einstellungen wurden gespeichert.";
+$textResourceMap["txtMitarbeiterdatenBearbeiten"] = "Mitarbeiterdaten bearbeiten";
 $textResourceMap["prlPsoSettings"] = "Einstellungen";
+$textResourceMap["prlPsoSettingsSaved"] = "Die Einstellungen wurden gespeichert.";
 $textResourceMap["prlPsoBtnNew"] = "Neuer Mitarbeiter";
 $textResourceMap["prlPsoBtnDFilter"] = "Personalfilter auswaehlen";
 $textResourceMap["prlPsoBtnQFilter"] = "Tabellenfilter";
@@ -137,13 +140,11 @@ $textResourceMap["prlVlAlertCloseWnd_Title"] = "Fenster schliessen?";
 $textResourceMap["prlVlAlertCloseWnd_Msg"] = "Die Bearbeitungsmaske ist bereits geoeffnet. Um den Design-Modus zu aktivieren, muss das Fenster zuerst geschlossen werden. Ungespeicherte Daten gehen dabei verloren.<br/><br/>Soll die Maske geschlossen werden?";
 
 
-$textResourceMap["prlVlEditDlg1Title"] = "Layout bearbeiten";
 $textResourceMap["prlVlEditDlg1BtnNew"] = "Neues Layout erstellen";
 $textResourceMap["prlVlEditDlg1LgndExistingLayout"] = "Bestehende Layouts";
 $textResourceMap["prlVlEditDlg1LblLayout"] = "Layout:";
 $textResourceMap["prlVlEditDlg1OptChooseLayout"] = "-- Layout auswaehlen --";
 
-$textResourceMap["prlVlEditDlg2Title"] = "Layout bearbeiten";
 $textResourceMap["prlVlEditDlg2LblName"] = "Layout-Name:";
 $textResourceMap["prlVlEditDlg2LblTemporary"] = "temporaer (wird beim Logout geloescht)";
 $textResourceMap["prlVlEditDlg2LblGlobal"] = "allen Benutzern zugaenglich";

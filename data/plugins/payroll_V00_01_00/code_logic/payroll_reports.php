@@ -1161,31 +1161,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 		$noBankAccount = $this->alleMitarbeiterHabenEineIBAN();
 		if (strlen($noBankAccount) > 1) {
-			$s=	"Verarbeitung wird abgebrochen!" .CRLF.
-				"Folgende Personen haben kein Bankkonto" .CRLF.
-				"registriert (IBAN fehlt)".CRLF;
+			$s=	"Verarbeitung wird abgebrochen!" .CRLF.CRLF.
+				"Folgende Personen haben kein" .CRLF.
+				"Bankkonto registriert (IBAN fehlt)".CRLF;
 			communication_interface::alert($s.$noBankAccount);
 			return false;//Abbruch ganze Aktion (Keine Files erzeugen)
 		}
-
-
-		$system_database_manager = system_database_manager::getInstance();
-		$result_bank_source = $system_database_manager->executeQuery("" .
-				"SELECT * FROM  " .
-				"payroll_bank_source " .
-				"WHERE id = ".$ZahlstellenID.";");
-
-		$iban = str_replace(" ", "", $result_bank_source[0]["bank_source_IBAN"]);
 		
-		$bs1 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc1"] )));
-		$bs2 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc2"] )));
-		$bs3 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc3"] )));
-		$bs4 =  strtoupper($auszahlen->replaceUmlaute(htmlentities( $result_bank_source[0]["bank_source_desc4"] )));
-
-		//Die jetztige Periode ist
-		$periodeID = blFunctionCall('payroll.auszahlen.getActualPeriodID');
-		$PeriodeDieserMonat = blFunctionCall('payroll.auszahlen.getActualPeriodName');
-
+		if ($ZahlstellenID < 1) {
+			//Zahlstelle verwenden, die den Employees hinterlegt sind
+			communication_interface::alert("comming soon");
+			return false;//Abbruch 
+		}
 
 		$dtaPersKreisFileName = "";
 		//Einschaenkung mit dem Personenfilter
@@ -1194,31 +1181,57 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 			$dtaPersKreisFileName = "_p".str_replace(",", "p", $Personenkreis);
 			$emplFilter = $auszahlen->getEmployeeFilters($Personenkreis);
 		}
+
+		//Die jetztige Periode ist
+		$periodeID = blFunctionCall('payroll.auszahlen.getActualPeriodID');
+		$PeriodeDieserMonat = blFunctionCall('payroll.auszahlen.getActualPeriodName');
+		
+		
+		$bankSource = $auszahlen->getZahlstelle($ZahlstellenID);
+		$iban = str_replace(" ", "", $bankSource["IBAN"]);		
+		$ZahlstelleL1 =  strtoupper($auszahlen->replaceUmlaute( $bankSource["line1"] ));
+		$ZahlstelleL2 =  strtoupper($auszahlen->replaceUmlaute( $bankSource["line2"] ));
+		$ZahlstelleL3 =  strtoupper($auszahlen->replaceUmlaute( $bankSource["line3"] ));
+		$ZahlstelleL4 =  strtoupper($auszahlen->replaceUmlaute( $bankSource["line4"] ));
+		$companyID = $bankSource["company"];
+		$ZahlstelleKonto = $iban;
+		
+		$company = $auszahlen->getCompany($companyID);
+		$AuftraggeberFirmaL1 = $company["name"];//"Presida Testunternehmung";
+		$AuftraggeberFirmaL2 = $company["str"];//"Mitteldorfstrasse 37";
+		$AuftraggeberFirmaL3 = $company["zip"]." ".$company["city"];//"5033 Buchs";
 	
 		$dtaFileName = "";
 		$dtaJournalFileName = "";
+		$dtaRekapFileName = "";
 		//communication_interface::alert("Zahlstelle:".$ZahlstellenID." \nDTAFileName:".$dtaFileName."\nperiodeDieserMonat:".$PeriodeDieserMonat."\nPersonenkreis:".$Personenkreis);
 		if (strlen($iban) < 3) {
 			$dtaFileName = date("Y-m-d").$dtaPersKreisFileName.".dta";
-			$dtaJournalFileName = date("Y-m-d").$dtaPersKreisFileName."_dtaJournal.txt";
+			$dtaJournalFileName = date("Y-m-d").$dtaPersKreisFileName."_dtaJournal";
+			$dtaRekapFileName = date("Y-m-d").$dtaPersKreisFileName.".rekap";;
 		} else {
 			$dtaFileName = $iban.$dtaPersKreisFileName.".dta";
-			$dtaJournalFileName = $iban.$dtaPersKreisFileName."_dtaJournal.txt";
+			$dtaJournalFileName = $iban.$dtaPersKreisFileName."_dtaJournal";
+			$dtaRekapFileName = $iban.$dtaPersKreisFileName.".rekap";;
 		}
 
-
 		//DTA File schreiben
-		$emplwithPayment = $auszahlen->getMitarbeiterZurAuszahlung("8000", "amount <> 0", "isFullPayed <> 'Y'",$emplFilter);
+		$emplwithPayment = $auszahlen->getMitarbeiterZurAuszahlung("8000", "amount > 0.001", "isFullPayed <> 'Y'",$emplFilter);
 		if ($emplwithPayment['count'] < 1) {
 			communication_interface::alert("Keine Daten zur Auszahlung");
 			return 0;
 		}
-		$effectedEmployeeList = "";	
+		
+		$effectedEmployees = "";	
 		foreach ( $emplwithPayment['data'] as $row ){
-			$effectedEmployeeList .= ",".$row['payroll_employee_ID'];
+			$effectedEmployees .= ",".$row['payroll_employee_ID'];
 		}
-		$effectedEmployeeList = substr($effectedEmployeeList, 1);//erstes "," wegmachen
-		$employeeList = $auszahlen->getMitarbeiterAddress($effectedEmployeeList);
+		$effectedEmployees = substr($effectedEmployees, 1);//erstes "," wegmachen
+		//$employeeList = $auszahlen->getMitarbeiterAddress($effectedEmployees);
+		$employeeList = $auszahlen->getEmployeesCurrentPeriod("8000", $effectedEmployees);
+
+//communication_interface::alert("effectedEmployeeList:\n".$effectedEmployees);
+//communication_interface::alert("employeeList:".count($employeeList["data"]));
 
 		$dtaContent="";
 		$dtaJournal="";
@@ -1226,45 +1239,38 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$SeitenNr = 1;
 		$SeitenTotal = 0;
 		$GesamtTotal = 0;
-		$AuftraggeberFirmaL1 = "Presida Testunternehmung";
-		$AuftraggeberFirmaL2 = "Mitteldorfstrasse 37";
-		$AuftraggeberFirmaL3 = "5033 Buchs";
-		$ZahlstelleL1 = $bs1." (".$ZahlstellenID.")";//"CREDIT SUISSE (4)";
-		$ZahlstelleL2 = $bs2;//"Paradeplatz 8";
-		$ZahlstelleL3 = $bs3;//"Postfach";
-		$ZahlstelleL4 = $bs4;//"8070 Zürich";
-		$ZahlstelleKonto = $iban;
-//			$dtaFile.="\n01  IBAN:$iban \n";
-//			$dtaFile.="\n02  PERS:$emplFilter \n";
-//			foreach ( $emplwithPayment['data'] as $row ) {     
-		foreach ( $employeeList['data'] as $row ) {     
+  		$RealEffectedEmployees = "";
+		foreach ( $employeeList as $row ) {     
 			$employee_ID = $row['id'];
-			$amountDTA = $auszahlen->getEmployeesCurrentPeriodAmount("8000", $employee_ID);
-			$amountDTAJournal = str_replace(",", ".", $amountDTA);
+			$RealEffectedEmployees .= ",".$employee_ID;
+			$employeeNumber = $row['EmployeeNumber'];
+			$amountDTA = number_format($row["amount"], 2, ',', "");
+			$amountDTAJournal = $row["amount"];//number_format($row["amount"], 2, '.', "'");
+			//communication_interface::alert("amountDTA:".$amountDTA."\namountDTAJournal:".$amountDTAJournal);
+			//$amountDTAJournal = str_replace(",", ".", $amountDTA);
 			$bene = $auszahlen->getBeneficiaryAddress($employee_ID);
-			$bn1 = trim($bene[0]['beneAddress1']);
-			$bn2 = trim($bene[0]['beneAddress2']);
-			$bn3 = trim($bene[0]['beneAddress3']);
-			$bn4 = trim($bene[0]['beneAddress4']);
+			$bn1 = trim($bene['beneAddress1']);
+			$bn2 = trim($bene['beneAddress2']);
+			$bn3 = trim($bene['beneAddress3']);
+			$bn4 = trim($bene['beneAddress4']);
 			if (strlen($bn1) < 3) {
 				$bn1 = trim($row['Firstname']). " " . trim($row['Lastname']);
 				$bn2 = trim($row['Street']);
 				$bn3 = trim($row['AdditionalAddrLine1']). " " . trim($row['AdditionalAddrLine2']);
 				$bn4 = trim($row['ZIP-Code']). " " . trim($row['City']);
 			}
-			$bn1 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn1 )));
-			$bn2 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn2 )));
-			$bn3 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn3 )));
-			$bn4 = strtoupper($auszahlen->replaceUmlaute(htmlentities( $bn4 )));
-			$benIBAN = str_replace(" ", "", $bene[0]['bank_account']);
-			$beneBank1 = strtoupper($auszahlen->replaceUmlaute(htmlentities($bene[0]['beneBank1'])));
-			$beneBank2 = strtoupper($auszahlen->replaceUmlaute(htmlentities(trim($bene[0]['beneBank2']))." ".htmlentities(trim($bene[0]['beneBank3']))));
-			$beneBank3 = strtoupper($auszahlen->replaceUmlaute(htmlentities($bene[0]['beneBank4'])));
+			$bn1 = $auszahlen->replaceUmlaute( $bn1 );
+			$bn2 = $auszahlen->replaceUmlaute( $bn2 );
+			$bn3 = $auszahlen->replaceUmlaute( $bn3 );
+			$bn4 = $auszahlen->replaceUmlaute( $bn4 );
+			$benIBAN = str_replace(" ", "", $bene['bank_account']);
+			$beneBank1 = $auszahlen->replaceUmlaute( $bene['beneBank1'] );
+			$beneBank2 = $auszahlen->replaceUmlaute( trim($bene['beneBank2'])." ".trim($bene['beneBank3']) );
+			$beneBank3 = $auszahlen->replaceUmlaute( $bene['beneBank4'] );
 			if (strlen($beneBank1) < 3) {
-				$beneBank1 = trim($auszahlen->replaceUmlaute(htmlentities($bene[0]['beneBankDescription'])));
+				$beneBank1 = trim($auszahlen->replaceUmlaute($bene['beneBankDescription']));
 			}
 			$trxnr++;
-			$effectedEmployeeList .= ",".$employee_ID;
 			$dtaHeader51stellen = "000000".str_pad(" ", 12)
 				."00000"
 				.date("ymd")
@@ -1283,10 +1289,10 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 					.str_pad(" ",14)
 				, 0, 128);						
 			$dtaContent.= CRLF.substr("02"
-					.str_pad($bs1, 20)
-					.str_pad($bs2, 20)
-					.str_pad($bs3, 20)
-					.str_pad($bs4, 20)
+					.str_pad($ZahlstelleL1, 20)
+					.str_pad($ZahlstelleL2, 20)
+					.str_pad($ZahlstelleL3, 20)
+					.str_pad($ZahlstelleL4, 20)
 					.str_pad(" ",46)
 				, 0, 128);						
 			$dtaContent.= CRLF.substr("03"
@@ -1310,23 +1316,26 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 			if ($trxnr == 1) {
 				$dtaJournal .= $this->setDTAJournalHeader($PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto);
 			}	
-			$X = 12; $Y = 16;				
-			if ($trxnr == $X || ($trxnr-$X) % $Y == 0) {//zuerst nach X, dann alle Y
+			$anzZeilenSeite01 = 24; $anzZeilenSeiteFF = 27;			
+			if ($trxnr == $anzZeilenSeite01 || ($trxnr-$anzZeilenSeite01) % $anzZeilenSeiteFF == 0) {//zuerst nach X, dann alle Y
 				$SeitenNr++;
-				$dtaJournal .= $this->setDTAJournalFollowHeader($SeitenNr, $SeitenTotal, $AuftraggeberFirmaL1, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL3, $ZahlstelleKonto);
+				$dtaJournal .= $this->setDTAJournalSeitenTotal($SeitenTotal);
+				$dtaJournal .= $this->setDTAJournalFollowHeader($SeitenNr, $AuftraggeberFirmaL1, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL3, $ZahlstelleKonto);
 				$SeitenTotal = 0;
 			}
-			$dtaJournal .= $this->setDTAJournalZeile($trxnr, $bn1, $bn2." ".$bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $amountDTAJournal);
-		}
+			$dtaJournal .= $this->setDTAJournalZeile($trxnr, $employeeNumber, $bn1, $bn2." ".$bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $amountDTAJournal);
+		}//end foreach
+
+//communication_interface::alert("RealEffectedEmployees IDs:\n".$RealEffectedEmployees."\n");
 		
 		//Abhaken Mitarbeiter mit Lohnbezug
 		$emplwithPayment = $trxnr;
 		if ($emplwithPayment > 0) {
-			$auszahlen->updatePeriodenAuszahlFlag($periodeID, substr($effectedEmployeeList, 1), "Y");//Liste ohne erstes Komma
+			$auszahlen->updatePeriodenAuszahlFlag($periodeID, substr($effectedEmployees, 1), "Y");//Liste ohne erstes Komma
 		} 
 
 		//Abhaken Mitarbeiter mit 0 Lohn
-		$emplwithoutPaymentList = $auszahlen->getMitarbeiterZurAuszahlung("8000", "amount = 0.0", "isFullPayed <> 'Y'",$emplFilter);
+		$emplwithoutPaymentList = $auszahlen->getMitarbeiterZurAuszahlung("8000", "amount < 0.001", "isFullPayed <> 'Y'",$emplFilter);
 		$emplwithoutPayment = $emplwithoutPaymentList["count"];
 		$effectedNoPaymentEmployeeList = "";
 		if ($emplwithoutPayment > 0) {
@@ -1335,22 +1344,60 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 			}
 			$effectedNoPaymentEmployeeList = substr($effectedNoPaymentEmployeeList, 1);
 			$auszahlen->updatePeriodenAuszahlFlag($periodeID, $effectedNoPaymentEmployeeList, "0");//Liste ohne erstes Komma
-		}
-		
-		$dtaJournal .= $this->setDTAJournalRekap($SeitenNr, $SeitenTotal, $GesamtTotal, strtoupper($PeriodeDieserMonat), $trxnr, $Personenkreis, $dtaFileName, $emplFilter, $emplwithPayment, $effectedNoPaymentEmployeeList, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto);
+		}		
+		$dtaJournal .= $this->setDTAJournalSeitenTotal($SeitenTotal);
+		$dtaRekap    = $this->setDTAJournalRekap($SeitenNr, $GesamtTotal, strtoupper($PeriodeDieserMonat), $trxnr, $Personenkreis, $dtaFileName, $emplFilter, $emplwithPayment, $effectedNoPaymentEmployeeList, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto);
+		$dtaJournal .= $dtaRekap;
 
+		
 		//Files speichern
 		$fm = new file_manager();
+		//$fullPath0 =  $fm->getFullPath();
 		$fm->customerSpace()->setPath("/".AUSZAHLDIR)->makeDir();   
 		$fm->customerSpace()->setPath("/".AUSZAHLDIR."/".$PeriodeDieserMonat);  
-		$fm->customerSpace()->setPath("/".AUSZAHLDIR."/".$PeriodeDieserMonat)->makeDir();  
+		$fm->customerSpace()->setPath("/".AUSZAHLDIR."/".$PeriodeDieserMonat)->makeDir(); 
+		$fullPath =  $fm->getFullPath();
 		$fm->setFile($dtaFileName); 
 		$fm->putContents($dtaContent); 
 		$anzFiles++;
-		$fm->setFile($dtaJournalFileName); 
-		$fm->putContents($dtaJournal); 
-		$anzFiles++;
+//		$fm->setFile($dtaJournalFileName.".txt"); 
+//		$fm->putContents($dtaJournal); 
+//		$anzFiles++;
+		$fm->setFile($dtaRekapFileName); 
+		$fm->putContents($dtaRekap); 
+		
+		$c = "";
+		$rekap = "";
+		$filelist = $fm->listDir(0);  
+		foreach($filelist as $row) {
+			if(strtolower(substr($row,-6))==".rekap") {
+				//communication_interface::alert("REKAP:\n".$row);
+				$c = $fm->getContents($row); 
+				$rekap = $rekap .CRLF. $c;
+				$c = "";
+				$row = "";
+			} 
+		}
+		//communication_interface::alert("REKAP:\n".p);
+//		$fm->setFile("REKAP.txt"); 
+//		$fm->putContents($rekap);//füllen 
 		$fm->fclose(); 
+		
+		require_once('/web/fpdf17/fpdf.php');
+		$pdf = new FPDF('P','mm','A4');
+		$pdf->AddPage();
+		$pdf->SetFont('Courier','',9);
+		$pdf->MultiCell( 188, 3, $dtaJournal , 0, 'L', 0); 
+		$pdf->Output($fullPath.$dtaJournalFileName.'.pdf', 'F');
+		$anzFiles++;
+
+		$pdf = new FPDF('P','mm','A4');
+		$pdf->AddPage();
+		$pdf->SetFont('Courier','',9);
+		$pdf->MultiCell( 188, 3, $rekap , 0, 'L', 0); 
+		$pdf->Output($fullPath.'REKAP.pdf', 'F');
+		$anzFiles++;
+		
 		system("chmod 666 *");
 		
 
@@ -1373,11 +1420,11 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$system_database_manager = system_database_manager::getInstance();
 		$result_dest_emp = $system_database_manager->executeQuery("				
 					SELECT * FROM
-					  payroll_bank_destination AS D
-					, payroll_employee AS E
-					WHERE	D.payroll_employee_ID = E.EmployeeNumber
-					AND		D.destination_type <> 3	
-					AND		D.bank_account = '' 
+					  payroll_bank_destination
+					, payroll_employee
+					WHERE	payroll_bank_destination.payroll_employee_ID = payroll_employee.id
+					AND		payroll_bank_destination.destination_type <> 3	
+					AND		payroll_bank_destination.bank_account = '' 
 					;");
 		$c = "";	 				
 		foreach ( $result_dest_emp as $row ) {
@@ -1417,23 +1464,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 				  .str_pad(substr("Ab Konto:", 0, $end_h3-1), $end_h3).trim($ZahlstelleKonto);
 		$h .= CRLF.str_pad("",$tab1_h1).str_pad(substr($ZahlstelleL4, 0, $tab3_h1-1), $tab3_h1);
 		$h .= CRLF.str_pad("F-NR.", $tab1_h3)
-				  .str_pad("ADRESSE EMPFAENGER", $tab2_h3)
+				  .str_pad("P-NR.  EMPFAENGER/BEGUENSTIGTER", $tab2_h3)
 				  .str_pad("IBAN NUMMER", $tab3_h3)
 				  .str_pad("BETRAG", $end_h3, " ", STR_PAD_LEFT);
-		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3+$tab3_h3+$end_h3, "-");
-		
+		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3+$tab3_h3+$end_h3, "-");		
 		return $h;
 	}
-	function setDTAJournalFollowHeader($SeitenNr, $SeitenTotal, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleKonto) {
+	
+	function setDTAJournalFollowHeader($SeitenNr, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleKonto) {
 		$tab1_h1 = 35;$tab2_h1 = 20;$end_h1 = 40;
 		$tab1_h2 = 35;$tab2_h2 = 20;$tab3_h2 = 31;$tab4_h2 = 6;$end_h2 = 3;
 		$tab1_h3 =  7;$tab2_h3 = 53;$tab3_h3 = 20;$end_h3 = 15;
-		
-		$h  = CRLF.str_pad(" ", $tab1_h3)
-				  .str_pad(" ", $tab2_h3)
-				  .str_pad("SEITENTOTAL", $tab3_h3)
-				  .str_pad(sprintf("%9.2f", $SeitenTotal), $end_h3, " ", STR_PAD_LEFT);
-		$h .= CRLF."\f".CRLF;
+		$h = "";
 		$h .= CRLF.str_pad(substr($AuftraggeberFirmaL1, 0, $tab1_h1-1), $tab1_h1)
 				  .str_pad(substr($ZahlstelleL1, 0, $tab2_h1-1), $tab2_h1)
 				  .str_pad(date("d.m.Y/H:i"), $end_h1, " ", STR_PAD_LEFT);
@@ -1444,42 +1486,47 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 				  .str_pad($SeitenNr, $end_h2, " ", STR_PAD_LEFT);
 		$h .= CRLF;
 		$h .= CRLF.str_pad("F-NR.", $tab1_h3)
-				  .str_pad("ADRESSE EMPFAENGER", $tab2_h3)
+				  .str_pad("P-NR.  EMPFAENGER/BEGUENSTIGTER", $tab2_h3)
 				  .str_pad("IBAN NUMMER", $tab3_h3)
 				  .str_pad("BETRAG", $end_h3, " ", STR_PAD_LEFT);
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3+$tab3_h3+$end_h3, "-");
 		
 		return $h;
 	}
-	function setDTAJournalRekap($SeitenNr, $SeitenTotal, $GesamtTotal, $PeriodeDieserMonat, $trxnr, $Personenkreis, $dtaFileName, $emplFilter, $emplwithPayment, $effectedNoPaymentEmployeeList, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto) {
-		$tab1_h1 = 35;$tab2_h1 = 20;$end_h1 = 40;
-		$tab1_h2 = 35;$tab2_h2 = 20;$tab3_h2 = 31;$tab4_h2 = 6;$end_h2 = 3;
+	function setDTAJournalSeitenTotal($SeitenTotal) {
 		$tab1_h3 =  7;$tab2_h3 = 53;$tab3_h3 = 20;$end_h3 = 15;
-		
 		$h  = CRLF.str_pad(" ", $tab1_h3)
 				  .str_pad(" ", $tab2_h3)
 				  .str_pad("SEITENTOTAL", $tab3_h3)
-				  .str_pad(sprintf("%01.2f", $SeitenTotal), $end_h3, " ", STR_PAD_LEFT);
+				  .str_pad(number_format($SeitenTotal, 2, '.', "'"), $end_h3, " ", STR_PAD_LEFT);
 		$h .= CRLF;
+		$h .= CRLF."\f".CRLF;
 		$h .= CRLF;
-		$h .= CRLF;
+		return $h;
+	}
+	function setDTAJournalRekap($SeitenNr, $GesamtTotal, $PeriodeDieserMonat, $trxnr, $Personenkreis, $dtaFileName, $emplFilter, $emplwithPayment, $effectedNoPaymentEmployeeList, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto) {
+		$tab1_h1 = 35;$tab2_h1 = 20;$end_h1 = 40;
+		$tab1_h2 = 35;$tab2_h2 = 20;$tab3_h2 = 31;$tab4_h2 = 6;$end_h2 = 3;
+		$tab1_h3 =  7;$tab2_h3 = 53;$tab3_h3 = 20;$end_h3 = 15;
+		$h  = "";
+		$h .= CRLF."REKAP DTA-JOURNAL ".strtoupper($PeriodeDieserMonat)." ".$dtaFileName;
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3+$tab3_h3+$end_h3, "-");
-		$h .= CRLF.str_pad("REKAP DTA-Journal ".$PeriodeDieserMonat, $tab1_h3+$tab2_h3)
-				  .str_pad("GESAMTTOTAL", $tab3_h3)
-				  .str_pad(sprintf("%9.2f", $GesamtTotal), $end_h3, " ", STR_PAD_LEFT);
-		$h .= CRLF;
 		$h .= CRLF;
 		$h .= CRLF.str_pad(" ", $tab1_h3)
 				  .str_pad("Zahlstelle",$tab2_h3).$ZahlstelleKonto;
+		$h .= CRLF;
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3).$ZahlstelleL1;
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3).$ZahlstelleL2;
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3).$ZahlstelleL3;
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3).$ZahlstelleL4;
+		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3)
+				  .str_pad("GESAMTTOTAL", $tab3_h3)
+				  .str_pad(number_format($GesamtTotal, 2, '.', "'") , $end_h3, " ", STR_PAD_LEFT);
 		$h .= CRLF;
 		$h .= CRLF.str_pad(" ", $tab1_h3)
 				  .str_pad("DTA-Datei", $tab2_h3).$dtaFileName;
 		$h .= CRLF.str_pad(" ", $tab1_h3)
-				  .str_pad("", $tab2_h3).$PeriodeDieserMonat;
+				  .str_pad("Auszahlperiode", $tab2_h3).$PeriodeDieserMonat;
 		$h .= CRLF.str_pad(" ", $tab1_h3)
 				  .str_pad("Transaktionen", $tab2_h3).$trxnr;
 		if ($Personenkreis != "*"){
@@ -1505,29 +1552,30 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 				foreach ( $result_employeesNoPayment as $row ){
 					 $h .= CRLF
 					    .str_pad("", $tab1_h3)
-					    ."keine Zahlung "
+					    ."keine Zahlung:  "
 						.str_pad($row['EmployeeNumber'], 6,"0", STR_PAD_LEFT)
-						." ".strtoupper($auszahlen->replaceUmlaute(htmlentities($row['Firstname']." ".$row['Lastname'].", ".$row['City'])));
+						." ".$auszahlen->replaceUmlaute($row['Firstname']." ".$row['Lastname'].", ".$row['City']);
 				}
 		}
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3+$tab3_h3+$end_h3, "-");
+		$h .= CRLF;
 		
 		return $h;
 	}	
-	function setDTAJournalZeile($trxNr, $ben1, $ben2, $ben3, $benIBAN, $benBank1, $benBank2, $benBank3, $betrag) {
+	function setDTAJournalZeile($trxNr, $employeeNumber, $ben1, $ben2, $ben3, $benIBAN, $benBank1, $benBank2, $benBank3, $betrag) {
 		$tab1_z1 =  7;$tab2_z1 = 33;$tab3_z1 = 20;
 		$tab1_z2 = 20;$tab2_z2 = 24;$tab3_z2 = 16;$tab4_z2 = 20;$end_z2 =  15;
 		$l  = "";
 		$l .= CRLF.str_pad(str_pad($trxNr,$tab1_z1-2,"0", STR_PAD_LEFT),$tab1_z1)
-				  .str_pad($ben1, $tab2_z1)
-				  .str_pad($ben2, $tab3_z1)
+				  .str_pad(substr( str_pad($employeeNumber,6,"0",STR_PAD_LEFT) ." ".$ben1, 0, $tab2_z1-1), $tab2_z1)  
+				  .str_pad(substr($ben2, 0, $tab3_z1-1), $tab3_z1)
 				  .$ben3;
 		$l .= CRLF.substr(
 				   str_pad(substr(trim($benBank1), 0, $tab1_z2-1), $tab1_z2)
 				  .str_pad(substr(trim($benBank2), 0, $tab2_z2-1), $tab2_z2)
 				  .str_pad(substr(trim($benBank3), 0, $tab3_z2-1), $tab3_z2)
 				  .str_pad($benIBAN, $tab4_z2), 0, $tab1_z2+$tab2_z2+$tab3_z2+$tab4_z2);
-		$l .=      str_pad($betrag, $end_z2, " ", STR_PAD_LEFT);
+		$l .=      str_pad(number_format($betrag, 2, '.', "'"), $end_z2, " ", STR_PAD_LEFT);
 		$l .= CRLF.str_pad("----", $tab1_z2+$tab2_z2+$tab3_z2+$tab4_z2+$end_z2, "-");
 		return $l;
 	}

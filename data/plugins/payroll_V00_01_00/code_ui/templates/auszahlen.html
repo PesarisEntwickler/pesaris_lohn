@@ -40,6 +40,25 @@
 
 
 <wgui:block name="wguiBlockAuszahlenGenerateWindow">
+	<link rel="stylesheet" href="web/js/jquery-ui-1.8.7.custom/development-bundle/themes/redmond/jquery.ui.all.css">
+	<link rel="stylesheet" href="web/js/jquery-ui-1.8.7.custom/development-bundle/themes/redmond/jquery-ui-1.8.7.custom.css" type="text/css" />
+   	<script src="web/js/jquery/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="web/js/jquery-ui-1.8.7.custom/development-bundle/ui/jquery-ui-1.8.7.custom.js"></script>
+	<script type="text/javascript" src="web/js/jquery-ui-1.8.7.custom/development-bundle/ui/i18n/jquery.ui.datepicker-de.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			$('#datepicker').datepicker({
+				inline: true,
+				disabled: false,
+				showOn: 'focus',
+				showWeek: true,
+				weekHeader: 'W',
+				showAnim: 'blind',
+				dateFormat: 'dd.mm.yy',
+				altFormat: 'dd.mm.yy'
+			});
+		});
+	</script>
 	<br/>
 	<div class="ui-tabs ui-widget-content ui-corner-all">
  	<table>
@@ -49,10 +68,12 @@
 					<legend>
 						<wgui:text id="txtZahlstelleAuswaehlen"/>
 					</legend>
-					<select id="sel_prl_auszahlen_zahlstellen" name="sel_prl_auszahlen_zahlstellen" style="width:100%;margin-bottom:4px;" size="4" > 
+					<select id="sel_prl_auszahlen_zahlstellen" name="sel_prl_auszahlen_zahlstellen" style="width:100%;margin-bottom:4px;" size="4" >
+							<option value="0">[z0] &nbsp;- <wgui:text id="txtZahlstellenDerMitarbeiter"/> -</option>
 						<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
-							<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="id"/>">
-								[z<wgui:loopvar loopname="zahlstellenLoop" varname="id"/>]&nbsp;
+							<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>">
+							  [z<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>]&nbsp;
+								<wgui:loopvar loopname="zahlstellenLoop" varname="company_shortname"/> - 
 								<wgui:loopvar loopname="zahlstellenLoop" varname="type_short"/>,
 								<wgui:loopvar loopname="zahlstellenLoop" varname="bank_source_currency_code"/>,
 								<wgui:loopvar loopname="zahlstellenLoop" varname="bank_source_IBAN"/>,
@@ -72,12 +93,12 @@
 			 	<table style="width: 100%; padding: 0; margin: 0;">
 			 		<tr>
 			 			<td><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</td>
-			 			<td style="width: 40px" align="center">
+			 			<td style="width: 40px" align="right">
 			 				<input type="radio" 
 			 					  	name="chk_payroll_auszahlen" 
 			 					  	id="chk_payroll_auszahlen_allepersonen" 
 			 					  	value="1" 
-			 					  	checked="checked" /></td>
+			 					  	checked="checked" />&nbsp;&nbsp;</td>
 			 		</tr>
 			 		<tr>
 			 			<td><wgui:text id="prlPsoDFltAllEmployeesToPay"/>:</td>
@@ -87,6 +108,17 @@
 			 						name='nbzMA' 
 			 						value='<wgui:var name="nochNichtAusbezahlteMA"/>' 
 			 					    style='width: 40px; font-weight: bold; text-align:center; border-style: hidden;'/>
+			 			</td>
+			 		</tr>
+			 		<tr>
+			 			<td><wgui:text id="prlPayout_interest_date"/>:</td>
+			 			<td align="right">
+			 				<input type='text' 
+			 						id='datepicker' 
+			 						name='datepicker'
+			 						size='10' 
+			 						value='<wgui:var name="valutaDatum"/>' 
+			 					    style='width: 80px; font-weight: bold; text-align:center;'/>
 			 			</td>
 			 		</tr>
 			 	</table>			 	

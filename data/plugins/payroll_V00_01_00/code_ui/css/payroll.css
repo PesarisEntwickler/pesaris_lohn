@@ -792,10 +792,10 @@ label[for=prlAccEtr_filter_mode], label[for=prlAccEtr_payroll_company_ID] {
 	margin-left:125px;
 	margin-right:10px;
 }
-#prlUtlEfcSave,#prlUtlEfcCancel {
+#prlUtlEfcCancel {
 	float:left;
 }
-#prlUtlEfcNew {
+#prlUtlEfcSave,#prlUtlEfcNew {
 	float:right;
 }
 #prlUtlEfcEdtFieldName, #prlUtlEfcEdtComparativeValues, #prlUtlEfcEdtSelect {
@@ -1394,8 +1394,9 @@ ul.prlPrdSetDate {
 	margin-right: 8px;
 }
 .PesarisButton {
+	height: 20px;
 	width: 100px;
-	margin: 8px 8px 8px 0;
+	margin: 4px 8px 0 0;
 }
 .PesarisWGUI {
 	overflow-y:auto;

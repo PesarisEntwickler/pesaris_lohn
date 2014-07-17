@@ -42,7 +42,7 @@ function prlAuszahlenGenerateWindowInit() {
 	  .click(function () {
 		document.getElementById('chk_payroll_auszahlen_personengruppen').checked = true;
 		document.getElementById('chk_payroll_auszahlen_allepersonen').checked = false;
-	  });
+	  });	
 }
 
 

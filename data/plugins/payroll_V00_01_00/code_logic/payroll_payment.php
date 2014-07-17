@@ -307,8 +307,7 @@ class payroll_BL_payment {
 					"beneficiary2_line4"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary2_line5"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"notice_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"notice_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"notice_line3"=>array("regex"=>".{0,32}","addQuotes"=>true)
+					"notice_line2"=>array("regex"=>".{0,32}","addQuotes"=>true)
 				);
 		$errFields = array();
 		switch($param["destination_type"]) {
@@ -321,7 +320,7 @@ class payroll_BL_payment {
 			$arrClearFields = array("bank_clearing","bank_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3");
 			break;
 		case 3: //Bar
-			$arrClearFields = array("bank_clearing","bank_account","postfinance_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","expense","beneficiary1_line1","beneficiary1_line2","beneficiary1_line3","beneficiary1_line4","beneficiary2_line1","beneficiary2_line2","beneficiary2_line3","beneficiary2_line4","beneficiary2_line5","notice_line1","notice_line2","notice_line3");
+			$arrClearFields = array("bank_clearing","bank_account","postfinance_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","expense","beneficiary1_line1","beneficiary1_line2","beneficiary1_line3","beneficiary1_line4","beneficiary2_line1","beneficiary2_line2","beneficiary2_line3","beneficiary2_line4","beneficiary2_line5","notice_line1","notice_line2");
 			break;
 		}
 		foreach($arrClearFields as $fldName) $param[$fldName]="";
