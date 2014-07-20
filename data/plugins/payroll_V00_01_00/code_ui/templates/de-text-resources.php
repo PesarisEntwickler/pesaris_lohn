@@ -75,7 +75,7 @@ $textResourceMap["txtBankverbindungAuswaehlenTitel"] = "Bankverbindung ausw&auml
 $textResourceMap["txtBankverbindungBearbeiten"] = "Bankverbindung bearbeiten";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
 $textResourceMap["txtBankverbindungAuswaehlen"] = "Bankverbindung ausw&auml;hlen";
-
+$textResourceMap["txtZahlstelleLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Zahlstelle l&ouml;schen wollen?";
 $textResourceMap["txtDestinationBankLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Bankverbindung l&ouml;schen wollen?";
 $textResourceMap["txtZahlSplittLoeschenSicher"] = "Sind Sie sicher, dass Sie den gew&auml;hlten Auszahlungssplit l&ouml;schen wollen?";
 $textResourceMap["txtZahlstelle"] = "Zahlstelle";
@@ -98,6 +98,27 @@ $textResourceMap["txtZahlstelleBez2"] = "Kontoinhaber Zeile 2";
 $textResourceMap["txtZahlstelleBez3"] = "Kontoinhaber Zeile 3";
 $textResourceMap["txtZahlstelleBez4"] = "Kontoinhaber Zeile 4";
 
+$textResourceMap["txtAuszahlungstyp"] = "Auszahlungstyp";
+$textResourceMap["txtSwiftAdr"] = "SWIFT-Adr. der Bank";
+$textResourceMap["txtBankLabel"] = "Bank";
+$textResourceMap["txtBankName"] = "Bankname";
+$textResourceMap["txtName"] = "Name";
+$textResourceMap["txtKonto"] = "Konto (IBAN)";
+$textResourceMap["txtPostcheckkonto"] = "Postcheckkonto";
+$textResourceMap["txtSpesenregelung"] = "Spesenregelung";
+$textResourceMap["txtSpesenregelungKeine"] = "keine Regelung";
+$textResourceMap["txtSpesenregelungzlAuftraggeber"] = "zu Lasten Auftraggeber";
+$textResourceMap["txtSpesenregelungzlBeguenstigter"] = "zu Lasten Beg&uuml;nstigter";
+$textResourceMap["txtSpesenregelungTeilung"] = "Spesen-Teilung";
+
+$textResourceMap["txtAdressZusatz"] = "Adresszusatz";
+$textResourceMap["txtAdresse"] = "Adresse";
+$textResourceMap["txtPlzOrt"] = "PLZ / Ort";
+$textResourceMap["txtLand"] = "Land";
+$textResourceMap["txtZeile"] = "Zeile";
+$textResourceMap["txtBeguenstigter"] = "Beg&uuml;nstigter";
+$textResourceMap["txtEndBeguenstigter"] = "Endbeg&uuml;nstigter";
+$textResourceMap["txtMitteilung"] = "Mitteilung";
 $textResourceMap["txtAllgemein"] = "Allgemein";
 $textResourceMap["txtBezeichnung"] = "Bezeichnung";
 
