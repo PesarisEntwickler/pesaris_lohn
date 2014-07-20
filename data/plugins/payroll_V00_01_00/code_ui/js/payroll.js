@@ -24,15 +24,16 @@ function prlAuszahlenGenerateWindowInit() {
 	});  
 	$('#btnAuszahlenGenerateFiles').bind('click', function() {
 	    var str = "";
+	    var dat = document.getElementById('datepicker').value ;
 	    if (document.getElementById('chk_payroll_auszahlen_allepersonen').checked) {
-	    	str = "ALL_EMPLOYEES";
+	    	str += "ALL_EMPLOYEES";
 	    } else {
-	    	str = "SELECTED_EMPL";
+	    	str += "SELECTED_EMPL";
 	    }
 	    $( "select option:selected" ).each(function() {
 	      str += "##" + $( this ).text();
 	    });
-		cb('payroll.auszahlen.GenerateFiles', str );
+		cb('payroll.auszahlen.GenerateFiles', str, dat );
 	});
 	$( "#sel_prl_auszahlen_zahlstellen" )
 	  .click(function () {

@@ -103,7 +103,7 @@ class auszahlen {
 		
 	}
 
-	public function updatePeriodenAuszahlFlag($periodID, $MAlist, $flag) {
+	public function updatePeriodenAuszahlFlag($periodID, $sqlIN, $MAlist, $flag) {
 		if (substr($MAlist, 0, 1)==",") {
 			$MAlist = substr($MAlist, 1);
 		}
@@ -114,7 +114,7 @@ class auszahlen {
 				UPDATE payroll_period_employee 
 				SET    isFullPayed='".$flag."' 
 				WHERE  payroll_period_ID=".$periodID." 			
-				AND    payroll_employee_ID IN (".$MAlist.")
+				AND    payroll_employee_ID ".$sqlIN." (".$MAlist.")
 				;"
 				;
 		$system_database_manager = system_database_manager::getInstance();
@@ -154,19 +154,6 @@ class auszahlen {
 		return count($filelist);
 	}
 
-	public function getAuszahlMitarbeiteranzahl() {
-		$employeeList = $this->getMitarbeiterZurAuszahlung("8000", "amount > 0.001", "isFullPayed <> 'Y'","");
-		$effectedEmployeeList = "";
-		if ($employeeList["count"]>0) {
-			foreach ( $employeeList['data'] as $row ){
-				$effectedEmployeeList .= ",".$row['payroll_employee_ID'];
-			}
-			$effectedEmployeeList = substr($effectedEmployeeList, 1);//erstes "," wegmachen
-			$employeeList = $this->getMitarbeiterAddress($effectedEmployeeList);			
-		}	
-		return $employeeList['count'];
-	}
-	
 	public function getMitarbeiterAddress($employeeIDList) {
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery(
@@ -187,26 +174,21 @@ class auszahlen {
 		return $retval;
 	}
 
+	public function getAuszahlMitarbeiteranzahl() {
+		$employeeList = $this->getMitarbeiterZurAuszahlung("8000", "amount > 0.001", "isFullPayed <> 'Y'","");
+		$effArr = array();
+		$auszahlMitarbeiteranzahl = 0;
+		if ($employeeList["count"]>0) {
+			foreach ( $employeeList['data'] as $row ){//füll Array mit allen betroffenen IDs
+				$effArr[] = $row['payroll_employee_ID'];
+			}
+			$arr = array_unique( $effArr );//mach die IDs eindeutig/unique
+			$auszahlMitarbeiteranzahl = count($arr);			
+		}	
+		return $auszahlMitarbeiteranzahl;
+	}
+	
 	public function getMitarbeiterZurAuszahlung($accountList, $amountClause, $isFullPayed, $erweiterteWhereKlausel) {
-//		$sql="
-//				SELECT * FROM payroll_employee AS emp
-//				INNER JOIN payroll_period_employee emprd 
-//					ON emprd.payroll_employee_ID=emp.id 
-//					AND emprd.processing!=0 
-//				INNER JOIN payroll_period prd  
-//				WHERE prd.id=emprd.payroll_period_ID 
-//					AND prd.finalized=0  
-//					AND prd.locked=0
-//					AND emp.id IN (
-//									SELECT payroll_employee_ID 
-//									FROM payroll_calculation_current 
-//									WHERE payroll_account_ID IN (".$accountList.") 
-//										AND ".$amountClause."
-//									)
-//					AND emprd.".$isFullPayed."
-//					".$erweiterteWhereKlausel."
-//				;";
-
 	//Die ganze Query ist (MIR) zu komplex um die IDs nur separat zurückzubringen. 
 	//Man muss nachher noch mals eine einzelne Abfrage machen mit der WHERE emp.id IN ()
 	//Damit werden die Doppelten ignoriert
@@ -224,7 +206,7 @@ class auszahlen {
 				AND emp.id 
 					IN (
 						SELECT payroll_employee_ID 
-						FROM lohndev.payroll_calculation_current 
+						FROM payroll_calculation_current 
 						WHERE payroll_account_ID 
 							IN (".$accountList.") 
 							AND ".$amountClause."
@@ -247,8 +229,7 @@ class auszahlen {
 			$retval["count"]    = count($result);
 			$retval["data"] 	= $result;
 		}
-		return $retval;
-		
+		return $retval;		
 	}
 	
 	public function getEmployeeFilters($Personenkreis) {
@@ -270,13 +251,51 @@ class auszahlen {
 		$result = $system_database_manager->executeQuery("
 			SELECT  *
 			FROM
-			  lohndev.payroll_calculation_current 
-			, lohndev.payroll_employee			
-			WHERE payroll_employee_ID  IN (".$emplIdList.")
-				AND payroll_account_ID IN (".$accountList.")
-				AND payroll_employee.id = payroll_calculation_current.payroll_employee_ID
+			  payroll_calculation_current   AS C
+			, payroll_employee				AS E	
+			WHERE C.payroll_employee_ID  IN (".$emplIdList.")
+			  AND C.payroll_account_ID IN (".$accountList.")
+			  AND E.id = C.payroll_employee_ID
 		    ; ");
-		return $result;
+		if(count($result) == 0) {
+			$retval["success"] 	= false;
+			$retval["errCode"]  = 108;
+			$retval["errText"]  = "Keine Daten gefunden.";
+			$retval["count"]    = 0;
+			$retval["data"] 	= "";
+		}else{
+			$retval["success"] 	= true;
+			$retval["errCode"]  = 0;
+			$retval["count"]    = count($result);
+			$retval["data"] 	= $result;
+		}
+		return $retval;		
+	}
+
+	public function getCalculationCurrentPeriodEmployeeList($accountList, $amountClause) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("
+					SELECT * FROM 
+					  payroll_calculation_current AS C
+					, payroll_period_employee     AS E
+					WHERE C.payroll_employee_ID = E.payroll_employee_ID
+					AND C.payroll_period_ID = E.payroll_period_ID
+					AND C.payroll_account_ID IN (".$accountList.")
+					AND C.".$amountClause." ;"
+				);
+		if(count($result) == 0) {
+			$retval["success"] 	= false;
+			$retval["errCode"]  = 109;
+			$retval["errText"]  = "Keine Daten gefunden.";
+			$retval["count"]    = 0;
+			$retval["data"] 	= "";
+		}else{
+			$retval["success"] 	= true;
+			$retval["errCode"]  = 0;
+			$retval["count"]    = count($result);
+			$retval["data"] 	= $result;
+		}
+		return $retval;		
 	}
 
 	public function getEmployeesCurrentPeriodAmount($accountList, $emplIdList) {
@@ -293,17 +312,39 @@ class auszahlen {
 		}
 		return $amount;
 	}
+	
+	function getEployeesWithoutIBAN(){
+		$system_database_manager = system_database_manager::getInstance();
+		$result_dest_emp = $system_database_manager->executeQuery("				
+					SELECT * FROM
+					  payroll_bank_destination
+					, payroll_employee
+					WHERE	payroll_bank_destination.payroll_employee_ID = payroll_employee.id
+					AND		payroll_bank_destination.destination_type <> 3	
+					AND		payroll_bank_destination.bank_account = '' 
+					;");
+		$c = "";	 				
+		foreach ( $result_dest_emp as $row ) {
+			$c .= $row['EmployeeNumber'].", ";
+			$c .= $row['Firstname']." ";
+			$c .= $row['Lastname'].", ";
+			$c .= $row['City'].CRLF;
+		}
+		return $c;
+	}
+		
 
-	public function getBeneficiaryAddress($employeeID) {
+	public function getFirstDestinationBankAccount($employeeID) {
 		$retArray = array();
 		$system_database_manager = system_database_manager::getInstance();
 		$result_bank_destination = $system_database_manager->executeQuery("				
 			SELECT * FROM
 			 payroll_bank_destination
 			WHERE payroll_employee_ID = ".$employeeID."
-			ORDER BY destination_type 
+			ORDER BY destination_type, id 
 			;");
 		$idx = 0;	 				
+		$retArray['bank_id'] = "";
 		$retArray['bank_account'] = "";
 		$retArray['beneAddress1'] = "";
 		$retArray['beneAddress2'] = "";
@@ -315,6 +356,7 @@ class auszahlen {
 		$retArray['beneBank3'] = "";
 		$retArray['beneBank4'] = "";
 		if ( count($result_bank_destination) > 0 ) {
+			$retArray['bank_id'] = trim( $result_bank_destination[0]['id'] ) ;
 			$retArray['bank_account'] = trim( $result_bank_destination[0]['bank_account'] ) ;
 			$retArray['beneAddress1'] = $result_bank_destination[0]['beneficiary1_line1'];
 			$retArray['beneAddress2'] = $result_bank_destination[0]['beneficiary1_line2'];
@@ -325,25 +367,55 @@ class auszahlen {
 			$retArray['beneBank2'] = $result_bank_destination[0]['beneficiary_bank_line2'];
 			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
 			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
-//			communication_interface::alert(
-//							"employeeID:".$employeeID."  idx:".$idx
-//							."\n bank_account:".$retArray[$idx]['bank_account']
-//							."\n beneAddress1:".$retArray[$idx]['beneAddress1']
-//							."\n beneAddress2:".$retArray[$idx]['beneAddress2']
-//							."\n beneAddress3:".$retArray[$idx]['beneAddress3']
-//							."\n beneAddress4:".$retArray[$idx]['beneAddress4']
-//							);
+		}
+		return $retArray;
+	}
+	
+	public function getAllDestinationBankAccounts($employeeID) {
+		$retArray = array();
+		$system_database_manager = system_database_manager::getInstance();
+		$result_bank_destination = $system_database_manager->executeQuery("				
+			SELECT * FROM
+			 payroll_bank_destination
+			WHERE payroll_employee_ID = ".$employeeID."
+			ORDER BY destination_type, id 
+			;");
+		$idx = 0;	 				
+		$retArray[$idx]['bank_account'] = "";
+		$retArray[$idx]['beneAddress1'] = "";
+		$retArray[$idx]['beneAddress2'] = "";
+		$retArray[$idx]['beneAddress3'] = "";
+		$retArray[$idx]['beneAddress4'] = "";
+		$retArray[$idx]['beneBankDescription'] = "";
+		$retArray[$idx]['beneBank1'] = "";
+		$retArray[$idx]['beneBank2'] = "";
+		$retArray[$idx]['beneBank3'] = "";
+		$retArray[$idx]['beneBank4'] = "";
+		if ( count($result_bank_destination) > 0 ) {
+			foreach ( $result_bank_destination as $res ) {       
+				$retArray[$idx]['bank_account'] = trim( $res[$idx]['bank_account'] ) ;
+				$retArray[$idx]['beneAddress1'] = $res[$idx]['beneficiary1_line1'];
+				$retArray[$idx]['beneAddress2'] = $res[$idx]['beneficiary1_line2'];
+				$retArray[$idx]['beneAddress3'] = $res[$idx]['beneficiary1_line3'];
+				$retArray[$idx]['beneAddress4'] = $res[$idx]['beneficiary1_line4'];
+				$retArray[$idx]['beneBankDescription'] = $res[$idx]['description'];
+				$retArray[$idx]['beneBank1'] = $res[$idx]['beneficiary_bank_line1'];
+				$retArray[$idx]['beneBank2'] = $res[$idx]['beneficiary_bank_line2'];
+				$retArray[$idx]['beneBank3'] = $res[$idx]['beneficiary_bank_line3'];
+				$retArray[$idx]['beneBank4'] = $res[$idx]['beneficiary_bank_line4'];
+				$idx++;
+			}
 		}
 		return $retArray;
 	}
 	
 	public function replaceUmlaute($uebergabeWort) {
-		$umlaute = array("'","ä","ö","ü","Ä","Ö","Ü","ß","à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
+		$umlaute = array("'","ä","ö" ,"ü" ,"Ä" ,"Ö" ,"Ü" ,"ß" ,"à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
 		$ersatz = array(" ","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u");
 		$uebergabeWort = str_replace($umlaute,$ersatz,$uebergabeWort);
 		
 		$umlaute = array("&auml;","&ouml;","&uuml;","&Auml;","&Ouml;","&Uuml;","&eacute;","&Eacute;","&ATILDE;&FRAC14;","&Atilde;","&atilde;","&frac14;","Ã¼","Ã¶","¶","Ã©");
-		$ersatz = array( "ae"    ,"oe"    ,"ue"    ,"AE"    ,"OE"    ,"UE"    ,"e"       ,"E"      ,"UE"              ,"UE"       ,"ue"      ,""        ,"ue","o" ,"o","e");
+		$ersatz = array( "ae"    ,"oe"    ,"ue"    ,"AE"    ,"OE"    ,"UE"    ,"e"       ,"E"       ,"UE"              ,"UE"      ,"ue"      ,""        ,"ue","o" ,"o","e");
 		return str_replace($umlaute,$ersatz,$uebergabeWort);
 	}
 	

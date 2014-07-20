@@ -41,11 +41,15 @@ class payroll_BL {
 		case 'payroll.auszahlen.GenerateDataFiles':
 			require_once('payroll_reports.php');
 			$reports = new payroll_BL_reports();		
-			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1]);
+			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1], $functionParameters[2]);
 		case 'payroll.auszahlen.getAuszahlMitarbeiteranzahl':
 			return $auszahlen->getAuszahlMitarbeiteranzahl();
+		case 'payroll.auszahlen.getCalculationCurrentPeriodEmployeeList':
+			return $auszahlen->getCalculationCurrentPeriodEmployeeList($functionParameters[0], $functionParameters[1]);//("8000",  " < 0.001 ") oder ("8000, 8001, 8002", " >= 0.001 ")
 		case 'payroll.auszahlen.getActualPeriodID':
 			return $auszahlen->getActualPeriodID();
+		case 'payroll.auszahlen.getFirstDestinationBankAccount':
+			return $auszahlen->getFirstDestinationBankAccount($functionParameters[0]);
 		case 'payroll.auszahlen.getActualPeriodName':
 			return $auszahlen->getActualPeriodName();
 		case 'payroll.auszahlen.getActualPeriodDir':
@@ -56,6 +60,10 @@ class payroll_BL {
 			return $auszahlen->resetActualPeriodenAuszahlFlags($functionParameters[0]);
 		case 'payroll.auszahlen.getZahlstellenDaten':
 			return $auszahlen->getZahlstellenDaten();
+		case 'payroll.auszahlen.getFirstDestinationBankAccount':
+			return $auszahlen->getFirstDestinationBankAccount($functionParameters[0]);//=$employeeID
+		case 'payroll.auszahlen.getAllDestinationBankAccounts':
+			return $auszahlen->getAllDestinationBankAccounts($functionParameters[0]);//=$employeeID
 			
 		case 'payroll.onBootComplete':
 			return $variousFunctions->onBootComplete();

@@ -19,7 +19,7 @@
 		</div>
 		<div id="prlCfgLoacTab">
 			<div id="toolbar" class="ui-widget-header ui-corner-all">
-				<button id="prlCfgLoacBtnNew"><wgui:text id="prlcfgLoacBtnNew"/></button>
+				<button class="PesarisButton" id="prlCfgLoacBtnNew"><wgui:text id="prlcfgLoacBtnNew"/></button>
 				<input type="checkbox" id="prlCfgLoacBtnQFilter" /><label for="prlCfgLoacBtnQFilter"><wgui:text id="prlcfgLoacBtnQFilter"/></label>
 				<button id="prlCfgLoacBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
 				<button id="prlCfgLoacBtnFinMgmtAcc"><wgui:text id="prlCfgLoacBtnFinMgmtAcc"/></button>
@@ -49,7 +49,7 @@
 		<div id="prlCfgSyacTab">
 			<div id="toolbar" class="ui-widget-header ui-corner-all">
 				<input type="checkbox" id="prlCfgSyacBtnQFilter" /><label for="prlCfgSyacBtnQFilter"><wgui:text id="prlCfgSyacBtnQFilter"/></label>
-				<button id="prlCfgSyacBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
+				<button class="PesarisButton" id="prlCfgSyacBtnSaveSettings"><wgui:text id="btnSaveSettings"/></button>
 			</div>
 			<div id="gridCfgSyac" style="width:600px;height:500px;"></div>
 		</div>
@@ -149,7 +149,10 @@
 			<fieldset>
 				<legend><wgui:text id="loacLgnAccAssigned"/></legend>
 				<select id="loacInpLOA" size="8"></select><br/>
-				<button id="loacInpAdd"><wgui:text id="btnAdd"/></button><button id="loacInpEdit"><wgui:text id="btnEdit"/></button><button id="loacInpDel"><wgui:text id="btnDelete"/></button><button id="loacInpGoto"><wgui:text id="btnOpen"/></button>
+				<button class="PesarisButton" id="loacInpAdd"><wgui:text id="btnAdd"/></button>
+				<button class="PesarisButton" id="loacInpEdit"><wgui:text id="btnEdit"/></button>
+				<button class="PesarisButton" id="loacInpDel"><wgui:text id="btnDelete"/></button>
+				<button class="PesarisButton" id="loacInpGoto"><wgui:text id="btnOpen"/></button>
 			</fieldset>
 			<fieldset>
 				<legend id="loacInpLgA"><wgui:text id="loacLgnNewAssignment"/></legend>
@@ -159,7 +162,8 @@
 				<label for="loacInpNeg"><wgui:text id="loacLblFwdNegativeValues"/></label><input type="checkbox" id="loacInpNeg"/><br/>
 				<label for="loacInpInv"><wgui:text id="loacLblInvertValues"/></label><input type="checkbox" id="loacInpInv"/><br/>
 				<label for="loacInpTarget"><wgui:text id="loacLblValueIntoField"/></label><select id="loacInpTarget"><option value="0"><wgui:text id="loacDefaultTarget"/></option><option value="1"><wgui:text id="loacFieldFACTOR"/></option><option value="2"><wgui:text id="loacFieldSURCHARGE"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option><option value="5"><wgui:text id="loacFieldAMOUNT"/></option></select><br/>
-				<button id="loacInpOK"><wgui:text id="btnSaveAssign"/></button><button id="loacInpCancel"><wgui:text id="btnCancel"/></button>
+				<button class="PesarisButton" id="loacInpOK"><wgui:text id="btnSaveAssign"/></button>
+				<button class="PesarisButton" id="loacInpCancel"><wgui:text id="btnCancel"/></button>
 			</fieldset>
 		</div>
 		<div id="loacTab3">
@@ -206,7 +210,10 @@
 			<fieldset>
 				<legend><wgui:text id="loacLgnAccAssigned"/></legend>
 				<select id="loacOutLOA" size="8"></select><br/>
-				<button id="loacOutAdd"><wgui:text id="btnAdd"/></button><button id="loacOutEdit"><wgui:text id="btnEdit"/></button><button id="loacOutDel"><wgui:text id="btnDelete"/></button><button id="loacOutGoto"><wgui:text id="btnOpen"/></button>
+				<button class="PesarisButton" id="loacOutAdd"><wgui:text id="btnAdd"/></button>
+				<button class="PesarisButton" id="loacOutEdit"><wgui:text id="btnEdit"/></button>
+				<button class="PesarisButton" id="loacOutDel"><wgui:text id="btnDelete"/></button>
+				<button class="PesarisButton" id="loacOutGoto"><wgui:text id="btnOpen"/></button>
 			</fieldset>
 			<fieldset>
 				<legend id="loacOutLgA"><wgui:text id="loacLgnNewAssignment"/></legend>
@@ -216,12 +223,13 @@
 				<label for="loacOutNeg"><wgui:text id="loacLblFwdNegativeValues"/></label><input type="checkbox" id="loacOutNeg"/><br/>
 				<label for="loacOutInv"><wgui:text id="loacLblInvertValues"/></label><input type="checkbox" id="loacOutInv"/><br/>
 				<label for="loacOutTarget"><wgui:text id="loacLblValueIntoField"/></label><select id="loacOutTarget"><option value="0"><wgui:text id="loacDefaultTarget"/></option><option value="1"><wgui:text id="loacFieldFACTOR"/></option><option value="2"><wgui:text id="loacFieldSURCHARGE"/></option><option value="3"><wgui:text id="loacFieldQUANTITY"/></option><option value="4"><wgui:text id="loacFieldRATE"/></option><option value="5"><wgui:text id="loacFieldAMOUNT"/></option></select><br/>
-				<button id="loacOutOK"><wgui:text id="btnSaveAssign"/></button><button id="loacOutCancel"><wgui:text id="btnCancel"/></button>
+				<button class="PesarisButton" id="loacOutOK"><wgui:text id="btnSaveAssign"/></button>
+				<button class="PesarisButton" id="loacOutCancel"><wgui:text id="btnCancel"/></button>
 			</fieldset>
 		</div>
 	</div>
-	<button id="loacBtnSave" onclick="prlLoacSave();"><wgui:text id="btnSave"/></button>
-	<button onclick="$('#payrollAccountForm').mb_close();"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="loacBtnSave" onclick="prlLoacSave();"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" onclick="$('#payrollAccountForm').mb_close();"><wgui:text id="btnCancel"/></button>
 </wgui:block name="payrollAccountForm">
 <wgui:block name="payrollFinMgmtAccounting">
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
@@ -302,12 +310,13 @@
 			<div id="prlAccAsgErr3"></div>
 		</div>
 	</div>
-	<button id="prlAccAsgBtnSave"><wgui:text id="btnSave"/></button>
-	<button id="prlAccAsgBtnCancel"><wgui:text id="btnCancel"/></button>
-	<button id="prlAccAsgBtnClose"><wgui:text id="btnClose"/></button>
+	<button class="PesarisButton" id="prlAccAsgBtnSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlAccAsgBtnCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlAccAsgBtnClose"><wgui:text id="btnClose"/></button>
 	<div id="prlAccAsgDel">
 		<p><wgui:text id="txtLoeschungBestaetigen"/></p>
-		<button><wgui:text id="btnDelEntry"/></button><button><wgui:text id="btnCancel"/></button>
+		<button><wgui:text id="btnDelEntry"/></button>
+		<button><wgui:text id="btnCancel"/></button>
 	</div>
 	<ul id="prlAccAsgTblMenu" tid="0" rid="0">
 		<li><a href="#" act="1"><wgui:text id="btnEdit"/></a></li>
@@ -326,7 +335,8 @@
 		<label for="prlFormCfg_UID_EHRA"><wgui:text id="prlFormCfg_UID_EHRA"/></label><input type="text" id="prlFormCfg_UID_EHRA"/><br/>
 		<label for="prlFormCfg_BUR_REE_Number"><wgui:text id="prlFormCfg_BUR_REE_Number"/></label><input type="text" id="prlFormCfg_BUR_REE_Number"/><br/>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
 </wgui:block name="prlFormCfgCmpc">
 <wgui:block name="prlFormCfgSyac">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -334,11 +344,12 @@
 		<label for="prlFormCfg_Description"><wgui:text id="prlFormCfg_Description"/></label><input type="text" id="prlFormCfg_Description" disabled/><br/>
 		<label for="prlFormCfg_payroll_account_ID"><wgui:text id="prlFormCfg_payroll_account_ID"/></label><input type="text" id="prlFormCfg_payroll_account_ID"/><br/>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
 </wgui:block name="prlFormCfgSyac">
 <wgui:block name="prlFormCfgInscInsr">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-		<button onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscInsrBtnNew"/></button><br/>
+		<button class="PesarisButton" onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscInsrBtnNew"/></button><br/>
 		<fieldset>
 		<legend><wgui:text id="prlFormCfgInscInsrLgndExistingInsr"/></legend>
 		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlFormCfgInscInsrLblInsr"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlFormCfgInscInsrOptChooseInsr"/></option>
@@ -346,10 +357,11 @@
 			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/> (<wgui:text id="prlFormCfgInscInsrInsrID"/> <wgui:loopvar loopname="insuranceLoop" varname="InsuranceID"/>, <wgui:text id="prlFormCfgInscInsrSubnumber"/> <wgui:loopvar loopname="insuranceLoop" varname="SubNumber"/>)</option>
 		</wgui:loop name="insuranceLoop">
 		</select><br/>
-		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscInsr","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscInsr","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
 		</fieldset>
 	</div>
-	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlFormCfgInscInsr">
 <wgui:block name="prlFormCfgInscInsrEdt">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -359,11 +371,12 @@
 		<label for="prlFormCfg_IsSUVA"><wgui:text id="prlFormCfg_IsSUVA"/></label><input type="checkbox" id="prlFormCfg_IsSUVA"/><br/>
 		<label for="prlFormCfg_SubNumber"><wgui:text id="prlFormCfg_SubNumber"/></label><input type="text" id="prlFormCfg_SubNumber"/><br/>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnClose"/></button><br/>
 </wgui:block name="prlFormCfgInscInsrEdt">
 <wgui:block name="prlFormCfgInscCode">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-		<button onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscCodeEdt","id":0,"InsuranceType":"<wgui:var name="InsuranceType"/>"});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscCodeBtnNew"/></button><br/>
+		<button class="PesarisButton" onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscCodeEdt","id":0,"InsuranceType":"<wgui:var name="InsuranceType"/>"});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscCodeBtnNew"/></button><br/>
 		<fieldset>
 		<legend><wgui:text id="prlFormCfgInscCodeLgndExistingInsr"/></legend>
 		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlFormCfgInscCodeLblInsr"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlFormCfgInscCodeOptChooseInsr"/></option>
@@ -371,10 +384,11 @@
 			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="InsuranceCode"/>, <wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/></option>
 		</wgui:loop name="insuranceLoop">
 		</select><br/>
-		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscCodeEdt","id":$("#prlFormCfg_id").val(),"InsuranceType":"<wgui:var name="InsuranceType"/>"});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscCode","id":$("#prlFormCfg_id").val(),"InsuranceType":"<wgui:var name="InsuranceType"/>"});'><wgui:text id="btnDelete"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscCodeEdt","id":$("#prlFormCfg_id").val(),"InsuranceType":"<wgui:var name="InsuranceType"/>"});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscCode","id":$("#prlFormCfg_id").val(),"InsuranceType":"<wgui:var name="InsuranceType"/>"});'><wgui:text id="btnDelete"/></button>
 		</fieldset>
 	</div>
-	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnClose"/></button>
 </wgui:block name="prlFormCfgInscCode">
 <wgui:block name="prlFormCfgInscCodeEdt">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -403,7 +417,8 @@
 		</wgui:loop name="labelLoop">
 		</fieldset>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
 </wgui:block name="prlFormCfgInscCodeEdt">
 <wgui:block name="prlFormCfgInsc">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI CfgInsc">
@@ -430,15 +445,16 @@
 		</li>
 	</ul>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
 </wgui:block name="prlFormCfgInsc">
 <wgui:block name="payrollFieldModifierOv">
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
-		<button id="prlFldModBtnNew"><wgui:text id="prlFldModBtnNew"/></button>
+		<button class="PesarisButton" id="prlFldModBtnNew"><wgui:text id="prlFldModBtnNew"/></button>
 		<input type="checkbox" id="prlFldModBtnQFilter" /><label for="prlFldModBtnQFilter"><wgui:text id="prlFldModBtnQFilter"/></label>
 	</div>
 	<div id="prlFldModGrd"></div>
-	<button id="prlFldModBtnClose"><wgui:text id="btnClose"/></button>
+	<button class="PesarisButton" id="prlFldModBtnClose"><wgui:text id="btnClose"/></button>
 	<ul id="prlFldModGrdTblMenu" rid="0">
 		<li><a href="#" act="1"><wgui:text id="btnEdit"/></a></li>
 		<li><a href="#" act="2"><wgui:text id="btnDelete"/></a></li>
@@ -482,7 +498,8 @@
 			<input type="checkbox" id="prlFormCfg_major_period"/> <label for="prlFormCfg_major_period"><wgui:text id="prlFormCfg_major_period"/></label> <input type="checkbox" id="prlFormCfg_major_period_bonus"/> <label for="prlFormCfg_major_period_bonus"><wgui:text id="prlFormCfg_major_period_bonus"/></label> <input type="checkbox" id="prlFormCfg_minor_period"/> <label for="prlFormCfg_minor_period"><wgui:text id="prlFormCfg_minor_period"/></label>
 		</fieldset>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><br/>
 </wgui:block name="prlFormCfgFldMod">
 <wgui:block name="prlFormCfgDascGlob">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlDasGlobal">
@@ -513,7 +530,8 @@
 			<label for="prlFormCfg_AccountType11">Netto-Brutto-Aufrechnung</label><input type="text" id="prlFormCfg_AccountType11" tabindex="6" /><br/>
 		</fieldset>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlFormCfgDascGlob">
 <wgui:block name="prlFormCfgDasc">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlDasCanton">
@@ -564,7 +582,8 @@
 			<label for="prlFormCfg_dasacc2">QST-Basis satzbestimmend</label><input type="text" id="prlFormCfg_dasacc2" /><br/>
 		</fieldset>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlFormCfgDasc">
 <wgui:block name="prlCfgDascUplRt">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -576,11 +595,12 @@
 			<input type="hidden" name="param" value="<wgui:var name="param"/>" />
 		</form>
 	</div>
-	<button id="prlFormCfgSave"><wgui:text id="btnSave"/></button><button id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><div id="prlCfgDascUplRtWait"><img src="web/img/working.gif" /></div>
+	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button><div id="prlCfgDascUplRtWait"><img src="web/img/working.gif" /></div>
 </wgui:block name="prlCfgDascUplRt">
 <wgui:block name="prlFormulaOverview">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-		<button onclick='cb("payroll.FormulaEditor",{"action":"editor","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlLoaFeOvBtnNew"/></button><br/>
+		<button class="PesarisButton" onclick='cb("payroll.FormulaEditor",{"action":"editor","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlLoaFeOvBtnNew"/></button><br/>
 		<fieldset>
 		<legend><wgui:text id="prlLoaFeOvLgndExisting"/></legend>
 		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlLoaFeOvLblFormula"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlLoaFeOvOptChooseFormula"/></option>
@@ -588,10 +608,11 @@
 			<option value="<wgui:loopvar loopname="formulaLoop" varname="id"/>"><wgui:loopvar loopname="formulaLoop" varname="formula"/></option>
 		</wgui:loop name="formulaLoop">
 		</select><br/>
-		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.FormulaEditor",{"action":"editor","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="prlLoaFeOvBtnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.FormulaEditor",{"action":"delete","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.FormulaEditor",{"action":"editor","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="prlLoaFeOvBtnEdit"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.FormulaEditor",{"action":"delete","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
 		</fieldset>
 	</div>
-	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlFormulaOverview">
 <wgui:block name="prlFormulaEditor">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlLoaFeMain">
@@ -618,11 +639,12 @@
 		</fieldset>
 		<div id="prlLoaFeErr"></div>
 	</div>
-	<button id="prlLoaFeSave"><wgui:text id="btnSave"/></button><button id="prlLoaFeCancel"><wgui:text id="prlLoaFeCancel"/></button>
+	<button class="PesarisButton" id="prlLoaFeSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlLoaFeCancel"><wgui:text id="prlLoaFeCancel"/></button>
 </wgui:block name="prlFormulaEditor">
 <wgui:block name="prlFormCfgInscInsr">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-		<button onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscInsrBtnNew"/></button><br/>
+		<button class="PesarisButton" onclick='cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":0});' style="margin-top:10px;margin-bottom:10px;"><wgui:text id="prlFormCfgInscInsrBtnNew"/></button><br/>
 		<fieldset>
 		<legend><wgui:text id="prlFormCfgInscInsrLgndExistingInsr"/></legend>
 		<label for="prlFormCfg_id" style="display:inline-block;width:100px;"><wgui:text id="prlFormCfgInscInsrLblInsr"/></label><select id="prlFormCfg_id" style="width:300px;margin-bottom:10px;"><option value="0"><wgui:text id="prlFormCfgInscInsrOptChooseInsr"/></option>
@@ -630,14 +652,15 @@
 			<option value="<wgui:loopvar loopname="insuranceLoop" varname="id"/>"><wgui:loopvar loopname="insuranceLoop" varname="CompanyName"/> (<wgui:text id="prlFormCfgInscInsrInsrID"/> <wgui:loopvar loopname="insuranceLoop" varname="InsuranceID"/>, <wgui:text id="prlFormCfgInscInsrSubnumber"/> <wgui:loopvar loopname="insuranceLoop" varname="SubNumber"/>)</option>
 		</wgui:loop name="insuranceLoop">
 		</select><br/>
-		<button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button><button onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscInsr","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormOpen",{"section":"CfgInscInsrEdt","id":$("#prlFormCfg_id").val()});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnEdit"/></button>
+		<button class="PesarisButton" onclick='if($("#prlFormCfg_id").val()>0) cb("payroll.ConfigEditFormDelete",{"section":"CfgInscInsr","id":$("#prlFormCfg_id").val()});'><wgui:text id="btnDelete"/></button>
 		</fieldset>
 	</div>
-	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlFormCfgInscInsr">
 <wgui:block name="selectPayslipCfg">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-		<button onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":"0","FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-top:10px;margin-bottom:10px;">Neue Vorlage</button><br/>
+		<button class="PesarisButton" onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":"0","FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-top:10px;margin-bottom:10px;">Neue Vorlage</button><br/>
 		<fieldset>
 		<legend>Bestehende Vorlagen</legend>
 		<label for="templateChooser" style="display:inline-block;width:100px;">Vorlage:</label><select id="templateChooser" style="width:300px;margin-bottom:10px;"><option value="0">-- Vorlage ausw&auml;hlen --</option>
@@ -645,10 +668,11 @@
 			<option value="<wgui:loopvar loopname="templateLoop" varname="id"/>"><wgui:loopvar loopname="templateLoop" varname="payslip_name"/></option>
 		</wgui:loop name="templateLoop">
 		</select><br/>
-		<button onclick='if($("#templateChooser").val()>0) cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":$("#templateChooser").val(),"FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnChange"/></button><button onclick='if($("#templateChooser").val()>0) cb("payroll.payslipConfig",{"f":"takeAction","w":"delete","id":$("#templateChooser").val(),"commit":0});'>L&ouml;schen</button>
+		<button class="PesarisButton" onclick='if($("#templateChooser").val()>0) cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":$("#templateChooser").val(),"FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-left:100px;margin-right:20px;"><wgui:text id="btnChange"/></button>
+		<button class="PesarisButton" onclick='if($("#templateChooser").val()>0) cb("payroll.payslipConfig",{"f":"takeAction","w":"delete","id":$("#templateChooser").val(),"commit":0});'>L&ouml;schen</button>
 		</fieldset>
 	</div>
-	<button onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" onclick='$("#modalContainer").mb_close();' style="margin-top:10px;"><wgui:text id="btnCancel"/></button>
 </wgui:block name="selectPayslipCfg">
 <wgui:block name="editPayslipCfg">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -663,7 +687,7 @@
 			<div class="prlPslpCfgLstI">
 				<ul></ul>
 			</div>
-			<button id="prlPslpCfgAdd">+</button>
+			<button class="PesarisButton" id="prlPslpCfgAdd">+</button>
 		</fieldset>
 		<fieldset class="prlPslpCfgFSL">
 			<legend>Allgemein</legend>
@@ -690,13 +714,15 @@
 			<label for="prlPslpCfg_content_width">Tabellenbreite:</label><input id="prlPslpCfg_content_width" type="text" value="" tabindex="12" /> mm<br/>
 		</fieldset>
 	</div>
-	<button id="prlPslpCfgSave">Speichern</button><button id="prlPslpCfgCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlPslpCfgSave">Speichern</button>
+	<button class="PesarisButton" id="prlPslpCfgCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="editPayslipCfg">
 <wgui:block name="deletePayslipCfg">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 	<br/>Sind Sie sicher, dass Sie die Vorlage '<wgui:var name="TemplateName"/>' unwiderruflich l&ouml;schen wollen?<br/>&nbsp;
 	</div>
-	<button onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"delete","id":<wgui:var name="TemplateId"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button><button onclick='cb("payroll.payslipConfig",{"f":"templateOv"});'>Nein</button>
+	<button class="PesarisButton" onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"delete","id":<wgui:var name="TemplateId"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button>
+	<button class="PesarisButton" onclick='cb("payroll.payslipConfig",{"f":"templateOv"});'>Nein</button>
 </wgui:block name="deletePayslipCfg">
 <wgui:block name="prlVlFldCfgSelect">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -709,7 +735,8 @@
 	</select>
 	<br/>&nbsp;
 	</div>
-	<button>OK</button><button><wgui:text id="btnCancel"/></button>
+	<button>OK</button>
+	<button><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlVlFldCfgSelect">
 <wgui:block name="prlVlFldCfgEditMain">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlVlFldCfg">
@@ -731,10 +758,11 @@
 				<label for="prlVlFldCfg_maxLength">Max. Textl&auml;nge:</label><input type="text" id="prlVlFldCfg_maxLength"/><br/>
 				<p id="prlVlFldCfg_noSettings">Keine Einstellungen m&ouml;glich.</p>
 				<hr id="prlVlFldCfg_hr1"/>
-				<button id="prlVlFldCfg_BtnAdd">Listenwert hinzuf&uuml;gen</button>
+				<button class="PesarisButton" id="prlVlFldCfg_BtnAdd">Listenwert hinzuf&uuml;gen</button>
 				<hr id="prlVlFldCfg_hr2"/>
 				<select id="prlVlFldCfg_listID"><option value="" token="">-- Listenwert ausw&auml;hlen --</option></select><br/>
-				<button id="prlVlFldCfg_BtnEdit">Listenwert bearbeiten</button><button id="prlVlFldCfg_BtnDel">Listenwert l&ouml;schen</button>
+				<button class="PesarisButton" id="prlVlFldCfg_BtnEdit">Listenwert bearbeiten</button>
+				<button class="PesarisButton" id="prlVlFldCfg_BtnDel">Listenwert l&ouml;schen</button>
 			</div>
 		</fieldset>
 		<fieldset>
@@ -746,13 +774,15 @@
 			</div>
 		</fieldset>
 	</div>
-	<button id="prlVlFldCfgSave">Speichern</button><button id="prlVlFldCfgCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlVlFldCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlVlFldCfgCancel"><wgui:text id="btnClose"/></button>
 </wgui:block name="prlVlFldCfgEditMain">
 <wgui:block name="prlVlFldCfgLstItemDel">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 	<br/>Sind Sie sicher, dass Sie den Listenwert '<wgui:var name="ItemName"/>' l&ouml;schen wollen?<br/>&nbsp;
 	</div>
-	<button onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button><button onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'>Nein</button>
+	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;">Ja</button>
+	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'>Nein</button>
 </wgui:block name="prlVlFldCfgLstItemDel">
 <wgui:block name="prlVlFldCfgLstItemEdit">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlVlFldCfgLI">
@@ -770,7 +800,8 @@
 			</div>
 		</fieldset>
 	</div>
-	<button id="prlVlFldCfgLISave">Speichern</button><button id="prlVlFldCfgLICancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlVlFldCfgLISave">Speichern</button>
+	<button class="PesarisButton" id="prlVlFldCfgLICancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlVlFldCfgLstItemEdit">
 <wgui:block name="prlCurrencyEdit">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlCfgCncy">
@@ -802,6 +833,7 @@
 		</tr>
 	</table>
 	</div>
-	<button id="prlCfgCncySave"><wgui:text id="btnSave"/></button><button id="prlCfgCncyCancel"><wgui:text id="btnCancel"/></button><br/>
+	<button class="PesarisButton" id="prlCfgCncySave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlCfgCncyCancel"><wgui:text id="btnCancel"/></button><br/>
 </wgui:block name="prlCurrencyEdit">
 

@@ -1,5 +1,34 @@
 <wgui:block name="GUI_paymentSplitOverview">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltMain">
+		<table style="background-color: #d2d2d2; width: 100%; height: 40px;" cellpadding="0" cellspacing="0">
+			<tr>
+				<td>
+					<label for="stdBank" ><wgui:text id="txtStandardBankverbindung"/>:</label>
+				</td>
+				<td>
+					<input type="text" 
+							name= "stdBankDescr"
+							id=   "stdBankDescr"
+							value=""
+							style="width: 120px; font-weight: bold; padding: 2px 8px; text-align: right;"
+							disabled="disabled" 
+					/>
+				</td>
+				<td>
+					<input type="text" 
+							name= "stdBankAccount"
+							id=   "stdBankAccount"
+							value=""
+							style="width: 200px; font-weight: bold; padding: 2px 8px;"
+							disabled="disabled" 
+					/>
+				</td>
+				<td>
+					<button id="btnBankverbindungStnd" name="btnBankverbindungStnd" class="PesarisButton"><wgui:text id="btnEdit"/>...</button>
+				</td>
+			</tr>
+			<tr><td colspan="4"><wgui:text id="txtZahlungssplitt"/> (<wgui:text id="txtAuszkritInReihenfolge"/>):</td></tr>
+		</table>
 		<div class="prlPmtSpltLstWrapper">
 			<div class="prlPmtSpltHeader">
 				<wgui:text id="txtTableHeadersPaymentSplit"/>
@@ -18,12 +47,11 @@
 			</wgui:loop name="paymentSplitLoop">
 			</ul>
 			</div>
-		</div>
-		<wgui:text id="txtAuszkritInReihenfolge"/>
+		</div>		
 	</div>
-	<button id="prlPmtSpltSaveOrder"><wgui:text id="btnReihenfolgespeichern"/></button>
-	<button id="prlPmtSpltNew"><wgui:text id="btnPlusAdd"/></button>
-	<button id="prlPmtSpltClose"><wgui:text id="btnClose"/></button>
+	<button class="PesarisButton" id="prlPmtSpltClose"><wgui:text id="btnClose"/></button>
+	<button class="PesarisButton" id="prlPmtSpltNew"><wgui:text id="btnPlusAdd"/></button>
+	<button class="PesarisButton" id="prlPmtSpltSaveOrder" style="width: 160px;"><wgui:text id="btnReihenfolgespeichern"/></button>
 </wgui:block name="GUI_paymentSplitOverview">
 <wgui:block name="paymentSplitEdit">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit PesarisWGUI">
@@ -165,15 +193,20 @@
 			</fieldset>
 		</td></tr></table>
 	</div>
-	<button id="prlPmtSpltSave" class="PesarisButton"><wgui:text id="btnSave"/></button>
-	<button id="prlPmtSpltCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
+	<table style="width: 100%"><tr>
+		<td align="left"><button id="prlPmtSpltCancel" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
+		<td align="right"><button id="prlPmtSpltSave" class="PesarisButton"><wgui:text id="btnSave"/></button></td>
+	</tr></table>
 </wgui:block name="destinationBankEdit">
+
+
+
 <wgui:block name="destinationBankDelete">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
 	<br/><wgui:text id="txtDestinationBankLoeschenSicher"/><br/>
 	</div>
-	<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
 	<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
+	<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
 </wgui:block name="destinationBankDelete">
 
 
@@ -195,7 +228,7 @@
 		<button id="prlBankSourceDelete" class="PesarisButton" ><wgui:text id="btnDelete"/></button>
 		</fieldset>
 	</div>
-	<button id="prlBankSourceCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
+	<button id="prlBankSourceCancel" class="PesarisButton"><wgui:text id="btnClose"/></button>
 </wgui:block name="GUItemplate_bank_source_Overview">
 
 

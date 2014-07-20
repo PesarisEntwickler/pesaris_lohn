@@ -1197,7 +1197,7 @@ ul.prlPrdSetDate {
 .prlPmtSpltScroll {
 	overflow-y:scroll;
 	background-color: #ddd;
-	height:200px;
+	height:100px;
 }
 
 .prlPmtSpltHeader ul, .prlPmtSpltScroll ul {
@@ -1396,7 +1396,7 @@ ul.prlPrdSetDate {
 .PesarisButton {
 	height: 20px;
 	width: 100px;
-	margin: 4px 8px 0 0;
+	margin: 2px 8px;
 }
 .PesarisWGUI {
 	overflow-y:auto;

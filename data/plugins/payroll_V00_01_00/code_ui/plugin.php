@@ -26,8 +26,9 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.auszahlen.GenerateFiles':
-//			communication_interface::alert("payroll.auszahlen.GenerateFiles\n".$functionParameters[0]);
+			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n1:".$functionParameters[0]."\n2:".$functionParameters[1]);
 			$param = $functionParameters[0];
+			$dueDateFromGUI = $functionParameters[1];
 			$paramArray = explode("##", $param);
 			$zahlstelle = $paramArray[1];
 			$personengruppenIDListe = "**";
@@ -53,7 +54,7 @@ class payroll_UI {
 //					"\nzahlstellenID=".$zahlstellenID .
 //					"\npersonengruppenIDListe=".$personengruppenIDListe);
 
-			$hatAuszahlFiles = blFunctionCall('payroll.auszahlen.GenerateDataFiles', $zahlstellenID, $personengruppenIDListe);
+			$hatAuszahlFiles = blFunctionCall('payroll.auszahlen.GenerateDataFiles', $zahlstellenID, $personengruppenIDListe, $dueDateFromGUI);
 
 			if ($hatAuszahlFiles > 0) {
 				//communication_interface::alert($hatAuszahlFiles." Datei erzeugt fuer Zahlstelle ".$zahlstellenID." und Personenkreis p".$personengruppenIDListe);// für ZahlstellenID:$zahlstellenID, Personengruppen:$personengruppenIDListe");				
@@ -209,7 +210,7 @@ class payroll_UI {
 			session_control::setSessionSettings("payroll", "psoSettings", serialize($functionParameters[0]), true); //true = save permanently
 			$objWindow = new wgui_window("payroll", "infoBox");
 			$objWindow->windowTitle($objWindow->getText("prlPsoSettings"));
-			$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
+			$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
 			$objWindow->showInfo();
 			break;
 		case 'payroll.prlVlOpenForm':
@@ -217,7 +218,7 @@ class payroll_UI {
 			if($currentFormId!="") {
 				$formDetail = blFunctionCall('payroll.getEmployeeFormDetail',$currentFormId);
 			}
-
+			$txtNochkeineBankverbindung = "";
 			if($functionParameters[0]["wndStatus"]==0) {
 				//nur ausfuehren, wenn Window noch nicht geoeffnet ist
 				$data = array();
@@ -234,9 +235,7 @@ class payroll_UI {
 				$objWindow->fullscreen(false);
 				$objWindow->loadContent("employees",$data,"employeeForm");
 				$objWindow->showWindow();
-
-				//communication_interface::jsExecute("$('#btnBankverbindung').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
-				communication_interface::jsExecute("$('#btnBankverbindung').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':38, 'bankId':39}); });");
+				$txtNochkeineBankverbindung = $objWindow->getText("txtNochKeineBankverbindung");
 
 				communication_interface::jsExecute("prlVlDirty = false;");
 				communication_interface::jsExecute("prlVlDesignMode = false;");
@@ -253,10 +252,19 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#employeeForm .n').html('".$title." (<span id=\"prlVlTitle\"></span>)');");
 			}
 
-
+			$employeeID = "";
+			$bankdestinationID = "";
 			if(isset($functionParameters[0]["id"]) && $functionParameters[0]["id"]!="" && $functionParameters[0]["id"]!=0) {
-				$employeeData = blFunctionCall('payroll.getEmployeeDetail',$functionParameters[0]["id"],true);
+				$employeeID = $functionParameters[0]["id"];
+				$employeeData = blFunctionCall('payroll.getEmployeeDetail',$employeeID,true);
 				if($employeeData["success"]) {
+					$bankDestArr = blFunctionCall('payroll.auszahlen.getFirstDestinationBankAccount',$employeeID);
+					if(strlen($bankDestArr["bank_id"]) > 0) {
+						$bankdestinationID = $bankDestArr["bank_id"];
+					} else {
+						communication_interface::alert($txtNochkeineBankverbindung);
+						$bankdestinationID = "0";
+					}
 					//Determine which fields are used in the current layout (only the corresponding values will be submitted)
 					$fieldsUsed = array();
 					$layoutMap = json_decode($formDetail["data"][0]["FormElements"], true);
@@ -320,22 +328,13 @@ class payroll_UI {
 						}
 					}
 					if($fieldCollector != "") communication_interface::jsExecute("prlVlFill( [".$fieldCollector."] );");
-					communication_interface::jsExecute("$('#prlVlTitle').html('".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"]."');");
+					communication_interface::jsExecute("$('#prlVlTitle').html('".$employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"]."');");
 				}
 			}else{
 				communication_interface::jsExecute("$('#prlVlTitle').html('* NEUERFASSUNG *');");
 			}
-/*
-			$employeeData = blFunctionCall('payroll.getEmployeeDetail',$functionParameters[0]["id"]);
-			if($employeeData["success"]) {
-				$fieldCollector = "";
-				foreach($employeeData["data"][0] as $fieldName=>$fieldValue) $fieldCollector .= ($fieldCollector=="" ? "" : ",")."['".$fieldName."','".str_replace("'","\\'",$fieldValue)."']";
-				if($fieldCollector != "") communication_interface::jsExecute("prlVlFill( [".$fieldCollector."] );");
-error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-application.log");
-//communication_interface::alert("prlVlFill( [".$fieldCollector."] );");
-			}
-*/
-			communication_interface::jsExecute("prlVlRid = ".$functionParameters[0]["id"].";"); //set record ID of current employee (on client side)
+			communication_interface::jsExecute("prlVlRid = ".$employeeID.";"); //set record ID of current employee (on client side)
+			communication_interface::jsExecute("$('#btnBankverbindung').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':".$employeeID.", 'bankId':".$bankdestinationID."}); });");
 			break;
 		case 'payroll.prlVlLoadFormData':
 			//wenn Form bereits geladen ist und nur die Daten geaendert werden sollen
@@ -348,7 +347,8 @@ error_log("prlVlFill( [".$fieldCollector."] );\n", 3, "/var/log/copronet-applica
 				communication_interface::jsExecute("$('#employeeForm').mb_close();");
 
 				//HIER WERDEN DATEN NEU IN UEBERSICHTSTABELLE GELADEN. 
-				//DAS IST NOCH NICHT OPTIMAL GELOEST, DA *ALLE* DATEN NACH JEDER AENDERUNG AN DEN CLIENT GESCHICKT WERDEN!!
+				//DAS IST NOCH NICHT OPTIMAL GELOEST, DA *ALLE* DATEN 
+				//NACH JEDER AENDERUNG AN DEN CLIENT GESCHICKT WERDEN!!
 				$queryOption["query_filter"] = "";
 				$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
 				$tblData = "prlPsoData = [";
@@ -1473,7 +1473,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				session_control::setSessionSettings("payroll", $assignments[$functionParameters[0]["section"]], serialize($functionParameters[0]["settings"]), true); //true = save permanently
 				$objWindow = new wgui_window("payroll", "infoBox");
 				$objWindow->windowTitle($objWindow->getText("prlPsoSettings"));
-				$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
+				$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
 				$objWindow->showInfo();
 			}else communication_interface::alert("wrong section id");
 			break;
@@ -1513,7 +1513,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			session_control::setSessionSettings("payroll", "calcOvSettings", serialize($functionParameters[0]), true); //true = save permanently
 			$objWindow = new wgui_window("payroll", "infoBox");
 			$objWindow->windowTitle($objWindow->getText("prlPsoSettings"));
-			$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
+			$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
 			$objWindow->showInfo();
 			break;
 		case 'payroll.prlCalcOvFnc':
@@ -1544,8 +1544,9 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 //Die jetztige Periode ist				
 				$PeriodeDieserMonat = blFunctionCall('payroll.auszahlen.getActualPeriodName');
 				$data["period"] = $PeriodeDieserMonat;
+												
+				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl'); 
 								
-				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl');
 				$uebermorgen = strtotime ( '+2 day' , strtotime ( date("d.m.Y") ) ) ;
 				//$data["valutaDatum"] = $uebermorgen;				
 				$data["valutaDatum"] = date ( 'd.m.Y' , $uebermorgen );				
@@ -2888,16 +2889,18 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 						$row["dest_bank_label"] = $row["dest_bank_label"]=="" ? "-- Standard --" : $row["dest_bank_label"];
 						$data["paymentSplitList"][] = $row;
 					}//end foreach
-//communication_interface::alert('ovSplit:'.print_r($data["paymentSplitList"],true));
 				} else {
 					if($res["errCode"] != 101) communication_interface::alert("Error Code ".$res["errCode"]);
 				}
-
+				$beneficiaryAddress = blFunctionCall('payroll.auszahlen.getFirstDestinationBankAccount', $payrollEmployeeID);
+				//communication_interface::alert('ovSplit:'.print_r($beneficiaryAddress,true));
+				$bankdestinationID = $beneficiaryAddress["bank_id"];
+				$payrollEmployeeID = $employee["data"][0]["id"];
 				$objWindow = new wgui_window("payroll", "GUI_paymentSplitOverview");
 				$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit")." - ".$employee["data"][0]["EmployeeNumber"]." ".$employee["data"][0]["Lastname"].", ".$employee["data"][0]["Firstname"]);
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(820);
-				$objWindow->windowHeight(350);
+				$objWindow->windowWidth(790);
+				$objWindow->windowHeight(300);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -2906,6 +2909,11 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->loadContent("payment",$data,"GUI_paymentSplitOverview");
 				$objWindow->showWindow();
 
+				communication_interface::jsExecute("document.getElementById('stdBankDescr').value = '".$beneficiaryAddress['beneBankDescription']."'; ");
+				communication_interface::jsExecute("document.getElementById('stdBankAccount').value = '".$beneficiaryAddress['bank_account']."'; ");
+				
+				communication_interface::jsExecute("$('#btnBankverbindungStnd').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':".$payrollEmployeeID.", 'bankId':".$bankdestinationID."}); });");
+				
 				communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."'};");
 				communication_interface::jsExecute("prlPmtSpltMainInit();");
 				if(isset($res["errCode"]) && $res["errCode"] == 101) communication_interface::jsExecute("$('#prlPmtSpltSaveOrder').attr('disabled', 'disabled');");
@@ -3028,6 +3036,8 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				break;
 			case 'editBankD':
 				$editMode = !isset($functionParameters[0]["bankId"]) || $functionParameters[0]["bankId"]=="0" || $functionParameters[0]["bankId"]=="" ? false : true;
+				$commingFromEmplStamm = !isset($functionParameters[0]["commingFromEmplStamm"]) || $functionParameters[0]["commingFromEmplStamm"]=="" ? false : true;
+communication_interface::alert("commingFromEmplStamm:".$commingFromEmplStamm);
 
 				$res = blFunctionCall('payroll.getCountryList');
 				$data["country_list"] = $res["data"];
@@ -3045,8 +3055,14 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 //`hand_delivered` varchar(1) NOT NULL,	-> wird noch nicht verwendet
 //`urgency` varchar(1) NOT NULL,	-> wird noch nicht verwendet
 
+				$maInfo = "";
+				$employeeData = blFunctionCall('payroll.getEmployeeDetail',$payrollEmployeeID,true);
+				if($employeeData["success"]) {
+					$maInfo = $employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"];
+				}
+
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
-				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten")." (".$payrollEmployeeID.")");
+				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten")." (".$maInfo.")");
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(945);
 				$objWindow->windowHeight(470);
@@ -3210,7 +3226,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten','plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png', 'prlCalcOvOpen();return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahldaten',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen.openHistoryWindow\');return false;');
 			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm', 'plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png',  'prlPsoOpenEmployeeOverview();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Firmenstamm',    'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Stammdatenverwaltung',    'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
 			break;
 		case 'core.bootComplete':
 			blFunctionCall('payroll.onBootComplete');

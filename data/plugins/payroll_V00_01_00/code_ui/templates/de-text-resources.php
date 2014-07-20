@@ -2,7 +2,7 @@
 $textResourceMap["btnOK"] 			= "OK";
 $textResourceMap["btnSave"] 		= "Speichern";//<wgui:text id="btnSave"/>
 $textResourceMap["btnSaveSettings"] = "Einstellungen speichern";
-$textResourceMap["btnCancel"] 		= "Abbrechen";
+$textResourceMap["btnCancel"] 		= "Schliessen";
 $textResourceMap["btnChange"] 		= "&Auml;ndern";
 $textResourceMap["btnDelete"] 		= "L&ouml;schen";
 $textResourceMap["btnDelEntry"] 	= "Eintrag l&ouml;schen";
@@ -61,21 +61,22 @@ $textResourceMap["txtTableHeadersAuszahlenPeriodenFiles"] =
 				"</ul>";
 
 /* ****** PAYMENTS ****** */
-$textResourceMap[""] = "";
+$textResourceMap["txtNochKeineBankverbindung"] = "Es besteht noch keine Bankverbindung";
+$textResourceMap["txtStandardBankverbindung"] = "Standard Bankverbindung";
 $textResourceMap["txtBerechnungsdatenVorbereiten"] = "Berechnungsdaten vorbereiten";
-$textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabrechnungs-Vorlagen";
+$textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabr.-Vorlagen";
 $textResourceMap["txtLayoutBearbeiten"] = "Layout bearbeiten";
 $textResourceMap["txtVorlageLoeschen"] = "Vorlage loeschen";
 $textResourceMap["txtWaehrungenBearbeiten"] = "W&auml;hrungen bearbeiten";
-$textResourceMap["txtUebersichtZahlungssplit"] = "&Uuml;bersicht Zahlungssplit";
+$textResourceMap["txtUebersichtZahlungssplit"] = "&Uuml;bersicht Bankverbindung und Zahlungssplit";
 $textResourceMap["txtZahlungssplitMutieren"] = "Zahlungssplit mutieren";
+$textResourceMap["txtZahlungssplitt"] = "Zahlungssplitt";
 $textResourceMap["txtBankverbindungAuswaehlenTitel"] = "Bankverbindung ausw&auml;hlen";
 $textResourceMap["txtBankverbindungBearbeiten"] = "Bankverbindung bearbeiten";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
 $textResourceMap["txtBankverbindungAuswaehlen"] = "Bankverbindung ausw&auml;hlen";
 
 $textResourceMap["txtDestinationBankLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Bankverbindung l&ouml;schen wollen?";
-$textResourceMap["txtZahlstelleLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Zahlstelle l&ouml;schen wollen?";
 $textResourceMap["txtZahlSplittLoeschenSicher"] = "Sind Sie sicher, dass Sie den gew&auml;hlten Auszahlungssplit l&ouml;schen wollen?";
 $textResourceMap["txtZahlstelle"] = "Zahlstelle";
 $textResourceMap["txtZahlstelleBearbeiten"] = "Zahlstelle bearbeiten";
@@ -106,7 +107,7 @@ $textResourceMap["txtAlle"] = "alle&nbsp;";
 $textResourceMap["txtAbrechnungsperioden"] = "Abrechnungsperioden";
 $textResourceMap["txtZwischenzahltage"] = "Zwischenzahltage";
 
-$textResourceMap["txtAuszkritInReihenfolge"] = "Die Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet.";
+$textResourceMap["txtAuszkritInReihenfolge"] = "Die untenstehenden Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet.";
 $textResourceMap["txtTableHeadersPaymentSplit"] = 
 		"<ul>" .
 			"<li>Zahlstelle</li>" .
@@ -168,7 +169,7 @@ $textResourceMap["prlCfgLoacBtnFinMgmtAcc"] = "FIBU-/BEBU-Konfiguration";
 $textResourceMap["prlCfgLoacBtnFldMod"] = "Feld-Modifikatoren";
 
 $textResourceMap["txtAbrechnungsdatenvorbereiten"] = "Abrechnungsdaten vorbereiten";
-$textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabrechnungs-Vorlagen konfigurieren";
+$textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabr.-Vorlagen konfigurieren";
 $textResourceMap["txtPersonalstammfelderverwalten"] = "Personalstammfelder verwalten";
 $textResourceMap["txtLohnartkopieren"] = "Lohnart kopieren";
 $textResourceMap["txtDBBackup"] = "DB Backup erstellen";
@@ -176,7 +177,6 @@ $textResourceMap["txtDBRestore"] = "DB Wiederherstellung";
 $textResourceMap["txtFremdwaehrungenVerwalten"] = "Fremdw&auml;hrungen verwalten";
 $textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abgeschlossen";
 $textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
-
 
 $textResourceMap["prlFldModBtnNew"] = "Neuer Feld-Modifikator";
 $textResourceMap["prlFldModBtnQFilter"] = "Tabellenfilter";
@@ -226,7 +226,7 @@ $textResourceMap["prlFormCfg_CustomerIdentity"] = "Kundennummer";
 $textResourceMap["prlFormCfg_ContractIdentity"] = "Vertragsnummer";
 $textResourceMap["prlFormCfg_legend_labels"] = "Bezeichnungen";
 
-$textResourceMap["prlFormCfg_payroll_insurance_code_ID"] = "Vers.Code";
+$textResourceMap["prlFormCfg_payroll_insurance_code_ID"] = "Vs.Cd";
 $textResourceMap["prlFormCfgInsr"] = "Versicherer";
 $textResourceMap["prlFormCfgCustNo"] = "Kd.Nr.";
 $textResourceMap["prlFormCfgContrNo"] = "Vertr.Nr.";
