@@ -86,9 +86,43 @@ class payroll_BL_payment {
 		$response["errCode"] = 0;
 		return $response;
 	}
+	
+	public function getZahlstelle($employeeId) {	
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("
+			SELECT MIN(processing_order)
+			FROM   payroll_payment_split 
+			WHERE  payroll_employee_ID    =".$employeeId." 
+			;", "payroll_getZahlstelle" 
+		);
+		if (count($result)>0) {
+			$return = $result[0];
+		} else {
+			$return = array();
+		}
+		return $return;
+	}
+	
+	public function getZahlstelle____($employeeId, $destBankId) {	
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("
+			SELECT MIN(processing_order)
+			FROM   payroll_payment_split 
+			WHERE  payroll_employee_ID    =".$employeeId." 
+			  AND  payroll_bank_source_ID =".$destBankId." 
+			;", "payroll_getZahlstelle" 
+		);
+		if (count($result)>0) {
+			$return = $result[0];
+		} else {
+			$return = array();
+		}
+		return $return;
+	}
+	
 
-	public function getPaymentSplitList($param) {
-		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_employee_ID
+	public function getPaymentSplitList($payroll_employee_ID) {
+		if(!preg_match( '/^[0-9]{1,9}$/', $payroll_employee_ID)) { 
 			$response["success"] = false;
 			$response["errCode"] = 10;
 			$response["errText"] = "invalid employee ID";
@@ -96,7 +130,16 @@ class payroll_BL_payment {
 		}
 
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT pps.*, IF(pbs.description IS NULL,'',pbs.description) as src_bank_label, IF(pbd.description IS NULL,'',pbd.description) as dest_bank_label FROM payroll_payment_split pps LEFT JOIN payroll_bank_source pbs ON pbs.id=pps.payroll_bank_source_ID LEFT JOIN payroll_bank_destination pbd ON pbd.id=pps.payroll_bank_destination_ID WHERE pps.payroll_employee_ID=".$param["id"]." ORDER BY pps.processing_order", "payroll_getPaymentSplitList");
+		$result = $system_database_manager->executeQuery("
+			SELECT pps.*, IF(pbs.description IS NULL,'',pbs.description) as src_bank_label 
+				        , IF(pbd.description IS NULL,'',pbd.description) as dest_bank_label 
+			FROM payroll_payment_split pps 
+				LEFT JOIN payroll_bank_source pbs ON pbs.id=pps.payroll_bank_source_ID 
+				LEFT JOIN payroll_bank_destination pbd ON pbd.id=pps.payroll_bank_destination_ID 
+			WHERE pps.payroll_employee_ID=".$payroll_employee_ID." 
+			ORDER BY pps.processing_order; 
+			", "payroll_getPaymentSplitList" 
+		);
 
 		if(count($result) != 0) {
 			$response["success"] = true;
@@ -106,6 +149,7 @@ class payroll_BL_payment {
 			$response["success"] = false;
 			$response["errCode"] = 101;
 			$response["errText"] = "no data found";
+			$response["data"] = array();
 		}
 		return $response;
 	}
@@ -259,6 +303,8 @@ class payroll_BL_payment {
 ////  BANKVERBINDUNG       destination bank        ////
 ///////////////////////////////////////////////////////
 	public function getDestBankDetail($param) {
+	//communication_interface::alert("getDestBankDetail(".$param["id"].") = ");
+	$response = array();
 		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) {
 			$response["success"] = false;
 			$response["errCode"] = 10;
@@ -266,9 +312,36 @@ class payroll_BL_payment {
 			return $response;
 		}
 
+		$response["data"]["id"] = $param["id"];
+		$response["data"]["payroll_employee_ID"] = 0;
+		$response["data"]["description"] = "";
+		$response["data"]["bank_swift"] = "";
+		$response["data"]["bank_account"] = "";
+		$response["data"]["postfinance_account"] = "";
+		$response["data"]["destination_type"] = 1;
+		$response["data"]["beneficiary1_line1"] = "";
+		$response["data"]["beneficiary1_line2"] = "";
+		$response["data"]["beneficiary1_line3"] = "";
+		$response["data"]["beneficiary1_line4"] = "";
+		$response["data"]["beneficiary2_line1"] = "";
+		$response["data"]["beneficiary2_line2"] = "";
+		$response["data"]["beneficiary2_line3"] = "";
+		$response["data"]["beneficiary2_line4"] = "";
+		$response["data"]["beneficiary2_line5"] = "";
+		$response["data"]["notice_line1"] = "";
+		$response["data"]["notice_line2"] = "";
+		$response["data"]["notice_line3"] = "";
+		$response["data"]["notice_line4"] = "";
+		$response["data"]["beneficiary_bank_line1"] = "";
+		$response["data"]["beneficiary_bank_line2"] = "";
+		$response["data"]["beneficiary_bank_line3"] = "";
+		$response["data"]["beneficiary_bank_line4"] = "";
+		$response["data"]["beneficiary_bank_line5"] = "";
+		$response["data"]["expense"] = "";
+		$response["data"]["urgency"] = "";
+
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_destination WHERE id=".$param["id"], "payroll_getDestBankDetail");
-
 		if(count($result) != 0) {
 			$response["success"] = true;
 			$response["errCode"] = 0;
@@ -290,13 +363,9 @@ class payroll_BL_payment {
 					"description"=>array("regex"=>".{1,25}","addQuotes"=>true),
 					"destination_type"=>array("regex"=>"1|2|3","addQuotes"=>false),
 					"core_intl_country_ID"=>array("regex"=>"[A-Z]{2,2}","addQuotes"=>true),
-					"bank_clearing"=>array("regex"=>"[0-9]{0,6}","addQuotes"=>true),
+					"bank_swift"=>array("regex"=>"[0-9A-Z]{0,11}","addQuotes"=>true),
 					"bank_account"=>array("regex"=>"[.0-9a-zA-Z\\s]{0,34}","addQuotes"=>true),
 					"postfinance_account"=>array("regex"=>"[-0-9a-zA-Z]{0,16}","addQuotes"=>true),
-					"beneficiary_bank_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"beneficiary_bank_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"beneficiary_bank_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"expense"=>array("regex"=>"[012]{0,1}","addQuotes"=>true),
 					"beneficiary1_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary1_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary1_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
@@ -306,6 +375,10 @@ class payroll_BL_payment {
 					"beneficiary2_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary2_line4"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary2_line5"=>array("regex"=>".{0,32}","addQuotes"=>true),
+					"beneficiary_bank_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
+					"beneficiary_bank_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
+					"beneficiary_bank_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
+					"expense"=>array("regex"=>"[012]{0,1}","addQuotes"=>true),
 					"notice_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"notice_line2"=>array("regex"=>".{0,32}","addQuotes"=>true)
 				);
@@ -317,10 +390,10 @@ class payroll_BL_payment {
 			foreach($arrMandatoryFields as $fldName) if(trim($param[$fldName])=="") $errFields[] = $fldName;
 			break;
 		case 2: //Post
-			$arrClearFields = array("bank_clearing","bank_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3");
+			$arrClearFields = array("bank_swift","bank_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3");
 			break;
 		case 3: //Bar
-			$arrClearFields = array("bank_clearing","bank_account","postfinance_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","expense","beneficiary1_line1","beneficiary1_line2","beneficiary1_line3","beneficiary1_line4","beneficiary2_line1","beneficiary2_line2","beneficiary2_line3","beneficiary2_line4","beneficiary2_line5","notice_line1","notice_line2");
+			$arrClearFields = array("bank_swift","bank_account","postfinance_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","expense","beneficiary1_line1","beneficiary1_line2","beneficiary1_line3","beneficiary1_line4","beneficiary2_line1","beneficiary2_line2","beneficiary2_line3","beneficiary2_line4","beneficiary2_line5","notice_line1","notice_line2");
 			break;
 		}
 		foreach($arrClearFields as $fldName) $param[$fldName]="";
@@ -391,13 +464,18 @@ class payroll_BL_payment {
 				);
 		
 		$errFields = array();
+		$response  = array();
 		////////////////////////////////
 		// Mandatory and validity checks
 		////////////////////////////////
-		foreach($fieldCfg as $fieldName=>$fieldParam) 
+		foreach($fieldCfg as $fieldName=>$fieldParam) {
 			if(!preg_match( '/^'.$fieldParam["regex"].'$/', $param[$fieldName])) 
-				if(isset($fieldParam["default"])) $param[$fieldName]=$fieldParam["default"];
-				else $errFields[] = $fieldName;
+				if(isset($fieldParam["default"])) {
+					$param[$fieldName]=$fieldParam["default"];
+				} else {
+					$errFields[] = $fieldName;				
+				}
+		}
 		$errFields = array_unique($errFields);
 		if(count($errFields)>0) {
 			$response["success"] = false;
@@ -408,42 +486,47 @@ class payroll_BL_payment {
 			return $response;
 		}
 
-		//communication_interface::alert("3 id:".$param["id"]." / updateMode=".$updateMode);
-		$erfolg = "DS ";
+		//communication_interface::alert("fieldCfg[id]:".$fieldCfg["id"].", param[id]:".$param["id"]." / updateMode=".$updateMode);
+		$erfolg = "Bank info ";
+		$sql = "";
 		if($updateMode) {
 			$sqlUPDATE = array();
 			$recID = $param["id"];
 			unset($fieldCfg["id"]); //entfernen, da dieses Feld nicht aktualisiert werden muss
-			unset($fieldCfg["payroll_company_ID"]); //entfernen, da dieses Feld nicht aktualisiert werden muss
+			unset($fieldCfg["payroll_company_ID"]); //entfernen, da dieses Feld nicht aktualisiert werden muss/soll
 			foreach($fieldCfg as $fieldName=>$fieldParam) {
 				if($fieldParam["addQuotes"]) $sqlUPDATE[] = "`".$fieldName."`='".addslashes($param[$fieldName])."'";
 				else $sqlUPDATE[] = "`".$fieldName."`=".addslashes($param[$fieldName]);
 			}
 			$sql = "UPDATE `payroll_bank_source` SET ".implode(",",$sqlUPDATE)." WHERE `id`=".$recID;
-			$erfolg .= "UPDATED";
+			$erfolg .= "updated";
 		}else{
 			$sqlFIELDS = array();
 			$sqlVALUES = array();
 			unset($fieldCfg["id"]);
-			$fieldCfg["payroll_company_ID"] = session_control::getSessionInfo("id");//TODO HM:bin unsicher, ob das richtig ist (id=FirmenNummer?). 
-			//Wenn man die id aus der SessionInfo holt, bekommt man "6", in der DB steht aber "600"
+			//$fieldCfg["payroll_company_ID"] = $param["id"]; 
 			foreach($fieldCfg as $fieldName=>$fieldParam) {
 				$sqlFIELDS[] = "`".$fieldName."`";
-				if($fieldParam["addQuotes"]) $sqlVALUES[] = "'".addslashes($param[$fieldName])."'";
-				else $sqlVALUES[] = addslashes($param[$fieldName]);
+				if($fieldParam["addQuotes"]== true) {
+					$sqlVALUES[] = "'".addslashes($param[$fieldName])."'";
+				} else {
+					$sqlVALUES[] = addslashes($param[$fieldName]);
+				}
 			}
 			$sql = "INSERT INTO `payroll_bank_source`(".implode(",",$sqlFIELDS).") VALUES(".implode(",",$sqlVALUES).")";
-			$erfolg .= "INSERTED";
+			$erfolg .= "inserted";
 		}
-
+		//communication_interface::alert($sql);
 		$system_database_manager = system_database_manager::getInstance();
 		$system_database_manager->executeUpdate($sql, "payroll_savePayslipCfgDetail");
 
-		//communication_interface::alert($erfolg);
+		communication_interface::alert($erfolg);
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;
 	}
+	
+	
 	public function deleteDestBankDetail($param) {
 		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_bank_destination_ID
 			$response["success"] = false;
@@ -466,7 +549,6 @@ class payroll_BL_payment {
 ///////////////////////////////////////////////////////
 //// ZAHLSTELLE bank source                        ////
 ///////////////////////////////////////////////////////
-
 	public function getBankSourceDetail($param) {
 		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) {
 			$response["success"] = false;

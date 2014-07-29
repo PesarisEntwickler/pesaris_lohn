@@ -16,10 +16,16 @@ class variousFunctions {
 		}
 		return $response;
 	}
-
+	
+	public function getNextCompanyId() {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT max(id)+1 as nextCompanyId FROM payroll_company", "payroll.getNextCompanyId");
+		return $result[0]['nextCompanyId'];
+	}
+		
 	public function getCompanyList() {
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_company", "payroll_getCompanyList");
+		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_company", "payroll.getCompanyList");
 
 		if(count($result) < 1) {
 			$response["success"] = false;
@@ -58,11 +64,12 @@ class variousFunctions {
 					"company_shortname"=>array("regex"=>".{1,60}","addQuotes"=>true),
 					"HR-RC-Name"=>array("regex"=>".{1,60}","addQuotes"=>true),
 					"Street"=>array("regex"=>".{1,60}","addQuotes"=>true),
-					"ZIP-Code"=>array("regex"=>"[0-9]{4,4}","addQuotes"=>true),
+					"ZIP-Code"=>array("regex"=>"[0-9]{4,5}","addQuotes"=>true),
 					"City"=>array("regex"=>".{1,50}","addQuotes"=>true),
-					"UID-EHRA"=>array("regex"=>"CH-[0-9]{3}\.[0-9]{1}\.[0-9]{3}\.[0-9]{3}\-[0-9]{1}","addQuotes"=>true),
+					"UID-EHRA"=>array("regex"=>"[A-Z]{3}\-[0-9]{3}\.[0-9]{3}\.[0-9]{3}","addQuotes"=>true),
 					"BUR-REE-Number"=>array("regex"=>".{0,45}","addQuotes"=>true),
 				);
+//					"UID-EHRA"=>array("regex"=>"CH-[0-9]{3}\.[0-9]{1}\.[0-9]{3}\.[0-9]{3}\-[0-9]{1}","addQuotes"=>true),
 
 		///////////////////////////////////////////////////
 		// Mandatory and validity checks

@@ -815,11 +815,7 @@ function prlPsoOpenEmployeeForm(empId) {
 		cb('payroll.prlVlOpenForm',{"id":empId,"dirty":prlVlDirty?1:0,"mode":prlVlDesignMode?1:0,"wndStatus":0,"fldDefFP":prlVlFldDefFP});
 	}
 }
-/*
-*************************************
-** Slick grid utility functions
-*************************************
-*/
+
 /*
 *************************************
 ** Configuration Overview
@@ -1503,7 +1499,7 @@ function prlLoacOpenForm(accId) {
 		}
 	}
 
-	function prlCalcOvInit() {
+	function prlCalcOvInit() {//Lohn bearbeiten
 		prlCalcOvDataView = new Slick.Data.DataView();
 		prlCalcOvGrid = new Slick.Grid("#gridCalcOv", prlCalcOvDataView, prlCalcOvColumns, prlCalcOvOptions);
 		prlCalcOvGrid.onSort.subscribe(function (e, args) {
@@ -3763,6 +3759,32 @@ function prlPmtSpltMainInit() {
 	$('.prlPmtSpltScroll ul').sortable();
 }
 
+function fieldsetZahlungssplittEditJSON2Form() {
+	$.each(prlPmtSplt.editSplt, function(k, v) {
+		var o = $('#prlPmtSplt_'+k);
+		if(o.length > 0) {
+			if(o.is(":checkbox")) o.prop("checked",(v==1?true:false));
+			else o.val(v);
+		}
+	});
+	$('#prlPmtSplt_split_mode').change();
+}
+
+function fieldsetZahlungssplittEditInit() {
+	$('#prlPmtSplt_split_mode').bind('change keyup', function(e) {
+		var f = ['#prlPmtSplt_amount','#prlPmtSplt_payroll_account_ID'];
+		var v = $(this).val();
+		if(v==1) {
+			$(f[1]).show().prev().show().next().next().show();
+			$(f[0]).hide().prev().hide().next().next().hide();
+		}else{
+			$(f[1]).hide().prev().hide().next().next().hide();
+			$(f[0]).show().prev().show().next().next().show();
+			$(f[0]).prev().text($(f[0]).prev().attr('smd'+v));
+		}
+	});
+}
+
 
 function prlPmtSpltEditInit() {
 	$('#prlPmtSplt_split_mode').bind('change keyup', function(e) {
@@ -3849,7 +3871,7 @@ function prl_BankSourceEdit_btnSave() {
 		if($(this).is(":checkbox")) r[n] = $(this).is(':checked') ? 1 : 0;
 		else r[n] = $(this).val();
 	});
-	cb('payroll.paymentSplit', {'action':'GUI_bank_source_save', 'empId':prlPmtSplt.empId, 'data':r});
+	//cb('payroll.paymentSplit', {'action':'GUI_bank_source_save', 'empId':prlPmtSplt.empId, 'data':r});
 }
 
 

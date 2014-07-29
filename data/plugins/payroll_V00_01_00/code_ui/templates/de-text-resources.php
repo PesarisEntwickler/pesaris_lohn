@@ -2,7 +2,7 @@
 $textResourceMap["btnOK"] 			= "OK";
 $textResourceMap["btnSave"] 		= "Speichern";//<wgui:text id="btnSave"/>
 $textResourceMap["btnSaveSettings"] = "Einstellungen speichern";
-$textResourceMap["btnCancel"] 		= "Schliessen";
+$textResourceMap["btnCancel"] 		= "Abbrechen";
 $textResourceMap["btnChange"] 		= "&Auml;ndern";
 $textResourceMap["btnDelete"] 		= "L&ouml;schen";
 $textResourceMap["btnDelEntry"] 	= "Eintrag l&ouml;schen";
@@ -31,6 +31,7 @@ $textResourceMap["btnNeuBerechnen"] = "Dateien erzeugen >";
 $textResourceMap["txtY"] = "Ja";
 $textResourceMap["txtN"] = "Nein";
 
+$textResourceMap["txtWechselkurs"] = "Umrechnungskurs";
 $textResourceMap["txtWaehrung"] = "W&auml;hrung";
 $textResourceMap["txtLohnart"] = "Lohnart";
 $textResourceMap["txtBetrag"] = "Betrag";
@@ -71,15 +72,17 @@ $textResourceMap["txtWaehrungenBearbeiten"] = "W&auml;hrungen bearbeiten";
 $textResourceMap["txtUebersichtZahlungssplit"] = "&Uuml;bersicht Bankverbindung und Zahlungssplit";
 $textResourceMap["txtZahlungssplitMutieren"] = "Zahlungssplit mutieren";
 $textResourceMap["txtZahlungssplitt"] = "Zahlungssplitt";
-$textResourceMap["txtBankverbindungAuswaehlenTitel"] = "Bankverbindung ausw&auml;hlen";
 $textResourceMap["txtBankverbindungBearbeiten"] = "Bankverbindung bearbeiten";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
 $textResourceMap["txtBankverbindungAuswaehlen"] = "Bankverbindung ausw&auml;hlen";
 $textResourceMap["txtZahlstelleLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Zahlstelle l&ouml;schen wollen?";
 $textResourceMap["txtDestinationBankLoeschenSicher"] = "Sind Sie sicher, dass Sie die gew&auml;hlte Bankverbindung l&ouml;schen wollen?";
 $textResourceMap["txtZahlSplittLoeschenSicher"] = "Sind Sie sicher, dass Sie den gew&auml;hlten Auszahlungssplit l&ouml;schen wollen?";
+$textResourceMap["txtZahlstelleNeu"] = "Neue Zahlstelle";
 $textResourceMap["txtZahlstelle"] = "Zahlstelle";
+$textResourceMap["txtZahlstellen"] = "Zahlstellen";
 $textResourceMap["txtZahlstelleBearbeiten"] = "Zahlstelle bearbeiten";
+$textResourceMap["txtZahlstellenBearbeiten"] = "Zahlstellen bearbeiten";
 $textResourceMap["txtZahlstelleBestehend"] = "Bestehende Zahlstellen";
 $textResourceMap["txtZahlstelleAuswaehlen"] = "Zahlstelle ausw&auml;hlen";
 $textResourceMap["txtZahlstelleBezeichnung"] = "Zahlstellen Bezeichnung";
@@ -99,7 +102,7 @@ $textResourceMap["txtZahlstelleBez3"] = "Kontoinhaber Zeile 3";
 $textResourceMap["txtZahlstelleBez4"] = "Kontoinhaber Zeile 4";
 
 $textResourceMap["txtAuszahlungstyp"] = "Auszahlungstyp";
-$textResourceMap["txtSwiftAdr"] = "SWIFT-Adr. der Bank";
+$textResourceMap["txtSwiftAdr"] = "SWIFT (BIC)";
 $textResourceMap["txtBankLabel"] = "Bank";
 $textResourceMap["txtBankName"] = "Bankname";
 $textResourceMap["txtName"] = "Name";
@@ -107,9 +110,9 @@ $textResourceMap["txtKonto"] = "Konto (IBAN)";
 $textResourceMap["txtPostcheckkonto"] = "Postcheckkonto";
 $textResourceMap["txtSpesenregelung"] = "Spesenregelung";
 $textResourceMap["txtSpesenregelungKeine"] = "keine Regelung";
-$textResourceMap["txtSpesenregelungzlAuftraggeber"] = "zu Lasten Auftraggeber";
-$textResourceMap["txtSpesenregelungzlBeguenstigter"] = "zu Lasten Beg&uuml;nstigter";
-$textResourceMap["txtSpesenregelungTeilung"] = "Spesen-Teilung";
+$textResourceMap["txtSpesenregelungzlAuftraggeber"] = "OUR: zu Lasten Auftraggeber";
+$textResourceMap["txtSpesenregelungzlBeguenstigter"] = "BEN: zu Lasten Beg&uuml;nstigter";
+$textResourceMap["txtSpesenregelungTeilung"] = "SHA: Spesen-Teilung";
 
 $textResourceMap["txtAdressZusatz"] = "Adresszusatz";
 $textResourceMap["txtAdresse"] = "Adresse";
@@ -128,13 +131,12 @@ $textResourceMap["txtAlle"] = "alle&nbsp;";
 $textResourceMap["txtAbrechnungsperioden"] = "Abrechnungsperioden";
 $textResourceMap["txtZwischenzahltage"] = "Zwischenzahltage";
 
-$textResourceMap["txtAuszkritInReihenfolge"] = "Die untenstehenden Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet.";
+$textResourceMap["txtAuszkritInReihenfolge"] = "Die untenstehenden Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet";
 $textResourceMap["txtTableHeadersPaymentSplit"] = 
 		"<ul>" .
-			"<li>Zahlstelle</li>" .
 			"<li>Bankverbindung</li>" .
 			"<li>Split-Modus</li>" .
-			"<li>Betrag</li>" .
+			"<li>Wert</li>" .
 			"<li>Periode</li>" .
 			"<li></li>" .
 		"</ul>";
@@ -192,16 +194,19 @@ $textResourceMap["prlCfgLoacBtnFldMod"] = "Feld-Modifikatoren";
 $textResourceMap["txtAbrechnungsdatenvorbereiten"] = "Abrechnungsdaten vorbereiten";
 $textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabr.-Vorlagen konfigurieren";
 $textResourceMap["txtPersonalstammfelderverwalten"] = "Personalstammfelder verwalten";
+$textResourceMap["txtPersonalstammfeldAuswaehlen"] = "Personalstammfeld ausw&auml;hlen";
+$textResourceMap["txtPersonalstammfeldverwalten"] = "Personalstamm-Feld verwalten";
+
 $textResourceMap["txtLohnartkopieren"] = "Lohnart kopieren";
 $textResourceMap["txtDBBackup"] = "DB Backup erstellen";
 $textResourceMap["txtDBRestore"] = "DB Wiederherstellung";
 $textResourceMap["txtFremdwaehrungenVerwalten"] = "Fremdw&auml;hrungen verwalten";
 $textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abgeschlossen";
 $textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
+$textResourceMap["txtKanton"] = "Kanton";
 
 $textResourceMap["prlFldModBtnNew"] = "Neuer Feld-Modifikator";
 $textResourceMap["prlFldModBtnQFilter"] = "Tabellenfilter";
-
 $textResourceMap["prlCfgCmpcBtnNew"] = "Neue Firma";
 $textResourceMap["prlCfgCmpcBtnQFilter"] = "Tabellenfilter";
 $textResourceMap["prlCfgInscBtnNew"] = "Neue Versicherungspraemie";
@@ -233,7 +238,7 @@ $textResourceMap["prlFormCfg_Street"] = "Strasse";
 $textResourceMap["prlFormCfg_ZIP_Code"] = "PLZ";
 $textResourceMap["prlFormCfg_City"] = "Ort";
 $textResourceMap["prlFormCfg_UID_EHRA"] = "Handelsregisternummer (UID)";
-$textResourceMap["prlFormCfg_BUR_REE_Number"] = "BUR-Nummer";
+$textResourceMap["prlFormCfg_BUR_REE_Number"] = "BUR-Nummer (Statistik-Nr)";
 $textResourceMap["prlFormCfg_Description"] = "System-LOA (Bezeichnung)";
 //$textResourceMap["prlFormCfg_payroll_account_ID"] = "Zugewiesene LOA-Nummer";
 $textResourceMap["prlFormCfg_CompanyName"] = "Firmenname";
@@ -385,7 +390,6 @@ $textResourceMap["prlLoaFeEdtQuantity"] = "MENGE";
 $textResourceMap["prlLoaFeEdtRate"] = "ANSATZ";
 $textResourceMap["prlLoaFeEdtAmount"] = "BETRAG";
 $textResourceMap["prlLoaFeEdtConst"] = "Konstante";
-$textResourceMap["prlLoaFeCancel"] = "Abbrechen";
 
 $textResourceMap["prlLoaFeOvBtnNew"] = "Neue Formel";
 $textResourceMap["prlLoaFeOvLgndExisting"] = "Bestehende Formeln";

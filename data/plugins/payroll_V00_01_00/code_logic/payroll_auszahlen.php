@@ -74,7 +74,13 @@ class auszahlen {
 					, "currency"=>$result_bank_source[0]["bank_source_currency_code"]
 					);		 
 	}
-	public function getZahlstellenDaten() {
+	public function getZahlstellenDaten($companyID) {
+		$companyClause = "";
+		if (isset($companyID)) {
+			if (intval($companyID)> 0) {
+				$companyClause = " AND payroll_company.id = ".$companyID;
+			}
+		}
 		$system_database_manager = system_database_manager::getInstance();
 		$resBankSrc = $system_database_manager->executeQuery("
 			SELECT *
@@ -85,6 +91,7 @@ class auszahlen {
 			, payroll_company
 			WHERE
 				payroll_company.id = payroll_bank_source.payroll_company_ID
+				".$companyClause."
 			AND
 			  payroll_bank_source.source_type = payroll_bank_source_type.type_id
 			ORDER BY payroll_bank_source.id
@@ -288,7 +295,7 @@ class auszahlen {
 			$retval["errCode"]  = 109;
 			$retval["errText"]  = "Keine Daten gefunden.";
 			$retval["count"]    = 0;
-			$retval["data"] 	= "";
+			$retval["data"] 	= array();
 		}else{
 			$retval["success"] 	= true;
 			$retval["errCode"]  = 0;
@@ -298,21 +305,6 @@ class auszahlen {
 		return $retval;		
 	}
 
-	public function getEmployeesCurrentPeriodAmount($accountList, $emplIdList) {
-		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("
-			SELECT amount FROM payroll_calculation_current 
-			WHERE payroll_employee_ID IN (".$emplIdList.")
-			AND   payroll_account_ID IN (".$accountList.")
-		    ; ");
-		$amount = "0.00";
-		if (count($result)>0) {
-			$arrAmt = explode(".", $result[0]['amount']);
-			$amount = $arrAmt[0].",".substr(rtrim($arrAmt[1], "0")."00", 0,2);	//formatiert auf 123.45			
-		}
-		return $amount;
-	}
-	
 	function getEployeesWithoutIBAN(){
 		$system_database_manager = system_database_manager::getInstance();
 		$result_dest_emp = $system_database_manager->executeQuery("				
@@ -332,15 +324,44 @@ class auszahlen {
 		}
 		return $c;
 	}
-		
 
-	public function getFirstDestinationBankAccount($employeeID) {
+	function getPaymentSplit($employeeID){
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("				
+			SELECT * FROM
+			          payroll_payment_split
+			WHERE	  payroll_employee_ID = ".$employeeID."
+			ORDER BY  processing_order
+					;");
+		if(count($result) == 0) {
+			$retval["success"] 	= false;
+			$retval["errCode"]  = 109;
+			$retval["errText"]  = "Keine Daten gefunden.";
+			$retval["count"]    = 0;
+			$retval["data"] 	= array();
+		}else{
+			$retval["success"] 	= true;
+			$retval["errCode"]  = 0;
+			$retval["count"]    = count($result);
+			$retval["data"] 	= $result;
+		}
+		return $retval;		
+	}
+
+
+	public function getDestinationBankAccount($employeeID, $bankDestID) {
 		$retArray = array();
+		$bankDestIDClause = "";
+		$bankDestID = intval($bankDestID);
+		if ($bankDestID > 0) {
+			$bankDestIDClause = " AND id = ".$bankDestID;
+		}
 		$system_database_manager = system_database_manager::getInstance();
 		$result_bank_destination = $system_database_manager->executeQuery("				
 			SELECT * FROM
 			 payroll_bank_destination
 			WHERE payroll_employee_ID = ".$employeeID."
+			".$bankDestIDClause." 
 			ORDER BY destination_type, id 
 			;");
 		$idx = 0;	 				
@@ -409,6 +430,57 @@ class auszahlen {
 		return $retArray;
 	}
 	
+	public function calcSplitAmount($splitMode, $splitValue, $openEmployeeAmount, $maxCalcAmount, $employee_ID ,$account_ID) {
+		$payAmount = 0;
+		//$splitValue        : ist der Betrag, der die Splitt-Tabelle für den hier aktuellen Split hergibt
+		//                     dieser ist aber unterschiedlich je nach split_mode
+		//$openEmployeeAmount: ist der Rest, der man jetzt noch auszahlen kann
+		//$maxCalcAmount     : ist der maximal auszubezahlende Betrag aus der Calculation-Tabelle (aus der Lohnart 8000)
+		if(floatval($openEmployeeAmount) > 0 && floatval($splitValue)<>0){	
+			switch ( $splitMode ) {
+				case 3://Betrag (im $splitValue steht der Auszahlungssbetrag)
+					$payAmount = floatval($splitValue);
+					break;				
+				case 2: //Prozente (im $splitValue steht die ProzenteZahl)
+					//ein $splitValue="50.00" wird als 50% interpretiert
+					$payAmount = floatval($splitValue) / 100 * floatval($maxCalcAmount);
+					break;				
+				case 1://Nach Lohnart
+					//hier ist der $splitValue als das Maximum zu verstehen, 
+					//was man auszahlen kann (bezüglich dieser Lohnart)
+					//--> man muss in der Calculation nachsehen, 
+					//ob im Lohnart-Konto was drin steht und das Maximum bestimmen
+					$maxLohnartAmount = $this->getCurrentPeriodAccountAmount($account_ID, $employee_ID);
+					if($maxLohnartAmount <= 0){
+						$maxLohnartAmount = floatval($splitValue);//max Auszahlung gemäss Splitt-Tabelle
+					} 
+					$payAmount = $maxLohnartAmount;	
+					break;				
+			}//end switch
+		}
+		//wenn aber weniger zur Verfügunjg steht, 
+		//weil schon ein Teil mit vorherigem Splitt ausbetzahlt wurde
+		//(nebenbei: $openEmployeeAmount ist immer gleich oder weniger als $maxCalcAmount)
+		if( floatval($openEmployeeAmount) < $payAmount ) {
+			$payAmount = floatval($openEmployeeAmount);//das wäre dann der Rest
+		}
+		return $this->rundungAuf5Rappen($payAmount);
+	}
+	
+	public function getCurrentPeriodAccountAmount($account_ID, $employee_ID) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("
+			SELECT amount FROM payroll_calculation_current 
+			WHERE payroll_employee_ID = ".$employee_ID."
+			AND   payroll_account_ID = ".$account_ID."
+		    ; ");
+		$amount = "0.00";
+		if (count($result)>0) {
+			$amount = $result[0]['amount'];
+		}
+		return floatval($amount);
+	}
+	
 	public function replaceUmlaute($uebergabeWort) {
 		$umlaute = array("'","ä","ö" ,"ü" ,"Ä" ,"Ö" ,"Ü" ,"ß" ,"à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
 		$ersatz = array(" ","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u");
@@ -418,7 +490,19 @@ class auszahlen {
 		$ersatz = array( "ae"    ,"oe"    ,"ue"    ,"AE"    ,"OE"    ,"UE"    ,"e"       ,"E"       ,"UE"              ,"UE"      ,"ue"      ,""        ,"ue","o" ,"o","e");
 		return str_replace($umlaute,$ersatz,$uebergabeWort);
 	}
-	
+	/**
+	 * Gibt einen (mixed-)Betrag als Float-Betrag auf 5 Rappen genau gerundet
+	 */
+	public function rundungAuf5Rappen($betrag) {
+		$gerundeterBetrag = floatval($betrag);
+		$flBetrag = $gerundeterBetrag;
+		if($flBetrag <> 0){
+			$flBetrag = $flBetrag * 20;
+			$flBetrag = round($flBetrag, 0);//schneidet nach dem Runden die Kommastellen ab.
+			$gerundeterBetrag = $flBetrag / 20;
+		}
+		return $gerundeterBetrag;
+	}
 	
 }
 ?>

@@ -48,8 +48,6 @@ class payroll_BL {
 			return $auszahlen->getCalculationCurrentPeriodEmployeeList($functionParameters[0], $functionParameters[1]);//("8000",  " < 0.001 ") oder ("8000, 8001, 8002", " >= 0.001 ")
 		case 'payroll.auszahlen.getActualPeriodID':
 			return $auszahlen->getActualPeriodID();
-		case 'payroll.auszahlen.getFirstDestinationBankAccount':
-			return $auszahlen->getFirstDestinationBankAccount($functionParameters[0]);
 		case 'payroll.auszahlen.getActualPeriodName':
 			return $auszahlen->getActualPeriodName();
 		case 'payroll.auszahlen.getActualPeriodDir':
@@ -59,18 +57,55 @@ class payroll_BL {
 		case 'payroll.auszahlen.resetActualPeriodenAuszahlFlags':
 			return $auszahlen->resetActualPeriodenAuszahlFlags($functionParameters[0]);
 		case 'payroll.auszahlen.getZahlstellenDaten':
-			return $auszahlen->getZahlstellenDaten();
-		case 'payroll.auszahlen.getFirstDestinationBankAccount':
-			return $auszahlen->getFirstDestinationBankAccount($functionParameters[0]);//=$employeeID
+			return $auszahlen->getZahlstellenDaten($functionParameters[0]);//$companyID
+		case 'payroll.auszahlen.getDestinationBankAccount':
+			return $auszahlen->getDestinationBankAccount($functionParameters[0],$functionParameters[1]);//=$employeeID, $bankDestID
+		case 'payroll.auszahlen.getCurrentPeriodAccountAmount':
+			return $auszahlen->getCurrentPeriodAccountAmount($functionParameters[0],$functionParameters[1]);//=$account_ID, $employee_ID
 		case 'payroll.auszahlen.getAllDestinationBankAccounts':
 			return $auszahlen->getAllDestinationBankAccounts($functionParameters[0]);//=$employeeID
+		case 'payroll.auszahlen.getPaymentSplit':
+			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1]);//=$employeeID, $bankID
+		case 'replaceUmlaute':
+			return $auszahlen->replaceUmlaute($functionParameters[0]);//=$uebergabeWort
+		case 'rundungAuf5Rappen':
+			return $auszahlen->rundungAuf5Rappen($functionParameters[0]);//=$payAmount
 			
+		case 'payroll.getZahlstelle':
+			return $payrollPayment->getZahlstelle($functionParameters[0]);//$employeeId
+		case 'payroll.getZahlstelle___':
+			return $payrollPayment->getZahlstelle___($functionParameters[0],$functionParameters[1]);//$employeeId, $destBankId
+		case 'payroll.getPaymentSplitList':
+			return $payrollPayment->getPaymentSplitList($functionParameters[0]);//$payrollEmployeeID
+		case 'payroll.getPaymentSplitDetail':
+			return $payrollPayment->getPaymentSplitDetail($functionParameters[0]);
+		case 'payroll.savePaymentSplitDetail':
+			return $payrollPayment->savePaymentSplitDetail($functionParameters[0]);
+		case 'payroll.savePaymentSplitOrder':
+			return $payrollPayment->savePaymentSplitOrder($functionParameters[0]);
+		case 'payroll.deletePaymentSplitDetail':
+			return $payrollPayment->deletePaymentSplitDetail($functionParameters[0]);
+		case 'payroll.getDestBankDetail':
+			return $payrollPayment->getDestBankDetail($functionParameters[0]);
+		case 'payroll.getBankSourceDetail':
+			return $payrollPayment->getBankSourceDetail($functionParameters[0]);
+		case 'payroll.saveDestBankDetail':
+			return $payrollPayment->saveDestBankDetail($functionParameters[0]);
+		case 'payroll.saveBankSourceDetail':
+			return $payrollPayment->saveBankSourceDetail($functionParameters[0]);
+		case 'payroll.deleteDestBankDetail':
+			return $payrollPayment->deleteDestBankDetail($functionParameters[0]);
+		case 'payroll.deleteBankSourceDetail':
+			return $payrollPayment->deleteBankSourceDetail($functionParameters[0]);
+
+		case 'payroll.getNextCompanyId':
+			return $variousFunctions->getNextCompanyId();
+		case 'payroll.getCountryList':
+			return $variousFunctions->getCountryList();
 		case 'payroll.onBootComplete':
 			return $variousFunctions->onBootComplete();
 		case 'payroll.getLanguageList':
 			return $variousFunctions->getLanguageList($functionParameters[0]);
-		case 'payroll.getCountryList':
-			return $variousFunctions->getCountryList();
 		case 'payroll.getFormulaList':
 			return $variousFunctions->getFormulaList();
 		case 'payroll.saveFormula':
@@ -239,29 +274,6 @@ class payroll_BL {
 			return $payslip->getPayslipNotifications($functionParameters[0]);
 		case 'payroll.savePayslipNotifications':
 			return $payslip->savePayslipNotifications($functionParameters[0]);
-
-		case 'payroll.getPaymentSplitList':
-			return $payrollPayment->getPaymentSplitList($functionParameters[0]);
-		case 'payroll.getPaymentSplitDetail':
-			return $payrollPayment->getPaymentSplitDetail($functionParameters[0]);
-		case 'payroll.savePaymentSplitDetail':
-			return $payrollPayment->savePaymentSplitDetail($functionParameters[0]);
-		case 'payroll.savePaymentSplitOrder':
-			return $payrollPayment->savePaymentSplitOrder($functionParameters[0]);
-		case 'payroll.deletePaymentSplitDetail':
-			return $payrollPayment->deletePaymentSplitDetail($functionParameters[0]);
-		case 'payroll.getDestBankDetail':
-			return $payrollPayment->getDestBankDetail($functionParameters[0]);
-		case 'payroll.getBankSourceDetail':
-			return $payrollPayment->getBankSourceDetail($functionParameters[0]);
-		case 'payroll.saveDestBankDetail':
-			return $payrollPayment->saveDestBankDetail($functionParameters[0]);
-		case 'payroll.saveBankSourceDetail':
-			return $payrollPayment->saveBankSourceDetail($functionParameters[0]);
-		case 'payroll.deleteDestBankDetail':
-			return $payrollPayment->deleteDestBankDetail($functionParameters[0]);
-		case 'payroll.deleteBankSourceDetail':
-			return $payrollPayment->deleteBankSourceDetail($functionParameters[0]);
 
 		case 'payroll.calculationReport':
 				require_once('payroll_reports.php');
