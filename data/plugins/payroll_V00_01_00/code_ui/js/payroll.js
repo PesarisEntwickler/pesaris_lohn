@@ -3743,18 +3743,19 @@ var prlPmtSplt = {};
 
 function prlPmtSpltMainInit() {
 	$('#prlPmtSpltClose').bind('click', function(e) { $('#modalContainer').mb_close(); });
-	$('#prlPmtSpltNew').bind('click', function(e) { cb('payroll.paymentSplit',{'action':'editSplit', 'empId':prlPmtSplt.empId, 'rid':0}); });
+	$('#prlPmtSpltNew').bind('click', function(e) { cb('payroll.paymentSplit',{'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'bankID':0}); });//'action':'paymentSplitAction_editSplit'
 	$('#prlPmtSpltSaveOrder').bind('click', function(e) {
 		var r = [];
 		var c = 0;
 		$('.prlPmtSpltScroll ul li').each(function(index) {
 			r.push([$(this).attr('rid'), c++]);
 		});
-		cb('payroll.paymentSplit',{'action':'saveSplitOrder', 'empId':prlPmtSplt.empId, 'data':r});
+		cb('payroll.paymentSplit',{'action':'paymentSplitAction_saveSplitOrder', 'empId':prlPmtSplt.empId, 'data':r});
 	});
 	$('.prlPmtSpltScroll li div span').bind('click', function(e) {
-		var a = $(this).attr('class')=='d' ? 'delSplit' : 'editSplit'; //gibt e oder d
-		cb('payroll.paymentSplit',{'action':a, 'empId':prlPmtSplt.empId, 'rid':$(this).parent().parent().attr('rid')});
+		var a = $(this).attr('class')=='d' ? 'paymentSplitAction_deleteSplit' : 'paymentSplitAction_BankverbindungBearbeiten'; //gibt e oder d  //'paymentSplitAction_editSplit'
+		//alert("payroll.js    rid:"+$(this).parent().parent().attr('rid'));
+		cb('payroll.paymentSplit',{'action':a, 'empId':prlPmtSplt.empId, 'bankID':0, 'splitID':$(this).parent().parent().attr('rid')});
 	});
 	$('.prlPmtSpltScroll ul').sortable();
 }
@@ -3785,6 +3786,28 @@ function fieldsetZahlungssplittEditInit() {
 	});
 }
 
+function prlBankDestSave() {
+	var r = {};
+	$('input[id^="prlPmtSplt_"], select[id^="prlPmtSplt_"]').each(function( index ) {
+		var n = $(this).attr('id').substring(11);
+		if($(this).is(":checkbox")) r[n] = $(this).is(':checked') ? 1 : 0;
+		else r[n] = $(this).val();
+	});
+	cb('payroll.paymentSplit', {'action':'paymentSplitAction_saveBankDestination', 'empId':prlPmtSplt.empId, 'data':r});
+}
+
+
+function jsSaveBankDestinationUndSplit() {
+
+	var r = {};
+	$('input[id^="prlPmtSplt_"], select[id^="prlPmtSplt_"]').each(function( index ) {
+		var n = $(this).attr('id').substring(11);
+		if($(this).is(":checkbox")) r[n] = $(this).is(':checked') ? 1 : 0;
+		else r[n] = $(this).val();
+	});
+	var eID = r['payroll_employee_ID'];
+	cb('payroll.paymentSplit', {'action':'paymentSplitAction_saveBankDestinationUndSplit', 'empId':eID, 'data':r});
+}
 
 function prlPmtSpltEditInit() {
 	$('#prlPmtSplt_split_mode').bind('change keyup', function(e) {
@@ -3807,27 +3830,23 @@ function prlPmtSpltEditInit() {
 			o.val('0.01');
 		}
 	});
-	$('#prlPmtSpltSave').bind('click', function(e) {
-		prlPmtSpltEditForm2JSON();
-		cb('payroll.paymentSplit', {'action':'saveSplit', 'empId':prlPmtSplt.empId, 'data':prlPmtSplt.editSplt});
-	});
-	$('#prlPmtSpltCancel').bind('click', function(e) {
-		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
-	});
-	$('#prlPmtSplt_BankSource_Cancel').bind('click', function(e) {
-		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
-	});
-	$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) {
-		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
-	});
-	$('#prlPmtSplt_BtnBSEdit').bind('click', function(e) {
-		prlPmtSpltEditForm2JSON();
-		cb('payroll.paymentSplit', {'action':'GUI_bank_source_Overview', 'empId':prlPmtSplt.empId});
-	});
-	$('#prlPmtSplt_BtnBDEdit').bind('click', function(e) {
-		prlPmtSpltEditForm2JSON();
-		cb('payroll.paymentSplit', {'action':'ovBankD', 'empId':prlPmtSplt.empId});
-	});
+//	$('#prlPmtSpltCancel').bind('click', function(e) {
+//		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
+//	});
+//	$('#prlPmtSplt_BankSource_Cancel').bind('click', function(e) {
+//		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
+//	});
+//	$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) {
+//		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
+//	});
+//	$('#prlPmtSplt_BtnBSEdit').bind('click', function(e) {
+//		prlPmtSpltEditForm2JSON();
+//		cb('payroll.paymentSplit', {'action':'GUI_bank_source_Overview', 'empId':prlPmtSplt.empId});
+//	});
+//	$('#prlPmtSplt_BtnBDEdit').bind('click', function(e) {
+//		prlPmtSpltEditForm2JSON();
+//		cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungAuswaehlen', 'empId':prlPmtSplt.empId});
+//	});
 }
 
 function prlPmtSpltEditJSON2Form() {
@@ -3852,16 +3871,6 @@ function prlPmtSpltEditForm2JSON() {
 		if($(this).is(":checkbox")) prlPmtSplt.editSplt[$(this).attr('id').substring(11)] = $(this).is(':checked') ? 1 : 0;
 		else prlPmtSplt.editSplt[$(this).attr('id').substring(11)] = $(this).val();
 	});
-}
-
-function prlBankDestSave() {
-	var r = {};
-	$('input[id^="prlPmtSplt_"], select[id^="prlPmtSplt_"]').each(function( index ) {
-		var n = $(this).attr('id').substring(11);
-		if($(this).is(":checkbox")) r[n] = $(this).is(':checked') ? 1 : 0;
-		else r[n] = $(this).val();
-	});
-	cb('payroll.paymentSplit', {'action':'saveBankD', 'empId':prlPmtSplt.empId, 'data':r});
 }
 
 function prl_BankSourceEdit_btnSave() {

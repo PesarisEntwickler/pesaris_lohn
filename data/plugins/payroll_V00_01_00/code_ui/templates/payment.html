@@ -24,7 +24,7 @@
 					/>
 				</td>
 				<td style="height:25px;">
-					<button id="btnBankverbindungStnd" name="btnBankverbindungStnd" class="PesarisButton" style="width: 25px;height: 25px;"><span class="edit"></span></button>
+					<!-- button id="btnBankverbindungStnd" name="btnBankverbindungStnd" class="PesarisButton" style="width: 25px;height: 25px;"><span class="edit"></span></button-->
 				</td>
 			</tr>
 			<tr><td colspan="4"><wgui:text id="txtZahlungssplitt"/>:
@@ -57,6 +57,7 @@
 
 
 <wgui:block name="paymentSplitEdit">
+	<!-- dieses GUI ist eliminiert -->
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit PesarisWGUI">
 		<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
 				<select id="prlPmtSplt_period">
@@ -82,14 +83,15 @@
 					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
 				</select><br/>
 		<label for="prlPmtSplt_split_mode"><wgui:text id="txtZuteilkriterium"/>:</label>
-				<select id="prlPmtSplt_split_mode">
-					<option value="2">%</option>
-					<option value="3"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtBetrag"/></option>
-					<option value="1"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtLohnart"/></option>
-				</select><br/>
+			<select id="prlPmtSplt_split_mode">
+				<option value="2">%</option>
+				<option value="3"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtBetrag"/></option>
+				<option value="1"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtLohnart"/></option>
+			</select><br/>
 		<label for="prlPmtSplt_amount" smd2="Prozent (%):" smd3="Betrag:"></label>
-				<input type="text" id="prlPmtSplt_amount"/><br/>
-		<label for="prlPmtSplt_payroll_account_ID"><wgui:text id="txtLohnart"/>:</label><input type="text" id="prlPmtSplt_payroll_account_ID"/><br/>
+			<input type="text" id="prlPmtSplt_amount"/><br/>
+		<label for="prlPmtSplt_payroll_account_ID"><wgui:text id="txtLohnart"/>:</label>
+			<input type="text" id="prlPmtSplt_payroll_account_ID"/><br/>
 		<label for="prlPmtSplt_payroll_currency_ID"><wgui:text id="txtWaehrung"/>:</label>
 			<select id="prlPmtSplt_payroll_currency_ID">
 				<option value="CHF">CHF</option>
@@ -120,9 +122,12 @@
 
 <wgui:block name="paymentSplitDelete">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
-	<br/><wgui:text id="txtZahlSplittLoeschenSicher"/><br/>&nbsp;
+		<br/><wgui:text id="txtZahlSplittLoeschenSicher"/><br/>&nbsp;
 	</div>
-	<button id="prlPmtSpltYes"><wgui:text id="txtY"/></button><button id="prlPmtSpltNo"><wgui:text id="txtN"/></button>
+	<div style="float: right;">
+		<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
+		<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
+	</div>
 </wgui:block name="paymentSplitDelete">
 
 
@@ -150,7 +155,7 @@
 
 
 <wgui:block name="destinationBankEdit"> 
-	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEditBD" style="height:430px;">
+	<div id="destBankContainer" class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEditBD" style="height:430px;">
 		<input type="hidden" id='prlPmtSplt_id' value='<wgui:var name="id"/>'/>
 		<input type="hidden" id='prlPmtSplt_payroll_employee_ID' value='<wgui:var name="payroll_employee_ID"/>'/>
 		<table cellpadding="0" cellspacing="0">
@@ -160,7 +165,7 @@
 					<legend>
 						<wgui:text id="txtZahlstelle"/>
 					</legend>
-					<select id="prlPmtSplt_zahlstellen" name="prlPmtSplt_zahlstellen" style="width:370px;margin-bottom:4px;" size="1" >
+					<select id="prlPmtSplt_selectedZahlstelle" name="prlPmtSplt_selectedZahlstelle" style="width:370px;margin-bottom:4px;" size="1" >
 							<option value="0"><wgui:text id="txtStandardVerwenden"/></option>
 						<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
 							<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>">
@@ -180,18 +185,35 @@
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtAllgemein"/></legend>
-					<label for="prlPmtSplt_description"><wgui:text id="txtBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value="<wgui:var name="description"/>"/><br/>
 					<label for="prlPmtSplt_destination_type"><wgui:text id=""/><wgui:text id="txtAuszahlungstyp"/>:</label>
 						<select id="prlPmtSplt_destination_type">
 							<option value="1"><wgui:text id="txtBank"/></option>
 							<option value="2"><wgui:text id="txtPost"/></option>
 							<option value="3"><wgui:text id="txtCash"/></option>
 						</select><br/>
-				</fieldset>
-				<fieldset>
-					<legend><wgui:text id="txtBankLabel"/></legend>
+					<label for="prlPmtSplt_description"><wgui:text id="txtBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value="<wgui:var name="description"/>"/><br/>
 					<label for="prlPmtSplt_bank_account"><wgui:text id="txtKonto"/>:</label><input type="text" id="prlPmtSplt_bank_account" value="<wgui:var name="bank_account"/>"/><br/>
 					<label for="prlPmtSplt_postfinance_account"><wgui:text id="txtPostcheckkonto"/>:</label><input type="text" id="prlPmtSplt_postfinance_account" value="<wgui:var name="postfinance_account"/>"/><br/>
+					<label for="prlPmtSplt_expense"><wgui:text id="txtSpesenregelung"/>:</label>
+						<select id="prlPmtSplt_expense">
+							<option value=""><wgui:text id="txtSpesenregelungKeine"/></option>
+							<option value="0"><wgui:text id="txtSpesenregelungzlAuftraggeber"/></option>
+							<option value="1"><wgui:text id="txtSpesenregelungzlBeguenstigter"/></option>
+							<option value="2"><wgui:text id="txtSpesenregelungTeilung"/></option>
+						</select><br/>
+				</fieldset>
+				<fieldset>
+					<legend><wgui:text id="txtBeguenstigter"/></legend>
+					<label for="prlPmtSplt_beneficiary1_line1"><wgui:text id="txtName"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line1" value="<wgui:var name="beneficiary1_line1"/>"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line2"><wgui:text id="txtAdressZusatz"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line2" value="<wgui:var name="beneficiary1_line2"/>"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line3"><wgui:text id="txtAdresse"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line3" value="<wgui:var name="beneficiary1_line3"/>"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line4"><wgui:text id="txtPlzOrt"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line4" value="<wgui:var name="beneficiary1_line4"/>"/><br/>
+				</fieldset>
+				<button id="btnInitZahlungssplitt" class="PesarisButton" style="width: 380px; margin: 8px;"><wgui:text id="txtZahlungssplittInit"/></button>
+			</td>
+			<td>
+				<fieldset>
+					<legend><wgui:text id="txtBankLabel"/></legend>
 					<label for="prlPmtSplt_bank_swift"><wgui:text id="txtSwiftAdr"/>:</label><input type="text" id="prlPmtSplt_bank_swift" value="<wgui:var name="bank_swift"/>"/><br/>
 					<label for="prlPmtSplt_beneficiary_bank_line1"><wgui:text id="txtBankName"/>:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line1" value="<wgui:var name="beneficiary_bank_line1"/>"/><br/>
 					<label for="prlPmtSplt_beneficiary_bank_line2"><wgui:text id="txtAdresse"/>:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line2" value="<wgui:var name="beneficiary_bank_line2"/>"/><br/>
@@ -202,22 +224,6 @@
 								<option value='<wgui:loopvar loopname="countryLoop" varname="id"/>'><wgui:loopvar loopname="countryLoop" varname="country_name"/></option>
 							</wgui:loop name="countryLoop">
 						</select><br/>
-					<label for="prlPmtSplt_expense"><wgui:text id="txtSpesenregelung"/>:</label>
-						<select id="prlPmtSplt_expense">
-							<option value=""><wgui:text id="txtSpesenregelungKeine"/></option>
-							<option value="0"><wgui:text id="txtSpesenregelungzlAuftraggeber"/></option>
-							<option value="1"><wgui:text id="txtSpesenregelungzlBeguenstigter"/></option>
-							<option value="2"><wgui:text id="txtSpesenregelungTeilung"/></option>
-						</select><br/>
-				</fieldset>
-			</td>
-			<td>
-				<fieldset>
-					<legend><wgui:text id="txtBeguenstigter"/></legend>
-					<label for="prlPmtSplt_beneficiary1_line1"><wgui:text id="txtName"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line1" value="<wgui:var name="beneficiary1_line1"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary1_line2"><wgui:text id="txtAdressZusatz"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line2" value="<wgui:var name="beneficiary1_line2"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary1_line3"><wgui:text id="txtAdresse"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line3" value="<wgui:var name="beneficiary1_line3"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary1_line4"><wgui:text id="txtPlzOrt"/>:</label><input type="text" id="prlPmtSplt_beneficiary1_line4" value="<wgui:var name="beneficiary1_line4"/>"/><br/>
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtEndBeguenstigter"/></legend>
@@ -290,9 +296,9 @@
 		</table>
 	</div>
 	<table style="width: 100%"><tr>
-		<!-- <td align="left"><button id="prlPmtSpltCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button></td> -->
-		<td align="left"><button id="prlPmtSpltClose" class="PesarisButton" onclick="$('#modalContainer').mb_close();"><wgui:text id="btnClose"/></button></td>
-		<td align="right"><button id="prlPmtSpltSave" class="PesarisButton"><wgui:text id="btnSave"/></button></td>
+		<td align="left"><button id="prlPmtSpltClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
+		<td align="right">			
+			<button id="btnSaveBankDestinationUndSplit" class="PesarisButton"><wgui:text id="btnSave"/></button></td>
 	</tr></table>
 </wgui:block name="destinationBankEdit">
 

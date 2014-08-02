@@ -1201,7 +1201,7 @@ ul.prlPrdSetDate {
 	/*overflow-y:scroll;*/
 	overflow:auto;
 	background-color: #ddd;
-	height:86px;
+	height:88px;
 }
 
 .prlPmtSpltHeader ul, .prlPmtSpltScroll ul {
@@ -1258,10 +1258,14 @@ ul.prlPrdSetDate {
 	width:90px;
 }
 
-.prlPmtSpltHeader ul li:first-child, .prlPmtSpltHeader ul li:first-child + li, .prlPmtSpltScroll ul li div:first-child, .prlPmtSpltScroll ul li div:first-child + div {
-	width:175px;
+.prlPmtSpltHeader ul li:first-child, .prlPmtSpltHeader ul li:first-child, .prlPmtSpltScroll ul li div:first-child {
+	width:260px;
 }
-
+/*
+.prlPmtSpltHeader ul li:first-child, .prlPmtSpltHeader ul li:first-child + li, .prlPmtSpltScroll ul li div:first-child, .prlPmtSpltScroll ul li div:first-child + div {
+	width:260px;
+}
+*/
 .prlPmtSpltHeader ul li:last-child, .prlPmtSpltScroll ul li div:last-child {
 	width:50px;
 }
@@ -1356,7 +1360,7 @@ span.edit {
 
 .prlPmtSpltEdit label {
 	display:inline-block;
-	width:180px;
+	width:170px;
 }
 
 .prlPmtSpltEditBD {
@@ -1371,7 +1375,7 @@ span.edit {
 }
 .prlPmtSpltEditBD label {
 	display:inline-block;
-	width:180px;
+	width:170px;
 }
 
 .prlPmtSpltEdit_bank_source {
@@ -1385,7 +1389,7 @@ span.edit {
 
 .prlPmtSpltEdit_bank_source label {
 	display:inline-block;
-	width:180px;
+	width:170px;
 }
 
 .prlPeriodenFileWrapper { 

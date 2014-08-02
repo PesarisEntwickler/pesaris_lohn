@@ -3,7 +3,10 @@ class payroll_UI {
 	public function sysListener($functionName, $functionParameters) {
 		global $aafwConfig;
 		
-		$txtLoeschungBestaetigen = "L&ouml;schung best&auml;tigen";
+		//communication_interface::alert("code_ui:".$functionName."\n");
+		
+		//einige allgemeine Texte holen	
+		$txtLoeschungBestaetigen = "Loeschung bestaetigen";
 
 		//error_log("\n", 3, "/var/log/copronet-application.log");
 		//communication_interface::alert(""); //alert sollte nur zu Debug-Zwecken eingesetzt werden
@@ -228,7 +231,7 @@ class payroll_UI {
 				$objWindow->windowTitle($title); //Mitarbeiterdaten erfassen / aendern
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(830);
-				$objWindow->windowHeight(525);
+				$objWindow->windowHeight(500);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -251,13 +254,14 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#prlVlTabContainer').height( $('#employeeForm .o').height() - $('#prlVlTabs .o').height() - 40 );");
 				communication_interface::jsExecute("$('#employeeForm .n').html('".$title." (<span id=\"prlVlTitle\"></span>)');");
 			}
-
+			$MAinfo = "";
 			$employeeID = "";
 			$bankdestinationID = "";
 			if(isset($functionParameters[0]["id"]) && $functionParameters[0]["id"]!="" && $functionParameters[0]["id"]!=0) {
 				$employeeID = $functionParameters[0]["id"];
 				$employeeData = blFunctionCall('payroll.getEmployeeDetail',$employeeID,true);
 				if($employeeData["success"]) {
+					$MAinfo = addslashes( $employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"] );
 					$bankDestArr = blFunctionCall('payroll.auszahlen.getDestinationBankAccount',$employeeID,"");
 					if(strlen($bankDestArr["bank_id"]) > 0) {
 						$bankdestinationID = $bankDestArr["bank_id"];
@@ -328,7 +332,7 @@ class payroll_UI {
 						}
 					}
 					if($fieldCollector != "") communication_interface::jsExecute("prlVlFill( [".$fieldCollector."] );");
-					communication_interface::jsExecute("$('#prlVlTitle').html('".$employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"]."');");
+					communication_interface::jsExecute("$('#prlVlTitle').html('".$MAinfo."');");
 				}
 			}else{
 				communication_interface::jsExecute("$('#prlVlTitle').html('* NEUERFASSUNG *');");
@@ -1034,7 +1038,7 @@ class payroll_UI {
 				//gewisse Masken muessen mit SELECT-Daten gefuellt werden
 				switch($sectionID) {
 				case "CfgCmpc":
-					$zahlstellenDaten = blFunctionCall('payroll.auszahlen.getZahlstellenDaten', $recID);
+					$zahlstellenDaten = blFunctionCall('payroll.auszahlen.getZahlstellenListe', $recID);
 					if($zahlstellenDaten["success"]) $data["zahlstellen_list"] = $zahlstellenDaten["data"];
 					if ($recID == 0) {
 						$nextCompanyId = blFunctionCall('payroll.getNextCompanyId');
@@ -1150,7 +1154,7 @@ class payroll_UI {
 			if($sectionID=="CfgCmpc") {
 				//communication_interface::alert("recID=".$recID.", nextCompanyId=".$nextCompanyId);
 				communication_interface::jsExecute("$('#prlFormCfg_id').val('".$nextCompanyId."')");			
-				communication_interface::jsExecute("$('#zahlstellen').bind('click',    function(e) {cb('payroll.paymentSplit',{'action':'GUI_bank_source_edit','bankId':this.value,'company_ID':'".$recID."'}) } )");			
+				communication_interface::jsExecute("$('#selZahlstelle').bind('click',    function(e) {cb('payroll.paymentSplit',{'action':'GUI_bank_source_edit','bankId':this.value,'company_ID':'".$recID."'}) } )");			
 				communication_interface::jsExecute("$('#neueZahlstelle').bind('click', function(e) {cb('payroll.paymentSplit',{'action':'GUI_bank_source_edit','bankId':'0',       'company_ID':'".$recID."'}); })");			
 			}
 			break;
@@ -1618,7 +1622,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
 				if($ret["success"]) $data["employeeFilter_list"] = $ret["data"];
 
-				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenDaten");
+				$ret = blFunctionCall("payroll.auszahlen.getZahlstellenListe");
 				if($ret["success"]) $data["zahlstellen_list"] = $ret["data"];
 
 				$objWindow = new wgui_window("payroll", "wndIDAuszahlenGenerate"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
@@ -2803,7 +2807,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 
 							if($functionParameters[0]["FieldDef"]!=1) communication_interface::jsExecute($this->getEmplFieldDef());
 							if($functionParameters[0]["id"]!=0) {
-//communication_interface::alert(print_r($formList,true));
+							//communication_interface::alert(print_r($formList,true));
 								$retFld = array();
 								$infoFld = array();
 								foreach($formList["data"] as $fld=>$val) $retFld[] = "'".$fld."':'".str_replace("'","\\'",$val)."'";
@@ -2838,7 +2842,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 							}else{
 								communication_interface::jsExecute("$('#modalContainer input').css('background-color','');");
 								communication_interface::jsExecute("$('#modalContainer select').css('background-color','');");
-//communication_interface::alert(print_r($ret,true));
+								//communication_interface::alert(print_r($ret,true));
 								if($ret["errCode"]==30) {
 									foreach($ret["fieldNames"] as $fld) {
 										if($fld["FieldName"]=="label") communication_interface::jsExecute("$('.prlPslpCfgLstI li').eq(".$fld["index"].").find('input').eq(0).css('background-color','#f88');");
@@ -2930,186 +2934,166 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				communication_interface::jsExecute("$('#prlFormCfg_destAcc').css('width','60px');");
 			}
 			break;
+
+
+/* **** P A Y M E N T   S P L I T T  *******************************************************************  */
+/* **** start                        *******************************************************************  */
+					
 		case 'payroll.paymentSplit':
-			//communication_interface::alert("payroll.paymentSplit:");
 			if(!isset($functionParameters[0]["action"])) {
-				$functionParameters[0]["action"] = "ovSplit";
+				$functionParameters[0]["action"] = "paymentSplitAction_UebersichtZahlungssplit";
 			}			
 			$payrollEmployeeID = isset($functionParameters[0]["empId"]) ? $functionParameters[0]["empId"] : 0;
-
+			$employee = blFunctionCall('payroll.getEmployee', $payrollEmployeeID);
+			$company_ID = $employee["data"][0]["payroll_company_ID"];
+			$MAInfo = addslashes( $employee["data"][0]["EmployeeNumber"]." ".$employee["data"][0]["Lastname"].", ".$employee["data"][0]["Firstname"]);
+	//communication_interface::alert("payroll.paymentSplit \n payrollEmployeeID:".$payrollEmployeeID."\n action:".$functionParameters[0]["action"]);
+		
 			switch($functionParameters[0]["action"]) {
-			case 'ovSplit': //case 'payroll.paymentSplit' action:'ovSplit'
+			case 'paymentSplitAction_UebersichtZahlungssplit': 
+				//communication_interface::alert("Form load paymentSplitAction_UebersichtZahlungssplit");
 				$data["paymentSplitList"] = array();
-				$res = blFunctionCall('payroll.getPaymentSplitList', $payrollEmployeeID);
-				$employee = blFunctionCall('payroll.getEmployee', $payrollEmployeeID);
+				$splitList = blFunctionCall('payroll.getPaymentSplitList', $payrollEmployeeID);
 				$bankdestinationID = 0;
-				if($res["success"]) {
-					//Mitarbeiter hat Zahlungssplit					
-					foreach($res["data"] as $row) {
-						if ($bankdestinationID < 1) {//die erste Bank gemäss Processing Order
-							$bankdestinationID = $row["payroll_bank_destination_ID"];
-							//communication_interface::alert("payroll_bank_destination_ID: ".$bankdestinationID);
-						}
-						switch($row["split_mode"]) {
-						case 1: $row["split_mode"]="Lohnart"; break;
-						case 2: $row["split_mode"]="%"; break;
-						case 3: $row["split_mode"]="Betrag"; break;
-						}//end switch
-						
-						$periodFlags = ($row["major_period"]==0 ? 0 : 1) + ($row["minor_period"]==0 ? 0 : 2) + ($row["major_period_bonus"]==0 ? 0 : 4);
-						switch($periodFlags) {
-						case 1: //Hauptzahltag
-							$prd = array("alle HZ", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "13. Monatslohn", "14. Monatslohn");
-							$row["period"] = $prd[$row["major_period_num"]];
-							break;
-						case 2: //Zwischenzahltag
-							$row["period"] = "alle ZZ";
-							break;
-						case 4: //Grati
-							$prd = array("alle HZ", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Gratifikation 1", "Gratifikation 2");
-							$row["period"] = $prd[$row["major_period_bonus_num"]];
-							break;
-						case 7: //alle Perioden
-							$row["period"] = "alle";
-							break;
-						}//end switch
-						$row["src_bank_label"] = $row["src_bank_label"]=="" ? "-- Standard --" : $row["src_bank_label"];
-						$row["dest_bank_label"] = $row["dest_bank_label"]=="" ? "-- Standard --" : $row["dest_bank_label"];
-						$data["paymentSplitList"][] = $row;
-					}//end foreach
-				} else {
-					if($res["errCode"] != 101) communication_interface::alert("Error Code ".$res["errCode"]);
+				if(!$splitList["success"]) {
+					//Ohne Splitt gehts direkt zum Banken-Fenster
+					//if($splitList["errCode"] != 101) communication_interface::alert("Error Code ".$splitList["errCode"]);
+					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$payrollEmployeeID.", 'bankID':".$bankdestinationID.", 'company_ID':".$company_ID."});");
+					break;
 				}
 				
-				$payrollEmployeeID = $employee["data"][0]["id"];
-				$company_ID = $employee["data"][0]["payroll_company_ID"];
-				$MAInfos = $employee["data"][0]["EmployeeNumber"]." ".$employee["data"][0]["Lastname"].", ".$employee["data"][0]["Firstname"];
+				//Mitarbeiter hat Zahlungssplit					
+				foreach($splitList["data"] as $row) {
+					if ($bankdestinationID < 1) {//die erste Bank gemäss Processing Order
+						$bankdestinationID = $row["payroll_bank_destination_ID"];
+						//communication_interface::alert("payroll_bank_destination_ID: ".$bankdestinationID);
+					}
+					switch($row["split_mode"]) {
+					case 1: $row["split_mode"]="Lohnart"; break;
+					case 2: $row["split_mode"]="%"; break;
+					case 3: $row["split_mode"]="Betrag"; break;
+					}//end switch
+					
+					$periodFlags = ($row["major_period"]==0 ? 0 : 1) + ($row["minor_period"]==0 ? 0 : 2) + ($row["major_period_bonus"]==0 ? 0 : 4);
+					switch($periodFlags) {
+					case 1: //Hauptzahltag
+						$prd = array("alle HZ", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "13. Monatslohn", "14. Monatslohn");
+						$row["period"] = $prd[$row["major_period_num"]];
+						break;
+					case 2: //Zwischenzahltag
+						$row["period"] = "alle ZZ";
+						break;
+					case 4: //Grati
+						$prd = array("alle HZ", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Gratifikation 1", "Gratifikation 2");
+						$row["period"] = $prd[$row["major_period_bonus_num"]];
+						break;
+					case 7: //alle Perioden
+						$row["period"] = "alle";
+						break;
+					}//end switch
+					$row["src_bank_label"] = $row["src_bank_label"]=="" ? "-- Standard --" : $row["src_bank_label"];
+					$row["dest_bank_label"] = $row["dest_bank_label"]=="" ? "-- Standard --" : $row["dest_bank_label"];
+					$data["paymentSplitList"][] = $row;
+				}//end foreach
+				
 				$beneficiaryAddress = blFunctionCall('payroll.auszahlen.getDestinationBankAccount', $payrollEmployeeID, 0);				
 				//communication_interface::alert("'payroll.auszahlen.getDestinationBankAccount', $payrollEmployeeID, $bankdestinationID");
-				if(intval($bankdestinationID < 1)) {
-					//Ohne Splitt gehts direkt zum Banken-Fenster
-					//communication_interface::alert("Ohne Zahlungssplit. BankId=".$beneficiaryAddress["bank_id"]);
-					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'editBankD', 'empId':".$payrollEmployeeID.", 'bankId':".$bankdestinationID.", 'company_ID':".$company_ID."});");
-					break;
-				} else {
-						$objWindow = new wgui_window("payroll", "GUI_paymentSplitOverview");
-						$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit")." - ".$bankdestinationID." - ".$MAInfos);
-						$objWindow->windowIcon("config32.png");
-						$objWindow->windowWidth(684);
-						$objWindow->windowHeight(300);
-						$objWindow->dockable(false);
-						$objWindow->buttonMaximize(false);
-						$objWindow->resizable(false);
-						$objWindow->fullscreen(false);
-						$objWindow->modal(true);
-						$objWindow->loadContent("payment",$data,"GUI_paymentSplitOverview");
-						$objWindow->showWindow();
-		
-						communication_interface::jsExecute("document.getElementById('stdBankDescr').value = '".$beneficiaryAddress['beneBankDescription']."'; ");
-						communication_interface::jsExecute("document.getElementById('stdBankAccount').value = '".$beneficiaryAddress['bank_account']."'; ");
-						
-						communication_interface::jsExecute("$('#btnBankverbindungStnd').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':".$payrollEmployeeID.", 'bankId':".$bankdestinationID."}); });");
-						
-						communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."'};");
-						communication_interface::jsExecute("prlPmtSpltMainInit();");
-						if(isset($res["errCode"]) && $res["errCode"] == 101) communication_interface::jsExecute("$('#prlPmtSpltSaveOrder').attr('disabled', 'disabled');");
-				}
-				break;
-			case 'editSplit': //case 'payroll.paymentSplit' action:'editSplit'
-				$data = array();
-				$res = blFunctionCall('payroll.getPaymentSplitDetail', 
-										array("id"=>(!isset($functionParameters[0]["rid"]) || $functionParameters[0]["rid"]=="" ? 0 : $functionParameters[0]["rid"]), 
-											  "empID"=>$payrollEmployeeID));
-				$data["bank_source_list"] = $res["dbview_payroll_bank_source"];
-				$data["bank_destination_list"] = $res["bankDestination"];
-				
-				$employee = blFunctionCall('payroll.getEmployee', $payrollEmployeeID );
-				$MAInfos = $employee["data"][0]["EmployeeNumber"]." ".$employee["data"][0]["Lastname"].", ".$employee["data"][0]["Firstname"];
-
-				$bankSourceZahlstellenID = 0;
-				$split = blFunctionCall('payroll.getZahlstelle', $payrollEmployeeID);
-				if( count($split) > 0 ){
-					//Mitarbeiter hat Zahlungssplit	
-				}
-
-				$objWindow = new wgui_window("payroll", "paymentSplitEdit");
-				$objWindow->windowTitle($objWindow->getText("txtZahlungssplitMutieren")." - ".$MAInfos);
+				//communication_interface::alert("/Mit Splitt GUI_paymentSplitOverview ");
+				$objWindow = new wgui_window("payroll", "GUI_paymentSplitOverview");
+				$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit")." - ".$bankdestinationID." - ".$MAInfo);
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(600);
-				$objWindow->windowHeight(280);
+				$objWindow->windowWidth(684);
+				$objWindow->windowHeight(310);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
 				$objWindow->fullscreen(false);
 				$objWindow->modal(true);
-				$objWindow->loadContent("payment",$data,"paymentSplitEdit");
+				$objWindow->loadContent("payment",$data,"GUI_paymentSplitOverview");
 				$objWindow->showWindow();
 
-				$loadFromJSON = isset($functionParameters[0]["loadFromJSON"]) ? true : false;
-				if(!$loadFromJSON) {
-					$arrFld = array();
-					if($res["success"]) {
-						$periodFlags = ($res["data"]["major_period"]==0 ? 0 : 1) + ($res["data"]["minor_period"]==0 ? 0 : 2) + ($res["data"]["major_period_bonus"]==0 ? 0 : 4);
-						$specificPeriod = ($res["data"]["major_period_num"]+$res["data"]["minor_period_num"]+$res["data"]["major_period_bonus_num"])==0 ? false : true;
-						if($periodFlags==7) $res["data"]["period"] = "";
-						else if(!$specificPeriod && $periodFlags==1) $res["data"]["period"] = "MAP";
-						else if(!$specificPeriod && $periodFlags==2) $res["data"]["period"] = "MIP";
-						else if(!$specificPeriod && $periodFlags==4) $res["data"]["period"] = "MPB";
-						else if($res["data"]["major_period_bonus_num"]!=0) $res["data"]["period"] = $res["data"]["major_period_bonus_num"];
-						else if($res["data"]["major_period_num"]!=0) $res["data"]["period"] = $res["data"]["major_period_num"];
+				communication_interface::jsExecute("document.getElementById('stdBankDescr').value = '".$beneficiaryAddress['beneBankDescription']."'; ");
+				communication_interface::jsExecute("document.getElementById('stdBankAccount').value = '".$beneficiaryAddress['bank_account']."'; ");
+				
+				communication_interface::jsExecute("$('#btnBankverbindungStnd').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$payrollEmployeeID.", 'bankID':".$bankdestinationID."}); });");
+				
+				communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."'};");
+				communication_interface::jsExecute("prlPmtSpltMainInit();");
+				if(isset($splitList["errCode"]) && $splitList["errCode"] == 101) communication_interface::jsExecute("$('#prlPmtSpltSaveOrder').attr('disabled', 'disabled');");
+				break;
 
-						foreach($res["data"] as $fieldName=>$fieldValue) $arrFld[] = "'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
-					}
-					communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."', 'editSplt':{".implode(",", $arrFld)."}};");
-				}
-				communication_interface::jsExecute("prlPmtSpltEditInit();");
-				communication_interface::jsExecute("prlPmtSpltEditJSON2Form();");
+			case 'paymentSplitAction_saveBankDestinationUndSplit':
+				//communication_interface::alert("paymentSplitAction_saveBankDestinationUndSplit");
+				$res = blFunctionCall('payroll.saveBankDestinationUndSplit', $functionParameters[0]["data"]);
 				break;
-			case 'saveSplit': //case 'payroll.paymentSplit' action:'saveSplit'
-				$data = $functionParameters[0]["data"];
-				$data["payroll_employee_ID"] = $payrollEmployeeID;
-				$data["major_period"] = 0; $data["minor_period"] = 0; $data["major_period_bonus"] = 0; $data["major_period_num"] = 0; $data["minor_period_num"] = 0; $data["major_period_bonus_num"] = 0;
-				if($data["period"]=="") {
-					$data["major_period"] = 1;
-					$data["minor_period"] = 1;
-					$data["major_period_bonus"] = 1;
-				}else if($data["period"]=="MAP") {
-					$data["major_period"] = 1;
-				}else if($data["period"]=="MIP") {
-					$data["minor_period"] = 1;
-				}else if($data["period"]=="MPB") {
-					$data["major_period_bonus"] = 1;
-				}else if($data["period"]>0 && $data["period"]<15) {
-					$data["major_period"] = 1;
-					$data["major_period_num"] = $data["period"];
-				}else if($data["period"]>14) {
-					$data["major_period_bonus"] = 1;
-					$data["major_period_bonus_num"] = $data["period"];
-				}
-				$res = blFunctionCall('payroll.savePaymentSplitDetail', $data);
-				if($res["success"]) {
-					communication_interface::jsExecute("cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});");
-				}else{
-					communication_interface::alert("error code ".$res["errCode"]);
-				}
-				break;
-			case 'saveSplitOrder': //case 'payroll.paymentSplit' action:'saveSplitOrder'
+//			case 'paymentSplitAction_saveBankDestination': //case 'payroll.paymentSplit' action:'paymentSplitAction_saveBankDestination'
+//		communication_interface::alert("Y1 paymentSplitAction_saveBankDestination\nData:".print_r($functionParameters[0]["data"], true)."\n.");				
+//				communication_interface::jsExecute("$('#btnSaveBankDestinationUndSplit').css('border-color', 'green');");	
+//				$payrollEmployeeID = $functionParameters[0]["data"]["payroll_employee_ID"];
+//				$res = blFunctionCall('payroll.saveBankDestDetail', $functionParameters[0]["data"]);
+//				if($res["success"]) {
+//					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$payrollEmployeeID.", 'loadFromJSON':1});");//vorher zu 'action':'paymentSplitAction_editSplit'
+//				}else{
+//					communication_interface::jsExecute("$('#modalContainer input').css('background-color','');");
+//					communication_interface::jsExecute("$('#modalContainer select').css('background-color','');");
+//					$f = "";
+//					foreach($res["fieldNames"] as $fieldName) {
+//						communication_interface::jsExecute("$('#prlPmtSplt_".$fieldName."').css('background-color','#f88');");
+//						$f .= "\n".$fieldName;
+//					}
+//					communication_interface::alert("error code ".$res["errCode"].$f);					
+//				}
+//				//break;
+//			case 'paymentSplitAction_saveSplit': //case 'payroll.paymentSplit' action:'paymentSplitAction_saveSplit'
+//		communication_interface::alert("Y2 paymentSplitAction_saveSplit\nData:".print_r($functionParameters[0]["data"], true)."\n.");				
+//				$data = $functionParameters[0]["data"];
+//				$data["payroll_employee_ID"] = $payrollEmployeeID;
+//				$data["major_period"] = 0; $data["minor_period"] = 0; $data["major_period_bonus"] = 0; $data["major_period_num"] = 0; $data["minor_period_num"] = 0; $data["major_period_bonus_num"] = 0;
+//				if($data["period"]=="") {
+//					$data["major_period"] = 1;
+//					$data["minor_period"] = 1;
+//					$data["major_period_bonus"] = 1;
+//				}else if($data["period"]=="MAP") {
+//					$data["major_period"] = 1;
+//				}else if($data["period"]=="MIP") {
+//					$data["minor_period"] = 1;
+//				}else if($data["period"]=="MPB") {
+//					$data["major_period_bonus"] = 1;
+//				}else if($data["period"]>0 && $data["period"]<15) {
+//					$data["major_period"] = 1;
+//					$data["major_period_num"] = $data["period"];
+//				}else if($data["period"]>14) {
+//					$data["major_period_bonus"] = 1;
+//					$data["major_period_bonus_num"] = $data["period"];
+//				}
+//				$res = blFunctionCall('payroll.savePaymentSplitDetail', $data); 
+//				if($res["success"]) {
+//					communication_interface::jsExecute("cb('payroll.paymentSplit', {'empId':".$payrollEmployeeID."});");
+//				}else{
+//					communication_interface::alert("error code ".$res["errCode"]);
+//				}				
+//				break;
+								
+			case 'paymentSplitAction_saveSplitOrder': //case 'payroll.paymentSplit' action:'paymentSplitAction_saveSplitOrder'
 				$res = blFunctionCall('payroll.savePaymentSplitOrder', array("data"=>$functionParameters[0]["data"]));
 				break;
-			case 'delSplit': //case 'payroll.paymentSplit' action:'delSplit'
+								
+			case 'paymentSplitAction_deleteSplit': //case 'payroll.paymentSplit' action:'paymentSplitAction_deleteSplit'
+				//communication_interface::alert('paymentSplitAction_deleteSplit: '.$functionParameters[0]["splitID"]);
 				if(isset($functionParameters[0]["commit"])) {
 					$res = blFunctionCall('payroll.deletePaymentSplitDetail', array("id"=>$functionParameters[0]["psId"]));
 					communication_interface::jsExecute("cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});");
 				}else{
+					$data[] = array();
 					$objWindow = new wgui_window("payroll", "paymentSplitDelete");
 					$objWindow->windowTitle($txtLoeschungBestaetigen);
-					$objWindow->windowWidth(420);
+					$objWindow->windowWidth(350);
 					$objWindow->windowHeight(155);
 					$objWindow->loadContent("payment",$data,"paymentSplitDelete");
 					$objWindow->showQuestion();
 
-					communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."', 'psId':'".$functionParameters[0]["rid"]."'};");
-					communication_interface::jsExecute("$('#prlPmtSpltYes').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'delSplit', 'commit':1, 'empId':prlPmtSplt.empId, 'psId':prlPmtSplt.psId}); });");
+					communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."', 'psId':'".$functionParameters[0]["splitID"]."'};");//rid
+					communication_interface::jsExecute("$('#prlPmtSpltYes').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_deleteSplit', 'commit':1, 'empId':prlPmtSplt.empId, 'psId':prlPmtSplt.psId}); });");
 					communication_interface::jsExecute("$('#prlPmtSpltNo').bind('click', function(e) { cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId}); });");
 				}
 				break;
@@ -3117,8 +3101,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 ///////////////////////////////////////////////////////
 ////  BANKVERBINDUNG       destination bank        ////
 ///////////////////////////////////////////////////////
-			case 'ovBankD': //case 'payroll.paymentSplit' action:'ovBankD'
-//				communication_interface::alert("ovBankD > empId: ".$payrollEmployeeID);
+			case 'paymentSplitAction_BankverbindungAuswaehlen': 
 				$res = blFunctionCall('payroll.getPaymentSplitDetail', array("id"=>0, "empID"=>$payrollEmployeeID));
 				$data["bank_list"] = $res["bankDestination"];
 
@@ -3129,69 +3112,119 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->loadContent("payment",$data,"destinationBankOverview");
 				$objWindow->showInfo();
 
-				communication_interface::jsExecute("$('#prlBankDNew').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editBankD', 'empId':prlPmtSplt.empId, 'bankId':0}); });");
-				communication_interface::jsExecute("$('#prlBankDEdit').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'editBankD', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
-				communication_interface::jsExecute("$('#prlBankDDelete').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'delBankD', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
-				communication_interface::jsExecute("$('#prlBankDCancel').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
+				communication_interface::jsExecute("$('#prlBankDNew').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'bankID':0}); });");
+				communication_interface::jsExecute("$('#prlBankDEdit').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'bankID':$('#prlFormCfg_id').val()}); });");
+				communication_interface::jsExecute("$('#prlBankDDelete').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'paymentSplitAction_deleteBankDestination', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
+				communication_interface::jsExecute("$('#prlBankDCancel').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");//vorher zu 'action':'paymentSplitAction_editSplit'
 				break;
-			case 'editBankD': //case 'payroll.paymentSplit' action:'editBankD'
-				//communication_interface::alert("Welcome to 'editBankD' ");
-				$bankID = $functionParameters[0]["bankId"];
-				$editMode = !isset($functionParameters[0]["bankId"]) || $bankID=="0" || $bankID=="" ? false : true;
-				//$commingFromEmplStamm = !isset($functionParameters[0]["commingFromEmplStamm"]) || $functionParameters[0]["commingFromEmplStamm"]=="" ? false : true;
+				
+			case 'paymentSplitAction_BankverbindungBearbeiten': //case 'payroll.paymentSplit' action:'paymentSplitAction_BankverbindungBearbeiten'
+				$loadFromJSON = isset($functionParameters[0]["loadFromJSON"]) ? true : false;
+				$splitID = 0;
+				$bankID = 0;
+				$zahlstellenID = 0;				
+				if(isset($functionParameters[0]["splitID"])){
+					$splitID = $functionParameters[0]["splitID"];
+				}
 
+				if (isset($functionParameters[0]["bankID"])) {
+					$bankID = intval($functionParameters[0]["bankID"]);
+				}
+
+				$windHeight = 470;
+				if($splitID>0) {
+					$windHeight = 554;
+					//Wenn diesem Mitarbeiter einen Zahlungssplitt hinterlegt ist
+					$splitDetail = blFunctionCall('payroll.getPaymentSplitDetail', array("id"=>$splitID, "empID"=>$payrollEmployeeID));
+					$data["bank_source_list"] = $splitDetail["dbview_payroll_bank_source"];
+					$data["bank_destination_list"] = $splitDetail["bankDestination"];
+					$zahlstellenID = $splitDetail["data"]["payroll_bank_source_ID"];
+					$bankID = $splitDetail["data"]["payroll_bank_destination_ID"];
+				}					
+							
+				$payrollEmployeeID = 0;
+				if(isset($functionParameters[0]["empId"])){
+					$payrollEmployeeID = $functionParameters[0]["empId"];
+				}
+				
+				if (!intval($payrollEmployeeID)>0){
+					communication_interface::alert("Error in 'paymentSplitAction_BankverbindungBearbeiten':  Employee-Id missing ".$payrollEmployeeID);
+					break;
+				}
 				$maInfo = "";
 				$employeeData = blFunctionCall('payroll.getEmployeeDetail',$payrollEmployeeID,true);
 				if($employeeData["success"]) {
-					$maInfo = $employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"];
+					$maInfo = addslashes($employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"]);
 				}
 
-				$res = blFunctionCall('payroll.getCountryList');
-				$data["country_list"] = $res["data"];
-				
 				//Die Firma ist diejenige, die dem Mitarbeiter hinterlegt ist
 				$company_ID = $employeeData["data"][0]["payroll_company_ID"];
 
-				if($editMode) {
-					$res = blFunctionCall('payroll.getDestBankDetail', array("id"=>$functionParameters[0]["bankId"]));
-					if($res["success"]) {
-						foreach($res["data"] as $fldName => $fldVal) {
-							$data[$fldName] = $fldVal;
-						}
-					}
-				}else{
-					$data["id"] = 0;
-					$data["payroll_employee_ID"] = $payrollEmployeeID;
-					$data["description"] = "";
-					$data["bank_account"] = "";
-					$data["postfinance_account"] = "";
-					$data["bank_swift"] = "";
-					$data["beneficiary1_line1"] = $employeeData["data"][0]["Firstname"]." ".$employeeData["data"][0]["Lastname"];
-					$data["beneficiary1_line2"] = $employeeData["data"][0]["AdditionalAddrLine1"]." ".$employeeData["data"][0]["AdditionalAddrLine2"];
-					$data["beneficiary1_line3"] = $employeeData["data"][0]["Street"];
-					$data["beneficiary1_line4"] = $employeeData["data"][0]["ZIP-Code"]." ".$employeeData["data"][0]["City"]." ".$employeeData["data"][0]["ResidenceCanton"];
-					$data["beneficiary2_line1"] = "";
-					$data["beneficiary2_line2"] = "";
-					$data["beneficiary2_line3"] = "";
-					$data["beneficiary2_line4"] = "";
-					$data["beneficiary2_line5"] = "";
-					$data["beneficiary_bank_line1"] = "";
-					$data["beneficiary_bank_line2"] = "";
-					$data["beneficiary_bank_line3"] = "";
-					$data["beneficiary_bank_line4"] = "";
-					$data["notice_line1"] = "";
-					$data["notice_line2"] = "";
-				}
-			
-				//es müssen alle Zahlstellenbanken geladen werden
-				$zahlstellenDaten = blFunctionCall("payroll.auszahlen.getZahlstellenDaten", 0);
+				//laden der Zahlstellenbanken 
+				$selectedCompany = 0;//wenn 0, dann alle sonst : $selectedCompany = $companyID;
+				$zahlstellenDaten = blFunctionCall("payroll.auszahlen.getZahlstellenListe", $selectedCompany);
 				if($zahlstellenDaten["success"]) $data["zahlstellen_list"] = $zahlstellenDaten["data"];
 								
+				//laden aller Länder
+				$countryList = blFunctionCall('payroll.getCountryList');
+				$data["country_list"] = $countryList["data"];
+				
+				if ($bankID < 1) {
+					//Versuche eine Bankverbindung zu finden in der Tabelle payroll_bank_destination
+					$dest = blFunctionCall('payroll.auszahlen.getDestinationBankAccount', $payrollEmployeeID, 0);
+					if($dest["success"]) {
+						$bankID = $dest["bank_id"];
+						$data["id"] = 0;
+						$data["payroll_employee_ID"] = $payrollEmployeeID;
+						$data["description"] = "";
+						$data["bank_account"] = "";
+						$data["postfinance_account"] = "";
+						$data["bank_swift"] = "";
+						$data["beneficiary1_line1"] = $employeeData["data"][0]["Firstname"]." ".$employeeData["data"][0]["Lastname"];
+						$data["beneficiary1_line2"] = $employeeData["data"][0]["AdditionalAddrLine1"]." ".$employeeData["data"][0]["AdditionalAddrLine2"];
+						$data["beneficiary1_line3"] = $employeeData["data"][0]["Street"];
+						$data["beneficiary1_line4"] = $employeeData["data"][0]["ZIP-Code"]." ".$employeeData["data"][0]["City"]." ".$employeeData["data"][0]["ResidenceCanton"];
+						$data["beneficiary2_line1"] = "";
+						$data["beneficiary2_line2"] = "";
+						$data["beneficiary2_line3"] = "";
+						$data["beneficiary2_line4"] = "";
+						$data["beneficiary2_line5"] = "";
+						$data["beneficiary_bank_line1"] = "";
+						$data["beneficiary_bank_line2"] = "";
+						$data["beneficiary_bank_line3"] = "";
+						$data["beneficiary_bank_line4"] = "";
+						$data["notice_line1"] = "";
+						$data["notice_line2"] = "";
+						$data["destination_type"] = "";
+						$data["core_intl_country_ID"] = "";
+						$data["expense"] = "";
+						$data["notice_line2"] = "";
+						$data["notice_line2"] = "";
+						$data["notice_line2"] = "";
+						$data["notice_line2"] = "";
+					}
+				} 
+
+				$bankDestDetail = blFunctionCall('payroll.getDestBankDetail', $bankID);					
+				foreach($bankDestDetail["data"] as $fldName => $fldVal) {
+					$data[$fldName] = $fldVal;
+					if($fldName=="beneficiary1_line1" && trim($fldVal)=="") $data["beneficiary1_line1"] = $employeeData["data"][0]["Firstname"]." ".$employeeData["data"][0]["Lastname"];
+					if($fldName=="beneficiary1_line2" && trim($fldVal)=="") $data["beneficiary1_line2"] =  $employeeData["data"][0]["AdditionalAddrLine1"]." ".$employeeData["data"][0]["AdditionalAddrLine2"];
+					if($fldName=="beneficiary1_line3" && trim($fldVal)=="") $data["beneficiary1_line3"] =  $employeeData["data"][0]["Street"];
+					if($fldName=="beneficiary1_line4" && trim($fldVal)=="") $data["beneficiary1_line4"] =  $employeeData["data"][0]["ZIP-Code"]." ".$employeeData["data"][0]["City"]." ".$employeeData["data"][0]["ResidenceCanton"];
+					//communication_interface::alert("field:".$fldName."=".$fldVal);
+				}
+
+				$editMode = false;
+				if ($bankID > 0) {
+					$editMode = true;
+				}
+			
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
 				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten")." - ".$bankID." - ".$maInfo); 
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(930);
-				$objWindow->windowHeight(550);
+				$objWindow->windowWidth(900);
+				$objWindow->windowHeight($windHeight);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(true);
@@ -3208,41 +3241,50 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					communication_interface::jsExecute("$('#prlPmtSplt_expense').val('".$data["expense"]."');");
 				}
 												
-				$zahlstellenID = 0;
-				
 				//Payment-Split-Daten
-				$hasSplit = blFunctionCall('payroll.auszahlen.getPaymentSplit',$payrollEmployeeID, $bankID);
-				if($hasSplit["count"]>0){
-					//Wenn diesem Mitarbeiter einen Zahlungssplitt hinterlegt ist
-					//$res = blFunctionCall('payroll.getPaymentSplitDetail', array("id"=>0, "empID"=>$payrollEmployeeID));
-					$zahlstellenID = 
-					communication_interface::jsExecute("fieldsetZahlungssplittEditInit();");
-					communication_interface::jsExecute("prlPmtSpltEditInit();");		//übernommen von case 'editSplit'
-					communication_interface::jsExecute("fieldsetZahlungssplittEditJSON2Form();");
+				if($splitID > 0){					
+					//communication_interface::alert("paymentSplitAction_editSplit\npayrollEmployeeID:".$payrollEmployeeID."\nHat Splitt  ".$splitID." \nbankID:".$bankID);
+					if(!$loadFromJSON) {
+						$arrFld = array();
+						if($splitDetail["success"]) {
+							$periodFlags = ($splitDetail["data"]["major_period"]==0 ? 0 : 1) + ($splitDetail["data"]["minor_period"]==0 ? 0 : 2) + ($splitDetail["data"]["major_period_bonus"]==0 ? 0 : 4);
+							$specificPeriod = ($splitDetail["data"]["major_period_num"]+$splitDetail["data"]["minor_period_num"]+$splitDetail["data"]["major_period_bonus_num"])==0 ? false : true;
+							if($periodFlags==7) $splitDetail["data"]["period"] = "";
+							else if(!$specificPeriod && $periodFlags==1) $splitDetail["data"]["period"] = "MAP";
+							else if(!$specificPeriod && $periodFlags==2) $splitDetail["data"]["period"] = "MIP";
+							else if(!$specificPeriod && $periodFlags==4) $splitDetail["data"]["period"] = "MPB";
+							else if($splitDetail["data"]["major_period_bonus_num"]!=0) $splitDetail["data"]["period"] = $splitDetail["data"]["major_period_bonus_num"];
+							else if($splitDetail["data"]["major_period_num"]!=0) $splitDetail["data"]["period"] = $splitDetail["data"]["major_period_num"];
+	
+							foreach($splitDetail["data"] as $fieldName=>$fieldValue) $arrFld[] = "'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
+						}
+						communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."', 'editSplt':{".implode(",", $arrFld)."}};");
+					}
+					communication_interface::jsExecute("$('#destBankContainer').css('height', '435px');");
+					communication_interface::jsExecute("$('#prlPmtSpltClose').bind('click', function(e) {	cb('payroll.paymentSplit', {'empId':".$payrollEmployeeID."});	});   ");					
+					communication_interface::jsExecute("$('#btnInitZahlungssplitt').hide();");
 				} else {
+					//communication_interface::alert("paymentSplitAction_editSplit\npayrollEmployeeID:".$payrollEmployeeID."\nNO Splitt  ".$splitID." \nbankID:".$bankID);				
 					communication_interface::jsExecute("$('#fieldsetZahlungssplitt').hide();");
+					communication_interface::jsExecute("$('#destBankContainer').css('height', '350px');");
+					communication_interface::jsExecute("$('#prlPmtSpltClose').bind('click', function(e) { $('#modalContainer').mb_close(); });");
+					communication_interface::jsExecute("$('#btnInitZahlungssplitt').bind('click', function(e) { cb('payroll.paymentSplit', {'action': 'paymentSplitAction_initZahlungssplitt', 'empId':$payrollEmployeeID, 'zahlstelle':0, 'bankID':$bankID});   $('#modalContainer').mb_close();	});   ");	
+					$objWindow->windowHeight(450);    
 				}
-				communication_interface::jsExecute("$('#prlPmtSplt_zahlstellen').val('".$zahlstellenID."');");
-				communication_interface::jsExecute("$('#prlPmtSpltCancel').bind('click', function(e) { $('#modalContainer').mb_close(); });");
-				communication_interface::jsExecute("$('#prlPmtSpltSave').bind('click', function(e) { prlBankDestSave(); });");
+				communication_interface::jsExecute("prlPmtSpltEditInit();");
+				communication_interface::jsExecute("prlPmtSpltEditJSON2Form();");
+				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').val('".$zahlstellenID."');");
+				communication_interface::jsExecute("$('#btnSaveBankDestinationUndSplit').bind('click', function(e) { jsSaveBankDestinationUndSplit();   $('#modalContainer').mb_close(); });");
 				break;
-			case 'saveBankD': //case 'payroll.paymentSplit' action:'saveBankD'
-//				communication_interface::alert("saveBankD > empId: ".$payrollEmployeeID.", data:".print_r($functionParameters[0]["data"],true));
-				$res = blFunctionCall('payroll.saveDestBankDetail', $functionParameters[0]["data"]);
-				if($res["success"]) {
-					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");
-				}else{
-				//					communication_interface::alert("error code ".$res["errCode"]);
-					communication_interface::jsExecute("$('#modalContainer input').css('background-color','');");
-					communication_interface::jsExecute("$('#modalContainer select').css('background-color','');");
-					foreach($res["fieldNames"] as $fieldName) communication_interface::jsExecute("$('#prlPmtSplt_".$fieldName."').css('background-color','#f88');");
-				}
-				break;
-			case 'delBankD': //case 'payroll.paymentSplit' action:'delBankD'
-				//				communication_interface::alert("delBankD > empId: ".$payrollEmployeeID.", bankId:".$functionParameters[0]["bankId"]);
+				
+			case 'paymentSplitAction_initZahlungssplitt';
+				$res = blFunctionCall('payroll.initZahlungssplitt', $functionParameters[0]["empId"], $functionParameters[0]["zahlstelle"], $functionParameters[0]["bankID"]);
+				break;			
+				
+			case 'paymentSplitAction_deleteBankDestination': //case 'payroll.paymentSplit' action:'paymentSplitAction_deleteBankDestination'
 				if(isset($functionParameters[0]["commit"])) {
 					$res = blFunctionCall('payroll.deleteDestBankDetail', array("id"=>$functionParameters[0]["bankId"]));
-					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");
+					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");//vorher zu 'action':'paymentSplitAction_editSplit'
 				} else {
 					$objWindow = new wgui_window("payroll", "destinationBankDelete");
 					$objWindow->windowTitle($txtLoeschungBestaetigen);
@@ -3251,8 +3293,8 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$objWindow->loadContent("payment",$data,"destinationBankDelete");
 					$objWindow->showQuestion();
 
-					communication_interface::jsExecute("$('#prlPmtSpltYes').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'delBankD', 'commit':1, 'empId':prlPmtSplt.empId, 'bankId':'".$functionParameters[0]["bankId"]."'}); });");
-					communication_interface::jsExecute("$('#prlPmtSpltNo').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
+					communication_interface::jsExecute("$('#prlPmtSpltYes').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_deleteBankDestination', 'commit':1, 'empId':prlPmtSplt.empId, 'bankId':'".$functionParameters[0]["bankId"]."'}); });");
+					communication_interface::jsExecute("$('#prlPmtSpltNo').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");//vorher zu 'action':'paymentSplitAction_editSplit'
 				}
 				break;
 
@@ -3276,7 +3318,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				communication_interface::jsExecute("$('#prlBankSourceNew').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'GUI_bank_source_edit'}); });");
 				communication_interface::jsExecute("$('#prlBankSourceEdit').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'GUI_bank_source_edit', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
 				communication_interface::jsExecute("$('#prlBankSourceDelete').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'GUI_bank_source_del', 'empId':prlPmtSplt.empId, 'bankId':$('#prlFormCfg_id').val()}); });");
-				communication_interface::jsExecute("$('#prlBankSourceCancel').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
+				communication_interface::jsExecute("$('#prlBankSourceCancel').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");//vorher zu 'action':'paymentSplitAction_editSplit'
 				break;
 				
 			case 'GUI_bank_source_edit': //case 'payroll.paymentSplit' action:'GUI_bank_source_edit'
@@ -3321,7 +3363,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->loadContent("payment", $data, "GUI_bank_source_Edit");
 				$objWindow->showWindow();
 
-				//communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
+				//communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
 				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnSave').bind('click', function(e) { prl_BankSourceEdit_btnSave(); });");
 				break;
 			case 'GUI_bank_source_save': //case 'payroll.paymentSplit' action:'GUI_bank_source_save'
@@ -3329,7 +3371,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$res = blFunctionCall("payroll.saveBankSourceDetail", $functionParameters[0]["data"]);
 				if($res["success"]) {
 					//communication_interface::alert("GUI_bank_source_save success :",true);
-					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");
+					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");//vorher zu 'action':'paymentSplitAction_editSplit'
 				} else {
 					//communication_interface::alert("GUI_bank_source_save success NOT:",true);
 					communication_interface::alert("error code ".$res["errCode"]);
@@ -3343,7 +3385,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				if(isset($functionParameters[0]["commit"])) {
 					//communication_interface::alert("GUI_bank_source_del > commit");
 					$res = blFunctionCall('payroll.deleteBankSourceDetail', array("id"=>$functionParameters[0]["bankId"]));
-					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");
+					communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1});");//vorher zu 'action':'paymentSplitAction_editSplit'
 				} else {
 					$objWindow = new wgui_window("payroll", "GUItemplate_bank_source_Delete");
 					$objWindow->windowTitle($txtLoeschungBestaetigen);
@@ -3353,8 +3395,59 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$objWindow->showQuestion();
 
 					communication_interface::jsExecute("$('#prlPmtSpltYes').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'GUI_bank_source_del', 'commit':1, 'empId':prlPmtSplt.empId, 'bankId':'".$functionParameters[0]["bankId"]."'}); });");
-					communication_interface::jsExecute("$('#prlPmtSpltNo').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'editSplit', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");
+					communication_interface::jsExecute("$('#prlPmtSpltNo').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'loadFromJSON':1}); });");//vorher zu 'action':'paymentSplitAction_editSplit'
 				}
+				break;
+			case 'paymentSplitAction_editSplit': //case 'payroll.paymentSplit' action:'paymentSplitAction_editSplit'
+				communication_interface::alert("paymentSplitAction_editSplit --> obsolet");
+//20140731hm: geht neu zu  paymentSplitAction_BankverbindungBearbeiten
+//				$data = array();
+//				$res = blFunctionCall('payroll.getPaymentSplitDetail', 
+//						array("id"=>(!isset($functionParameters[0]["rid"]) || $functionParameters[0]["rid"]=="" ? 0 : $functionParameters[0]["rid"]), "empID"=>$payrollEmployeeID));
+//				$data["bank_source_list"] = $res["dbview_payroll_bank_source"];
+//				$data["bank_destination_list"] = $res["bankDestination"];
+//				
+//				$employee = blFunctionCall('payroll.getEmployee', $payrollEmployeeID );
+//				$MAInfo = addslashes($employee["data"][0]["EmployeeNumber"]." ".$employee["data"][0]["Lastname"].", ".$employee["data"][0]["Firstname"]);
+//
+//				$bankSourceZahlstellenID = 0;
+//				$split = blFunctionCall('payroll.getZahlstelle', $payrollEmployeeID);
+//				if( count($split) > 0 ){
+//					//Mitarbeiter hat Zahlungssplit	
+//				}
+//
+//				$objWindow = new wgui_window("payroll", "paymentSplitEdit");
+//				$objWindow->windowTitle($objWindow->getText("txtZahlungssplitMutieren")." - ".$MAInfo);
+//				$objWindow->windowIcon("config32.png");
+//				$objWindow->windowWidth(600);
+//				$objWindow->windowHeight(280);
+//				$objWindow->dockable(false);
+//				$objWindow->buttonMaximize(false);
+//				$objWindow->resizable(false);
+//				$objWindow->fullscreen(false);
+//				$objWindow->modal(true);
+//				$objWindow->loadContent("payment",$data,"paymentSplitEdit");
+//				$objWindow->showWindow();
+//
+//				$loadFromJSON = isset($functionParameters[0]["loadFromJSON"]) ? true : false;
+//				if(!$loadFromJSON) {
+//					$arrFld = array();
+//					if($res["success"]) {
+//						$periodFlags = ($res["data"]["major_period"]==0 ? 0 : 1) + ($res["data"]["minor_period"]==0 ? 0 : 2) + ($res["data"]["major_period_bonus"]==0 ? 0 : 4);
+//						$specificPeriod = ($res["data"]["major_period_num"]+$res["data"]["minor_period_num"]+$res["data"]["major_period_bonus_num"])==0 ? false : true;
+//						if($periodFlags==7) $res["data"]["period"] = "";
+//						else if(!$specificPeriod && $periodFlags==1) $res["data"]["period"] = "MAP";
+//						else if(!$specificPeriod && $periodFlags==2) $res["data"]["period"] = "MIP";
+//						else if(!$specificPeriod && $periodFlags==4) $res["data"]["period"] = "MPB";
+//						else if($res["data"]["major_period_bonus_num"]!=0) $res["data"]["period"] = $res["data"]["major_period_bonus_num"];
+//						else if($res["data"]["major_period_num"]!=0) $res["data"]["period"] = $res["data"]["major_period_num"];
+//
+//						foreach($res["data"] as $fieldName=>$fieldValue) $arrFld[] = "'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
+//					}
+//					communication_interface::jsExecute("prlPmtSplt = {'empId':'".$payrollEmployeeID."', 'editSplt':{".implode(",", $arrFld)."}};");
+//				}
+//				communication_interface::jsExecute("prlPmtSpltEditInit();");
+//				communication_interface::jsExecute("prlPmtSpltEditJSON2Form();");
 				break;
 
 			default: //case 'payroll.paymentSplit' action:'?'

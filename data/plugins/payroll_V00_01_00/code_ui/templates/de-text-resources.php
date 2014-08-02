@@ -39,8 +39,10 @@ $textResourceMap["txtZuteilkriterium"] = "Zuteilkriterium";
 
 
 $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
-$textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
 $textResourceMap["txtLoeschungBestaetigen"] = "L&ouml;schung best&auml;tigen";
+$textResourceMap["txtSaved"] = " - Datensatz gespeichert - ";
+
+$textResourceMap["txtLohnBearbeiten"] = "Lohn bearbeiten";
 $textResourceMap["txtBackupAusfuehren"] = "Backup ausfuehren";
 $textResourceMap["txtBackupAbgeschlossen"] = "Backup abgeschlossen";
 $textResourceMap["txtBerechnungsdatenVorbereiten"] = "Berechnungsdaten vorbereiten";
@@ -72,6 +74,7 @@ $textResourceMap["txtWaehrungenBearbeiten"] = "W&auml;hrungen bearbeiten";
 $textResourceMap["txtUebersichtZahlungssplit"] = "&Uuml;bersicht Bankverbindung und Zahlungssplit";
 $textResourceMap["txtZahlungssplitMutieren"] = "Zahlungssplit mutieren";
 $textResourceMap["txtZahlungssplitt"] = "Zahlungssplitt";
+$textResourceMap["txtZahlungssplittInit"] = "Zahlungssplitt initialisieren";
 $textResourceMap["txtBankverbindungBearbeiten"] = "Bankverbindung bearbeiten";
 $textResourceMap["txtBankverbindung"] = "Bankverbindung";
 $textResourceMap["txtBankverbindungAuswaehlen"] = "Bankverbindung ausw&auml;hlen";

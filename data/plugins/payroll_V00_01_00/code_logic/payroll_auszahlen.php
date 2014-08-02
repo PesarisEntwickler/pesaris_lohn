@@ -74,7 +74,7 @@ class auszahlen {
 					, "currency"=>$result_bank_source[0]["bank_source_currency_code"]
 					);		 
 	}
-	public function getZahlstellenDaten($companyID) {
+	public function getZahlstellenListe($companyID) {
 		$companyClause = "";
 		if (isset($companyID)) {
 			if (intval($companyID)> 0) {
@@ -122,8 +122,7 @@ class auszahlen {
 				SET    isFullPayed='".$flag."' 
 				WHERE  payroll_period_ID=".$periodID." 			
 				AND    payroll_employee_ID ".$sqlIN." (".$MAlist.")
-				;"
-				;
+				;";
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeUpdate($sql);
 //		communication_interface::alert("updated $periodID, $MA, $flag \n".$sql);
@@ -325,14 +324,23 @@ class auszahlen {
 		return $c;
 	}
 
-	function getPaymentSplit($employeeID){
-		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("				
+	function getPaymentSplit($employeeID, $bankDestID){
+		$whereBankIdClause = "";
+		if (intval($bankDestID) > 0) {
+			$whereBankIdClause = " AND payroll_bank_destination_ID = ".$bankDestID;
+		}
+		$sql = "				
 			SELECT * FROM
 			          payroll_payment_split
-			WHERE	  payroll_employee_ID = ".$employeeID."
+			WHERE	  payroll_employee_ID = ".$employeeID.
+			$whereBankIdClause."
 			ORDER BY  processing_order
-					;");
+			LIMIT 1
+		;";
+				
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		$retval["sql"] 	= $sql;
 		if(count($result) == 0) {
 			$retval["success"] 	= false;
 			$retval["errCode"]  = 109;
@@ -363,8 +371,8 @@ class auszahlen {
 			WHERE payroll_employee_ID = ".$employeeID."
 			".$bankDestIDClause." 
 			ORDER BY destination_type, id 
-			;");
-		$idx = 0;	 				
+			LIMIT 1 
+			;"); 				
 		$retArray['bank_id'] = "";
 		$retArray['bank_account'] = "";
 		$retArray['beneAddress1'] = "";
@@ -376,7 +384,9 @@ class auszahlen {
 		$retArray['beneBank2'] = "";
 		$retArray['beneBank3'] = "";
 		$retArray['beneBank4'] = "";
+		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
+			$retArray['success'] = true;
 			$retArray['bank_id'] = trim( $result_bank_destination[0]['id'] ) ;
 			$retArray['bank_account'] = trim( $result_bank_destination[0]['bank_account'] ) ;
 			$retArray['beneAddress1'] = $result_bank_destination[0]['beneficiary1_line1'];

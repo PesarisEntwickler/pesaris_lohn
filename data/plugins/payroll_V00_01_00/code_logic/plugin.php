@@ -1,9 +1,8 @@
 <?php
-
 class payroll_BL {
 
 	public function sysListener($functionName, $functionParameters) {
-		
+
 		require_once('payroll_various_functions.php'); 
 		$variousFunctions = new variousFunctions();
 					
@@ -56,8 +55,8 @@ class payroll_BL {
 			return $auszahlen->getActualPeriodenDaten($functionParameters[0]);
 		case 'payroll.auszahlen.resetActualPeriodenAuszahlFlags':
 			return $auszahlen->resetActualPeriodenAuszahlFlags($functionParameters[0]);
-		case 'payroll.auszahlen.getZahlstellenDaten':
-			return $auszahlen->getZahlstellenDaten($functionParameters[0]);//$companyID
+		case 'payroll.auszahlen.getZahlstellenListe':
+			return $auszahlen->getZahlstellenListe($functionParameters[0]);//$companyID
 		case 'payroll.auszahlen.getDestinationBankAccount':
 			return $auszahlen->getDestinationBankAccount($functionParameters[0],$functionParameters[1]);//=$employeeID, $bankDestID
 		case 'payroll.auszahlen.getCurrentPeriodAccountAmount':
@@ -73,14 +72,16 @@ class payroll_BL {
 			
 		case 'payroll.getZahlstelle':
 			return $payrollPayment->getZahlstelle($functionParameters[0]);//$employeeId
-		case 'payroll.getZahlstelle___':
-			return $payrollPayment->getZahlstelle___($functionParameters[0],$functionParameters[1]);//$employeeId, $destBankId
+		case 'payroll.initZahlungssplitt':
+			return $payrollPayment->initZahlungssplitt($functionParameters[0],$functionParameters[1],$functionParameters[2]);//$employeeId, $zahlstelleId, $destBankId
 		case 'payroll.getPaymentSplitList':
 			return $payrollPayment->getPaymentSplitList($functionParameters[0]);//$payrollEmployeeID
 		case 'payroll.getPaymentSplitDetail':
 			return $payrollPayment->getPaymentSplitDetail($functionParameters[0]);
 		case 'payroll.savePaymentSplitDetail':
 			return $payrollPayment->savePaymentSplitDetail($functionParameters[0]);
+		case 'payroll.saveBankDestinationUndSplit':
+			return $payrollPayment->saveBankDestinationUndSplit($functionParameters[0]);
 		case 'payroll.savePaymentSplitOrder':
 			return $payrollPayment->savePaymentSplitOrder($functionParameters[0]);
 		case 'payroll.deletePaymentSplitDetail':
@@ -89,8 +90,8 @@ class payroll_BL {
 			return $payrollPayment->getDestBankDetail($functionParameters[0]);
 		case 'payroll.getBankSourceDetail':
 			return $payrollPayment->getBankSourceDetail($functionParameters[0]);
-		case 'payroll.saveDestBankDetail':
-			return $payrollPayment->saveDestBankDetail($functionParameters[0]);
+		case 'payroll.saveBankDestDetail':
+			return $payrollPayment->saveBankDestinationDetail($functionParameters[0]);
 		case 'payroll.saveBankSourceDetail':
 			return $payrollPayment->saveBankSourceDetail($functionParameters[0]);
 		case 'payroll.deleteDestBankDetail':

@@ -132,7 +132,7 @@ class payroll_BL_payment {
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("
 			SELECT pps.*, IF(pbs.description IS NULL,'',pbs.description) as src_bank_label 
-				        , IF(pbd.description IS NULL,'',pbd.description) as dest_bank_label 
+				        , IF(pbd.description IS NULL,'',pbd.bank_account) as dest_bank_label 
 			FROM payroll_payment_split pps 
 				LEFT JOIN payroll_bank_source pbs ON pbs.id=pps.payroll_bank_source_ID 
 				LEFT JOIN payroll_bank_destination pbd ON pbd.id=pps.payroll_bank_destination_ID 
@@ -186,6 +186,95 @@ class payroll_BL_payment {
 		return $response;
 	}
 
+	public function saveBankDestinationUndSplit($param) { 
+		//communication_interface::alert("saveBankDestinationUndSplit:\n param:".print_r($param, true));
+		require_once('payroll_auszahlen.php');
+		$auszahlen = new auszahlen();
+		
+		$paramBankDest = array();
+		$paramSplitTab = array();
+		
+		$employeeID = $param['payroll_employee_ID'];
+		$bankDestID = $param['id'];
+		$splitTabID = $param['id'];
+		$hasSplit = false;		
+		$split = $auszahlen->getPaymentSplit($employeeID,0);
+		if ($split["count"] > 0) {
+			$hasSplit = true;
+			$bankDestID = $split['data'][0]["payroll_bank_destination_ID"];
+			$paramSplitTab["id"] 		= $splitTabID;
+			$paramSplitTab["payroll_employee_ID"] 		= $param["payroll_employee_ID"];
+			$paramSplitTab["payroll_bank_source_ID"] 	= $param["selectedZahlstelle"];
+			$paramSplitTab["payroll_bank_destination_ID"] 	= $bankDestID;
+			$paramSplitTab["split_mode"] 				= $param["split_mode"];
+			$paramSplitTab["payroll_account_ID"] 		= $param["payroll_account_ID"];
+			$paramSplitTab["amount"] 					= $param["amount"];
+			$paramSplitTab["payroll_currency_ID"] 		= $param["payroll_currency_ID"];
+			$paramSplitTab["major_period"] = 0; $paramSplitTab["minor_period"] = 0; $paramSplitTab["major_period_bonus"] = 0; $paramSplitTab["major_period_num"] = 0; $paramSplitTab["minor_period_num"] = 0; $paramSplitTab["major_period_bonus_num"] = 0;
+			if($param["period"]=="") {
+				$paramSplitTab["major_period"] = 1;
+				$paramSplitTab["minor_period"] = 1;
+				$paramSplitTab["major_period_bonus"] = 1;
+			}else if($param["period"]=="MAP") {
+				$paramSplitTab["major_period"] = 1;
+			}else if($param["period"]=="MIP") {
+				$paramSplitTab["minor_period"] = 1;
+			}else if($param["period"]=="MPB") {
+				$paramSplitTab["major_period_bonus"] = 1;
+			}else if($param["period"]>0 && $param["period"]<15) {
+				$paramSplitTab["major_period"] = 1;
+				$paramSplitTab["major_period_num"] = $param["period"];
+			}else if($param["period"]>14) {
+				$paramSplitTab["major_period_bonus"] = 1;
+				$paramSplitTab["major_period_bonus_num"] = $param["period"];
+			}
+			$paramSplitTab["having_rounding"] = 1;
+			$paramSplitTab["round_param"] = 0.00;
+		}
+		$paramBankDest["id"] 					= $bankDestID;
+		$paramBankDest["payroll_employee_ID"] 	= $param["payroll_employee_ID"];
+		$paramBankDest["description"] 			= $param["description"];
+		$paramBankDest["destination_type"] 		= $param["destination_type"];
+		$paramBankDest["core_intl_country_ID"] 	= $param["core_intl_country_ID"];
+		$paramBankDest["bank_swift"] 			= $param["bank_swift"];
+		$paramBankDest["bank_account"] 			= $param["bank_account"];
+		$paramBankDest["postfinance_account"]	= $param["postfinance_account"];
+		$paramBankDest["beneficiary1_line1"] 	= $param["beneficiary1_line1"];
+		$paramBankDest["beneficiary1_line2"] 	= $param["beneficiary1_line2"];
+		$paramBankDest["beneficiary1_line3"] 	= $param["beneficiary1_line3"];
+		$paramBankDest["beneficiary1_line4"] 	= $param["beneficiary1_line4"];
+		$paramBankDest["beneficiary2_line1"] 	= $param["beneficiary2_line1"];
+		$paramBankDest["beneficiary2_line2"] 	= $param["beneficiary2_line2"];
+		$paramBankDest["beneficiary2_line3"] 	= $param["beneficiary2_line3"];
+		$paramBankDest["beneficiary2_line4"] 	= $param["beneficiary2_line4"];
+		$paramBankDest["beneficiary2_line5"] 	= "";
+		$paramBankDest["notice_line1"] 			= $param["notice_line1"];
+		$paramBankDest["notice_line2"] 			= $param["notice_line2"];
+		$paramBankDest["notice_line3"] 			= "";
+		$paramBankDest["notice_line4"] 			= "";
+		$paramBankDest["hand_delivered"] 		= "";
+		$paramBankDest["beneficiary_bank_line1"]= $param["beneficiary_bank_line1"];
+		$paramBankDest["beneficiary_bank_line2"]= $param["beneficiary_bank_line2"];
+		$paramBankDest["beneficiary_bank_line3"]= $param["beneficiary_bank_line3"];
+		$paramBankDest["beneficiary_bank_line4"]= "";
+		$paramBankDest["expense"] 				= $param["expense"];
+		$paramBankDest["urgency"] 				= "";
+		
+		if ($param["selectedZahlstelle"] > 0 && $hasSplit == false) {
+			communication_interface::alert("Die Zahlstelle entspricht nicht der Standard-Zahlstelle.");
+			$this->initZahlungssplitt($param["payroll_employee_ID"], $param["selectedZahlstelle"], $bankDestID);
+		}
+		
+		if ($hasSplit) {
+			communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamSplitTab:".print_r($paramSplitTab, true));
+			$splitRes = $this->savePaymentSplitDetail($paramSplitTab);			
+		}
+		communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamBankDest:".print_r($paramBankDest, true));
+		$bankDestRes = $this->saveBankDestinationDetail($paramBankDest);
+		return true;
+	}
+
+
 	public function savePaymentSplitDetail($param) {
 		$updateMode = !isset($param["id"]) || $param["id"]==0 || $param["id"]=="" ? false : true;
 		$fieldCfg = array(
@@ -207,8 +296,10 @@ class payroll_BL_payment {
 					"having_rounding"=>array("regex"=>"[01]{1,1}","addQuotes"=>false, "default"=>0),
 					"round_param"=>array("regex"=>"[0-9]{1,3}(\.[0-9]{1,2})?","addQuotes"=>false)
 				);
-		if($param["having_rounding"]==1) $param["round_param"]="0.0";
-//communication_interface::alert(print_r($param,true));
+		$param["round_param"]="0.0";
+		//if (isset($param["having_rounding"])) {
+		//	if($param["having_rounding"]==1) $param["round_param"]="0.0";			
+		//}
 		////////////////////////////////
 		// Mandatory and validity checks
 		////////////////////////////////
@@ -247,115 +338,18 @@ class payroll_BL_payment {
 			}
 			$sql = "INSERT INTO `payroll_payment_split`(".implode(",",$sqlFIELDS).") VALUES(".implode(",",$sqlVALUES).")";
 		}
-//communication_interface::alert("id:".$param["id"]." / ".$sql);
+communication_interface::alert("YY savePaymentSplitDetail id:".$param["id"].print_r($param,true)."\n  SQL: ".$sql."\n");
 
 		$system_database_manager = system_database_manager::getInstance();
-		$system_database_manager->executeUpdate($sql, "payroll_savePayslipCfgDetail");
+		$ret = $system_database_manager->executeUpdate($sql, "payroll_savePayslipCfgDetail");
 
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;
 	}
 
-	public function savePaymentSplitOrder($param) {
-		if(!isset($param["data"]) || !is_array($param["data"])) {
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "missing data";
-			return $response;
-		}
-		$updateSQL = array();
-		foreach($param["data"] as $row) {
-			if(!preg_match( '/^[0-9]{1,9}$/', $row[0]) || !preg_match( '/^[0-9]{1,9}$/', $row[1])) {
-				$response["success"] = false;
-				$response["errCode"] = 20;
-				$response["errText"] = "invalid data";
-				return $response;
-			}
-			$updateSQL[] = "UPDATE `payroll_payment_split` SET `processing_order`=".$row[1]." WHERE `id`=".$row[0];
-		}
-
-		$system_database_manager = system_database_manager::getInstance();
-		foreach($updateSQL as $sql) $system_database_manager->executeUpdate($sql, "payroll_savePaymentSplitOrder");
-
-		$response["success"] = true;
-		$response["errCode"] = 0;
-		return $response;
-	}
-
-	public function deletePaymentSplitDetail($param) {
-		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_payment_split_ID
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "invalid payment split ID";
-			return $response;
-		}
-
-		$system_database_manager = system_database_manager::getInstance();
-		$system_database_manager->executeUpdate("DELETE FROM payroll_payment_split WHERE id=".$param["id"], "payroll_deletePaymentSplitDetail");
-
-		$response["success"] = true;
-		$response["errCode"] = 0;
-		return $response;
-	}
-
-///////////////////////////////////////////////////////
-////  BANKVERBINDUNG       destination bank        ////
-///////////////////////////////////////////////////////
-	public function getDestBankDetail($param) {
-	//communication_interface::alert("getDestBankDetail(".$param["id"].") = ");
-	$response = array();
-		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) {
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "invalid bank ID";
-			return $response;
-		}
-
-		$response["data"]["id"] = $param["id"];
-		$response["data"]["payroll_employee_ID"] = 0;
-		$response["data"]["description"] = "";
-		$response["data"]["bank_swift"] = "";
-		$response["data"]["bank_account"] = "";
-		$response["data"]["postfinance_account"] = "";
-		$response["data"]["destination_type"] = 1;
-		$response["data"]["beneficiary1_line1"] = "";
-		$response["data"]["beneficiary1_line2"] = "";
-		$response["data"]["beneficiary1_line3"] = "";
-		$response["data"]["beneficiary1_line4"] = "";
-		$response["data"]["beneficiary2_line1"] = "";
-		$response["data"]["beneficiary2_line2"] = "";
-		$response["data"]["beneficiary2_line3"] = "";
-		$response["data"]["beneficiary2_line4"] = "";
-		$response["data"]["beneficiary2_line5"] = "";
-		$response["data"]["notice_line1"] = "";
-		$response["data"]["notice_line2"] = "";
-		$response["data"]["notice_line3"] = "";
-		$response["data"]["notice_line4"] = "";
-		$response["data"]["beneficiary_bank_line1"] = "";
-		$response["data"]["beneficiary_bank_line2"] = "";
-		$response["data"]["beneficiary_bank_line3"] = "";
-		$response["data"]["beneficiary_bank_line4"] = "";
-		$response["data"]["beneficiary_bank_line5"] = "";
-		$response["data"]["expense"] = "";
-		$response["data"]["urgency"] = "";
-
-		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_destination WHERE id=".$param["id"], "payroll_getDestBankDetail");
-		if(count($result) != 0) {
-			$response["success"] = true;
-			$response["errCode"] = 0;
-			$response["data"] = $result[0];
-		}else{
-			$response["success"] = false;
-			$response["errCode"] = 101;
-			$response["errText"] = "no data found";
-		}
-		return $response;
-	}
-
-	public function saveDestBankDetail($param) {
-		//communication_interface::alert("[payroll.code_logic] saveDestBankDetail() id:".$param["id"]);
+	public function saveBankDestinationDetail($param) {
+		communication_interface::alert("[payroll.code_logic] saveBankDestinationDetail() id:".$param["id"]."\n".implode(",",$param));
 		$updateMode = !isset($param["id"]) || $param["id"]==0 || $param["id"]=="" ? false : true;
 		$fieldCfg = array(
 					"id"=>array("regex"=>"[0-9]{1,9}","addQuotes"=>false, "default"=>0),
@@ -419,7 +413,7 @@ class payroll_BL_payment {
 			$sqlUPDATE = array();
 			$recID = $param["id"];
 			unset($fieldCfg["id"]); //entfernen, da dieses Feld nicht aktualisiert werden muss
-			unset($fieldCfg["payroll_employee_ID"]); //entfernen, da dieses Feld nicht aktualisiert werden muss
+			unset($fieldCfg["payroll_employee_ID"]); //entfernen, da dieses Feld nicht aktualisiert werden soll
 			foreach($fieldCfg as $fieldName=>$fieldParam) {
 				if($fieldParam["addQuotes"]) $sqlUPDATE[] = "`".$fieldName."`='".addslashes($param[$fieldName])."'";
 				else $sqlUPDATE[] = "`".$fieldName."`=".addslashes($param[$fieldName]);
@@ -436,13 +430,163 @@ class payroll_BL_payment {
 			}
 			$sql = "INSERT INTO `payroll_bank_destination`(".implode(",",$sqlFIELDS).") VALUES(".implode(",",$sqlVALUES).")";
 		}
-//communication_interface::alert("id:".$param["id"]." / ".$sql);
+communication_interface::alert("id:".$param["id"]." \n ".$sql);
+//communication_interface::alert("saveBankDestinationDetail:\n ".print_r($fieldCfg, true));
 
 		$system_database_manager = system_database_manager::getInstance();
 		$system_database_manager->executeUpdate($sql, "payroll_savePayslipCfgDetail");
 
+//		//Wenn Zahlstelle angegeben wurde
+//		$zahlstelle = 0;
+//		if (isset($param["selZahlstelle"])) {
+//			$zahlstelle = intval($param["selZahlstelle"]);
+//		}
+//		//Prüfen, ob schon eine Zahlstelle(=BankSource) mit gleicher DestBank in der Splitt-Tabelle hinterlegt ist
+//		if ($zahlstelle > 0) {
+//			$employeeId = $param["payroll_employee_ID"];
+//			$bankID = $param["id"];
+//			$sql="SELECT count(*) AS anzahlSplits FROM  payroll_payment_split  " 
+//				."WHERE payroll_employee_ID=".$employeeId
+//				."  AND payroll_bank_destination_ID=".$bankID
+//				."  AND payroll_bank_source_ID=".$zahlstelle
+//				;
+//			$hasSplit = $system_database_manager->executeQuery($sql, "payroll_getAnzahlSplit");
+//			communication_interface::alert("A) Zahlstelle:".$zahlstelle
+//											."\n".$sql
+//											."\n anzahlSplits=/".trim($hasSplit[0]["anzahlSplits"]))."/";
+//
+//			$sql="SELECT count(*) AS anzahlSplits FROM  payroll_payment_split  " 
+//				."WHERE payroll_employee_ID=".$employeeId
+//				."  AND payroll_bank_destination_ID=".$bankID
+//				;
+//			$hasSplit = $system_database_manager->executeQuery($sql, "payroll_getAnzahlSplit");
+//			communication_interface::alert("B) Zahlstelle:".$zahlstelle
+//											."\n".$sql
+//											."\n anzahlSplits=/".trim($hasSplit[0]["anzahlSplits"]))."/";
+//			//Wenn ja, dann möchte der User diese wechseln
+//			//Wenn nein (kein Eintrag mit dieser DestBank), dann ein neuen (ersten) Zahlungs-Splitt eintragen
+//			
+//			$sql = "
+//				INSERT INTO payroll_payment_split  
+//				(`payroll_employee_ID`, `payroll_bank_source_ID`, `payroll_bank_destination_ID`) 
+//				VALUES ('".$employeeId."', '".$zahlstelle."', '".$bankID."')
+//			;";
+//			//	ab jetzt ist ein Zahlungssplit vorhanden (Defaultwerte z.B. 100% auf DestBank), 
+//			//  User bekommt das Splitt-GUI beim nächsten Aufruf
+//		}
+			 
 		$response["success"] = true;
 		$response["errCode"] = 0;
+		return $response;
+	}
+	
+	
+	public function savePaymentSplitOrder($param) {
+		if(!isset($param["data"]) || !is_array($param["data"])) {
+			$response["success"] = false;
+			$response["errCode"] = 10;
+			$response["errText"] = "missing data";
+			return $response;
+		}
+		$updateSQL = array();
+		foreach($param["data"] as $row) {
+			if(!preg_match( '/^[0-9]{1,9}$/', $row[0]) || !preg_match( '/^[0-9]{1,9}$/', $row[1])) {
+				$response["success"] = false;
+				$response["errCode"] = 20;
+				$response["errText"] = "invalid data";
+				return $response;
+			}
+			$updateSQL[] = "UPDATE `payroll_payment_split` SET `processing_order`=".$row[1]." WHERE `id`=".$row[0];
+		}
+
+		$system_database_manager = system_database_manager::getInstance();
+		foreach($updateSQL as $sql) $system_database_manager->executeUpdate($sql, "payroll_savePaymentSplitOrder");
+
+		$response["success"] = true;
+		$response["errCode"] = 0;
+		return $response;
+	}
+
+	public function deletePaymentSplitDetail($param) {
+		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_payment_split_ID
+			$response["success"] = false;
+			$response["errCode"] = 10;
+			$response["errText"] = "invalid payment split ID";
+			return $response;
+		}
+
+		$system_database_manager = system_database_manager::getInstance();
+		$system_database_manager->executeUpdate("DELETE FROM payroll_payment_split WHERE id=".$param["id"], "payroll_deletePaymentSplitDetail");
+
+		$response["success"] = true;
+		$response["errCode"] = 0;
+		return $response;
+	}
+
+	public function getDestBankDetail($destBankID) {
+	//communication_interface::alert("getDestBankDetail($destBankID)");
+	$response = array();
+		if(!preg_match( '/^[0-9]{1,9}$/', $destBankID)) {
+			$response["success"] = false;
+			$response["errCode"] = 10;
+			$response["errText"] = "invalid bank ID";
+			return $response;
+		}
+
+		$response["data"]["id"] = $destBankID;
+		$response["data"]["payroll_employee_ID"] = 0;
+		$response["data"]["description"] = "";
+		$response["data"]["bank_swift"] = "";
+		$response["data"]["bank_account"] = "";
+		$response["data"]["postfinance_account"] = "";
+		$response["data"]["destination_type"] = 1;
+		$response["data"]["beneficiary1_line1"] = "";
+		$response["data"]["beneficiary1_line2"] = "";
+		$response["data"]["beneficiary1_line3"] = "";
+		$response["data"]["beneficiary1_line4"] = "";
+		$response["data"]["beneficiary2_line1"] = "";
+		$response["data"]["beneficiary2_line2"] = "";
+		$response["data"]["beneficiary2_line3"] = "";
+		$response["data"]["beneficiary2_line4"] = "";
+		$response["data"]["beneficiary2_line5"] = "";
+		$response["data"]["notice_line1"] = "";
+		$response["data"]["notice_line2"] = "";
+		$response["data"]["notice_line3"] = "";
+		$response["data"]["notice_line4"] = "";
+		$response["data"]["beneficiary_bank_line1"] = "";
+		$response["data"]["beneficiary_bank_line2"] = "";
+		$response["data"]["beneficiary_bank_line3"] = "";
+		$response["data"]["beneficiary_bank_line4"] = "";
+		$response["data"]["beneficiary_bank_line5"] = "";
+		$response["data"]["expense"] = "";
+		$response["data"]["urgency"] = "";
+
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_destination WHERE id=".$destBankID, "payroll_getDestBankDetail");
+		if(count($result) != 0) {
+			$response["success"] = true;
+			$response["errCode"] = 0;
+			$response["data"] = $result[0];
+		}else{
+			$response["success"] = false;
+			$response["errCode"] = 101;
+			$response["errText"] = "no data found";
+		}
+		return $response;
+	}
+
+	
+	public function initZahlungssplitt($employeeId, $zahlstelle, $destBankId) {
+			$sql = "
+				INSERT INTO payroll_payment_split  
+				(`payroll_employee_ID`, `payroll_bank_source_ID`, `payroll_bank_destination_ID`) 
+				VALUES ('".$employeeId."', '".$zahlstelle."', '".$destBankId."')
+			;";
+		$system_database_manager = system_database_manager::getInstance();
+		$system_database_manager->executeUpdate($sql, "payroll_initZahlungssplitt");
+		$response["success"] = true;
+		$response["errCode"] = 0;
+		communication_interface::alert("Es wurde ein Zahlungssplitt initialisiert mit 100% auf Standardkonto");
 		return $response;
 	}
 
