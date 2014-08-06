@@ -58,7 +58,9 @@ class payroll_BL {
 		case 'payroll.auszahlen.getZahlstellenListe':
 			return $auszahlen->getZahlstellenListe($functionParameters[0]);//$companyID
 		case 'payroll.auszahlen.getDestinationBankAccount':
-			return $auszahlen->getDestinationBankAccount($functionParameters[0],$functionParameters[1]);//=$employeeID, $bankDestID
+			return $auszahlen->getDestinationBankAccount($functionParameters[0],$functionParameters[1],"");//=$employeeID, $bankDestID, "Y"/"N" is_sandard_bank
+		case 'payroll.auszahlen.getStandardDestinationBankAccount':
+			return $auszahlen->getStandardDestinationBankAccount($functionParameters[0]);//=$employeeID
 		case 'payroll.auszahlen.getCurrentPeriodAccountAmount':
 			return $auszahlen->getCurrentPeriodAccountAmount($functionParameters[0],$functionParameters[1]);//=$account_ID, $employee_ID
 		case 'payroll.auszahlen.getAllDestinationBankAccounts':

@@ -356,20 +356,32 @@ class auszahlen {
 		return $retval;		
 	}
 
-
-	public function getDestinationBankAccount($employeeID, $bankDestID) {
+	public function getStandardDestinationBankAccount($employeeID) {
 		$retArray = array();
-		$bankDestIDClause = "";
+		$retArray = $this->getDestinationBankAccount($employeeID, 0, "Y");
+		return $retArray;
+	}
+	
+	public function getDestinationBankAccount($employeeID, $bankDestID, $standardBank) {
+		$retArray = array();
+		$addOnClause = "";
 		$bankDestID = intval($bankDestID);
 		if ($bankDestID > 0) {
-			$bankDestIDClause = " AND id = ".$bankDestID;
+			$addOnClause = " AND id = ".$bankDestID;
+		}
+		if (strlen(trim($standardBank)) > 0) {
+			if ($standardBank == "Y") {
+				$addOnClause = " AND is_standard_bank = 'Y' ";
+			} else {
+				$addOnClause = " AND is_standard_bank <> 'Y' ";
+			}
 		}
 		$system_database_manager = system_database_manager::getInstance();
 		$result_bank_destination = $system_database_manager->executeQuery("				
 			SELECT * FROM
 			 payroll_bank_destination
 			WHERE payroll_employee_ID = ".$employeeID."
-			".$bankDestIDClause." 
+			".$addOnClause." 
 			ORDER BY destination_type, id 
 			LIMIT 1 
 			;"); 				
@@ -384,6 +396,7 @@ class auszahlen {
 		$retArray['beneBank2'] = "";
 		$retArray['beneBank3'] = "";
 		$retArray['beneBank4'] = "";
+		$retArray['bankpostcash'] = "";
 		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
 			$retArray['success'] = true;
@@ -398,6 +411,17 @@ class auszahlen {
 			$retArray['beneBank2'] = $result_bank_destination[0]['beneficiary_bank_line2'];
 			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
 			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
+			switch ( $result_bank_destination[0]['destination_type'] ) {
+				case 1:
+					$retArray['bankpostcash'] = "BANK";
+					break;
+				case 2:
+					$retArray['bankpostcash'] = "POST";
+					break;
+				case 3:
+					$retArray['bankpostcash'] = "CASH";
+					break;
+			}
 		}
 		return $retArray;
 	}

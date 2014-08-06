@@ -290,8 +290,8 @@ class payroll_BL_calculate {
 
 						//Ueberpraefen welche MA keine Differenzen mehr aufweisen, diese muessen nicht weiter iteriert werden. Wenn keiner der MA mehr Diff aufweist, kann Loop beendet werden
 						$arrEmployeeProcessed = array_unique($arrEmployeeProcessed);
-						foreach($arrEmployeeProcessed as $empID) {
-							if(abs($employees[$empID]["NetGross"]["diff"]) < 0.05) $arrEmployeesDone[] = $empID;
+						foreach($arrEmployeeProcessed as $empId) {
+							if(abs($employees[$empId]["NetGross"]["diff"]) < 0.05) $arrEmployeesDone[] = $empId;
 						}
 
 
@@ -434,15 +434,15 @@ class payroll_BL_calculate {
 					}
 					$mainIterationActive = false;
 					$employeesCombinedProcessing = array();
-					foreach($employees as $empID=>$empParam) {
+					foreach($employees as $empId=>$empParam) {
 						if(isset($empParam["NetGross"]) && isset($empParam["NetAdj"])) {
 							//es handelt sich um einen MA, bei dem beides verarbeitet werden muss: NB-Aufrechnung und NL-Korrektur -> also muessen wir hier die Start-Differenz aeberpraefen
 							$delta = abs($empParam["overallAccuracy"]-$empParam["latestAmount"]);
 							if($delta > 0.10) {
 								//Die Differenz ist noch zu hoch, der Gesamtloop darf noch nicht beendet werden
 								$mainIterationActive = true;
-								$employeesCombinedProcessing[] = $empID;
-								$employees[$empID]["overallAccuracy"] = $empParam["latestAmount"];
+								$employeesCombinedProcessing[] = $empId;
+								$employees[$empId]["overallAccuracy"] = $empParam["latestAmount"];
 							}
 						}
 					}
@@ -676,7 +676,7 @@ class payroll_BL_calculate {
 		if(count($arrAffectedEmployeeID)!=0) {
 			$uid = session_control::getSessionInfo("id");
 			$sqlVal = array();
-			foreach($arrAffectedEmployeeID as $empID) $sqlVal[] = "(".$uid.",".$empID.")";
+			foreach($arrAffectedEmployeeID as $empId) $sqlVal[] = "(".$uid.",".$empId.")";
 			$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_ID`=".$uid, "payroll_calculate");
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_change_mng`(`core_user_ID`,`numID`) VALUES".implode(",",$sqlVal), "payroll_calculate");
 			require_once('payroll_calculate.php');

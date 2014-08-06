@@ -1292,7 +1292,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 															  ,$account_ID);
 					$openEmployeeAmount = $openEmployeeAmount - $splitAmount;
 					
-					$bene = $auszahlen->getDestinationBankAccount($employee_ID, $bankDestID);
+					$bene = $auszahlen->getDestinationBankAccount($employee_ID, $bankDestID, "Y");
 					if (strlen(trim($bene['beneAddress1'])) > 2) {
 						$bn1 = $auszahlen->replaceUmlaute( trim($bene['beneAddress1']) );
 						$bn2 = $auszahlen->replaceUmlaute( trim($bene['beneAddress2']) );
@@ -1339,7 +1339,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 					$splitTrx++;
 					$splitt++;
 					
-					$bene = $auszahlen->getDestinationBankAccount($employee_ID, "");
+					$bene = $auszahlen->getStandardDestinationBankAccount($employee_ID);
 					if (strlen(trim($bene['beneAddress1'])) > 2) {
 						$bn1 = $auszahlen->replaceUmlaute( trim($bene['beneAddress1']) );
 						$bn2 = $auszahlen->replaceUmlaute( trim($bene['beneAddress2']) );
@@ -1375,8 +1375,8 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 					$auszahlen->updatePeriodenAuszahlFlag($periodeID, "IN", $employee_ID, "Y");
 				}
 			} else {	
-			//MA hat kein Splitt, (Bank Destination ist noch nicht bekannt)	
-				$bene = $auszahlen->getDestinationBankAccount($employee_ID, "");
+			//MA hat kein Splitt	
+				$bene = $auszahlen->getStandardDestinationBankAccount($employee_ID);
 				if (strlen(trim($bene['beneAddress1'])) > 2) {
 					$bn1 = $auszahlen->replaceUmlaute( trim($bene['beneAddress1']) );
 					$bn2 = $auszahlen->replaceUmlaute( trim($bene['beneAddress2']) );

@@ -3797,16 +3797,14 @@ function prlBankDestSave() {
 }
 
 
-function jsSaveBankDestinationUndSplit() {
-
+function jsSaveBankDestinationUndSplit(empId) {
 	var r = {};
 	$('input[id^="prlPmtSplt_"], select[id^="prlPmtSplt_"]').each(function( index ) {
 		var n = $(this).attr('id').substring(11);
 		if($(this).is(":checkbox")) r[n] = $(this).is(':checked') ? 1 : 0;
 		else r[n] = $(this).val();
 	});
-	var eID = r['payroll_employee_ID'];
-	cb('payroll.paymentSplit', {'action':'paymentSplitAction_saveBankDestinationUndSplit', 'empId':eID, 'data':r});
+	cb('payroll.paymentSplit', {'action':'paymentSplitAction_saveBankDestinationUndSplit', 'empId':empId, 'data':r});
 }
 
 function prlPmtSpltEditInit() {

@@ -39,6 +39,8 @@ $textResourceMap["txtZuteilkriterium"] = "Zuteilkriterium";
 
 
 $textResourceMap["txtStandardVerwenden"] = "-- Standard verwenden --";
+$textResourceMap["txtStandardZahlstellenVerwenden"] = "- - Standard-Zahlstelle anwenden - -";
+
 $textResourceMap["txtLoeschungBestaetigen"] = "L&ouml;schung best&auml;tigen";
 $textResourceMap["txtSaved"] = " - Datensatz gespeichert - ";
 
@@ -65,7 +67,7 @@ $textResourceMap["txtTableHeadersAuszahlenPeriodenFiles"] =
 
 /* ****** PAYMENTS ****** */
 $textResourceMap["txtNochKeineBankverbindung"] = "Es besteht noch keine Bankverbindung";
-$textResourceMap["txtStandardBankverbindung"] = "Standard Bankverbindung";
+$textResourceMap["txtStandardBankverbindung"] = "Standard Bankverb.";
 $textResourceMap["txtBerechnungsdatenVorbereiten"] = "Berechnungsdaten vorbereiten";
 $textResourceMap["txtLohnabrechnungsVorlagen"] = "Lohnabr.-Vorlagen";
 $textResourceMap["txtLayoutBearbeiten"] = "Layout bearbeiten";
@@ -95,7 +97,7 @@ $textResourceMap["txtCarrier2"] = "Cash";
 $textResourceMap["txtBank"] = "BANK";
 $textResourceMap["txtPost"] = "POST";
 $textResourceMap["txtCash"] = "CASH";
-$textResourceMap["txtZahlstellenKontoIBAN"] = "Zahlungs-Konto IBAN";
+$textResourceMap["txtZahlstellenKontoIBAN"] = "IBAN Zahlungs-Konto";
 $textResourceMap["txtZahlungsKontoWaehrung"] = "Zahlungs-Konto W&auml;hrung";
 $textResourceMap["txtZahlungstraeger"] = "Zahlungstr&auml;ger";
 $textResourceMap["txtZahlstelleAuftraggeber"] = "Zahlstelle/Auftraggeber Konto";
@@ -103,13 +105,13 @@ $textResourceMap["txtZahlstelleBez1"] = "Kontoinhaber Zeile 1";
 $textResourceMap["txtZahlstelleBez2"] = "Kontoinhaber Zeile 2";
 $textResourceMap["txtZahlstelleBez3"] = "Kontoinhaber Zeile 3";
 $textResourceMap["txtZahlstelleBez4"] = "Kontoinhaber Zeile 4";
-
+$textResourceMap["txtAuszahlkonto"] = "Zahlungsweg/Auszahlungskonto";
 $textResourceMap["txtAuszahlungstyp"] = "Auszahlungstyp";
 $textResourceMap["txtSwiftAdr"] = "SWIFT (BIC)";
 $textResourceMap["txtBankLabel"] = "Bank";
 $textResourceMap["txtBankName"] = "Bankname";
 $textResourceMap["txtName"] = "Name";
-$textResourceMap["txtKonto"] = "Konto (IBAN)";
+$textResourceMap["txtKonto"] = "IBAN Bank/Post";
 $textResourceMap["txtPostcheckkonto"] = "Postcheckkonto";
 $textResourceMap["txtSpesenregelung"] = "Spesenregelung";
 $textResourceMap["txtSpesenregelungKeine"] = "keine Regelung";
