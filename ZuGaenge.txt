@@ -90,7 +90,7 @@ srv2.copronet.ch
 UID: prldev
 PWD: A6$LuTc81
 
-tail -n 10 /var/log/httpd-error.log
+tail -n 20 /var/log/httpd-error.log
 (Anzahl der letzten 20 Zeilen)
 
 Session beenden: "exit" + ENTER eingeben.

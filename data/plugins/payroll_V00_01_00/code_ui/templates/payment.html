@@ -38,12 +38,12 @@
 			<ul>
 				<wgui:loop name="paymentSplitLoop" varname="paymentSplitList">
 					<li rid='<wgui:loopvar loopname="paymentSplitLoop" varname="id"/>'>
-						<!-- div><wgui:loopvar loopname="paymentSplitLoop" varname="src_bank_label"/></div -->
-						<div><wgui:loopvar loopname="paymentSplitLoop" varname="dest_bank_label"/></div>
-						<div><wgui:loopvar loopname="paymentSplitLoop" varname="split_mode"/></div>
-						<div><wgui:loopvar loopname="paymentSplitLoop" varname="amount"/></div>
-						<div><wgui:loopvar loopname="paymentSplitLoop" varname="period"/></div>
-						<div><span class="e"></span><span class="d"></span></div>
+						<div style='width: 40px;'><wgui:loopvar loopname="paymentSplitLoop" varname="src_bank_label"/></div>
+						<div style='width: 260px;'><wgui:loopvar loopname="paymentSplitLoop" varname="dest_bank_label"/></div>
+						<div style='width: 90px;'><wgui:loopvar loopname="paymentSplitLoop" varname="split_mode"/></div>
+						<div style='width: 80px;'><wgui:loopvar loopname="paymentSplitLoop" varname="amount"/></div>
+						<div style='width: 80px;'><wgui:loopvar loopname="paymentSplitLoop" varname="period"/></div>
+						<div style='width: 60px;'><span class="e"></span><span class="d"></span></div>
 					</li>
 				</wgui:loop name="paymentSplitLoop">
 			</ul>
@@ -124,10 +124,8 @@
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 		<br/><wgui:text id="txtZahlSplittLoeschenSicher"/><br/>&nbsp;
 	</div>
-	<div style="float: right;">
-		<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
-		<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
-	</div>
+	<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
+	<button id="prlPmtSpltYes" class="PesarisButton" style="float: right;"><wgui:text id="txtY"/></button>
 </wgui:block name="paymentSplitDelete">
 
 
@@ -158,6 +156,8 @@
 	<div id="destBankContainer" class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEditBD" style="height:430px;">
 		<input type="hidden" id='prlPmtSplt_id' value='<wgui:var name="id"/>'/>
 		<input type="hidden" id='prlPmtSplt_payroll_employee_ID' value='<wgui:var name="payroll_employee_ID"/>'/>
+		<input type="hidden" id='prlPmtSplt_splitID' value='<wgui:var name="splitID"/>'/>
+		<input type="hidden" id='prlPmtSplt_bankID' value='<wgui:var name="bankID"/>'/>
 		<table cellpadding="0" cellspacing="0">
 		<tr>
 			<td>

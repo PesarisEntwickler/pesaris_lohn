@@ -19,6 +19,7 @@ class payroll_UI {
 		case 'payroll.auszahlen.periodenReset':
 			$periodID = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 			$payroll_period = blFunctionCall('payroll.auszahlen.resetActualPeriodenAuszahlFlags', $periodID);
+			$xx = blFunctionCall('payroll.auszahlen.initTrackingTable');
 			break; 
 		case 'payroll.auszahlen.closewindow':
 			//communication_interface::alert("payroll.auszahlen.closewindow");
@@ -1640,7 +1641,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				$data["valutaDatum"] = date ( 'd.m.Y' , $uebermorgen );				
 				$objWindow->windowTitle($objWindow->getText("txtAuszahlungErstellen").": ".$PeriodeDieserMonat);
 				$objWindow->windowIcon("auszahlen32.png");
-				$objWindow->windowWidth(700); 
+				$objWindow->windowWidth(800); 
 				$objWindow->windowHeight(405); 
 				$objWindow->modal(true);	
 				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
@@ -1862,6 +1863,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 						break;
 					}
 				}
+				blFunctionCall('payroll.auszahlen.initTrackingTable');
 				break;
 			case 3: //Periode fixieren
 				if(isset($functionParameters[0]["commit"]) && $functionParameters[0]["commit"]==1) {
@@ -2976,7 +2978,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$data["bank_source_list"] = $splitDetail["dbview_payroll_bank_source"];
 					$data["bank_destination_list"] = $splitDetail["bankDestination"];
 					$zahlstellenID = $splitDetail["data"]["payroll_bank_source_ID"];
-					$bankID = $splitDetail["data"]["payroll_bank_destination_ID"];
+					$bankID = $splitDetail["data"]["payroll_bank_destination_ID"];					
 				}					
 							
 				if(isset($functionParameters[0]["empId"])){
@@ -3050,6 +3052,8 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				} else {
 					$MAInfo .= " [Bank-ID ".$bankID."]";
 				}
+				$data["splitID"] = $splitID;
+				$data["bankID"] = $bankID;
 
 				$editMode = false;
 				if ($bankID > 0) {
@@ -3132,7 +3136,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				foreach($splitList["data"] as $row) {
 					if ($bankdestinationID < 1) {//die erste Bank gemäss Processing Order
 						$bankdestinationID = $row["payroll_bank_destination_ID"];
-						//communication_interface::alert("payroll_bank_destination_ID: ".$bankdestinationID);
 					}
 					switch($row["split_mode"]) {
 					case 1: $row["split_mode"]="Lohnart"; break;
@@ -3157,8 +3160,12 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 						$row["period"] = "alle";
 						break;
 					}//end switch
-					$row["src_bank_label"] = $row["src_bank_label"]=="" ? "-- Standard --" : $row["src_bank_label"];
+					$row["src_bank_label"] = $row["src_bank_label"]=="" ? "std" : "z".$row["src_bank_label"];
 					$row["dest_bank_label"] = $row["dest_bank_label"]=="" ? "-- Standard --" : $row["dest_bank_label"]."  [".$row["payroll_bank_destination_ID"]."]";
+					if ($row["destination_type"] == 3) {
+						$row["dest_bank_label"] = "CASH [".$row["payroll_bank_destination_ID"]."]";
+					}
+					//communication_interface::alert("row:".print_r($row, true));
 					$data["paymentSplitList"][] = $row;
 				}//end foreach
 				
@@ -3166,7 +3173,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow = new wgui_window("payroll", "GUI_paymentSplitOverview");
 				$objWindow->windowTitle($objWindow->getText("txtUebersichtZahlungssplit").$MAInfo);
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(684);
+				$objWindow->windowWidth(730);
 				$objWindow->windowHeight(310);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
@@ -3176,7 +3183,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->loadContent("payment",$data,"GUI_paymentSplitOverview");
 				$objWindow->showWindow();
 
-				$stdBankDescr = $standardBank['bankpostcash']." ".$standardBank['beneBank1'].", ".$standardBank['beneBank3'];
+				$stdBankDescr = $standardBank['bankpostcash']." ".$standardBank['beneBank1']." ".$standardBank['beneBank3'];
 
 				communication_interface::jsExecute("document.getElementById('stdBankDescr').value = '".$stdBankDescr."'; ");
 				communication_interface::jsExecute("document.getElementById('stdBankAccount').value = '".$standardBank['bank_account']." [". $standardBank['bank_id']."]'; ");

@@ -111,7 +111,7 @@ $textResourceMap["txtSwiftAdr"] = "SWIFT (BIC)";
 $textResourceMap["txtBankLabel"] = "Bank";
 $textResourceMap["txtBankName"] = "Bankname";
 $textResourceMap["txtName"] = "Name";
-$textResourceMap["txtKonto"] = "IBAN Bank/Post";
+$textResourceMap["txtKonto"] = "IBAN Bank-/Post-Konto";
 $textResourceMap["txtPostcheckkonto"] = "Postcheckkonto";
 $textResourceMap["txtSpesenregelung"] = "Spesenregelung";
 $textResourceMap["txtSpesenregelungKeine"] = "keine Regelung";
@@ -139,11 +139,12 @@ $textResourceMap["txtZwischenzahltage"] = "Zwischenzahltage";
 $textResourceMap["txtAuszkritInReihenfolge"] = "Die untenstehenden Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet";
 $textResourceMap["txtTableHeadersPaymentSplit"] = 
 		"<ul>" .
-			"<li>Bankverbindung</li>" .
-			"<li>Split-Modus</li>" .
-			"<li>Wert</li>" .
-			"<li>Periode</li>" .
-			"<li></li>" .
+			"<li style='width: 40px;'>ZS</li>" .
+			"<li style='width: 260px;'>Bankverbindung/Auszahlung</li>" .
+			"<li style='width: 90px;'>Split-Modus</li>" .
+			"<li style='width: 80px;'>Wert</li>" .
+			"<li style='width: 80px;'>Periode</li>" .
+			"<li style='width: 60px;'></li>" .
 		"</ul>";
  
 /*

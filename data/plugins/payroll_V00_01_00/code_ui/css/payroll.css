@@ -1190,7 +1190,7 @@ ul.prlPrdSetDate {
 
 .prlPmtSpltLstWrapper { 
 	border:1px solid #999;
-	width:625px;
+	width:650px;
 }
 
 .prlPmtSpltHeader {
@@ -1254,21 +1254,6 @@ ul.prlPrdSetDate {
 	margin:0;
 }
 
-.prlPmtSpltHeader ul li, .prlPmtSpltScroll ul li div {
-	width:90px;
-}
-
-.prlPmtSpltHeader ul li:first-child, .prlPmtSpltHeader ul li:first-child, .prlPmtSpltScroll ul li div:first-child {
-	width:260px;
-}
-/*
-.prlPmtSpltHeader ul li:first-child, .prlPmtSpltHeader ul li:first-child + li, .prlPmtSpltScroll ul li div:first-child, .prlPmtSpltScroll ul li div:first-child + div {
-	width:260px;
-}
-*/
-.prlPmtSpltHeader ul li:last-child, .prlPmtSpltScroll ul li div:last-child {
-	width:50px;
-}
 
 .prlPmtSpltHeader ul li:first-child + li + li + li, .prlPmtSpltScroll ul li div:first-child + div + div + div {
 	padding-right:1px;

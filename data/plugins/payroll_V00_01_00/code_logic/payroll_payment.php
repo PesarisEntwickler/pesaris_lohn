@@ -137,8 +137,10 @@ class payroll_BL_payment {
 
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("
-			SELECT pps.*, IF(pbs.description IS NULL,'',pbs.description) as src_bank_label 
+			SELECT pps.*, IF(pbs.id IS NULL,'',pbs.id) as src_bank_label 
 				        , IF(pbd.description IS NULL,'',pbd.bank_account) as dest_bank_label 
+				        , IF(pbd.destination_type IS NULL,'',pbd.destination_type) as destination_type  
+ 
 			FROM payroll_payment_split pps 
 				LEFT JOIN payroll_bank_source pbs ON pbs.id=pps.payroll_bank_source_ID 
 				LEFT JOIN payroll_bank_destination pbd ON pbd.id=pps.payroll_bank_destination_ID 
@@ -208,15 +210,14 @@ class payroll_BL_payment {
 		}
 		$isStanardBank = $auszahlen->getStandardDestinationBankAccount($employeeID);
 		
-		$bankDestID = $param['id'];		
-		$splitTabID = $param['id'];
+		$bankDestID = $param['bankID'];		
+		$splitTabID = $param['splitID'];
 		$hasSplit = false;
-		if($isStanardBank["bank_id"]!=$param['id']) {
+		if($isStanardBank["bank_id"]!=$param['id']  && $bankDestID > 0) {
 							
-			$split = $auszahlen->getPaymentSplit($employeeID,0);
+			$split = $auszahlen->getPaymentSplit($employeeID,$bankDestID,0);
 			if ($split["count"] > 0) {
 				$hasSplit = true;
-				$bankDestID = $split['data'][0]["payroll_bank_destination_ID"];
 				$paramSplitTab["id"] 		= $splitTabID;
 				$paramSplitTab["payroll_employee_ID"] 		= $employeeID;
 				$paramSplitTab["payroll_bank_source_ID"] 	= $param["selectedZahlstelle"];
@@ -373,7 +374,7 @@ class payroll_BL_payment {
 	}
 
 	public function saveBankDestinationDetail($param) {
-		//communication_interface::alert("saveBankDestinationDetail() id:".$param["id"]."\n".implode(",",$param));
+		//communication_interface::alert("saveBankDestinationDetail() id:".$param["id"]."\n".print_r($param, true));
 		$updateMode = !isset($param["id"]) || $param["id"]==0 || $param["id"]=="" ? false : true;
 		$fieldCfg = array(
 					"id"=>array("regex"=>"[0-9]{1,9}","addQuotes"=>false, "default"=>0),
@@ -469,7 +470,7 @@ class payroll_BL_payment {
 			 
 		$response["success"] = true;
 		$response["errCode"] = 0;
-		communication_interface::alert("Bank/Post ".$erfolg);
+		communication_interface::alert("Bank/Post/Cash ".$erfolg);
 		return $response;
 	}
 	
@@ -603,6 +604,17 @@ class payroll_BL_payment {
 		 	";
 		 	$bD = $system_database_manager->executeQuery($sqlSelectBankDest);
 		 	$resMaxID = $system_database_manager->executeQuery("SELECT MAX(id) AS maxId FROM payroll_bank_destination");
+
+			$copy = "Copy";
+			switch($bD[0]["destination_type"]) {
+			case 1: //Bank
+				$copy = "BANK-Copy";
+				break;
+			case 2: //Post
+				$copy = "POST-Copy";
+				break;
+			}
+		 	
 		 	//communication_interface::alert("id=".$bD[0]["id"].",\nempId=".$bD[0]["payroll_employee_ID"].",\nkonto=".$bD[0]["bank_account"].",\nmaxId:".$resMaxID[0]["maxId"]);
 		 	$nextBD_id = $resMaxID[0]["maxId"]+1;
 			$sqlInsertBankDest = "
@@ -611,7 +623,7 @@ class payroll_BL_payment {
 				VALUES (".$nextBD_id."
 					  , ".$bD[0]["payroll_employee_ID"]."
 					  , ".$bD[0]["destination_type"]."
-					  ,'Kopie von ".$auszahlen->replaceUmlaute( $bD[0]["description"] )."'
+					  ,'".$copy."'
 					  ,'".$auszahlen->replaceUmlaute( $bD[0]["core_intl_country_ID"] )."'
 					  ,'".$auszahlen->replaceUmlaute( $bD[0]["bank_account"] )."'
 					  ,'".$auszahlen->replaceUmlaute( $bD[0]["postfinance_account"] )."'

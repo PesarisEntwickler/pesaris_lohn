@@ -66,7 +66,15 @@ class payroll_BL {
 		case 'payroll.auszahlen.getAllDestinationBankAccounts':
 			return $auszahlen->getAllDestinationBankAccounts($functionParameters[0]);//=$employeeID
 		case 'payroll.auszahlen.getPaymentSplit':
-			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1]);//=$employeeID, $bankID
+			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1],$functionParameters[2]);//=$employeeID, $bankID, $Zahlstelle
+		case 'payroll.auszahlen.initTrackingTable':
+			return $auszahlen->initTrackingTable();
+		case 'payroll.auszahlen.truncateTrackingTable':
+			return $auszahlen->truncateTrackingTable();
+		case 'payroll.auszahlen.setAmountAvailableTrackingTable':
+			return $auszahlen->setAmountAvailableTrackingTable($functionParameters[0],$functionParameters[1],$functionParameters[2],$functionParameters[3],$functionParameters[4]);//$periodeID, $employeeID, $splitID, $processingOrder, $newAmountAvalable
+		case 'payroll.auszahlen.getAmountAvailableFromTrackingTable':
+			return $auszahlen->getAmountAvailableFromTrackingTable($functionParameters[0],$functionParameters[1]);//$periodeID, $employeeID
 		case 'replaceUmlaute':
 			return $auszahlen->replaceUmlaute($functionParameters[0]);//=$uebergabeWort
 		case 'rundungAuf5Rappen':

@@ -33,7 +33,6 @@ class auszahlen {
 	public function getActualPeriodName() {
 		$periodenID = $this->getActualPeriodID();
 		$periodenDaten = $this->getActualPeriodenDaten($periodenID);
-		//communication_interface::alert($periodenDaten['data'][0]['payroll_year_ID']);
 		$response = PERIODENPREFIX.$periodenDaten['data']['payroll_year_ID']."-".substr("00".$periodenDaten['data']['major_period'], -2);		
 		return $response;
 	}
@@ -222,7 +221,10 @@ class auszahlen {
 				;";
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery($sql);
-		//communication_interface::alert(count($result)."\n".$sql);
+		
+//		communication_interface::alert(count($result)."\n".$sql);
+//		return;
+		
 		if(count($result) == 0) {
 			$retval["success"] 	= false;
 			$retval["errCode"]  = 106;
@@ -252,7 +254,7 @@ class auszahlen {
 		return $emplFilter;	
 	}
 	
-	public function getEmployeesCurrentPeriod($accountList, $emplIdList) {
+	public function getEmployeeDataCurrentPeriod($accountList, $emplIdList) {
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("
 			SELECT  *
@@ -285,9 +287,9 @@ class auszahlen {
 					  payroll_calculation_current AS C
 					, payroll_period_employee     AS E
 					WHERE C.payroll_employee_ID = E.payroll_employee_ID
-					AND C.payroll_period_ID = E.payroll_period_ID
-					AND C.payroll_account_ID IN (".$accountList.")
-					AND C.".$amountClause." ;"
+					  AND C.payroll_period_ID   = E.payroll_period_ID
+					  AND C.payroll_account_ID IN (".$accountList.")
+					  AND C.".$amountClause." ;"
 				);
 		if(count($result) == 0) {
 			$retval["success"] 	= false;
@@ -324,16 +326,21 @@ class auszahlen {
 		return $c;
 	}
 
-	function getPaymentSplit($employeeID, $bankDestID){
-		$whereBankIdClause = "";
+	function getPaymentSplit($employeeID, $bankDestID, $ZahlstellenID){
+		$ANDwhereBankDestIdClause = "";
 		if (intval($bankDestID) > 0) {
-			$whereBankIdClause = " AND payroll_bank_destination_ID = ".$bankDestID;
+			$ANDwhereBankDestIdClause = " AND payroll_bank_destination_ID = ".$bankDestID;
+		}
+		$ANDwhereBankSourceIdClause = "";
+		if (intval($bankDestID) > 0) {
+			$ANDwhereBankSourceIdClause = " AND payroll_bank_source_ID = ".$ZahlstellenID;
 		}
 		$sql = "				
 			SELECT * FROM
 			          payroll_payment_split
 			WHERE	  payroll_employee_ID = ".$employeeID.
-			$whereBankIdClause."
+			$ANDwhereBankDestIdClause.
+			$ANDwhereBankSourceIdClause."
 			ORDER BY  processing_order
 			LIMIT 1
 		;";
@@ -412,15 +419,9 @@ class auszahlen {
 			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
 			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
 			switch ( $result_bank_destination[0]['destination_type'] ) {
-				case 1:
-					$retArray['bankpostcash'] = "BANK";
-					break;
-				case 2:
-					$retArray['bankpostcash'] = "POST";
-					break;
-				case 3:
-					$retArray['bankpostcash'] = "CASH";
-					break;
+				case 1: $retArray['bankpostcash'] = "BANK"; break;
+				case 2: $retArray['bankpostcash'] = "POST"; break;
+				case 3: $retArray['bankpostcash'] = "CASH"; break;
 			}
 		}
 		return $retArray;
@@ -514,6 +515,128 @@ class auszahlen {
 		}
 		return floatval($amount);
 	}
+		
+	public function getPeriodZahlstellenListe($periodeID) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("
+			SELECT DISTINCT payroll_bank_source_ID 
+			FROM payroll_payment_split
+			WHERE payroll_employee_ID IN 
+			(	SELECT payroll_employee_ID 
+				FROM payroll_period_employee
+				WHERE payroll_period_ID = ".$periodeID."
+			)
+			AND payroll_bank_source_ID > 0
+			ORDER BY payroll_bank_source_ID
+		    ");
+		$return = array();
+		foreach ( $result as $row ) {
+			$return[] = $row["payroll_bank_source_ID"];
+		}  
+		return $return;
+	}
+		
+	public function getPeriodZahlstellenMitarbeiterListe($periodeID, $ZahlstellenID, $empList) {
+		$sql = "
+				SELECT payroll_employee_ID 
+				FROM payroll_period_employee
+				WHERE payroll_period_ID = ".$periodeID."					
+				";
+		if (strlen($empList)>0){
+			$sql = "
+					SELECT payroll_employee_ID 
+					FROM payroll_period_employee
+					WHERE payroll_period_ID = ".$periodeID."
+					AND payroll_employee_ID IN (".$empList.")					
+					";
+		}
+		if(intval($ZahlstellenID)>0) {
+			$ANDwhereZahlstelle = " AND payroll_bank_source_ID = ".$ZahlstellenID." ";
+			$sql = "
+					SELECT DISTINCT payroll_employee_ID 
+					FROM payroll_payment_split
+					WHERE payroll_employee_ID IN 
+					(	SELECT payroll_employee_ID 
+						FROM payroll_period_employee
+						WHERE payroll_period_ID = ".$periodeID."
+					)
+					AND payroll_bank_source_ID = ".$ZahlstellenID."
+					ORDER BY payroll_employee_ID, processing_order
+				    ";
+		}		
+
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		$return = array();
+		foreach ( $result as $row ) {
+			$return[] = $row["payroll_employee_ID"];
+		}  
+		return $return;
+	}
+	
+	public function truncateTrackingTable() {
+		$sql = "TRUNCATE `payroll_auszahlen_tracking`;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeUpdate($sql);
+		return true;
+	}
+
+	public function initTrackingTable() {
+		$this->truncateTrackingTable();
+		$system_database_manager = system_database_manager::getInstance();
+		$sql = "SELECT * FROM payroll_calculation_current WHERE payroll_account_ID = 8000";
+		$result = $system_database_manager->executeQuery($sql);
+		$insert =  "INSERT INTO `payroll_auszahlen_tracking`
+					(`payroll_period_ID`,
+					`payroll_employee_ID`,
+					`payroll_payment_split_ID`,
+					`processing_order`,
+					`amount_initial`,
+					`amount_available`)
+					VALUES "; 
+		foreach ( $result as $row ) {
+			$insert .="
+					('".$row['payroll_period_ID']."'
+					,'".$row['payroll_employee_ID']."'
+					,'0'
+					,'0'
+					,'".$row['amount']."'
+					,'".$row['amount']."')
+				    ,";
+		}  
+		$insert = substr($insert, 0, strlen($insert)-1);//letztes Komma wegmachen
+		$result = $system_database_manager->executeUpdate($insert);
+
+		return true;
+	}
+
+	public function setAmountAvailableTrackingTable($periodeID, $employeeID, $splitID, $processingOrder, $newAmountAvailable) {
+		$sql = "
+				UPDATE payroll_auszahlen_tracking
+				   SET amount_available  = ".$newAmountAvailable."
+				      ,payroll_payment_split_ID  = ".$splitID."
+				      ,processing_order  = ".$processingOrder."
+				 WHERE payroll_period_ID  = ".$periodeID."
+				   AND payroll_employee_ID  = ".$employeeID."			
+			  ;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeUpdate($sql);
+		return true;
+	}
+
+	public function getAmountAvailableFromTrackingTable($periodeID, $employeeID) {
+		$sql = "
+				SELECT MAX(id), amount_available 
+				  FROM payroll_auszahlen_tracking
+			     WHERE payroll_period_ID  = ".$periodeID."
+			       AND payroll_employee_ID  = ".$employeeID."		
+			     ORDER BY payroll_employee_ID, processing_order		
+			    ";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		//communication_interface::alert($result[0]["amount_available"]);
+		return $result[0]["amount_available"];
+	}
 	
 	public function replaceUmlaute($uebergabeWort) {
 		$umlaute = array("'","ä","ö" ,"ü" ,"Ä" ,"Ö" ,"Ü" ,"ß" ,"à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
@@ -537,6 +660,6 @@ class auszahlen {
 		}
 		return $gerundeterBetrag;
 	}
-	
+		
 }
 ?>
