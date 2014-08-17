@@ -331,7 +331,7 @@
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
 		<input type="hidden" id="prlFormCfg_rid"/>
 		<label for="prlFormCfg_company_shortname"><wgui:text id="prlFormCfg_company_shortname"/>:</label>
-			<input type="text" id="prlFormCfg_company_shortname" style="width: 194px;"/> 
+			<input type="text" id="prlFormCfg_company_shortname" style="width: 194px; padding: 0 3px 0 3px;"/> 
 			<input type="text" id="prlFormCfg_id" style="width: 30px; font-weight: bold; text-align: center;" disabled="disabled"/>
 		<br/>
 		<label for="prlFormCfg_HR_RC_Name"><wgui:text id="prlFormCfg_HR_RC_Name"/>:</label>
@@ -340,11 +340,9 @@
 		<label for="prlFormCfg_Street"><wgui:text id="prlFormCfg_Street"/>:</label>
 			<input type="text" id="prlFormCfg_Street"/>
 		<br/>
-		<label for="prlFormCfg_ZIP_Code"><wgui:text id="prlFormCfg_ZIP_Code"/>:</label>
-			<input type="text" id="prlFormCfg_ZIP_Code"/>
-		<br/>
-		<label for="prlFormCfg_City"><wgui:text id="prlFormCfg_City"/>:</label>
-			<input type="text" id="prlFormCfg_City"/>
+		<label for="prlFormCfg_ZIP_Code"><wgui:text id="txtPlzOrt"/>:</label>
+			<input type="text" id="prlFormCfg_ZIP_Code" style="width: 60px;"/>
+			<input type="text" id="prlFormCfg_City" style="width: 164px;"/>
 		<br/>
 		<label for="prlFormCfg_UID_EHRA"><wgui:text id="prlFormCfg_UID_EHRA"/>:</label>
 			<input type="text" id="prlFormCfg_UID_EHRA"/>
@@ -355,7 +353,7 @@
 		<br/>
 		<label for="selZahlstelle"><wgui:text id="txtZahlstellen"/>:</label>
 		<br/>
-			<select id="selZahlstelle" name="selZahlstelle" style="width:100%;margin-bottom:4px;" size="4"  >
+			<select id="selZahlstelle" name="selZahlstelle" style="width:650px; margin-bottom:4px;" size="4"  >
 				<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
 					<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>">
 					  [z<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>]&nbsp;

@@ -182,6 +182,10 @@ $textResourceMap["prlVlEditDlg2LblGlobal"] = "allen Benutzern zugaenglich";
 $textResourceMap["prlVlSelectFormTitle"] = "Bearbeitungsmaske auswaehlen";
 $textResourceMap["prlVlSelectFormLblLayout"] = "Bearbeitungsmaske:";
 
+$textResourceMap["txtNameDesReiters"] = "Name des Reiters";
+$textResourceMap["txtSicherLayoutLoeschen1"] = "Sind Sie sicher, dass Sie das Layout";
+$textResourceMap["txtSicherLayoutLoeschen2"] = "unwiderruflich l&ouml;schen wollen?";
+
 
 /*
 ********* CONFIGURATION ***********

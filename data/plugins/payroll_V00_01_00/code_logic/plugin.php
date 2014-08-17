@@ -47,6 +47,8 @@ class payroll_BL {
 			return $auszahlen->getCalculationCurrentPeriodEmployeeList($functionParameters[0], $functionParameters[1]);//("8000",  " < 0.001 ") oder ("8000, 8001, 8002", " >= 0.001 ")
 		case 'payroll.auszahlen.getActualPeriodID':
 			return $auszahlen->getActualPeriodID();
+		case 'payroll.auszahlen.getCompany':
+			return $auszahlen->getCompany($functionParameters[0]);//$company_ID
 		case 'payroll.auszahlen.getActualPeriodName':
 			return $auszahlen->getActualPeriodName();
 		case 'payroll.auszahlen.getActualPeriodDir':

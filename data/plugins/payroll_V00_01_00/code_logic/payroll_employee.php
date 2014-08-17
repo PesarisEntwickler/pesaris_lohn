@@ -964,7 +964,10 @@ spezielle felder und sonderfälle:
 			$response["errText"] = "mandatory table fields are empty";
 			$response["fieldNames"] = array();
 			$response["tableRows"] = $arrMandatoryErr;
-			communication_interface::alert($response["errText"]."?\n".print_r($arrValidityErr,true));
+			$arSearch = array("Array", "(", ")", "tblprd");
+			$arReplace = array("Fehlende Informationen:", "", "", "Perioden Tabelle");
+			$err = str_replace($arSearch, $arReplace, print_r($arrValidityErr[0], true));
+			communication_interface::alert($err);
 			$response["success"] = true;//TODO harald <--- Warum??			
 			return $response;
 		}
@@ -976,7 +979,12 @@ spezielle felder und sonderfälle:
 			$response["errText"] = "validity check failed (table content)";
 			$response["fieldNames"] = array();
 			$response["tableRows"] = $arrValidityErr[0];
-			communication_interface::alert($response["errText"]."??\n".print_r($arrValidityErr[0],true));			
+			$arSearch = array("Array", "(", ")", "tblprd");
+			$arReplace = array("Inkorrekte Werte in Tabellen-Informationen:", "", "", "Perioden Tabelle");
+			$err = str_replace($arSearch, $arReplace, print_r($arrValidityErr[0], true));
+			communication_interface::alert($err);
+			
+			//communication_interface::alert($response["errText"]."\n".print_r($arrValidityErr[0],true));			
 			$response["success"] = true;//TODO harald !! ---> was ist der Fehler mit dem "table content"
 			return $response;
 		}

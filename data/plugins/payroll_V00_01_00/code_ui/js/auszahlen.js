@@ -1,0 +1,3 @@
+function getX() {
+	alert("X");
+}

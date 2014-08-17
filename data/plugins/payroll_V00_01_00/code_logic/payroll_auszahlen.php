@@ -404,6 +404,7 @@ class auszahlen {
 		$retArray['beneBank3'] = "";
 		$retArray['beneBank4'] = "";
 		$retArray['bankpostcash'] = "";
+		$retArray['nonstandard_banksourcezahlstelle'] = "";
 		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
 			$retArray['success'] = true;
@@ -418,6 +419,7 @@ class auszahlen {
 			$retArray['beneBank2'] = $result_bank_destination[0]['beneficiary_bank_line2'];
 			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
 			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
+			$retArray['nonstandard_banksourcezahlstelle'] = $result_bank_destination[0]['nonstandard_banksourcezahlstelle'];
 			switch ( $result_bank_destination[0]['destination_type'] ) {
 				case 1: $retArray['bankpostcash'] = "BANK"; break;
 				case 2: $retArray['bankpostcash'] = "POST"; break;
@@ -447,6 +449,7 @@ class auszahlen {
 		$retArray[$idx]['beneBank2'] = "";
 		$retArray[$idx]['beneBank3'] = "";
 		$retArray[$idx]['beneBank4'] = "";
+		$retArray[$idx]['nonstandard_banksourcezahlstelle'] = "";
 		if ( count($result_bank_destination) > 0 ) {
 			foreach ( $result_bank_destination as $res ) {       
 				$retArray[$idx]['bank_account'] = trim( $res[$idx]['bank_account'] ) ;
@@ -459,6 +462,7 @@ class auszahlen {
 				$retArray[$idx]['beneBank2'] = $res[$idx]['beneficiary_bank_line2'];
 				$retArray[$idx]['beneBank3'] = $res[$idx]['beneficiary_bank_line3'];
 				$retArray[$idx]['beneBank4'] = $res[$idx]['beneficiary_bank_line4'];
+				$retArray[$idx]['nonstandard_banksourcezahlstelle'] = $res[$idx]['nonstandard_banksourcezahlstelle'];
 				$idx++;
 			}
 		}

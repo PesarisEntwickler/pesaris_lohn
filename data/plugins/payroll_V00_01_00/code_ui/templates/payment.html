@@ -153,7 +153,7 @@
 
 
 <wgui:block name="destinationBankEdit"> 
-	<div id="destBankContainer" class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEditBD" style="height:430px;">
+	<div id="destBankContainer" class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEditBD" style="height:440px;">
 		<input type="hidden" id='prlPmtSplt_id' value='<wgui:var name="id"/>'/>
 		<input type="hidden" id='prlPmtSplt_payroll_employee_ID' value='<wgui:var name="payroll_employee_ID"/>'/>
 		<input type="hidden" id='prlPmtSplt_splitID' value='<wgui:var name="splitID"/>'/>
@@ -338,11 +338,13 @@
 
 <wgui:block name="GUI_bank_source_Edit">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit_bank_source">
-		<input type="hidden" id="prlPmtSplt_id" value='<wgui:var name="id"/>'/>
 		<input type="hidden" id="prlPmtSplt_payroll_company_ID" value='<wgui:var name="payroll_company_ID"/>' />
+		<input type="hidden" id="prlPmtSplt_payroll_bankId" value='<wgui:var name="id"/>' />
 		<fieldset>
 			<legend><wgui:text id="txtAllgemein"/>:</legend>
-			<label for="prlPmtSplt_description"><wgui:text id="txtZahlstelleBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value='<wgui:var name="description"/>'/><br/>
+			<label for="prlPmtSplt_description"><wgui:text id="txtZahlstelleBezeichnung"/>:</label>
+			<input type="text" id="prlPmtSplt_description" value='<wgui:var name="description"/>' style="width: 160px;"/>
+			<input type="text" id="prlPmtSplt_id" value='<wgui:var name="id"/>' style="width: 30px; text-align:center;" disabled="disabled"/><br/>
 			<label for="prlPmtSplt_source_type"><wgui:text id="txtZahlstellenTyp"/>:</label>
 				<select id="prlPmtSplt_source_type">
 					<option value="1"><wgui:text id="txtBank"/></option>
@@ -397,15 +399,20 @@
 			<label for="prlPmtSplt_bank_source_desc4"><wgui:text id="txtZahlstelleBez4"/>:</label><input type="text" id="prlPmtSplt_bank_source_desc4" value='<wgui:var name="bank_source_desc4"/>'/><br/>
 		</fieldset>
 	</div>
-	<button id="btnBankSourceEditClose" class="PesarisButton" onclick='$("#modalContainer").mb_close();' ><wgui:text id="btnClose"/></button>
-	<button id="prlPmtSplt_BankSourceEdit_btnSave" style="float: right;" class="PesarisButton"><wgui:text id="btnSave"/></button>
+	<button id="prlPmtSplt_BankSourceEdit_btnCancel" class="PesarisButton" ><wgui:text id="btnClose"/></button>
+	<div style="float: right;">
+	<button id="prlPmtSplt_BankSourceEdit_btnDelete" class="PesarisButton" ><wgui:text id="btnDelete"/>...</button>
+	<button id="prlPmtSplt_BankSourceEdit_btnSave"   class="PesarisButton" ><wgui:text id="btnSave"/></button>
+	</div>
 </wgui:block name="GUI_bank_source_Edit">
 
 <wgui:block name="GUItemplate_bank_source_Delete">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
 		<wgui:text id="txtZahlstelleLoeschenSicher"/>
 	</div>
-	<button id="prlPmtSpltYes" class="PesarisButton"><wgui:text id="txtY"/></button>
-	<button id="prlPmtSpltNo" class="PesarisButton"><wgui:text id="txtN"/></button>
+	<div style="float: center;">
+	<button id="btn_bank_source_Delete_YES" class="PesarisButton"><wgui:text id="txtY"/></button>
+	<button id="btn_bank_source_Delete_NO" class="PesarisButton"><wgui:text id="txtN"/></button>
+	</div>
 </wgui:block name="GUItemplate_bank_source_Delete">
 

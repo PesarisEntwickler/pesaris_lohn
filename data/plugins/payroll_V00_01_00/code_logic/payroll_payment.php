@@ -215,8 +215,8 @@ class payroll_BL_payment {
 		$hasSplit = false;
 		if($isStanardBank["bank_id"]!=$param['id']  && $bankDestID > 0) {
 							
-			$split = $auszahlen->getPaymentSplit($employeeID,$bankDestID,0);
-			if ($split["count"] > 0) {
+			//$split = $auszahlen->getPaymentSplit($employeeID,$bankDestID,0); 
+			//if ($split["count"] > 0) {
 				$hasSplit = true;
 				$paramSplitTab["id"] 		= $splitTabID;
 				$paramSplitTab["payroll_employee_ID"] 		= $employeeID;
@@ -246,10 +246,10 @@ class payroll_BL_payment {
 				}
 				$paramSplitTab["having_rounding"] = 1;
 				$paramSplitTab["round_param"] = 0.00;
-			} else {
-				communication_interface::alert("Problem mit BankDest & Split");
-				return false;				
-			}
+			//} else {
+			//	communication_interface::alert("Problem mit BankDest & Split\n$employeeID,$bankDestID");
+			//	return false;				
+			//}
 		}
 		
 		$paramBankDest["id"] 					= $bankDestID;
@@ -280,11 +280,7 @@ class payroll_BL_payment {
 		$paramBankDest["beneficiary_bank_line4"]= "";
 		$paramBankDest["expense"] 				= strtoupper($param["expense"]);
 		//$paramBankDest["is_standard_bank"] 		= "";
-		
-		if ($param["selectedZahlstelle"] > 0 && $hasSplit == false) {
-			communication_interface::alert("Die Zahlstelle entspricht nicht der Standard-Zahlstelle.");
-			$this->initZahlungssplitt($param["payroll_employee_ID"], $param["selectedZahlstelle"], $bankDestID);
-		}
+		$paramBankDest["nonstandard_banksourcezahlstelle"] =  $param["selectedZahlstelle"];
 		
 		if ($hasSplit) {
 			//communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamSplitTab:".print_r($paramSplitTab, true));
@@ -399,7 +395,8 @@ class payroll_BL_payment {
 					"beneficiary_bank_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"expense"=>array("regex"=>"[012]{0,1}","addQuotes"=>true),
 					"notice_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"notice_line2"=>array("regex"=>".{0,32}","addQuotes"=>true)
+					"notice_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
+					"nonstandard_banksourcezahlstelle"=>array("regex"=>"[0-9]{1,9}","addQuotes"=>false)
 				);
 		$errFields = array();
 		switch($param["destination_type"]) {
@@ -433,8 +430,8 @@ class payroll_BL_payment {
 			$response["errCode"] = 10;
 			$response["errText"] = "invalid field value [10]";
 			$response["fieldNames"] = $errFields;
-			$arSearch = array("Array", "(", ")");
-			$arReplace = array("mandatory fields missing [pp10]:", "", "");
+			$arSearch = array("Array", "(", ")","bank_account","beneficiary_bank_line1","beneficiary_bank_line3","beneficiary1_line1","beneficiary1_line4");
+			$arReplace = array("Bitte fehlende Informationen eingeben:", "", "","Bank Konto/IBAN","Bankname","Bank PLZ / Ort","Beguenstigter Name","Beguenstigter PLZ / Ort");
 			$err = str_replace($arSearch, $arReplace, print_r($errFields, true));
 			communication_interface::alert($err);
 			return $response;
@@ -470,7 +467,8 @@ class payroll_BL_payment {
 			 
 		$response["success"] = true;
 		$response["errCode"] = 0;
-		communication_interface::alert("Bank/Post/Cash ".$erfolg);
+		communication_interface::alert("Bank, Post, Cash ".$erfolg);//.print_r($param, true).$sql
+		communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
 		return $response;
 	}
 	
@@ -554,6 +552,7 @@ class payroll_BL_payment {
 		$response["data"]["beneficiary_bank_line5"] = "";
 		$response["data"]["expense"] = "";
 		$response["data"]["is_standard_bank"] = "";
+		$response["data"]["nonstandard_banksourcezahlstelle"] = "0";
 
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_bank_destination WHERE id=".$destBankID, "payroll_getDestBankDetail");
@@ -566,6 +565,26 @@ class payroll_BL_payment {
 			$response["errCode"] = 101;
 			$response["errText"] = "no data found";
 		}
+		return $response;
+	}
+
+	public function deleteDestBankDetail($param) {
+		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_bank_destination_ID
+			$response["success"] = false;
+			$response["errCode"] = 10;
+			$response["errText"] = "invalid payment split ID";
+			return $response;
+		}
+		//wenn die zu loeschende Bank im Personalstamm als Standard-Bankverbindung hinterlegt wurde, darf nicht geloescht werden. 
+		//Stattdessen ist eine Warnung/Fehlermeldung anzuzeigen.
+		$system_database_manager = system_database_manager::getInstance();
+		$system_database_manager->executeUpdate("BEGIN", "payroll_deleteDestBankDetail");
+		$system_database_manager->executeUpdate("DELETE FROM `payroll_bank_destination` WHERE `id`=".$param["id"], "payroll_deleteDestBankDetail");
+		$system_database_manager->executeUpdate("DELETE FROM `payroll_payment_split` WHERE `payroll_bank_destination_ID`=".$param["id"], "payroll_deleteDestBankDetail");
+		$system_database_manager->executeUpdate("COMMIT", "payroll_deleteDestBankDetail");
+
+		$response["success"] = true;
+		$response["errCode"] = 0;
 		return $response;
 	}
 
@@ -619,7 +638,7 @@ class payroll_BL_payment {
 		 	$nextBD_id = $resMaxID[0]["maxId"]+1;
 			$sqlInsertBankDest = "
 				INSERT INTO payroll_bank_destination (
-						 `id`, `payroll_employee_ID`, `destination_type`, `description`, `core_intl_country_ID`, `bank_account`, `postfinance_account`, `bank_swift`, `beneficiary1_line1`, `beneficiary1_line2`, `beneficiary1_line3`, `beneficiary1_line4`, `beneficiary_bank_line1`, `beneficiary_bank_line2`, `beneficiary_bank_line3`, `beneficiary_bank_line4`, `is_standard_bank`) 
+						 `id`, `payroll_employee_ID`, `destination_type`, `description`, `core_intl_country_ID`, `bank_account`, `postfinance_account`, `bank_swift`, `beneficiary1_line1`, `beneficiary1_line2`, `beneficiary1_line3`, `beneficiary1_line4`, `beneficiary_bank_line1`, `beneficiary_bank_line2`, `beneficiary_bank_line3`, `beneficiary_bank_line4`, `is_standard_bank`, `nonstandard_banksourcezahlstelle`) 
 				VALUES (".$nextBD_id."
 					  , ".$bD[0]["payroll_employee_ID"]."
 					  , ".$bD[0]["destination_type"]."
@@ -637,6 +656,7 @@ class payroll_BL_payment {
 					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line3"] )."'
 					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line4"] )."'
 					  ,'N'
+					  ,'0'
 					  );";
 			$ret = $system_database_manager->executeUpdate($sqlInsertBankDest, "payroll_initZahlungssplitt");
 		 	
@@ -687,14 +707,14 @@ class payroll_BL_payment {
 		if(count($errFields)>0) {
 			$response["success"] = false;
 			$response["errCode"] = 13;
-			$response["errText"] = "invalid field value [13]";
+			$response["errText"] = "invalid field value";
 			$response["fieldNames"] = $errFields;
 			//communication_interface::alert("err saveBankSourceDetail() id:".$param["id"]." =".$errFields[0]);
 			return $response;
 		}
 
 		//communication_interface::alert("fieldCfg[id]:".$fieldCfg["id"].", param[id]:".$param["id"]." / updateMode=".$updateMode);
-		$erfolg = "Bank info ";
+		$erfolg = "Bank-Info ";
 		$sql = "";
 		if($updateMode) {
 			$sqlUPDATE = array();
@@ -727,35 +747,13 @@ class payroll_BL_payment {
 		$system_database_manager = system_database_manager::getInstance();
 		$system_database_manager->executeUpdate($sql, "payroll_savePayslipCfgDetail");
 
-		communication_interface::alert($erfolg);
+		//communication_interface::alert($erfolg);
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;
 	}
 	
 	
-	public function deleteDestBankDetail($param) {
-		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_bank_destination_ID
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "invalid payment split ID";
-			return $response;
-		}
-		//wenn die zu loeschende Bank im Personalstamm als Standard-Bankverbindung hinterlegt wurde, darf nicht geloescht werden. 
-		//Stattdessen ist eine Warnung/Fehlermeldung anzuzeigen.
-		$system_database_manager = system_database_manager::getInstance();
-		$system_database_manager->executeUpdate("BEGIN", "payroll_deleteDestBankDetail");
-		$system_database_manager->executeUpdate("DELETE FROM `payroll_bank_destination` WHERE `id`=".$param["id"], "payroll_deleteDestBankDetail");
-		$system_database_manager->executeUpdate("DELETE FROM `payroll_payment_split` WHERE `payroll_bank_destination_ID`=".$param["id"], "payroll_deleteDestBankDetail");
-		$system_database_manager->executeUpdate("COMMIT", "payroll_deleteDestBankDetail");
-
-		$response["success"] = true;
-		$response["errCode"] = 0;
-		return $response;
-	}
-///////////////////////////////////////////////////////
-//// ZAHLSTELLE bank source                        ////
-///////////////////////////////////////////////////////
 	public function getBankSourceDetail($param) {
 		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) {
 			$response["success"] = false;
@@ -779,21 +777,46 @@ class payroll_BL_payment {
 		$response["dbview_payroll_bank_sourcewaehrungen"] = $resBankSourceCurrencies;
 		return $response;
 	}
+	
+	
 	public function deleteBankSourceDetail($param) {
-		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_bank_source_ID
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "invalid payment split ID";
-			return $response;
-		}
-//TODO: wenn die zu loeschende Bank im Personalstamm als Standard-Bankverbindung hinterlegt wurde, darf nicht geloescht werden. 
-//Stattdessen ist eine Warnung/Fehlermeldung anzuzeigen.
-		$system_database_manager = system_database_manager::getInstance();
-		$system_database_manager->executeUpdate("BEGIN", "payroll_deleteBankSourceDetail");
-		$system_database_manager->executeUpdate("DELETE FROM `payroll_bank_source` WHERE `id`=".$param["id"], "payroll_deleteBankSourceDetail");
-		$system_database_manager->executeUpdate("DELETE FROM `payroll_payment_split` WHERE `payroll_bank_source_ID`=".$param["id"], "payroll_deleteBankSourceDetail");
-		$system_database_manager->executeUpdate("COMMIT", "payroll_deleteBankSourceDetail");
+		$bankSourceId = $param["id"];
+		//communication_interface::alert("deleteBankSourceDetail() :".$bankSourceId);
+		
+		//wenn die zu loeschende Bank im Personalstamm als Standard-Bankverbindung hinterlegt wurde, darf nicht geloescht werden. 
 
+		$system_database_manager = system_database_manager::getInstance();
+
+		$sql = "
+				SELECT *  
+				FROM payroll_employee
+				WHERE id IN (
+							SELECT DISTINCT payroll_employee_ID 
+							FROM payroll_payment_split
+							WHERE payroll_bank_source_ID = ".$bankSourceId."
+							)				
+				";
+		$result = $system_database_manager->executeQuery($sql);
+		if (count($result)> 0) {
+			$c = "";
+			foreach ( $result as $row ) {
+				$c .= " - ";
+				$c .= $row['EmployeeNumber'].", ";
+				$c .= $row['Firstname']." ";
+				$c .= $row['Lastname'].", ";
+				$c .= $row['City']."\n";
+			}
+			communication_interface::alert("Loeschen noch nicht moeglich!" .
+										"\n\nFolgende Mitarbeiter haben noch eine\nVerbindung zu der zu loeschenden Bank:" .
+										"\n\n".$c);
+		} else {
+			//communication_interface::alert("Loeschen von ".$bankSourceId);
+			$system_database_manager->executeUpdate("BEGIN", "payroll_deleteBankSourceDetail");
+			$system_database_manager->executeUpdate("DELETE FROM `payroll_bank_source` WHERE `id`=".$bankSourceId, "payroll_deleteBankSourceDetail");
+			$system_database_manager->executeUpdate("DELETE FROM `payroll_payment_split` WHERE `payroll_bank_source_ID`=".$bankSourceId, "payroll_deleteBankSourceDetail");
+			$system_database_manager->executeUpdate("COMMIT", "payroll_deleteBankSourceDetail");
+		}
+		
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;
