@@ -23,7 +23,7 @@ class finMgmtAccounting{
 		//1=mandatory add, 2=mand edit, 3=mand del, 4=add apostrophe in SQL, 5=regex
 		$arrFields = array(
 			array('id'=>array(false,true,true,false,'/^[0-9]{1,9}$/'),'payroll_company_ID'=>array(true,true,false,false,'/^[0-9]{1,9}$/'),'payroll_employee_ID'=>array(true,true,false,false,'/^[0-9]{1,9}$/'),'payroll_account_ID'=>array(true,true,false,true,'/^[0-9a-zA-Z]{1,5}$/'),'cost_center'=>array(false,false,false,true,'/^.{0,15}$/'),'account_no'=>array(true,true,false,true,'/^.{1,15}$/'),'counter_account_no'=>array(false,false,false,true,'/^.{0,15}$/'),'debitcredit'=>array(true,true,false,false,'/^[01]{1,1}$/'),'entry_text'=>array(true,true,false,true,'/^.{1,50}$/'),'invert_value'=>array(true,true,false,false,'/^[01]{1,1}$/'),'processing_order'=>array(false,false,false,false,'/^[0-9]{1,2}$/')),
-			array('id'=>array(false,true,true,false,'/^[0-9]{1,9}$/'),'payroll_company_ID'=>array(false,true,false,false,'/^[0-9]{1,9}$/'),'payroll_employee_ID'=>array(false,true,false,false,'/^[0-9]{1,9}$/'),'payroll_account_ID'=>array(true,true,false,true,'/^[0-9a-zA-Z]{1,5}$/'),'cost_center'=>array(false,true,false,true,'/^.{1,15}$/'),'amount'=>array(true,true,false,false,'/^[0-9]{1,3}(\.[0-9]{0,2})?$/'),'invert_value'=>array(true,true,false,false,'/^[01]{1,1}$/'),'remainder'=>array(true,true,false,false,'/^[01]{1,1}$/'),'processing_order'=>array(false,false,false,false,'/^[0-9]{1,2}$/')),
+			array('id'=>array(false,true,true,false,'/^[0-9]{1,9}$/'),'payroll_company_ID'=>array(false,true,false,false,'/^[0-9]{1,9}$/'),'payroll_employee_ID'=>array(false,true,false,false,'/^[0-9]{1,9}$/'),'payroll_account_ID'=>array(true,true,false,true,'/^[0-9a-zA-Z]{1,5}$/'),'cost_center'=>array(false,true,false,true,'/^.{1,15}$/'),'amount'=>array(true,true,false,false,'/^[0-9]{1,3}(\.[0-9]{0,2})?$/'),'invert_value'=>array(true,true,false,false,'/^[01]{1,1}$/')/*,'remainder'=>array(true,true,false,false,'/^[01]{1,1}$/')*/,'processing_order'=>array(false,false,false,false,'/^[0-9]{1,2}$/')),
 			array('id'=>array(false,true,true,false,'/^[0-9]{1,9}$/'),'payroll_company_ID'=>array(false,true,false,false,'/^[0-9]{1,9}$/'),'payroll_employee_ID'=>array(false,true,false,false,'/^[0-9]{1,9}$/'),'payroll_account_ID'=>array(true,true,false,true,'/^[0-9a-zA-Z]{1,5}$/'),'cost_center'=>array(false,false,false,true,'/^.{0,15}$/'),'account_no'=>array(true,true,false,true,'/^.{1,15}$/'),'counter_account_no'=>array(false,false,false,true,'/^.{0,15}$/'),'debitcredit'=>array(true,true,false,false,'/^[01]{1,1}$/'),'entry_text'=>array(true,true,false,true,'/^.{1,50}$/'),'invert_value'=>array(true,true,false,false,'/^[01]{1,1}$/'),'processing_order'=>array(false,false,false,false,'/^[0-9]{1,2}$/')));
 		$arrModes = array("add","edit","delete");
 		if(!isset($param["section"]) || !in_array($param["section"], $arrSections) ) {
@@ -80,7 +80,7 @@ class finMgmtAccounting{
 			}
 		}
 
-		//asseble SQL statement
+		//assemble SQL statement
 		switch($mode) {
 		case 0: //add
 			$sqlFlds = array();
@@ -131,96 +131,128 @@ class finMgmtAccounting{
 		///////////////////////////////////////////////////
 		// validity check of processing flags
 		///////////////////////////////////////////////////
-		if(!preg_match( '/^[01]{1,1}$/', $param["fin_acc_process"])) {
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "financial accounting processing flag";
-			$response["errField"] = "fin_acc_process";
-			return $response;
-		}else $finAccProcess = $param["fin_acc_process"]==1 ? true : false;
-		if(!preg_match( '/^[01]{1,1}$/', $param["mgmt_acc_process"])) {
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "management accounting processing flag";
-			$response["errField"] = "mgmt_acc_process";
-			return $response;
-		}else $mgmtAccProcess = $param["mgmt_acc_process"]==1 ? true : false;
+        //if(!preg_match( '/^[01]{1,1}$/', $param["fin_acc_process"])) {
+        //    $response["success"] = false;
+        //    $response["errCode"] = 10;
+        //    $response["errText"] = "financial accounting processing flag";
+        //    $response["errField"] = "fin_acc_process";
+        //    return $response;
+        //}else $finAccProcess = $param["fin_acc_process"]==1 ? true : false;
+        //if(!preg_match( '/^[01]{1,1}$/', $param["mgmt_acc_process"])) {
+        //    $response["success"] = false;
+        //    $response["errCode"] = 10;
+        //    $response["errText"] = "management accounting processing flag";
+        //    $response["errField"] = "mgmt_acc_process";
+        //    return $response;
+        //}else $mgmtAccProcess = $param["mgmt_acc_process"]==1 ? true : false;
 
-		if(!$finAccProcess && !$mgmtAccProcess) {
-			$response["success"] = false;
-			$response["errCode"] = 20;
-			$response["errText"] = "select at least one accounting method";
-			return $response;
-		}
+        //if(!$finAccProcess && !$mgmtAccProcess) {
+        //    $response["success"] = false;
+        //    $response["errCode"] = 20;
+        //    $response["errText"] = "select at least one accounting method";
+        //    return $response;
+        //}
 
-		if($finAccProcess) {
-			if(!$chkDate->chkDate($param["fin_acc_date"], 1, $finAccDate)) {
+        //if($finAccProcess) {
+        //    
+        if(!$chkDate->chkDate($param["fin_acc_date"], 1, $finAccDate)) {
 				$response["success"] = false;
 				$response["errCode"] = 10;
 				$response["errText"] = "date value";
 				$response["errField"] = "fin_acc_date";
 				return $response;
 			}
-		}
-		if($mgmtAccProcess) {
-			if(!$chkDate->chkDate($param["mgmt_acc_date"], 1, $mgmtAccDate)) {
+        //}
+        //if($mgmtAccProcess) {
+        //    
+        if(!$chkDate->chkDate($param["mgmt_acc_date"], 1, $mgmtAccDate)) {
 				$response["success"] = false;
 				$response["errCode"] = 10;
 				$response["errText"] = "date value";
 				$response["errField"] = "mgmt_acc_date";
 				return $response;
 			}
-			if(!preg_match( '/^[01]{1,1}$/', $param["mgmt_acc_quantity"])) {
-				$response["success"] = false;
-				$response["errCode"] = 10;
-				$response["errText"] = "quantity processing flag";
-				$response["errField"] = "mgmt_acc_quantity";
-				return $response;
-			}else $mgmtAccQuantity = $param["mgmt_acc_quantity"]==1 ? true : false;
-			if(!preg_match( '/^[01]{1,1}$/', $param["mgmt_acc_round"])) {
+            //if(!preg_match( '/^[01]{1,1}$/', $param["mgmt_acc_quantity"])) {
+            //    $response["success"] = false;
+            //    $response["errCode"] = 10;
+            //    $response["errText"] = "quantity processing flag";
+            //    $response["errField"] = "mgmt_acc_quantity";
+            //    return $response;
+            //}else $mgmtAccQuantity = $param["mgmt_acc_quantity"]==1 ? true : false;
+            
+            if(!preg_match( '/^[01]{1,1}$/', $param["mgmt_acc_round"])) {
 				$response["success"] = false;
 				$response["errCode"] = 10;
 				$response["errText"] = "rounding processing flag";
 				$response["errField"] = "mgmt_acc_round";
 				return $response;
-			}else $mgmtAccRound = $param["mgmt_acc_round"]==1 ? true : false;
-		}
+			}
+            $amountRounding = $param["mgmt_acc_round"]==1 ? 0.05 : 0.01;
+            $quantityRounding = 0.01;
+        //}
 
 		///////////////////////////////////////////////////
 		// filter_mode must be numeric, non-decimal and in a certain range
 		///////////////////////////////////////////////////
-		if(!preg_match( '/^[0-2]{1,1}$/', $param["filter_mode"])) {
-			$response["success"] = false;
-			$response["errCode"] = 10;
-			$response["errText"] = "invalid company id";
-			$response["errField"] = "filter_mode";
-			return $response;
-		}else $paramFilterMode = $param["filter_mode"];
+        //if(!preg_match( '/^[0-2]{1,1}$/', $param["filter_mode"])) {
+        //    $response["success"] = false;
+        //    $response["errCode"] = 10;
+        //    $response["errText"] = "invalid company id";
+        //    $response["errField"] = "filter_mode";
+        //    return $response;
+        //}else $paramFilterMode = $param["filter_mode"];
 
-		if($paramFilterMode==1) {
-			///////////////////////////////////////////////////
-			// company id must be numeric and non-decimal
-			///////////////////////////////////////////////////
-			if(!preg_match( '/^[0-9]{1,9}$/', $param["payroll_company_ID"])) {
-				$response["success"] = false;
-				$response["errCode"] = 10;
-				$response["errText"] = "invalid company id";
-				$response["errField"] = "payroll_company_ID";
-				return $response;
-			}
-			$paramCompanyID = $param["payroll_company_ID"];
-		}else $paramCompanyID = 0;
+        //if($paramFilterMode==1) {
+        //    ///////////////////////////////////////////////////
+        //    // company id must be numeric and non-decimal
+        //    ///////////////////////////////////////////////////
+        //    if(!preg_match( '/^[0-9]{1,9}$/', $param["payroll_company_ID"])) {
+        //        $response["success"] = false;
+        //        $response["errCode"] = 10;
+        //        $response["errText"] = "invalid company id";
+        //        $response["errField"] = "payroll_company_ID";
+        //        return $response;
+        //    }
+        //    $paramCompanyID = $param["payroll_company_ID"];
+        //}else $paramCompanyID = 0;
+
+		$uid = session_control::getSessionInfo("id");
 
 
 		$system_database_manager = system_database_manager::getInstance();
+        
+        $sqlCommandText = "CALL `payroll_prc_fibu_bebu`(".$uid.",".$amountRounding.",".$quantityRounding.",".$mgmtAccDate.",".$finAccDate.")";
+        $result = $system_database_manager->executeQuery($sqlCommandText, "processFinMgmtAccountingEntry");
+        if ($result == false)
+        {
+            //Error Code
+			$response["success"] = false;
+			$response["errCode"] = 11;
+			$response["errText"] = "Error executing SQL vs database.";
+			return $response;
+        }
+        else if ($result[0][ErrorCode] != 0) 
+        {
+            //Error Code
+			$response["success"] = false;
+			$response["errCode"] = $result[0][ErrorCode];
+			$response["errText"] = "Error occured when executing the following database command: ".$sqlCommandText;
+			return $response;
+        }
+        else 
+        {
+		    $response["success"] = true;
+		    $response["errCode"] = 0;
+			return $response;
+        }
+        
+        //TODO: Delete below commands: Unreachable code. (Ch. Jossi)
 
 		//get the id of the current period
 		$result = $system_database_manager->executeQuery("SELECT `id` FROM `payroll_period` WHERE `locked`=0 AND `finalized`=0", "payroll_getPeriodInformation");
 		$payrollPeriodID = $result[0]["id"];
 
 		$system_database_manager->executeUpdate("BEGIN", "payroll_processFinMgmtAccountingEntry");
-
-		$uid = session_control::getSessionInfo("id");
 
 		$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_ID`=".$uid, "payroll_processFinMgmtAccountingEntry");
 		switch($paramFilterMode) {
