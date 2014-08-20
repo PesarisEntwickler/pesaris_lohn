@@ -227,7 +227,10 @@ class payroll_BL {
 			return $insurance->saveInsuranceRateDetail($functionParameters[0]);
 		case 'payroll.deleteInsuranceRateDetail':
 			return $insurance->deleteInsuranceRateDetail($functionParameters[0]);
-			
+		
+        case 'payroll.processPayment': 
+ 			return $payrollPayment->processPayment($functionParameters[0]); 
+
 		case 'payroll.editFinMgmtAccountingConfig':
 			return $finMgmtAccounting->editFinMgmtAccountingConfig($functionParameters[0]);
 		case 'payroll.getFinMgmtAccountingInfo':

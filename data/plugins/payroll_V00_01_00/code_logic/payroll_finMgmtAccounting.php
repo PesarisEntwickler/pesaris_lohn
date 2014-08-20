@@ -222,29 +222,31 @@ class finMgmtAccounting{
 		$system_database_manager = system_database_manager::getInstance();
         
         $sqlCommandText = "CALL `payroll_prc_fibu_bebu`(".$uid.",".$amountRounding.",".$quantityRounding.",".$mgmtAccDate.",".$finAccDate.")";
-        $result = $system_database_manager->executeQuery($sqlCommandText, "processFinMgmtAccountingEntry");
-        if ($result == false)
-        {
-            //Error Code
-			$response["success"] = false;
-			$response["errCode"] = 11;
-			$response["errText"] = "Error executing SQL vs database.";
-			return $response;
-        }
-        else if ($result[0][ErrorCode] != 0) 
-        {
-            //Error Code
-			$response["success"] = false;
-			$response["errCode"] = $result[0][ErrorCode];
-			$response["errText"] = "Error occured when executing the following database command: ".$sqlCommandText;
-			return $response;
-        }
-        else 
-        {
+        $system_database_manager->executeUpdate($sqlCommandText);
+
+        //Fehlerbehandlung nur möglich, falls mehrere ResultSets im database_manager abgehandelt werden.
+        //if ($result == false)
+        //{
+        //    //Error Code
+        //    $response["success"] = false;
+        //    $response["errCode"] = 11;
+        //    $response["errText"] = "Error executing SQL vs database.";
+        //    return $response;
+        //}
+        //else if ($result[0][ErrorCode] != 0) 
+        //{
+        //    //Error Code
+        //    $response["success"] = false;
+        //    $response["errCode"] = $result[0][ErrorCode];
+        //    $response["errText"] = "Error occured when executing the following database command: ".$sqlCommandText;
+        //    return $response;
+        //}
+        //else 
+        //{
 		    $response["success"] = true;
 		    $response["errCode"] = 0;
 			return $response;
-        }
+        //}
         
         //TODO: Delete below commands: Unreachable code. (Ch. Jossi)
 
