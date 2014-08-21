@@ -378,15 +378,21 @@ class payroll_UI {
 				communication_interface::jsExecute("prlPsoGrid.invalidate();");
 
 			}else{
-				$s = serialize($ret);
-				$s = str_replace("{", "<br/> {", $s);
-				$s = str_replace("s:", "<br/> s:", $s);
+				$f = print_r($ret ['fieldNames'], true);
+				$t = print_r($ret ['tableRows'], true);
+				$arSearch = array("[","]","Array","(",")","1","2","3","4","5","6","7","8","9","0","=>");
+				$arReplace = array("","" ,""     ,""  ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"","<br/> - ");
+				$s = str_replace($arSearch, $arReplace, $f.$t);
+				
+				$arSearch = array("BaseWage"  ,"City","DateOfBirth" ,"EmployeeNumber","Firstname" ,"Lastname","ZIP-Code" ,"EmployeeNumber");
+				$arReplace = array("Grundlohn","Ort" ,"Geburtsdatum","Personalnummer","Vorname"   ,"Nachname","Postleitzahl" ,"EmployeeNumber");
+				$s = str_replace($arSearch, $arReplace, $s);
 				
 				$objWindow = new wgui_window("payroll", "infoBox");
 				$objWindow->windowTitle("Speichern fehlgeschlagen");
 				$objWindow->windowWidth(420);
-				$objWindow->windowHeight(180);
-				$objWindow->setContent("<br/>Die Daten konnten nicht gespeichert werden.<br/><br/>[err: ".$ret["errCode"]." ".$ret["errText"]."]<br/><br/><br/><div align='center'><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>OK</button></div><br/><br/>".$s."");
+				$objWindow->windowHeight(250);
+				$objWindow->setContent("<br/>Die Daten konnten nicht gespeichert werden.<br/>Folgende Muss-Felder sind erforderlich:<br/>".$s."<div align='center'><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>OK</button></div><br/>");
 				$objWindow->showAlert();
 				communication_interface::jsExecute("$('#employeeForm input').css('background-color','');");
 				communication_interface::jsExecute("$('#employeeForm select').css('background-color','');");
@@ -1616,7 +1622,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			break;
 		case 'payroll.prlCalcOvProcess':
 			switch($functionParameters[0]["functionNumber"]) {
-			case 5: //Auszahldaten erzeugen 
+			case 5: //Auszahlung erstellen...
 				//communication_interface::alert("GUI Auszahldaten erzeugen");
 				$data = array();
 				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
@@ -3088,7 +3094,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
 				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten").$MAInfo); 
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(910);
+				$objWindow->windowWidth(950);
 				$objWindow->windowHeight($windHeight);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);

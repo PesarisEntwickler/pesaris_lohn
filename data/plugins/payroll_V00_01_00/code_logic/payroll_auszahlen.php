@@ -336,7 +336,7 @@ class auszahlen {
 			$ANDwhereBankSourceIdClause = " AND payroll_bank_source_ID = ".$ZahlstellenID;
 		}
 		$sql = "				
-			SELECT * FROM
+			SELECT *  FROM
 			          payroll_payment_split
 			WHERE	  payroll_employee_ID = ".$employeeID.
 			$ANDwhereBankDestIdClause.

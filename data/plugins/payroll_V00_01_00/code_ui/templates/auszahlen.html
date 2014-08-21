@@ -54,7 +54,7 @@
 				showWeek: true,
 				weekHeader: 'W',
 			    showOn: "button",
-			    buttonImage: "web/images/calendar.png",
+			    buttonImage: "web/img/calendar.png",
 //			    showButtonPanel: true,
 				dateFormat: 'dd.mm.yy',
 				altFormat: 'dd.mm.yy'
@@ -95,7 +95,7 @@
 			 	<table style="width: 100%; padding: 0; margin: 0;">
 			 		<tr>
 			 			<td><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</td>
-			 			<td style="width: 40px" align="right">
+			 			<td style="width: 120px" align="right">
 			 				<input type="radio" 
 			 					  	name="chk_payroll_auszahlen" 
 			 					  	id="chk_payroll_auszahlen_allepersonen" 
@@ -122,6 +122,10 @@
 			 						value='<wgui:var name="valutaDatum"/>' 
 			 					    style='width: 80px; font-weight: bold; text-align:center;'/>
 			 			</td>
+			 		</tr>
+			 		<tr>
+			 			<td><wgui:text id="prlPayout_interest_date"/>:</td>
+			 			<td><a href="#" onclick="cb('payroll.currencyConfig');   cb('payroll.prlCalcOvProcess',{'functionNumber':5}); "><img src="web/img/calc.png" /></a></td>
 			 		</tr>
 			 	</table>			 	
  			</td>

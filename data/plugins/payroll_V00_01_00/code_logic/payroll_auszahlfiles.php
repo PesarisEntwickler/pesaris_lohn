@@ -130,6 +130,7 @@ class auszahlfiles {
 						$account_ID  	= $hasSplit["data"][$index]["payroll_account_ID"];
 						$bankDestID  	= $hasSplit["data"][$index]["payroll_bank_destination_ID"];
 						$amount		 	= $hasSplit["data"][$index]["amount"];
+						$splittWaehrung		= $hasSplit["data"][$index]["payroll_currencyID"];
 						$maxCalcAmount	= $amount;
 						$splitAmount 	= $auszahlen->calcSplitAmount($hasSplit["data"][$index]["split_mode"]
 																  ,$hasSplit["data"][$index]["amount"]
@@ -137,7 +138,6 @@ class auszahlfiles {
 																  ,$maxCalcAmount
 																  ,$employee_ID
 																  ,$account_ID);
-
 						$SeitenTotal += $splitAmount;
 						$GesamtTotal += $splitAmount;
 						$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$splitAmount);

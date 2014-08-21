@@ -957,8 +957,8 @@ spezielle felder und sonderfälle:
 			}
 		}
 		if(count($arrMandatoryErr)>0) {
-//			error_log("\n". date("Ymd-H:i:s ", time())."INFO arrMandatoryErr: ".count($arrMandatoryErr), 3, "__harald.log");
-//			error_log("\n". date("Ymd-H:i:s ", time())."INFO ".print_r($arrMandatoryErr,true), 3, "__harald.log");
+//			error_log("\n". date("Ymd-H:i:s arrMandatoryErr ", time())."INFO arrMandatoryErr: ".count($arrMandatoryErr), 3, "__harald.log");
+//			error_log("\n". date("Ymd-H:i:s arrMandatoryErr ", time())."INFO ".print_r($arrMandatoryErr,true), 3, "__harald.log");
 			$response["success"] = false;
 			$response["errCode"] = 530;
 			$response["errText"] = "mandatory table fields are empty";
@@ -968,12 +968,12 @@ spezielle felder und sonderfälle:
 			$arReplace = array("Fehlende Informationen:", "", "", "Perioden Tabelle");
 			$err = str_replace($arSearch, $arReplace, print_r($arrValidityErr[0], true));
 			communication_interface::alert($err);
-			$response["success"] = true;//TODO harald <--- Warum??			
+			$response["success"] = true;			
 			return $response;
 		}
 		if(count($arrValidityErr)>0) {
-//			error_log("\n". date("Ymd-H:i:s ", time())."INFO ".count($arrValidityErr), 3, "__harald.log");
-//			error_log("\n". date("Ymd-H:i:s ", time())."INFO ".print_r($arrValidityErr,true), 3, "__harald.log");
+//			error_log("\n". date("Ymd-H:i:s arrValidityErr ", time())."INFO ".count($arrValidityErr), 3, "__harald.log");
+//			error_log("\n". date("Ymd-H:i:s arrValidityErr ", time())."INFO ".print_r($arrValidityErr,true), 3, "__harald.log");
 			$response["success"] = false;
 			$response["errCode"] = 540;
 			$response["errText"] = "validity check failed (table content)";

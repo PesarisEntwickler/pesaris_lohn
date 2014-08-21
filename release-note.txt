@@ -1,19 +1,27 @@
 
+noch offen: [Pkt 2 - TP 12.8.14] IBAN->Bankenadresse lookup
+noch offen: [Pkt 10 - TP 12.8.14] Auszahlung in Fremdwährung
 
-2014-08-15
- 	
-- Fehlermeldunge im Klartext bei "Bankverbindung bearbeiten" und "Mitarbeiterdaten bearbeiten" [Pkt 1 & Pkt 6 - TP 12.8.14]
+[Pkt 9 - TP 12.8.14] Darstellung der Daten in Stammdatenverwaltung
+--> konnte ich nicht mehr nachvollziehen
+
+2014-08-18
+
+- Gültig für: (nur Hauptzahltag, Validierung entfällt damit vorerst) [Pkt 5 - TP 12.8.14]
+	
+- Fehlermeldungen im Klartext bei "Bankverbindung bearbeiten" und "Mitarbeiterdaten bearbeiten" [Pkt 1 & Pkt 6 - TP 12.8.14]
 	
 - Fenster-Schliessung nach "Speichern" anstelle Popup-Feedback bei 4 Fenstern [Pkt 3 und Pkt 5 - TP 12.8.14]
+
+2014-08-15
 
 - Zahlstellenverwaltung im Firmen-Stamm
 	Zahlstelle - Neu/Ändern/Löschen / 
 	(Löschung hat eine Prüfung, ob die Zahlstelle noch einem Mitarbeiter hinterlegt ist) [Erweiterung zu Pkt 8 - TP 12.8.14]
 
 - Neues DB-Feld in Bankdestination für Zahlstelle, inkl. Verwaltung dafür
- 	(Zahlstelle kann nun auch der Standard-Bank des Mitarbeiters hinterlegt werden) [Pkt 10 - TP 12.8.14]
+ 	(Zahlstelle kann nun auch der Standard-Bank des Mitarbeiters hinterlegt werden) [Pkt 12 - TP 12.8.14]
 
 - Diverse Fenstergrössen z.B. "Bankverbindung bearbeiten" und "Mitarbeiterdaten bearbeiten" angepasst. Passt nun auch für Chrome und IE [Pkt 7 - TP 12.8.14]
 
-noch nicht nachvollziehbar [Pkt 9 - TP 12.8.14]
-noch offen: [Pkt 2 - TP 12.8.14]
+

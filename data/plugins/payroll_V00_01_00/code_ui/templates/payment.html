@@ -61,8 +61,10 @@
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit PesarisWGUI">
 		<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
 				<select id="prlPmtSplt_period">
-					<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
 					<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
+<!-- 							
+					<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
+ 					<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
 					<option value="MPB"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvBonuses"/></option>
 					<option value="MIP"><wgui:text id="txtAlle"/><wgui:text id="txtZwischenzahltage"/></option>
 					<option value="1"><wgui:text id="prlCalcOvMonth01"/></option>
@@ -81,6 +83,7 @@
 					<option value="14">14. <wgui:text id="txtMohnatslohn"/></option>
 					<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
 					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
+ -->
 				</select><br/>
 		<label for="prlPmtSplt_split_mode"><wgui:text id="txtZuteilkriterium"/>:</label>
 			<select id="prlPmtSplt_split_mode">
@@ -239,6 +242,20 @@
 					<label for="prlPmtSplt_notice_line2"><wgui:text id="txtZeile"/> 2:</label><input type="text" id="prlPmtSplt_notice_line2" value='<wgui:var name="notice_line2"/>'/><br/>
 				</fieldset>
 			</td>
+			<td>
+				<br/>
+				<br/>
+				<br/>
+				<br/><img src="web/img/six_favicon_sps.png"/><img src="web/img/lupe16gelb.png"/>
+				<br/>
+				<a href="http://www.six-interbank-clearing.com/de/home/standardization/iban/inquiry-iban.html" target="_blank">
+					IBAN
+				</a>
+				<br/>
+				<a href="http://www.six-interbank-clearing.com/de/home/bank-master-data/inquiry-bc-number.html" target="_blank">
+					bc-nr
+				</a>
+			</td>
 		</tr>
 		<tr>
 			<td colspan="2">
@@ -247,6 +264,8 @@
 					  <table style="width: 100%;" cellpadding="0" cellspacing="0"><tr><td>
 						<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
 						<select id="prlPmtSplt_period" style="width: 190px;">
+							<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
+<!-- 							
 							<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
 							<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
 							<option value="MPB"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvBonuses"/></option>
@@ -267,6 +286,7 @@
 							<option value="14">14. <wgui:text id="txtMohnatslohn"/></option>
 							<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
 							<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
+ -->							
 						</select><br/>
 						<label for="prlPmtSplt_payroll_currency_ID"><wgui:text id="txtWaehrung"/>:</label>
 						<select id="prlPmtSplt_payroll_currency_ID" style="width: 190px;">
@@ -292,6 +312,8 @@
 					</tr>
 					</table>
 				</fieldset>
+			</td>
+			<td>
 			</td>
 		</tr>
 		</table>
