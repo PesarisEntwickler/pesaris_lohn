@@ -144,7 +144,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                 $query = "SELECT 
                                 emp.`id` as EmployeeID, 
                                 emp.`EmployeeNumber`, 
-                                emp.`payroll_company_ID`, 
+                                IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID, 
                                 emp.`Lastname`, 
                                 emp.`Firstname`, 
                                 accetry.`payroll_account_ID`, 
@@ -199,7 +199,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
                 
                 $query = "  SELECT 
-                                emp.payroll_company_ID,
+                                IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
                                 comp.company_shortname,
                                 accetry.account_no,
                                 accetry.counter_account_no,
@@ -212,19 +212,19 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                     INNER JOIN
                                 payroll_employee emp ON emp.id = accetry.payroll_employee_ID
                                     INNER JOIN
-                                payroll_company comp ON comp.id = emp.payroll_company_ID
+                                payroll_company comp ON comp.id = IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID)
 									INNER JOIN
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
                             WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
-                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"])."
-                            GROUP BY    emp.payroll_company_ID, 
+                            ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"])."
+                            GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no, 
                                         accetry.counter_account_no, 
                                         accetry.cost_center, 
                                         accetry.entry_text
-                            ORDER BY    emp.payroll_company_ID , 
+                            ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no , 
                                         accetry.counter_account_no , 
                                         accetry.cost_center";
@@ -278,7 +278,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
                  
                  $query = "  SELECT 
-                                emp.payroll_company_ID,
+                                IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
                                 comp.company_shortname,
                                 accetry.account_no,
                                 accetry.counter_account_no,
@@ -291,20 +291,20 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                     INNER JOIN
                                 payroll_employee emp ON emp.id = accetry.payroll_employee_ID
                                     INNER JOIN
-                                payroll_company comp ON comp.id = emp.payroll_company_ID
+                                payroll_company comp ON comp.id = IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID)
 									INNER JOIN
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
                             WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
-                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"]).
+                            ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"]).
                             ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
-                            GROUP BY    emp.payroll_company_ID, 
+                            GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.cost_center, 
                                         accetry.account_no, 
                                         accetry.counter_account_no, 
                                         accetry.entry_text
-                            ORDER BY    emp.payroll_company_ID , 
+                            ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) , 
                                         accetry.cost_center,
                                         accetry.account_no , 
                                         accetry.counter_account_no";
@@ -356,7 +356,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
                  
                  $query = "  SELECT 
-                                emp.payroll_company_ID,
+                                IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
                                 comp.company_shortname,
                                 accetry.account_no,
                                 accetry.counter_account_no,
@@ -368,18 +368,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                     INNER JOIN
                                 payroll_employee emp ON emp.id = accetry.payroll_employee_ID
                                     INNER JOIN
-                                payroll_company comp ON comp.id = emp.payroll_company_ID
+                                payroll_company comp ON comp.id = IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID)
 									INNER JOIN
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
                             WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
-                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"])."
-                            GROUP BY    emp.payroll_company_ID, 
+                            ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"])."
+                            GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no, 
                                         accetry.counter_account_no, 
                                         accetry.entry_text
-                            ORDER BY    emp.payroll_company_ID , 
+                            ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no , 
                                         accetry.counter_account_no";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
@@ -430,7 +430,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
                  
                  $query = "  SELECT 
-                                emp.payroll_company_ID,
+                                IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
                                 comp.company_shortname,
                                 accetry.cost_center,
                                 SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
@@ -441,18 +441,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                     INNER JOIN
                                 payroll_employee emp ON emp.id = accetry.payroll_employee_ID
                                     INNER JOIN
-                                payroll_company comp ON comp.id = emp.payroll_company_ID
+                                payroll_company comp ON comp.id = IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID)
 									INNER JOIN
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
                             WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
-                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"]).
+                            ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"]).
                             ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
-                            GROUP BY    emp.payroll_company_ID, 
+                            GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.cost_center, 
                                         accetry.entry_text
-                            ORDER BY    emp.payroll_company_ID , 
+                            ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.cost_center";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $lastPayrollCompanyID = 0;
@@ -502,7 +502,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
                  
                  $query = "  SELECT 
-                                emp.payroll_company_ID,
+                                IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
                                 comp.company_shortname,
                                 accetry.account_no,
                                 SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
@@ -513,17 +513,17 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                     INNER JOIN
                                 payroll_employee emp ON emp.id = accetry.payroll_employee_ID
                                     INNER JOIN
-                                payroll_company comp ON comp.id = emp.payroll_company_ID
+                                payroll_company comp ON comp.id = IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID)
 									INNER JOIN
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
                             WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
-                            ($param["company"] == false ? "":" AND emp.payroll_company_ID = ".$param["company"])."
-                            GROUP BY    emp.payroll_company_ID, 
+                            ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"])."
+                            GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no, 
                                         accetry.entry_text
-                            ORDER BY    emp.payroll_company_ID , 
+                            ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $lastPayrollCompanyID = 0;

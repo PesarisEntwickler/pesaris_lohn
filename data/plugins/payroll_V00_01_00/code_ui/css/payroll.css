@@ -575,6 +575,10 @@ label[for=prlAccAsg_amt2], #prlAccAsg_amt2 {
 	float:left;
 	width:65px;
 }
+label[for=prlAccAsg_mapsTo], #prlAccAsg_mapsTo {
+	float:left;
+	width:10px;
+}
 label[for=prlAccAsg_inv2], #prlAccAsg_inv2 {
 	float:left;
 	width:45px;

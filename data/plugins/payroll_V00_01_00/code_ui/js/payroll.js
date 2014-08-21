@@ -2578,12 +2578,13 @@ function prlAccAsgInit() {
 			[
 				{id: "cidt", name: "Firma", field: "cidt", sortable: true, resizable: true, width: 155},
 				{id: "eidt", name: "Mitarbeiter", field: "eidt", sortable: true, resizable: true, width: 200},
-				{id: "cc", name: "KST", field: "cc", sortable: true, resizable: true, width: 110},
-				{id: "aid", name: "LOA", field: "aid", sortable: true, resizable: true, width: 110},
+				{id: "aid", name: "Lohnart", field: "aid", sortable: true, resizable: true, width: 110},
 				{id: "amt", name: "Proz.", field: "amt", sortable: true, width: 65},
-				{id: "inv", name: "Vz", field: "inv", sortable: true, width: 45, csClass: "txtCenter", formatter: function (row, cell, value, columnDef, dataContext) { return value==1 ? prlAccAsgParam.yes : prlAccAsgParam.no; } },
-				{id: "rem", name: "Rest", field: "rem", sortable: true, width: 40, csClass: "txtCenter"}
-			]
+				{id: "mapsTo", name: "-->", field: "", sortable: false, width: 5 },
+				{id: "cc", name: "Kostenstelle", field: "cc", sortable: true, resizable: true, width: 110 },
+				{ id: "inv", name: "Vz", field: "inv", sortable: true, width : 45, cssClass: "txtCenter", formatter: function (row, cell, value, columnDef, dataContext) { return value==1 ? prlAccAsgParam.yes: prlAccAsgParam.no; } },
+                //{id: "rem", name: "Rest", field: "rem", sortable: true, width: 40, cssClass: "txtCenter"}
+    ]
 	];
 	columns[3] = columns[1];
 
