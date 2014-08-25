@@ -33,7 +33,9 @@ function prlAuszahlenGenerateWindowInit() {
 	    $( "select option:selected" ).each(function() {
 	      str += "##" + $( this ).text();
 	    });
-		cb('payroll.auszahlen.GenerateFiles', str, dat );
+	    var EUR = document.getElementById('wechselkursEUR').value ;
+	    var USD = document.getElementById('wechselkursUSD').value ;
+		cb('payroll.auszahlen.GenerateFiles', str, dat, EUR, USD );
 	});
 	$( "#sel_prl_auszahlen_zahlstellen" )
 	  .click(function () {

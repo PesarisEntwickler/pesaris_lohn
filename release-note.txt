@@ -1,3 +1,31 @@
+2014-08-25
+
+- Einbau interner Banken-LookUp auf "Bankverbindung bearbeiten"
+	(funktioniert aber nur, 
+	 1. wenn der Eingabefeldwechsel passiert bei "verlassen" von Feld IBAN
+	 2. wenn IBAN länger als 19 Stellen ist
+	 3. wenn BankLinie3 (Plz/Ort) leer ist
+	 damit nicht dauernd vorher eingetippte und schon gespeicherte Inhalte wieder überschrieben werden.)
+	=> [Pkt 2 - TP 12.8.14] IBAN->Bankenadresse lookup ---> erledigt
+
+2014-08-22
+
+- Einbau Fremdwährung auf Auszahlungs-Fenster 
+	(Die Wechselkurde werden angezeigt und der User kann die Kurse gleich anpassen)
+- Einbau Fremdwährungsberechnung in DTAJournal und DTA 
+	(DTAJournal hat bei Nicht-CHF-Auszahlung eine dritte Journalzeile mit Wechselkurs und FW-Betrag
+	"Wechselkurs EUR/CHF = 1/1.21011, Ueberweisung EUR 7'558.04")
+	=> [Pkt 10 - TP 12.8.14] Auszahlung in Fremdwährung ---> erledigt
+- Korrektur Reste-Auszahlung, wenns nach dem Splitt noch eine Restauszahlung gibt
+- Fenstersteuerung "Auszahlung erstellen". Beim "DTA zurücksetzen" wird das Fenster gleich wieder geöffnet.
+
+2014-08-21
+
+- Bereich BEBU/FIBU von Ascamis integriert
+
+2014-08-20
+
+- externer Lookup IBAN und BC auf offizielle SIX-Seite in Window Bankverbindung
 
 noch offen: [Pkt 2 - TP 12.8.14] IBAN->Bankenadresse lookup
 noch offen: [Pkt 10 - TP 12.8.14] Auszahlung in Fremdwährung

@@ -87,13 +87,13 @@ class payroll_BL_payment {
 		return $response;
 	}
 	
-	public function getZahlstelle($employeeId) {	
+	public function getEmplZahlstelle($employeeId) {	
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("
 			SELECT MIN(processing_order)
 			FROM   payroll_payment_split 
 			WHERE  payroll_employee_ID    =".$employeeId." 
-			;", "payroll_getZahlstelle" 
+			;", "payroll_getEmplZahlstelle" 
 		);
 		if (count($result)>0) {
 			$return = $result[0];
@@ -103,24 +103,6 @@ class payroll_BL_payment {
 		return $return;
 	}
 	
-	public function getZahlstelle____($employeeId, $destBankId) {	
-		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("
-			SELECT MIN(processing_order)
-			FROM   payroll_payment_split 
-			WHERE  payroll_employee_ID    =".$employeeId." 
-			  AND  payroll_bank_source_ID =".$destBankId." 
-			;", "payroll_getZahlstelle" 
-		);
-		if (count($result)>0) {
-			$return = $result[0];
-		} else {
-			$return = array();
-		}
-		return $return;
-	}
-	
-
 	public function getPaymentSplitList($payroll_employee_ID) {
 		if(!preg_match( '/^[0-9]{1,9}$/', $payroll_employee_ID)) { 
 			$response["success"] = false;
@@ -215,7 +197,7 @@ class payroll_BL_payment {
 		$hasSplit = false;
 		if($isStanardBank["bank_id"]!=$param['id']  && $bankDestID > 0) {
 							
-			//$split = $auszahlen->getPaymentSplit($employeeID,$bankDestID,0); 
+			//$split = $auszahlen->getPaymentSplit($employeeID,$bankDestID,0,-1); 
 			//if ($split["count"] > 0) {
 				$hasSplit = true;
 				$paramSplitTab["id"] 		= $splitTabID;
@@ -288,6 +270,13 @@ class payroll_BL_payment {
 		}
 		//communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamBankDest:".print_r($paramBankDest, true));
 		$bankDestRes = $this->saveBankDestinationDetail($paramBankDest);
+		
+		if ($hasSplit) {			
+			communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_UebersichtZahlungssplit', 'empId':".$employeeID.", 'bankID':".$bankDestID." }); ");
+  		} else {
+			communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
+		}
+		
 		return true;
 	}
 
@@ -468,7 +457,7 @@ class payroll_BL_payment {
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		communication_interface::alert("Bank, Post, Cash ".$erfolg);//.print_r($param, true).$sql
-		communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
+//		communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
 		return $response;
 	}
 	
@@ -636,25 +625,35 @@ class payroll_BL_payment {
 		 	
 		 	//communication_interface::alert("id=".$bD[0]["id"].",\nempId=".$bD[0]["payroll_employee_ID"].",\nkonto=".$bD[0]["bank_account"].",\nmaxId:".$resMaxID[0]["maxId"]);
 		 	$nextBD_id = $resMaxID[0]["maxId"]+1;
+//			$sqlInsertBankDest = "
+//				INSERT INTO payroll_bank_destination (
+//						 `id`, `payroll_employee_ID`, `destination_type`, `description`, `core_intl_country_ID`, `bank_account`, `postfinance_account`, `bank_swift`, `beneficiary1_line1`, `beneficiary1_line2`, `beneficiary1_line3`, `beneficiary1_line4`, `beneficiary_bank_line1`, `beneficiary_bank_line2`, `beneficiary_bank_line3`, `beneficiary_bank_line4`, `is_standard_bank`, `nonstandard_banksourcezahlstelle`) 
+//				VALUES (".$nextBD_id."
+//					  , ".$bD[0]["payroll_employee_ID"]."
+//					  , ".$bD[0]["destination_type"]."
+//					  ,'".$copy."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["core_intl_country_ID"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["bank_account"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["postfinance_account"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["bank_swift"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line1"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line2"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line3"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line4"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line1"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line2"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line3"] )."'
+//					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line4"] )."'
+//					  ,'N'
+//					  ,'0'
+//					  );";
 			$sqlInsertBankDest = "
 				INSERT INTO payroll_bank_destination (
-						 `id`, `payroll_employee_ID`, `destination_type`, `description`, `core_intl_country_ID`, `bank_account`, `postfinance_account`, `bank_swift`, `beneficiary1_line1`, `beneficiary1_line2`, `beneficiary1_line3`, `beneficiary1_line4`, `beneficiary_bank_line1`, `beneficiary_bank_line2`, `beneficiary_bank_line3`, `beneficiary_bank_line4`, `is_standard_bank`, `nonstandard_banksourcezahlstelle`) 
+						 `id`, `payroll_employee_ID`, `destination_type`, `core_intl_country_ID`, `is_standard_bank`, `nonstandard_banksourcezahlstelle`) 
 				VALUES (".$nextBD_id."
 					  , ".$bD[0]["payroll_employee_ID"]."
 					  , ".$bD[0]["destination_type"]."
-					  ,'".$copy."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["core_intl_country_ID"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["bank_account"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["postfinance_account"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["bank_swift"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line1"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line2"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line3"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary1_line4"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line1"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line2"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line3"] )."'
-					  ,'".$auszahlen->replaceUmlaute( $bD[0]["beneficiary_bank_line4"] )."'
+					  ,'CHF'
 					  ,'N'
 					  ,'0'
 					  );";
@@ -820,6 +819,24 @@ class payroll_BL_payment {
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;
+	}
+	
+	public function getClearingBank($IBAN) {
+		$IBAN = str_replace(" ", "",trim($IBAN));
+		$BCNr = "";
+		if (strlen($IBAN) > 19) {
+			$BCNr = substr($IBAN,4,5);
+			if (substr($BCNr,0,1)=="0") $BCNr = substr($BCNr,1);//erstes 0 weg
+			if (substr($BCNr,0,1)=="0") $BCNr = substr($BCNr,1);//zweites 0 weg
+		}
+		if (strlen($BCNr) >= 3) {
+			return  $this->getClearingBanks($BCNr);
+		}
+	}
+	public function getClearingBanks($BCNr) {
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT * FROM core_clearing_banks WHERE BCNr = '".$BCNr."' ORDER BY SWIFT DESC;", "payroll_getBcBankenstamm");
+		return $result[0];
 	}
 	
 }

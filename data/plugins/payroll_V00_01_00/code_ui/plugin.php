@@ -27,9 +27,16 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.auszahlen.GenerateFiles':
-			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n1:".$functionParameters[0]."\n2:".$functionParameters[1]);
+			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n1:".print_r($functionParameters[0], true)."\n2:".print_r($functionParameters[1], true)."\nEUR:".$functionParameters[2]."\nUSD:".$functionParameters[3]);
 			$param = $functionParameters[0];
 			$dueDateFromGUI = $functionParameters[1];
+			$EUR = $functionParameters[2];
+			$USD = $functionParameters[3]; 
+			$res = blFunctionCall('payroll.saveCurrencyForexRate', "EUR", $EUR); 
+			if ($res==false) break;
+			$res = blFunctionCall('payroll.saveCurrencyForexRate', "USD", $USD); 
+			if ($res==false) break;
+
 			$paramArray = explode("##", $param);
 			$zahlstelle = $paramArray[1];
 			$personengruppenIDListe = "**";
@@ -1636,6 +1643,9 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 //Die jetztige Periode ist				
 				$PeriodeDieserMonat = blFunctionCall('payroll.auszahlen.getActualPeriodName');
 				$data["period"] = $PeriodeDieserMonat;
+								
+				$data["wechselkursEUR"] = blFunctionCall('payroll.getCurrencyForexRate', "EUR" );
+				$data["wechselkursUSD"] = blFunctionCall('payroll.getCurrencyForexRate', "USD" );
 												
 				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl'); 
 								
@@ -2958,6 +2968,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			}			
 			
 			switch($functionParameterAction) {
+			case 'BankverbindungBearbeiten_BankdataFill':
 			case 'GUI_bank_source_Overview':
 			case 'GUI_bank_source_edit':
 			case 'GUI_bank_source_save':
@@ -3147,7 +3158,32 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				communication_interface::jsExecute("prlPmtSpltEditInit();");
 				communication_interface::jsExecute("prlPmtSpltEditJSON2Form();");
 				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').val('".$zahlstellenID."');");                                        
-				communication_interface::jsExecute("$('#btnSaveBankDestinationUndSplit').bind('click', function(e) { jsSaveBankDestinationUndSplit(".$payrollEmployeeID.");           });");//harald hugo             $('#modalContainer').mb_close();
+				communication_interface::jsExecute("$('#btnSaveBankDestinationUndSplit').bind('click', function(e) {    jsSaveBankDestinationUndSplit(".$payrollEmployeeID.");     });");
+				communication_interface::jsExecute("$('#prlPmtSplt_bank_account').bind('blur', function(e) { cb('payroll.paymentSplit', {'action': 'BankverbindungBearbeiten_BankdataFill', 'iban': document.getElementById('prlPmtSplt_bank_account').value , 'bankLine3': document.getElementById('prlPmtSplt_beneficiary_bank_line3').value });  	});   ");
+				break;
+
+			case 'BankverbindungBearbeiten_BankdataFill':
+				$IBAN = "";
+				if (isset($functionParameters[0]["iban"])) {
+					$IBAN = trim($functionParameters[0]["iban"]);
+				}
+				if (strlen($IBAN)>19) {
+					if (strlen(trim($functionParameters[0]["bankLine3"])) < 5) {
+						$clearingBank = blFunctionCall('payroll.getClearingBank', $IBAN);
+						$adr = $clearingBank["Domizil"].", ".$clearingBank["Postadr"];
+						if (strlen(trim($clearingBank["Domizil"])) < 2) {
+							$adr = $clearingBank["Postadr"];
+						}
+						if (strlen(trim($clearingBank["Postadr"])) < 2) {
+							$adr = $clearingBank["Domizil"];
+						}
+						communication_interface::jsExecute("$('#prlPmtSplt_description').val('".$clearingBank["Kurzbez"]."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_bank_swift').val('".$clearingBank["SWIFT"]."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line1').val('".$clearingBank["BankName"]."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line2').val('".$adr."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line3').val('".$clearingBank["PLZ"]." ".$clearingBank["Ort"]."');");                                        						
+					}
+				}
 				break;
 
 			case 'paymentSplitAction_UebersichtZahlungssplit': 

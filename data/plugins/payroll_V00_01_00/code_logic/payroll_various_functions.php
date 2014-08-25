@@ -343,6 +343,32 @@ class variousFunctions {
 		return $response;
 	}
 
+	public function getCurrencyForexRate($curr) {
+		$response = 0;
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery("SELECT `forex_rate` FROM `payroll_currency` WHERE `core_intl_currency_ID` = '".$curr."' ;", "payroll_getCurrencyForexRate");
+		return $result[0]["forex_rate"];
+	}
+
+	public function saveCurrencyForexRate($curr, $rate) {
+		if(!preg_match( '/^[0-9]{1,9}$/', $curr)) {
+			$rate = floatval(strip_tags($rate));
+			if ($rate > 0.0001) {
+				//communication_interface::alert("T setCurrencyForexRate($curr, $rate)");
+				$system_database_manager = system_database_manager::getInstance();
+				$result = $system_database_manager->executeUpdate("UPDATE `payroll_currency` SET `forex_rate` = '".$rate."'  WHERE `core_intl_currency_ID` = '".$curr."' ;", "payroll_setCurrencyForexRate");
+				return true;
+			} else {
+				communication_interface::alert("Ungueltiger Wert ($curr, $rate)");
+				return false;
+			}
+		} else {
+			communication_interface::alert("Problem in setCurrencyForexRate($curr, $rate)");
+			return false;
+		}
+	}
+
+
 	public function getCurrencyList($param) {
 		if(!isset($param["type"])) $param["type"] = "complete";
 		if(!preg_match( '/^assigned|complete$/', $param["type"])) {

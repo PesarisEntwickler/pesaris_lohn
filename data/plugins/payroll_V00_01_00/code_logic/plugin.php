@@ -68,7 +68,9 @@ class payroll_BL {
 		case 'payroll.auszahlen.getAllDestinationBankAccounts':
 			return $auszahlen->getAllDestinationBankAccounts($functionParameters[0]);//=$employeeID
 		case 'payroll.auszahlen.getPaymentSplit':
-			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1],$functionParameters[2]);//=$employeeID, $bankID, $Zahlstelle
+			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1],$functionParameters[2],$functionParameters[3]);//=$employeeID, $bankID, $Zahlstelle, $processing_order
+		case 'payroll.auszahlen.getEmplFromTrackingTable':
+			return $auszahlen->getEmplFromTrackingTable($functionParameters[0]);
 		case 'payroll.auszahlen.initTrackingTable':
 			return $auszahlen->initTrackingTable();
 		case 'payroll.auszahlen.truncateTrackingTable':
@@ -82,8 +84,8 @@ class payroll_BL {
 		case 'rundungAuf5Rappen':
 			return $auszahlen->rundungAuf5Rappen($functionParameters[0]);//=$payAmount
 			
-		case 'payroll.getZahlstelle':
-			return $payrollPayment->getZahlstelle($functionParameters[0]);//$employeeId
+		case 'payroll.getEmplZahlstelle':
+			return $payrollPayment->getEmplZahlstelle($functionParameters[0]);//$employeeId
 		case 'payroll.initZahlungssplitt':
 			return $payrollPayment->initZahlungssplitt($functionParameters[0],$functionParameters[1],$functionParameters[2]);//$employeeId, $zahlstelleId, $destBankId
 		case 'payroll.getPaymentSplitList':
@@ -110,6 +112,11 @@ class payroll_BL {
 			return $payrollPayment->deleteDestBankDetail($functionParameters[0]);
 		case 'payroll.deleteBankSourceDetail':
 			return $payrollPayment->deleteBankSourceDetail($functionParameters[0]);
+		case 'payroll.getClearingBanks':
+			return $payrollPayment->getClearingBanks($functionParameters[0]);//BCNr
+		case 'payroll.getClearingBank':
+			return $payrollPayment->getClearingBank($functionParameters[0]);//IBAN
+
 
 		case 'payroll.getNextCompanyId':
 			return $variousFunctions->getNextCompanyId();
@@ -141,6 +148,10 @@ class payroll_BL {
 			return $variousFunctions->getCurrencyList($functionParameters[0]);
 		case 'payroll.saveCurrencyList':
 			return $variousFunctions->saveCurrencyList($functionParameters[0]);
+		case 'payroll.getCurrencyForexRate':
+			return $variousFunctions->getCurrencyForexRate($functionParameters[0]);//"EUR" oder "USD"
+		case 'payroll.saveCurrencyForexRate':
+			return $variousFunctions->saveCurrencyForexRate($functionParameters[0],$functionParameters[1]);//"EUR", "1.2222"
 		case 'payroll.prepareCalculation':
 			return $variousFunctions->prepareCalculation($functionParameters[0]);
 //		case 'payroll.getpayrollountFormOverview':

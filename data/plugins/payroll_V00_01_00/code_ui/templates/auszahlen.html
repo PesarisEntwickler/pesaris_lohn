@@ -92,7 +92,7 @@
  		</tr>
  		<tr>
  			<td>
-			 	<table style="width: 100%; padding: 0; margin: 0;">
+			 	<table  cellspacing="0" cellpadding="0" style="width: 100%; padding: 0; margin: 0;">
 			 		<tr>
 			 			<td><wgui:text id="prlPsoDFltAllEmployeesRestliche"/>:</td>
 			 			<td style="width: 120px" align="right">
@@ -114,28 +114,44 @@
 			 		</tr>
 			 		<tr>
 			 			<td><wgui:text id="prlPayout_interest_date"/>:</td>
-			 			<td align="right">
-			 				<input type='text' 
+			 			<td><input type='text' 
 			 						id='datepicker' 
 			 						name='datepicker'
 			 						size='10' 
 			 						value='<wgui:var name="valutaDatum"/>' 
-			 					    style='width: 80px; font-weight: bold; text-align:center;'/>
+			 					    style='width: 75px; font-weight: bold; text-align:center;'/>
 			 			</td>
 			 		</tr>
 			 		<tr>
-			 			<td><wgui:text id="prlPayout_interest_date"/>:</td>
-			 			<td><a href="#" onclick="cb('payroll.currencyConfig');   cb('payroll.prlCalcOvProcess',{'functionNumber':5}); "><img src="web/img/calc.png" /></a></td>
+			 			<td><wgui:text id="txtWechselkurs"/> EUR/CHF:</td>
+			 			<td><input type='text' 
+			 						id='wechselkursEUR' 
+			 						name='wechselkursEUR'
+			 						maxlength='7' 
+			 						value='<wgui:var name="wechselkursEUR"/>' 
+			 					    style='width: 75px; font-weight: bold; text-align:center;'/>
+			 			</td>
+			 		</tr>
+			 		<tr>
+			 			<td><wgui:text id="txtWechselkurs"/> USD/CHF:</td>
+			 			<td><input type='text' 
+			 						id='wechselkursUSD' 
+			 						name='wechselkursUSD'
+			 						maxlength='7' 
+			 						value='<wgui:var name="wechselkursUSD"/>' 
+			 					    style='width: 75px; font-weight: bold; text-align:center;'/>
+			 				<!-- a href="#" onclick="cb('payroll.currencyConfig');   cb('payroll.prlCalcOvProcess',{'functionNumber':5}); "><img src="web/img/calc.png" /></a -->
+			 			</td>
 			 		</tr>
 			 	</table>			 	
  			</td>
- 			<td style="padding: 6px 8px 0 0; margin: 0 0 0 0;">
+ 			<td  cellspacing="0" cellpadding="0" style="padding: 6px 8px 0 0; margin: 0 0 0 0;">
 				<fieldset>
 					<legend>
 						<input type="radio" name="chk_payroll_auszahlen" id="chk_payroll_auszahlen_personengruppen" value="0" />
 						<wgui:text id="prlUtlEfcLgndExistingFilterAnwenden"/>
 					</legend>
-					<select id="sel_prl_auszahlen_personalfilter" style="width:380px;margin-bottom:4px;" size="8" multiple="multiple"> 
+					<select id="sel_prl_auszahlen_personalfilter" style="width:350px;margin-bottom:4px;" size="8" multiple="multiple"> 
 	<!--  				<option value="0"><wgui:text id="prlUtlEfcOptChooseFilter"/></option>	 -->
 						<wgui:loop name="empfltLoop" varname="employeeFilter_list">
 							<option value="<wgui:loopvar loopname="empfltLoop" varname="id"/>">
