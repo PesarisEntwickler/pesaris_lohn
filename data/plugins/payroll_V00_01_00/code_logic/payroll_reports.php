@@ -136,7 +136,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
         switch ($param["selectedReportType"])
         {
             case 0:
-                // Auswertung nach Mitarbeiter
+                // Auswertung nach Mitarbeiter (von Daniel Müller)
                 $reportTemplate = $ReportName;
                 
                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Employees>\n");
@@ -163,7 +163,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 `payroll_account_label` acclbl ON acclbl.`payroll_account_ID`=accetry.`payroll_account_ID` 
                                 AND acclbl.`payroll_year_ID`=".$param["year"]." 
                                 AND acclbl.`language`='".session_control::getSessionInfo("language")."' 
-                            WHERE accetry.`payroll_period_ID`=".$payrollPeriodID." 
+                            WHERE accetry.`payroll_period_ID`=".$payrollPeriodID."
                             ORDER BY 
                                 emp.`Lastname`, 
                                 emp.`Firstname`, 
@@ -217,7 +217,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"])."
                             GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no, 
@@ -227,7 +227,8 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                             ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no , 
                                         accetry.counter_account_no , 
-                                        accetry.cost_center";
+                                        accetry.cost_center, 
+                                        accetry.entry_text";
                 $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                 $lastPayrollCompanyID = 0;
                 $runningSumDebitAmount = 0;
@@ -296,7 +297,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"]).
                             ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
                             GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
@@ -307,7 +308,8 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                             ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) , 
                                         accetry.cost_center,
                                         accetry.account_no , 
-                                        accetry.counter_account_no";
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $lastPayrollCompanyID = 0;
                  $runningSumDebitAmount = 0;
@@ -373,7 +375,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"])."
                             GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no, 
@@ -381,7 +383,8 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                         accetry.entry_text
                             ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no , 
-                                        accetry.counter_account_no";
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $lastPayrollCompanyID = 0;
                  $runningSumDebitAmount = 0;
@@ -446,14 +449,15 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"]).
                             ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
                             GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.cost_center, 
                                         accetry.entry_text
                             ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
-                                        accetry.cost_center";
+                                        accetry.cost_center, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $lastPayrollCompanyID = 0;
                  $runningSumDebitAmount = 0;
@@ -518,13 +522,14 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["company"] == false ? "":" AND IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) = ".$param["company"])."
                             GROUP BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
                                         accetry.account_no, 
                                         accetry.entry_text
                             ORDER BY    IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID), 
-                                        accetry.account_no";
+                                        accetry.account_no, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $lastPayrollCompanyID = 0;
                  $runningSumDebitAmount = 0;
@@ -587,14 +592,15 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID."
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''
                             GROUP BY    accetry.account_no, 
                                         accetry.counter_account_no, 
                                         accetry.cost_center, 
                                         accetry.entry_text
                             ORDER BY    accetry.account_no , 
                                         accetry.counter_account_no , 
-                                        accetry.cost_center";
+                                        accetry.cost_center, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $corporationDebitAmount = 0;
                  $corporationCreditAmount = 0;
@@ -635,7 +641,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
                             GROUP BY    accetry.cost_center, 
                                         accetry.account_no, 
@@ -643,7 +649,8 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                         accetry.entry_text
                             ORDER BY    accetry.cost_center , 
                                         accetry.account_no , 
-                                        accetry.counter_account_no";
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $corporationDebitAmount = 0;
                  $corporationCreditAmount = 0;
@@ -683,12 +690,13 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID."
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''
                             GROUP BY    accetry.account_no, 
                                         accetry.counter_account_no, 
                                         accetry.entry_text
                             ORDER BY    accetry.account_no , 
-                                        accetry.counter_account_no";
+                                        accetry.counter_account_no, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $corporationDebitAmount = 0;
                  $corporationCreditAmount = 0;
@@ -728,11 +736,12 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID.
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''".
                             ($param["cost_center"] == false ? "": " AND accetry.cost_center = ".$param["cost_center"])."
                             GROUP BY    accetry.cost_center, 
                                         accetry.entry_text
-                            ORDER BY    accetry.cost_center";
+                            ORDER BY    accetry.cost_center, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $corporationDebitAmount = 0;
                  $corporationCreditAmount = 0;
@@ -771,10 +780,11 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                 payroll_account_label acclbl ON acclbl.payroll_account_ID = accetry.payroll_account_ID
                                     AND acclbl.payroll_year_ID = ".$param["year"]."
                                     AND acclbl.language = '".session_control::getSessionInfo("language")."'
-                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID."
+                            WHERE accetry.payroll_period_ID = ".$payrollPeriodID." AND `amount_quantity` = 0 AND `account_no` <> ''
                             GROUP BY    accetry.account_no, 
                                         accetry.entry_text
-                            ORDER BY    accetry.account_no";
+                            ORDER BY    accetry.account_no, 
+                                        accetry.entry_text";
                  $result = $system_database_manager->executeQuery($query, "payroll_report_".$ReportName);
                  $corporationDebitAmount = 0;
                  $corporationCreditAmount = 0;
