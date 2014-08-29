@@ -27,9 +27,16 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.auszahlen.GenerateFiles':
-			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n1:".$functionParameters[0]."\n2:".$functionParameters[1]);
+			//communication_interface::alert("payroll.auszahlen.GenerateFiles\n1:".print_r($functionParameters[0], true)."\n2:".print_r($functionParameters[1], true)."\nEUR:".$functionParameters[2]."\nUSD:".$functionParameters[3]);
 			$param = $functionParameters[0];
 			$dueDateFromGUI = $functionParameters[1];
+			$EUR = $functionParameters[2];
+			$USD = $functionParameters[3]; 
+			$res = blFunctionCall('payroll.saveCurrencyForexRate', "EUR", $EUR); 
+			if ($res==false) break;
+			$res = blFunctionCall('payroll.saveCurrencyForexRate', "USD", $USD); 
+			if ($res==false) break;
+
 			$paramArray = explode("##", $param);
 			$zahlstelle = $paramArray[1];
 			$personengruppenIDListe = "**";
@@ -378,15 +385,21 @@ class payroll_UI {
 				communication_interface::jsExecute("prlPsoGrid.invalidate();");
 
 			}else{
-				$s = serialize($ret);
-				$s = str_replace("{", "<br/> {", $s);
-				$s = str_replace("s:", "<br/> s:", $s);
+				$f = print_r($ret ['fieldNames'], true);
+				$t = print_r($ret ['tableRows'], true);
+				$arSearch = array("[","]","Array","(",")","1","2","3","4","5","6","7","8","9","0","=>");
+				$arReplace = array("","" ,""     ,""  ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"" ,"","<br/> - ");
+				$s = str_replace($arSearch, $arReplace, $f.$t);
+				
+				$arSearch = array("BaseWage"  ,"City","DateOfBirth" ,"EmployeeNumber","Firstname" ,"Lastname","ZIP-Code" ,"EmployeeNumber");
+				$arReplace = array("Grundlohn","Ort" ,"Geburtsdatum","Personalnummer","Vorname"   ,"Nachname","Postleitzahl" ,"EmployeeNumber");
+				$s = str_replace($arSearch, $arReplace, $s);
 				
 				$objWindow = new wgui_window("payroll", "infoBox");
 				$objWindow->windowTitle("Speichern fehlgeschlagen");
 				$objWindow->windowWidth(420);
-				$objWindow->windowHeight(180);
-				$objWindow->setContent("<br/>Die Daten konnten nicht gespeichert werden.<br/><br/>[err: ".$ret["errCode"]." ".$ret["errText"]."]<br/><br/><br/><div align='center'><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>OK</button></div><br/><br/>".$s."");
+				$objWindow->windowHeight(250);
+				$objWindow->setContent("<br/>Die Daten konnten nicht gespeichert werden.<br/>Folgende Muss-Felder sind erforderlich:<br/>".$s."<div align='center'><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>OK</button></div><br/>");
 				$objWindow->showAlert();
 				communication_interface::jsExecute("$('#employeeForm input').css('background-color','');");
 				communication_interface::jsExecute("$('#employeeForm select').css('background-color','');");
@@ -1616,7 +1629,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			break;
 		case 'payroll.prlCalcOvProcess':
 			switch($functionParameters[0]["functionNumber"]) {
-			case 5: //Auszahldaten erzeugen 
+			case 5: //Auszahlung erstellen...
 				//communication_interface::alert("GUI Auszahldaten erzeugen");
 				$data = array();
 				$ret = blFunctionCall("payroll.getEmployeeFilterList",array("FilterForEmplOverview"=>true, "FilterForCalculation"=>true));
@@ -1630,6 +1643,9 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 //Die jetztige Periode ist				
 				$PeriodeDieserMonat = blFunctionCall('payroll.auszahlen.getActualPeriodName');
 				$data["period"] = $PeriodeDieserMonat;
+								
+				$data["wechselkursEUR"] = blFunctionCall('payroll.getCurrencyForexRate', "EUR" );
+				$data["wechselkursUSD"] = blFunctionCall('payroll.getCurrencyForexRate', "USD" );
 												
 				$data["nochNichtAusbezahlteMA"] = blFunctionCall('payroll.auszahlen.getAuszahlMitarbeiteranzahl'); 
 								
@@ -2952,6 +2968,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			}			
 			
 			switch($functionParameterAction) {
+			case 'BankverbindungBearbeiten_BankdataFill':
 			case 'GUI_bank_source_Overview':
 			case 'GUI_bank_source_edit':
 			case 'GUI_bank_source_save':
@@ -3088,7 +3105,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
 				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten").$MAInfo); 
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(910);
+				$objWindow->windowWidth(950);
 				$objWindow->windowHeight($windHeight);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
@@ -3141,7 +3158,32 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				communication_interface::jsExecute("prlPmtSpltEditInit();");
 				communication_interface::jsExecute("prlPmtSpltEditJSON2Form();");
 				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').val('".$zahlstellenID."');");                                        
-				communication_interface::jsExecute("$('#btnSaveBankDestinationUndSplit').bind('click', function(e) { jsSaveBankDestinationUndSplit(".$payrollEmployeeID.");           });");//harald hugo             $('#modalContainer').mb_close();
+				communication_interface::jsExecute("$('#btnSaveBankDestinationUndSplit').bind('click', function(e) {    jsSaveBankDestinationUndSplit(".$payrollEmployeeID.");     });");
+				communication_interface::jsExecute("$('#prlPmtSplt_bank_account').bind('blur', function(e) { cb('payroll.paymentSplit', {'action': 'BankverbindungBearbeiten_BankdataFill', 'iban': document.getElementById('prlPmtSplt_bank_account').value , 'bankLine3': document.getElementById('prlPmtSplt_beneficiary_bank_line3').value });  	});   ");
+				break;
+
+			case 'BankverbindungBearbeiten_BankdataFill':
+				$IBAN = "";
+				if (isset($functionParameters[0]["iban"])) {
+					$IBAN = trim($functionParameters[0]["iban"]);
+				}
+				if (strlen($IBAN)>19) {
+					if (strlen(trim($functionParameters[0]["bankLine3"])) < 5) {
+						$clearingBank = blFunctionCall('payroll.getClearingBank', $IBAN);
+						$adr = $clearingBank["Domizil"].", ".$clearingBank["Postadr"];
+						if (strlen(trim($clearingBank["Domizil"])) < 2) {
+							$adr = $clearingBank["Postadr"];
+						}
+						if (strlen(trim($clearingBank["Postadr"])) < 2) {
+							$adr = $clearingBank["Domizil"];
+						}
+						communication_interface::jsExecute("$('#prlPmtSplt_description').val('".$clearingBank["Kurzbez"]."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_bank_swift').val('".$clearingBank["SWIFT"]."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line1').val('".$clearingBank["BankName"]."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line2').val('".$adr."');");                                        
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line3').val('".$clearingBank["PLZ"]." ".$clearingBank["Ort"]."');");                                        						
+					}
+				}
 				break;
 
 			case 'paymentSplitAction_UebersichtZahlungssplit': 

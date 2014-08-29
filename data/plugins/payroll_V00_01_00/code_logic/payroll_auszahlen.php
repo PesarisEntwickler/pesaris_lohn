@@ -326,7 +326,7 @@ class auszahlen {
 		return $c;
 	}
 
-	function getPaymentSplit($employeeID, $bankDestID, $ZahlstellenID){
+	function getPaymentSplit($employeeID, $bankDestID, $ZahlstellenID, $last_processing_order){
 		$ANDwhereBankDestIdClause = "";
 		if (intval($bankDestID) > 0) {
 			$ANDwhereBankDestIdClause = " AND payroll_bank_destination_ID = ".$bankDestID;
@@ -335,12 +335,17 @@ class auszahlen {
 		if (intval($bankDestID) > 0) {
 			$ANDwhereBankSourceIdClause = " AND payroll_bank_source_ID = ".$ZahlstellenID;
 		}
+		$ANDwhereProcessingOrderClause = "";
+		if (intval($last_processing_order) >= -1) {
+			$ANDwhereProcessingOrderClause = " AND processing_order > ".$last_processing_order;
+		}
 		$sql = "				
-			SELECT * FROM
+			SELECT *  FROM
 			          payroll_payment_split
 			WHERE	  payroll_employee_ID = ".$employeeID.
 			$ANDwhereBankDestIdClause.
-			$ANDwhereBankSourceIdClause."
+			$ANDwhereBankSourceIdClause.
+			$ANDwhereProcessingOrderClause."
 			ORDER BY  processing_order
 			LIMIT 1
 		;";
@@ -405,6 +410,7 @@ class auszahlen {
 		$retArray['beneBank4'] = "";
 		$retArray['bankpostcash'] = "";
 		$retArray['nonstandard_banksourcezahlstelle'] = "";
+		$retArray['bank_dest_currency'] = "";
 		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
 			$retArray['success'] = true;
@@ -420,6 +426,7 @@ class auszahlen {
 			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
 			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
 			$retArray['nonstandard_banksourcezahlstelle'] = $result_bank_destination[0]['nonstandard_banksourcezahlstelle'];
+			$retArray['bank_dest_currency'] = $result_bank_destination[0]['bank_dest_currency'];
 			switch ( $result_bank_destination[0]['destination_type'] ) {
 				case 1: $retArray['bankpostcash'] = "BANK"; break;
 				case 2: $retArray['bankpostcash'] = "POST"; break;
@@ -469,20 +476,36 @@ class auszahlen {
 		return $retArray;
 	}
 	
-	public function calcSplitAmount($splitMode, $splitValue, $openEmployeeAmount, $maxCalcAmount, $employee_ID ,$account_ID) {
+	public function calcSplitAmount($splitMode, $splitValue, $availAmt, $splittWaehrungEmployee, $zahlstellenWaehrung, $employee_ID ,$account_ID) {
+
 		$payAmount = 0;
+		$wechselkursFremdZuCHF = 1;
 		//$splitValue        : ist der Betrag, der die Splitt-Tabelle für den hier aktuellen Split hergibt
 		//                     dieser ist aber unterschiedlich je nach split_mode
-		//$openEmployeeAmount: ist der Rest, der man jetzt noch auszahlen kann
-		//$maxCalcAmount     : ist der maximal auszubezahlende Betrag aus der Calculation-Tabelle (aus der Lohnart 8000)
-		if(floatval($openEmployeeAmount) > 0 && floatval($splitValue)<>0){	
+		//$availAmt: ist der Rest, der man jetzt noch auszahlen kann
+		
+		$Waehrung = "CHF";
+		if ($Waehrung != $splittWaehrungEmployee) {
+			$Waehrung = $splittWaehrungEmployee;
+		}
+		
+		if(floatval($availAmt) > 0 && floatval($splitValue) <> 0){	
+			switch ( $Waehrung ) {
+				case "EUR":
+					$wechselkursFremdZuCHF = floatval(blFunctionCall("payroll.getCurrencyForexRate", "EUR"));
+				break;
+				case "USD":
+					$wechselkursFremdZuCHF = floatval(blFunctionCall("payroll.getCurrencyForexRate", "USD"));
+				break;
+			}//end switch ( $Waehrung )
+
 			switch ( $splitMode ) {
 				case 3://Betrag (im $splitValue steht der Auszahlungssbetrag)
 					$payAmount = floatval($splitValue);
 					break;				
 				case 2: //Prozente (im $splitValue steht die ProzenteZahl)
 					//ein $splitValue="50.00" wird als 50% interpretiert
-					$payAmount = floatval($splitValue) / 100 * floatval($maxCalcAmount);
+					$payAmount = floatval($splitValue) / 100 * floatval($availAmt);
 					break;				
 				case 1://Nach Lohnart
 					//hier ist der $splitValue als das Maximum zu verstehen, 
@@ -495,15 +518,21 @@ class auszahlen {
 					} 
 					$payAmount = $maxLohnartAmount;	
 					break;				
-			}//end switch
+			}//end switch ( $splitMode )
+			
 		}
 		//wenn aber weniger zur Verfügunjg steht, 
-		//weil schon ein Teil mit vorherigem Splitt ausbetzahlt wurde
-		//(nebenbei: $openEmployeeAmount ist immer gleich oder weniger als $maxCalcAmount)
-		if( floatval($openEmployeeAmount) < $payAmount ) {
-			$payAmount = floatval($openEmployeeAmount);//das wäre dann der Rest
-		}
-		return $this->rundungAuf5Rappen($payAmount);
+		//weil schon ein Teil mit vorherigem Splitt ausbetzahlt wurde		
+		if( floatval($availAmt) < $payAmount ) {
+			$payAmount = floatval($availAmt);//das wäre dann der Rest
+		}		
+		$payAmountSystemCurrencyCHF = $this->rundungAuf5Rappen($payAmount);
+		$payAmountForeignCurrency   = $payAmount / $wechselkursFremdZuCHF;
+		
+		$ret = array("payAmountSystemCurrencyCHF"=> $payAmountSystemCurrencyCHF
+					,"payAmountForeignCurrency" => $payAmountForeignCurrency 
+					,"payCurrency" => $Waehrung);
+		return $ret;
 	}
 	
 	public function getCurrentPeriodAccountAmount($account_ID, $employee_ID) {
@@ -578,6 +607,17 @@ class auszahlen {
 		return $return;
 	}
 	
+	public function getEmplFromTrackingTable() {
+		$sql = "SELECT * FROM `payroll_auszahlen_tracking` WHERE amount_available > 0.001;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		$return = array();
+		foreach ( $result as $row ) {
+			$return[] = $row["payroll_employee_ID"];
+		}  
+		return $return;
+	}
+	
 	public function truncateTrackingTable() {
 		$sql = "TRUNCATE `payroll_auszahlen_tracking`;";
 		$system_database_manager = system_database_manager::getInstance();
@@ -630,7 +670,7 @@ class auszahlen {
 
 	public function getAmountAvailableFromTrackingTable($periodeID, $employeeID) {
 		$sql = "
-				SELECT MAX(id), amount_available 
+				SELECT MAX(id), amount_available, processing_order 
 				  FROM payroll_auszahlen_tracking
 			     WHERE payroll_period_ID  = ".$periodeID."
 			       AND payroll_employee_ID  = ".$employeeID."		
@@ -638,8 +678,9 @@ class auszahlen {
 			    ";
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery($sql);
-		//communication_interface::alert($result[0]["amount_available"]);
-		return $result[0]["amount_available"];
+		//communication_interface::alert($result[0]["amount_available"]."\nPO:".$result[0]["processing_order"]);
+		return array( "amount_available" => $result[0]["amount_available"] 
+				     ,"processing_order" => $result[0]["processing_order"] );
 	}
 	
 	public function replaceUmlaute($uebergabeWort) {

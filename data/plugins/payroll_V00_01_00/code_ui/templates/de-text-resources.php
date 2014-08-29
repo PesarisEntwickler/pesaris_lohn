@@ -32,6 +32,7 @@ $textResourceMap["txtY"] = "Ja";
 $textResourceMap["txtN"] = "Nein";
 
 $textResourceMap["txtWechselkurs"] = "Umrechnungskurs";
+$textResourceMap["txtWechselkurse"] = "Umrechnungskurse";
 $textResourceMap["txtWaehrung"] = "W&auml;hrung";
 $textResourceMap["txtLohnart"] = "Lohnart";
 $textResourceMap["txtBetrag"] = "Betrag";

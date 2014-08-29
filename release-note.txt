@@ -1,19 +1,55 @@
+2014-08-25
 
+- Einbau interner Banken-LookUp auf "Bankverbindung bearbeiten"
+	(funktioniert aber nur, 
+	 1. wenn der Eingabefeldwechsel passiert bei "verlassen" von Feld IBAN
+	 2. wenn IBAN länger als 19 Stellen ist
+	 3. wenn BankLinie3 (Plz/Ort) leer ist
+	 damit nicht dauernd vorher eingetippte und schon gespeicherte Inhalte wieder überschrieben werden.)
+	=> [Pkt 2 - TP 12.8.14] IBAN->Bankenadresse lookup ---> erledigt
 
-2014-08-15
- 	
-- Fehlermeldunge im Klartext bei "Bankverbindung bearbeiten" und "Mitarbeiterdaten bearbeiten" [Pkt 1 & Pkt 6 - TP 12.8.14]
+2014-08-22
+
+- Einbau Fremdwährung auf Auszahlungs-Fenster 
+	(Die Wechselkurde werden angezeigt und der User kann die Kurse gleich anpassen)
+- Einbau Fremdwährungsberechnung in DTAJournal und DTA 
+	(DTAJournal hat bei Nicht-CHF-Auszahlung eine dritte Journalzeile mit Wechselkurs und FW-Betrag
+	"Wechselkurs EUR/CHF = 1/1.21011, Ueberweisung EUR 7'558.04")
+	=> [Pkt 10 - TP 12.8.14] Auszahlung in Fremdwährung ---> erledigt
+- Korrektur Reste-Auszahlung, wenns nach dem Splitt noch eine Restauszahlung gibt
+- Fenstersteuerung "Auszahlung erstellen". Beim "DTA zurücksetzen" wird das Fenster gleich wieder geöffnet.
+
+2014-08-21
+
+- Bereich BEBU/FIBU von Ascamis integriert
+
+2014-08-20
+
+- externer Lookup IBAN und BC auf offizielle SIX-Seite in Window Bankverbindung
+
+noch offen: [Pkt 2 - TP 12.8.14] IBAN->Bankenadresse lookup
+noch offen: [Pkt 10 - TP 12.8.14] Auszahlung in Fremdwährung
+
+[Pkt 9 - TP 12.8.14] Darstellung der Daten in Stammdatenverwaltung
+--> konnte ich nicht mehr nachvollziehen
+
+2014-08-18
+
+- Gültig für: (nur Hauptzahltag, Validierung entfällt damit vorerst) [Pkt 5 - TP 12.8.14]
+	
+- Fehlermeldungen im Klartext bei "Bankverbindung bearbeiten" und "Mitarbeiterdaten bearbeiten" [Pkt 1 & Pkt 6 - TP 12.8.14]
 	
 - Fenster-Schliessung nach "Speichern" anstelle Popup-Feedback bei 4 Fenstern [Pkt 3 und Pkt 5 - TP 12.8.14]
+
+2014-08-15
 
 - Zahlstellenverwaltung im Firmen-Stamm
 	Zahlstelle - Neu/Ändern/Löschen / 
 	(Löschung hat eine Prüfung, ob die Zahlstelle noch einem Mitarbeiter hinterlegt ist) [Erweiterung zu Pkt 8 - TP 12.8.14]
 
 - Neues DB-Feld in Bankdestination für Zahlstelle, inkl. Verwaltung dafür
- 	(Zahlstelle kann nun auch der Standard-Bank des Mitarbeiters hinterlegt werden) [Pkt 10 - TP 12.8.14]
+ 	(Zahlstelle kann nun auch der Standard-Bank des Mitarbeiters hinterlegt werden) [Pkt 12 - TP 12.8.14]
 
 - Diverse Fenstergrössen z.B. "Bankverbindung bearbeiten" und "Mitarbeiterdaten bearbeiten" angepasst. Passt nun auch für Chrome und IE [Pkt 7 - TP 12.8.14]
 
-noch nicht nachvollziehbar [Pkt 9 - TP 12.8.14]
-noch offen: [Pkt 2 - TP 12.8.14]
+
