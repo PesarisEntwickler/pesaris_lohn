@@ -1,4 +1,4 @@
-<?php
+<?php 
 $textResourceMap["btnOK"] 			= "OK";
 $textResourceMap["btnSave"] 		= "Speichern";//<wgui:text id="btnSave"/>
 $textResourceMap["btnSaveSettings"] = "Einstellungen speichern";

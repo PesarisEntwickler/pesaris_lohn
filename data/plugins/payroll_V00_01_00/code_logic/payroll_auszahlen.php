@@ -180,16 +180,20 @@ class auszahlen {
 	}
 
 	public function getAuszahlMitarbeiteranzahl() {
-		$employeeList = $this->getMitarbeiterZurAuszahlung("8000", "amount > 0.001", "isFullPayed <> 'Y'","");
-		$effArr = array();
-		$auszahlMitarbeiteranzahl = 0;
-		if ($employeeList["count"]>0) {
-			foreach ( $employeeList['data'] as $row ){//füll Array mit allen betroffenen IDs
-				$effArr[] = $row['payroll_employee_ID'];
-			}
-			$arr = array_unique( $effArr );//mach die IDs eindeutig/unique
-			$auszahlMitarbeiteranzahl = count($arr);			
-		}	
+//		$employeeList = $this->getMitarbeiterZurAuszahlung("8000", "amount > 0.001", "isFullPayed <> 'Y'","");
+//		$effArr = array();
+//		$auszahlMitarbeiteranzahl = 0;
+//		if ($employeeList["count"]>0) {
+//			foreach ( $employeeList['data'] as $row ){//füll Array mit allen betroffenen IDs
+//				$effArr[] = $row['payroll_employee_ID'];
+//			}
+//			$arr = array_unique( $effArr );//mach die IDs eindeutig/unique
+//			$auszahlMitarbeiteranzahl = count($arr);			
+//		}	
+		$sql="SELECT count(amount_available) AS anzahl FROM payroll_auszahlen_tracking WHERE amount_available > 0.00001 ;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		$auszahlMitarbeiteranzahl = $result[0]["anzahl"];
 		return $auszahlMitarbeiteranzahl;
 	}
 	
@@ -308,14 +312,26 @@ class auszahlen {
 
 	function getEployeesWithoutIBAN(){
 		$system_database_manager = system_database_manager::getInstance();
-		$result_dest_emp = $system_database_manager->executeQuery("				
-					SELECT * FROM
-					  payroll_bank_destination
-					, payroll_employee
-					WHERE	payroll_bank_destination.payroll_employee_ID = payroll_employee.id
-					AND		payroll_bank_destination.destination_type <> 3	
-					AND		payroll_bank_destination.bank_account = '' 
-					;");
+		$sql = "
+			DELETE FROM payroll_bank_destination
+			WHERE destination_type <> 3
+			AND bank_account = ''
+			AND description = ''
+			AND beneficiary1_line1 = ''
+			AND beneficiary_bank_line1 = ''
+			AND beneficiary_bank_line3 = ''
+			;";
+		$result_dest_emp = $system_database_manager->executeUpdate($sql);				
+		
+		$sql = "
+			SELECT * FROM
+			  payroll_bank_destination
+			, payroll_employee
+			WHERE	payroll_bank_destination.payroll_employee_ID = payroll_employee.id
+			AND		payroll_bank_destination.destination_type <> 3	
+			AND		payroll_bank_destination.bank_account = '' 
+			;";
+		$result_dest_emp = $system_database_manager->executeQuery($sql);
 		$c = "";	 				
 		foreach ( $result_dest_emp as $row ) {
 			$c .= $row['EmployeeNumber'].", ";
@@ -326,7 +342,7 @@ class auszahlen {
 		return $c;
 	}
 
-	function getPaymentSplit($employeeID, $bankDestID, $ZahlstellenID, $last_processing_order){
+	function getPaymentSplit($employeeID, $bankDestID, $ZahlstellenID, $last_processing_order, $limit){
 		$ANDwhereBankDestIdClause = "";
 		if (intval($bankDestID) > 0) {
 			$ANDwhereBankDestIdClause = " AND payroll_bank_destination_ID = ".$bankDestID;
@@ -347,7 +363,7 @@ class auszahlen {
 			$ANDwhereBankSourceIdClause.
 			$ANDwhereProcessingOrderClause."
 			ORDER BY  processing_order
-			LIMIT 1
+			".$limit."
 		;";
 				
 		$system_database_manager = system_database_manager::getInstance();
@@ -404,12 +420,18 @@ class auszahlen {
 		$retArray['beneAddress3'] = "";
 		$retArray['beneAddress4'] = "";
 		$retArray['beneBankDescription'] = "";
+		$retArray['beneBankSWIFT'] = "";
 		$retArray['beneBank1'] = "";
 		$retArray['beneBank2'] = "";
 		$retArray['beneBank3'] = "";
 		$retArray['beneBank4'] = "";
+		$retArray['beneEndbeguenst1'] = "";
+		$retArray['beneEndbeguenst2'] = "";
+		$retArray['beneEndbeguenst3'] = "";
+		$retArray['beneEndbeguenst4'] = "";
 		$retArray['bankpostcash'] = "";
 		$retArray['nonstandard_banksourcezahlstelle'] = "";
+		$retArray['spesenregelung'] = "";
 		$retArray['bank_dest_currency'] = "";
 		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
@@ -421,10 +443,16 @@ class auszahlen {
 			$retArray['beneAddress3'] = $result_bank_destination[0]['beneficiary1_line3'];
 			$retArray['beneAddress4'] = $result_bank_destination[0]['beneficiary1_line4'];
 			$retArray['beneBankDescription'] = $result_bank_destination[0]['description'];
+			$retArray['beneBankSWIFT'] = $result_bank_destination[0]['bank_swift'];
 			$retArray['beneBank1'] = $result_bank_destination[0]['beneficiary_bank_line1'];
 			$retArray['beneBank2'] = $result_bank_destination[0]['beneficiary_bank_line2'];
 			$retArray['beneBank3'] = $result_bank_destination[0]['beneficiary_bank_line3'];
 			$retArray['beneBank4'] = $result_bank_destination[0]['beneficiary_bank_line4'];
+			$retArray['beneEndbeguenst1'] = $result_bank_destination[0]['beneficiary2_line1'];//IBAN
+			$retArray['beneEndbeguenst2'] = $result_bank_destination[0]['beneficiary2_line2'];//Name
+			$retArray['beneEndbeguenst3'] = $result_bank_destination[0]['beneficiary2_line3']." ".$result_bank_destination[0]['beneficiary2_line4'];
+			$retArray['beneEndbeguenst4'] = $result_bank_destination[0]['beneficiary2_line5'];//Ort
+			$retArray['spesenregelung']   = $result_bank_destination[0]['expense'];
 			$retArray['nonstandard_banksourcezahlstelle'] = $result_bank_destination[0]['nonstandard_banksourcezahlstelle'];
 			$retArray['bank_dest_currency'] = $result_bank_destination[0]['bank_dest_currency'];
 			switch ( $result_bank_destination[0]['destination_type'] ) {
@@ -482,7 +510,7 @@ class auszahlen {
 		$wechselkursFremdZuCHF = 1;
 		//$splitValue        : ist der Betrag, der die Splitt-Tabelle für den hier aktuellen Split hergibt
 		//                     dieser ist aber unterschiedlich je nach split_mode
-		//$availAmt: ist der Rest, der man jetzt noch auszahlen kann
+		//$availAmt			 : ist der Rest, der man jetzt noch auszahlen kann
 		
 		$Waehrung = "CHF";
 		if ($Waehrung != $splittWaehrungEmployee) {
@@ -526,8 +554,8 @@ class auszahlen {
 		if( floatval($availAmt) < $payAmount ) {
 			$payAmount = floatval($availAmt);//das wäre dann der Rest
 		}		
-		$payAmountSystemCurrencyCHF = $this->rundungAuf5Rappen($payAmount);
-		$payAmountForeignCurrency   = $payAmount / $wechselkursFremdZuCHF;
+		$payAmountForeignCurrency   = $payAmount;
+		$payAmountSystemCurrencyCHF = $this->rundungAuf5Rappen($payAmountForeignCurrency * $wechselkursFremdZuCHF);
 		
 		$ret = array("payAmountSystemCurrencyCHF"=> $payAmountSystemCurrencyCHF
 					,"payAmountForeignCurrency" => $payAmountForeignCurrency 

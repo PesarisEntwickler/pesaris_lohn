@@ -1,3 +1,71 @@
+Noch offen: 
+[Pkt 1 - TP 2.9.14] "Unverständliche Fehlermeldung im Personalstamm"
+[Pkt 2 - TP 2.9.14] "Splitt Nunez" --> müssen wir noch diskutieren
+[Pkt 4 - TP 2.9.14] "Splitt Jung" --> müssen wir noch diskutieren
+[Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung  andrucken . Beispiel Nestler Paula"
+
+2014-09-07
+
+- Fremdwährungsumrechnung umgedreht. Wenn im Split jemand "EUR" und Betrag 1000 angibt, werden nun 1000 EUR und nicht mehr 1000 CHF in EUR ausbezahlt
+	[Pkt 5 - TP 2.9.14]
+- "Falsches Konto" -> Es werden jetzt bei Splitts die richtigen IBAN zugewiesen 
+	[Pkt 5 - TP 2.9.14]
+- Fehlermeldungen / Splitt Erfassung -> korrigiert bzw. eliminiert
+	[Pkt 6 - TP 2.9.14/HP] auch [Pkt 1 - TP 5.9.14/RK]
+- Wenn ein Endbegünstigter angegeben ist, wird der Begünstigte mit diesem in der DTA überschrieben
+- Eine Zeile für den Endbegünstigten auch im DTA-Journal
+- Korrektur der "Splitt-Zahl" in der Statistik (Splitts = TRXZahl - Mitarbeiter)
+
+
+2014-09-06
+
+- Löschen eines Zahlungssplitts löscht nun auch die "dahinter" liegende Destination-Bank des Employee.
+- Beim Neu-Initiieren eines Splitts konnte es vorkommen, dass kurzzeitig eine andere Destinationsbank angezeigt wurde (ID-Problem behoben).
+- Beim Endbegünstigten wird die Zeile „Postleitzahl und Ort“ auch gespeichert, Adresszusatz wurde entfernt
+- Formale Validierung nun auch bei IBAN des End-Begünstigten
+- Validierungsverschärfung bei IBAN. (Muss 2 Buchstaben am Anfang haben. Die Länge wird ohne Leerzeichen gezählt)
+- Zähler "ohne Auszahlung" korrigiert 
+	[Pkt 1 - TP 5.9.14]
+- Neu bei DTA der TA 836, Wechsel von TA 827 zu TA 836 bei Nicht-CHF-Währung, damit wird nun auch der Endbegünstigte ausgewiesen
+	[Pkt 2 - TP 5.9.14]
+- Neu bei DTA der TA 890 Totalrecord
+	[Pkt 3 - TP 5.9.14]
+
+
+2014-09-05
+
+- Validierungsprobleme beim Speichern einer Bankverbindung u/o Split
+- Bei Nunez Maria kommt keine Auswahl „Zahlungssplitt initialiseren“ mehr (--> Korr. Default-Bank in DB)
+
+2014-08-29
+
+- Oeffnen Bankverbindung-Splitt-Fenster nach Zahlungs-Splitt-Initialisierung
+	[Pkt 4 - TP 28.8.14]
+
+- Bankverbindung bleibt jetzt offen, wenn Validierungsfehler angezeigt wurden
+	[Pkt 5 - TP 28.8.14]
+
+- Banken-Look-Up
+	Damit das funktioniert müssen alle(!) folgende Bedingungen erfüllt sein:
+	1.	Eingabefeld-Fokus-Wechsel (Event: Verlassen von „IBAN“-Feld)
+	2.	Die IBAN muss mehr als 19 Stellen haben
+	3.	In einer korrekten IBAN muss an Stelle 5 bis Stelle 9 eine 3- oder 4- oder 5-stellige BC-Nummer stehen 
+	(siehe Wikipedia unter „IBAN Zusammensetzung“ http://de.wikipedia.org/wiki/IBAN  )
+	4.	Bank-Linie 3 (Postleitzahl & Ort) muss leer sein (damit, wenn schon was drin steht, die Bank nicht überschrieben wird)
+
+	Wenn eine der 4 Bedingungen nicht zutrifft, wird kein Banken-Look-Up gemacht, bzw. es kann kein Resultat gefunden werden. 
+	Es funktioniert z.B. diese formal korrekte IBAN „CH00 0020 2000 0000 0000 0“ -> BC-Nummer = 202 -> UBS in Uster
+	
+	es gibt jetzt zusätzlich  
+	-	Eine Meldung eingebaut, die anzeigt, dass die IBAN zu kurz eingegeben wurde ( < 19 Stellen). Dies direkt anstelle des Banken-Look-Up.
+	-	Und eine Meldung ("Keine Bank gefunden. Ist die IBAN inkorrekt?"), wenn keine Bank gefunden werden konnte 
+	[Pkt 2 - TP 28.8.14]
+	
+- Fehlermeldung bei Auszahlen "Folgende Personen haben noch kein Bankkonto registriert (IBAN fehlt)".
+	Beim Evaluieren dieser Bedingung werden jetzt allfällige Falsch-Eintragungen, die beim Split-Initialisieren entstanden sein könnten, entfernt.	
+	[Pkt 3 - TP 28.8.14]
+
+
 2014-08-25
 
 - Einbau interner Banken-LookUp auf "Bankverbindung bearbeiten"

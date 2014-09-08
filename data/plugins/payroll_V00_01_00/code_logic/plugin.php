@@ -68,7 +68,7 @@ class payroll_BL {
 		case 'payroll.auszahlen.getAllDestinationBankAccounts':
 			return $auszahlen->getAllDestinationBankAccounts($functionParameters[0]);//=$employeeID
 		case 'payroll.auszahlen.getPaymentSplit':
-			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1],$functionParameters[2],$functionParameters[3]);//=$employeeID, $bankID, $Zahlstelle, $processing_order
+			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1],$functionParameters[2],$functionParameters[3],$functionParameters[4]);//=$employeeID, $bankID, $Zahlstelle, $processing_order, LIMIT 1
 		case 'payroll.auszahlen.getEmplFromTrackingTable':
 			return $auszahlen->getEmplFromTrackingTable($functionParameters[0]);
 		case 'payroll.auszahlen.initTrackingTable':
@@ -90,6 +90,8 @@ class payroll_BL {
 			return $payrollPayment->initZahlungssplitt($functionParameters[0],$functionParameters[1],$functionParameters[2]);//$employeeId, $zahlstelleId, $destBankId
 		case 'payroll.getPaymentSplitList':
 			return $payrollPayment->getPaymentSplitList($functionParameters[0]);//$payrollEmployeeID
+		case 'payroll.getPaymentSplitList_and_splitRecId':
+			return $payrollPayment->getPaymentSplitList_and_splitRecId($functionParameters[0], $functionParameters[1]);//$payrollEmployeeID, $splitRecId
 		case 'payroll.getPaymentSplitDetail':
 			return $payrollPayment->getPaymentSplitDetail($functionParameters[0]);
 		case 'payroll.savePaymentSplitDetail':

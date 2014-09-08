@@ -17,7 +17,7 @@ function prlAuszahlenGenerateWindowInit() {
 	$('#btnAuszahlenReset').bind('click', function() {
 		cb('payroll.auszahlen.periodenReset');
 		$('#modalContainer').mb_close();
-		cb('payroll.prlCalcOvProcess',{'functionNumber':5});
+		//cb('payroll.prlCalcOvProcess',{'functionNumber':5});
 	});  
 	$('#btnAuszahlenGenerateWindowClose').bind('click', function() {
 		$('#modalContainer').mb_close();
@@ -3757,9 +3757,12 @@ function prlPmtSpltMainInit() {
 		cb('payroll.paymentSplit',{'action':'paymentSplitAction_saveSplitOrder', 'empId':prlPmtSplt.empId, 'data':r});
 	});
 	$('.prlPmtSpltScroll li div span').bind('click', function(e) {
-		var a = $(this).attr('class')=='d' ? 'paymentSplitAction_deleteSplit' : 'paymentSplitAction_BankverbindungBearbeiten'; //gibt e oder d  //'paymentSplitAction_editSplit'
-		//alert("payroll.js    rid:"+$(this).parent().parent().attr('rid'));
-		cb('payroll.paymentSplit',{'action':a, 'empId':prlPmtSplt.empId, 'bankID':0, 'splitID':$(this).parent().parent().attr('rid')});
+		//alert("payroll.js    rid:"+$(this).parent().parent().attr('rid') + ", empId:"+prlPmtSplt.empId  + ", bankID:"+prlPmtSplt.bankID );
+		if ($(this).attr('class')=='d') {
+			cb('payroll.paymentSplit',{'action':'paymentSplitAction_deleteSplit'             , 'empId':prlPmtSplt.empId, 'bankID':0, 'rid':$(this).parent().parent().attr('rid')});
+		} else {
+			cb('payroll.paymentSplit',{'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'bankID':0, 'rid':$(this).parent().parent().attr('rid')});
+		}
 	});
 	$('.prlPmtSpltScroll ul').sortable();
 }

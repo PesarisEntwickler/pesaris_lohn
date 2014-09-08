@@ -103,6 +103,17 @@ class payroll_BL_payment {
 		return $return;
 	}
 	
+	public function getPaymentSplitList_and_splitRecId($payroll_employee_ID, $recId) {
+		$ret = $this->getPaymentSplitList($payroll_employee_ID);
+		$max_count = count($ret["data"]);
+		for ( $index = 0, $max_count; $index < $max_count; $index++ ) {
+			if ($ret["data"][$index]["id"] == $recId) {
+				//communication_interface::alert("index=".$index.", rid=".$ret["data"][$index]["id"]."\n".print_r($ret["data"][$index], true));				
+				return $ret["data"][$index];
+			}
+		}
+	}
+	
 	public function getPaymentSplitList($payroll_employee_ID) {
 		if(!preg_match( '/^[0-9]{1,9}$/', $payroll_employee_ID)) { 
 			$response["success"] = false;
@@ -180,8 +191,8 @@ class payroll_BL_payment {
 	public function saveBankDestinationUndSplit($param) { 
 		//communication_interface::alert("saveBankDestinationUndSplit:\n param:".print_r($param, true));
 		require_once('payroll_auszahlen.php');
-		$auszahlen = new auszahlen();
-		
+		$auszahlen = new auszahlen();	
+		$return = 0;
 		$paramBankDest = array();
 		$paramSplitTab = array();
 		
@@ -196,9 +207,6 @@ class payroll_BL_payment {
 		$splitTabID = $param['splitID'];
 		$hasSplit = false;
 		if($isStanardBank["bank_id"]!=$param['id']  && $bankDestID > 0) {
-							
-			//$split = $auszahlen->getPaymentSplit($employeeID,$bankDestID,0,-1); 
-			//if ($split["count"] > 0) {
 				$hasSplit = true;
 				$paramSplitTab["id"] 		= $splitTabID;
 				$paramSplitTab["payroll_employee_ID"] 		= $employeeID;
@@ -246,11 +254,11 @@ class payroll_BL_payment {
 		$paramBankDest["beneficiary1_line2"] 	= $param["beneficiary1_line2"];
 		$paramBankDest["beneficiary1_line3"] 	= $param["beneficiary1_line3"];
 		$paramBankDest["beneficiary1_line4"] 	= $param["beneficiary1_line4"];
-		$paramBankDest["beneficiary2_line1"] 	= $param["beneficiary2_line1"];
+		$paramBankDest["beneficiary2_line1"] 	= strtoupper($param["beneficiary2_line1"]);
 		$paramBankDest["beneficiary2_line2"] 	= $param["beneficiary2_line2"];
 		$paramBankDest["beneficiary2_line3"] 	= $param["beneficiary2_line3"];
 		$paramBankDest["beneficiary2_line4"] 	= $param["beneficiary2_line4"];
-		$paramBankDest["beneficiary2_line5"] 	= "";
+//		$paramBankDest["beneficiary2_line5"] 	= $param["beneficiary2_line5"];
 		$paramBankDest["notice_line1"] 			= $param["notice_line1"];
 		$paramBankDest["notice_line2"] 			= $param["notice_line2"];
 		$paramBankDest["notice_line3"] 			= "";
@@ -268,15 +276,20 @@ class payroll_BL_payment {
 			//communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamSplitTab:".print_r($paramSplitTab, true));
 			$splitRes = $this->savePaymentSplitDetail($paramSplitTab);			
 		}
-		//communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamBankDest:".print_r($paramBankDest, true));
 		$bankDestRes = $this->saveBankDestinationDetail($paramBankDest);
+		$return = intval($bankDestRes["errCode"]);
+		if (intval($return) > 0) {
+			//communication_interface::alert("saveBankDestinationDetail:\nerrCode:".$bankDestRes["errCode"]."\n".$hasSplit["count"]."\nparamBankDest:".print_r($paramBankDest, true));
+			//communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$employeeID.", 'bankID':".$bankDestID." , 'splitID':".$bankDestID." }); ");
+			return false;		
+		} else {
 		
-		if ($hasSplit) {			
-			communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_UebersichtZahlungssplit', 'empId':".$employeeID.", 'bankID':".$bankDestID." }); ");
-  		} else {
-			communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
-		}
-		
+			if ($hasSplit) {			
+				communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_UebersichtZahlungssplit', 'empId':".$employeeID.", 'bankID':".$bankDestID." }); ");
+	  		} else {
+				communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
+			}
+		}	
 		return true;
 	}
 
@@ -359,6 +372,9 @@ class payroll_BL_payment {
 	}
 
 	public function saveBankDestinationDetail($param) {
+		$recID = $param["id"];
+		$response["success"] = true;
+		$response["errCode"] = 0;
 		//communication_interface::alert("saveBankDestinationDetail() id:".$param["id"]."\n".print_r($param, true));
 		$updateMode = !isset($param["id"]) || $param["id"]==0 || $param["id"]=="" ? false : true;
 		$fieldCfg = array(
@@ -378,7 +394,7 @@ class payroll_BL_payment {
 					"beneficiary2_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary2_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary2_line4"=>array("regex"=>".{0,32}","addQuotes"=>true),
-					"beneficiary2_line5"=>array("regex"=>".{0,32}","addQuotes"=>true),
+//					"beneficiary2_line5"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary_bank_line1"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary_bank_line2"=>array("regex"=>".{0,32}","addQuotes"=>true),
 					"beneficiary_bank_line3"=>array("regex"=>".{0,32}","addQuotes"=>true),
@@ -398,7 +414,7 @@ class payroll_BL_payment {
 			$arrMandatoryFields = array("bank_account","beneficiary1_line1","beneficiary1_line4");
 			break;
 		case 3: //Cash
-			$arrClearFields = array("bank_swift","bank_account","postfinance_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","expense","beneficiary1_line1","beneficiary1_line2","beneficiary1_line3","beneficiary1_line4","beneficiary2_line1","beneficiary2_line2","beneficiary2_line3","beneficiary2_line4","beneficiary2_line5","notice_line1","notice_line2");
+			$arrClearFields = array("bank_swift","bank_account","postfinance_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","expense","beneficiary1_line1","beneficiary1_line2","beneficiary1_line3","beneficiary1_line4","beneficiary2_line1","beneficiary2_line2","beneficiary2_line3","beneficiary2_line4","notice_line1","notice_line2");
 			$arrMandatoryFields = array();
 			break;
 		}
@@ -419,17 +435,28 @@ class payroll_BL_payment {
 			$response["errCode"] = 10;
 			$response["errText"] = "invalid field value [10]";
 			$response["fieldNames"] = $errFields;
-			$arSearch = array("Array", "(", ")","bank_account","beneficiary_bank_line1","beneficiary_bank_line3","beneficiary1_line1","beneficiary1_line4");
-			$arReplace = array("Bitte fehlende Informationen eingeben:", "", "","Bank Konto/IBAN","Bankname","Bank PLZ / Ort","Beguenstigter Name","Beguenstigter PLZ / Ort");
+			$arSearch = array("Array", "(", ")","bank_account","beneficiary_bank_line1","beneficiary_bank_line2","beneficiary_bank_line3","beneficiary1_line1","beneficiary1_line4");
+			$arReplace = array("Bitte fehlende Informationen eingeben:", "", "","Bank Konto/IBAN","Bank Name","Post Adresse","Bank PLZ / Ort","Beguenstigter Name","Beguenstigter PLZ / Ort");
 			$err = str_replace($arSearch, $arReplace, print_r($errFields, true));
 			communication_interface::alert($err);
+			//communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$param["payroll_employee_ID"].", 'bankID':".$recID." , 'splitID':".$recID." }); ");			
 			return $response;
+		}
+		
+		$iban = str_replace(" ", "", $param["bank_account"]);
+		if (strlen($iban) < 19 ) {
+			$response["success"] = false;
+			$response["errCode"] = 11;
+			$response["errText"] = "invalid field value [11]";
+			$err = "IBAN ungueltig ( < 19 Zeichen).";
+			communication_interface::alert($err);
+			communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$param["payroll_employee_ID"].", 'bankID':".$recID." }); ");			
+			return $response;			
 		}
 
 		$erfolg = "";
 		if($updateMode) {
 			$sqlUPDATE = array();
-			$recID = $param["id"];
 			unset($fieldCfg["id"]); //entfernen, da dieses Feld nicht aktualisiert werden muss
 			unset($fieldCfg["payroll_employee_ID"]); //entfernen, da dieses Feld nicht aktualisiert werden soll
 			foreach($fieldCfg as $fieldName=>$fieldParam) {
@@ -454,9 +481,7 @@ class payroll_BL_payment {
 		$system_database_manager = system_database_manager::getInstance();
 		$system_database_manager->executeUpdate($sql, "payroll_savePayslipCfgDetail");
 			 
-		$response["success"] = true;
-		$response["errCode"] = 0;
-		communication_interface::alert("Bank, Post, Cash ".$erfolg);//.print_r($param, true).$sql
+		communication_interface::alert("Bank-ID ".$recID." ".$erfolg);//.print_r($param, true).$sql
 //		communication_interface::jsExecute("$('#modalContainer').mb_close(); ");
 		return $response;
 	}
@@ -487,7 +512,8 @@ class payroll_BL_payment {
 		$response["errCode"] = 0;
 		return $response;
 	}
-
+	
+	
 	public function deletePaymentSplitDetail($param) {
 		if(!preg_match( '/^[0-9]{1,9}$/', $param["id"])) { // id = payroll_payment_split_ID
 			$response["success"] = false;
@@ -497,7 +523,14 @@ class payroll_BL_payment {
 		}
 
 		$system_database_manager = system_database_manager::getInstance();
+		$sql = "SELECT * FROM payroll_payment_split WHERE id=".$param["id"];
+		
+		$splitRow = $system_database_manager->executeQuery($sql);
+		$bankID = $splitRow[0]["payroll_bank_destination_ID"];
+		//communication_interface::alert("deletePaymentSplitDetail(rid=".$param["id"]."), bd=".$splitRow[0]["payroll_bank_destination_ID"]);
+		
 		$system_database_manager->executeUpdate("DELETE FROM payroll_payment_split WHERE id=".$param["id"], "payroll_deletePaymentSplitDetail");
+		$system_database_manager->executeUpdate("DELETE FROM payroll_bank_destination WHERE id=".$bankID, "payroll_deletePaymentSplitDetail");
 
 		$response["success"] = true;
 		$response["errCode"] = 0;
@@ -529,7 +562,7 @@ class payroll_BL_payment {
 		$response["data"]["beneficiary2_line2"] = "";
 		$response["data"]["beneficiary2_line3"] = "";
 		$response["data"]["beneficiary2_line4"] = "";
-		$response["data"]["beneficiary2_line5"] = "";
+//		$response["data"]["beneficiary2_line5"] = "";
 		$response["data"]["notice_line1"] = "";
 		$response["data"]["notice_line2"] = "";
 		$response["data"]["notice_line3"] = "";
@@ -667,8 +700,16 @@ class payroll_BL_payment {
 		;";
 		$ret = $system_database_manager->executeUpdate($sql, "payroll_initZahlungssplitt");
 		$response["success"] = true;
-		$response["errCode"] = 0;
-		communication_interface::alert("split initialized");
+		$response["errCode"] = 0; 
+
+		$sql = "SELECT * FROM payroll_payment_split WHERE payroll_bank_destination_ID = ".$nextBD_id.";";
+		$ret = $system_database_manager->executeQuery($sql);
+		$splitID = $ret[0]["id"];
+		
+		//communication_interface::alert("split initialized (bankID ".$nextBD_id.", splitID=".$splitID); 
+		
+		communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_UebersichtZahlungssplit', 'empId':".$employeeId.", 'bankID':".$nextBD_id." }); ");		
+		communication_interface::jsExecute("cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$employeeId.", 'bankID':".$nextBD_id." , 'splitID':".$splitID." }); ");
 		return $response;
 	}
 
