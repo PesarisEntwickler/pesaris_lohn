@@ -674,14 +674,16 @@ class employee {
 		///////////////////////////////////////////////////
 		// employee id must be numeric and non-decimal
 		///////////////////////////////////////////////////
+		$response["success"] = true;
+		$response["errCode"] = 999;
+		$response["fieldNames"] = array();
+		$response["tableRows"] = array();
 		if(preg_match( '/^[0-9]{1,9}$/', $id)) {
 		    //TRUE
 		}else{
 			$response["success"] = false;
 			$response["errCode"] = 10;
 			$response["errText"] = "invalid employee id";
-			$response["fieldNames"] = array();
-			$response["tableRows"] = array();
 			return $response;
 		}
 
@@ -706,7 +708,6 @@ class employee {
 				$response["errCode"] = 20;
 				$response["errText"] = "missing mandatory fields in submitted fieldset";
 				$response["fieldNames"] = $arrFieldName;
-				$response["tableRows"] = array();
 				return $response;
 			}
 		}
@@ -758,7 +759,6 @@ class employee {
 			}else if($row["childOf"]!="" && in_array($row["childOf"], $arrTableName)) {
 				$tableset[$row["childOf"]]["fields"][$row["fieldName"]]["properties"] = $row;
 			}
-
 		}
 //error_log("\n\n".print_r($fieldset,true)."\n\n", 3, "/var/log/copronet-application.log");
 //error_log("\n\n".print_r($tableset,true)."\n\n", 3, "/var/log/copronet-application.log");
@@ -776,7 +776,6 @@ class employee {
 			$response["errCode"] = 30;
 			$response["errText"] = "mandatory fields are empty";
 			$response["fieldNames"] = $arrFieldName;
-			$response["tableRows"] = array();
 			return $response;
 		}
 //communication_interface::alert("5***"); //TODO: remove!
@@ -828,9 +827,10 @@ class employee {
 				}
 //			}
 /*
-spezielle felder und sonderfälle:
+spezielle felder und sonderf�lle:
 -> Tabellen
--> Berechnete Werte: Alter, Pensionsdatum, Dienstalter, etc. (Werte gar nicht speichern... stattdessen nach INSERT oder UPDATE ein weiteres SQL-Statement absetzen, womit die Werte berechnet werden)
+-> Berechnete Werte: Alter, Pensionsdatum, Dienstalter, etc. (Werte gar nicht speichern... 
+	stattdessen nach INSERT oder UPDATE ein weiteres SQL-Statement absetzen, womit die Werte berechnet werden)
 -> Mutationen archivieren? Hier oder erst bei Abrechnung/Fixierung?
 */
 		}
@@ -841,7 +841,6 @@ spezielle felder und sonderfälle:
 			$response["errCode"] = 40;
 			$response["errText"] = "validity check failed";
 			$response["fieldNames"] = $arrFieldName;
-			$response["tableRows"] = array();
 			return $response;
 		}
 //error_log("\n".print_r($fieldset,true)."\n", 3, "/var/log/copronet-application.log");
@@ -855,7 +854,6 @@ spezielle felder und sonderfälle:
 				$response["errCode"] = 50;
 				$response["errText"] = "duplicate employee number";
 				$response["fieldNames"] = array("EmployeeNumber");
-				$response["tableRows"] = array();
 				return $response;
 			}
 		}
@@ -875,14 +873,12 @@ spezielle felder und sonderfälle:
 					$response["success"] = false;
 					$response["errCode"] = 500;
 					$response["errText"] = "missing table record id";
-					$response["fieldNames"] = array();
 					$response["tableRows"] = array($tableName, "");
 					return $response;
 				}else if(!preg_match('/^(remove_|new)?([0-9]{1,9})$/', $tableRow["id"], $arrIdSplit)) {
 					$response["success"] = false;
 					$response["errCode"] = 510;
 					$response["errText"] = "invalid table record id";
-					$response["fieldNames"] = array();
 					$response["tableRows"] = array($tableName, $tableRow["id"]);
 				}
 				switch($arrIdSplit[1]) {
@@ -962,13 +958,13 @@ spezielle felder und sonderfälle:
 			$response["success"] = false;
 			$response["errCode"] = 530;
 			$response["errText"] = "mandatory table fields are empty";
-			$response["fieldNames"] = array();
 			$response["tableRows"] = $arrMandatoryErr;
+			//communication_interface::alert(print_r($arrMandatoryErr,true));
 			$arSearch = array("Array", "(", ")", "tblprd");
 			$arReplace = array("Fehlende Informationen:", "", "", "Perioden Tabelle");
 			$err = str_replace($arSearch, $arReplace, print_r($arrValidityErr[0], true));
-			communication_interface::alert($err);
-			$response["success"] = true;			
+			//communication_interface::alert("err530:".$err);
+			$response["success"] = false;			
 			return $response;
 		}
 		if(count($arrValidityErr)>0) {
@@ -977,15 +973,9 @@ spezielle felder und sonderfälle:
 			$response["success"] = false;
 			$response["errCode"] = 540;
 			$response["errText"] = "validity check failed (table content)";
-			$response["fieldNames"] = array();
-			$response["tableRows"] = $arrValidityErr[0];
-			$arSearch = array("Array", "(", ")", "tblprd");
-			$arReplace = array("Inkorrekte Werte in Tabellen-Informationen:", "", "", "Perioden Tabelle");
-			$err = str_replace($arSearch, $arReplace, print_r($arrValidityErr[0], true));
-			communication_interface::alert($err);
-			
-			//communication_interface::alert($response["errText"]."\n".print_r($arrValidityErr[0],true));			
-			$response["success"] = true;//TODO harald !! ---> was ist der Fehler mit dem "table content"
+			$response["tableRows"] = $arrValidityErr;
+			//communication_interface::alert("arrValidityErr:".print_r($arrValidityErr,true));
+			$response["success"] = false;
 			return $response;
 		}
 //error_log("\n".print_r($arrCleanTableRows,true)."\n", 3, "/var/log/copronet-application.log");
@@ -1032,8 +1022,6 @@ spezielle felder und sonderfälle:
 				$response["success"] = false;
 				$response["errCode"] = 666;
 				$response["errText"] = "could not get period start and end date";
-				$response["fieldNames"] = array();
-				$response["tableRows"] = array();
 			}
 			$datePeriodStart = $resDate[0]["datePeriodStart"];
 			$datePeriodEnd = $resDate[0]["datePeriodEnd"];
@@ -1052,8 +1040,6 @@ spezielle felder und sonderfälle:
 			$response["success"] = false;
 			$response["errCode"] = 1;
 			$response["errText"] = "nothing to save";
-			$response["fieldNames"] = array();
-			$response["tableRows"] = array();
 		}
 		/// END: Save "normal" fields
 
@@ -1550,6 +1536,23 @@ spezielle felder und sonderfälle:
 		return $difference;
 	}
 
-
+	public function getEmployeeLabelListe($language, $fieldNameList) {
+		$fieldNames = "'".str_replace(  ","    ,   "','"   , $fieldNameList)."'";//" 'tblprd','tblchld' ";
+		$fieldNames = str_replace("''", "'", $fieldNames);
+		$sprache = "de";
+		if (strlen($language)==2) {
+			$sprache = strtolower($language);
+		}
+		
+		$sql = " 
+SELECT label AS Labels FROM payroll_employee_field_label 
+WHERE language = '".$sprache."'
+AND fieldName IN (".$fieldNames."); 		
+			   ";
+		//communication_interface::alert($sql);
+		$system_database_manager = system_database_manager::getInstance();
+		$res = $system_database_manager->executeQuery($sql);
+		return $res;
+	}
 }
 ?>

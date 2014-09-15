@@ -140,7 +140,7 @@ $textResourceMap["txtZwischenzahltage"] = "Zwischenzahltage";
 $textResourceMap["txtAuszkritInReihenfolge"] = "Die untenstehenden Auszahlungskriterien werden in abgebildeter Reihenfolge verarbeitet";
 $textResourceMap["txtTableHeadersPaymentSplit"] = 
 		"<ul>" .
-			"<li style='width: 40px;'>ZS</li>" .
+			"<li style='width: 50px;'>ZhlSt</li>" .
 			"<li style='width: 260px;'>Bankverbindung/Auszahlung</li>" .
 			"<li style='width: 90px;'>Split-Modus</li>" .
 			"<li style='width: 80px;'>Wert</li>" .
@@ -187,6 +187,8 @@ $textResourceMap["txtNameDesReiters"] = "Name des Reiters";
 $textResourceMap["txtSicherLayoutLoeschen1"] = "Sind Sie sicher, dass Sie das Layout";
 $textResourceMap["txtSicherLayoutLoeschen2"] = "unwiderruflich l&ouml;schen wollen?";
 
+$textResourceMap["txtProblemBei"] = "Problem bei";
+$textResourceMap["txtFehlerBei"] = "Fehler bei";
 
 /*
 ********* CONFIGURATION ***********

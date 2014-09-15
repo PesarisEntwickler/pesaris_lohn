@@ -1,8 +1,20 @@
 Noch offen: 
-[Pkt 1 - TP 2.9.14] "Unverständliche Fehlermeldung im Personalstamm"
-[Pkt 2 - TP 2.9.14] "Splitt Nunez" --> müssen wir noch diskutieren
-[Pkt 4 - TP 2.9.14] "Splitt Jung" --> müssen wir noch diskutieren
+[Pkt 1 Mail 12.9.14] Keine gemischten Währungen im DTA-File
 [Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung  andrucken . Beispiel Nestler Paula"
+
+2014-09-11, 12 & 15
+
+- Spesen sind jetzt default auf OUR
+- Validierung und Lookup von BankenClearing nur auf "CH"-IBAN
+- Wenn ein Split nicht gespeichert wird, wird er wieder eliminiert
+- Validierung auf Prozentfeld (max. 100 %)
+- Nichterfüllbarer Split geht auf Standardbank. Falls es noch weitere Splitt-Anweisungen gibt, werden diese ignoriert. 
+	-->	[Pkt 2 - TP 2.9.14] "Splitt Nunez" ist damit gelöst
+	-->	[Pkt 4 - TP 2.9.14] "Splitt Jung"  ist damit gelöst
+- Im Personalstamm werden nicht nur die fehlerhaften Felder rot hinterlegt, 
+	sondern es gibt jetzt auch eine Meldungsbox mit den Feldern im Klartext  
+	--> [Pkt 1 - TP 2.9.14] "Unverständliche Fehlermeldung im Personalstamm" ist gelöst
+- Umstellung auf DTA TA-836
 
 2014-09-07
 

@@ -178,6 +178,8 @@ class payroll_BL {
 			return $employee->getEmployeeFormList();
 		case 'payroll.getEmployeeFormDetail':
 			return $employee->getEmployeeFormDetail($functionParameters[0]);
+		case 'payroll.getEmployeeLabelListe':
+			return $employee->getEmployeeLabelListe($functionParameters[0],$functionParameters[1]);//$language, $fieldNameList
 		case 'payroll.deleteEmployeeForm':
 			return $employee->deleteEmployeeForm($functionParameters[0]);
 		case 'payroll.getEmployeeDetail':
@@ -196,8 +198,6 @@ class payroll_BL {
 			return $employee->saveEmployeeFilterDetail($functionParameters[0]);
 		case 'payroll.deleteEmployeeFilterDetail':
 			return $employee->deleteEmployeeFilterDetail($functionParameters[0]);
-
-
 
 		case 'payroll.getPayrollAccountList':
 			return $account->getPayrollAccountList();

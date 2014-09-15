@@ -3745,9 +3745,8 @@ function prlVlFldCfgInit() {
 var prlPmtSplt = {};
 
 function prlPmtSpltMainInit() {
-	$('#prlPmtSpltClose').bind('click', function(e) { $('#modalContainer').mb_close(); });
-	//$('#prlPmtSpltNew').bind('click', function(e) { cb('payroll.paymentSplit',{'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':prlPmtSplt.empId, 'bankID':0}); });//'action':'paymentSplitAction_editSplit'
-	$('#prlPmtSpltNew').bind('click', function(e) { cb('payroll.paymentSplit',{'action':'paymentSplitAction_initZahlungssplitt', 'empId':prlPmtSplt.empId, 'zahlstelle':0, 'bankID':0});   $('#modalContainer').mb_close();  });//'action':'paymentSplitAction_editSplit'
+	$('#prlPmtSpltOverviewClose').bind('click', function(e) { $('#modalContainer').mb_close(); });
+	$('#prlPmtSpltOverviewNew').bind('click', function(e) { cb('payroll.paymentSplit',{'action':'paymentSplitAction_initZahlungssplitt', 'empId':prlPmtSplt.empId, 'zahlstelle':0, 'bankID':0});   $('#modalContainer').mb_close();  });//'action':'paymentSplitAction_editSplit'
 	$('#prlPmtSpltSaveOrder').bind('click', function(e) {
 		var r = [];
 		var c = 0;

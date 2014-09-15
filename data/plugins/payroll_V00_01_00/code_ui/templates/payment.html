@@ -10,7 +10,7 @@
 							name= "stdBankDescr"
 							id=   "stdBankDescr"
 							value=""
-							style="width: 120px; font-weight: bold; padding: 2px; background-color: #f2f2f2;"
+							style="width: 140px; font-weight: bold; padding: 2px; background-color: #f2f2f2;"
 							disabled="disabled" 
 					/>
 				</td>
@@ -38,21 +38,21 @@
 			<ul>
 				<wgui:loop name="paymentSplitLoop" varname="paymentSplitList">
 					<li rid='<wgui:loopvar loopname="paymentSplitLoop" varname="id"/>'>
-						<div style='width: 40px;'><wgui:loopvar loopname="paymentSplitLoop" varname="src_bank_label"/></div>
+						<div style='width: 50px;'><wgui:loopvar loopname="paymentSplitLoop" varname="src_bank_label"/></div>
 						<div style='width: 260px;'><wgui:loopvar loopname="paymentSplitLoop" varname="dest_bank_label"/></div>
 						<div style='width: 90px;'><wgui:loopvar loopname="paymentSplitLoop" varname="split_mode"/></div>
 						<div style='width: 80px;'><wgui:loopvar loopname="paymentSplitLoop" varname="amount"/></div>
 						<div style='width: 80px;'><wgui:loopvar loopname="paymentSplitLoop" varname="period"/></div>
-						<div style='width: 60px;'><span class="e"></span><span class="d"></span></div>
+						<div style='width: 50px;'><span class="e"></span><span class="d"></span></div>
 					</li>
 				</wgui:loop name="paymentSplitLoop">
 			</ul>
 			</div>
 		</div>		
 	</div>
-	<button class="PesarisButton" id="prlPmtSpltClose"><wgui:text id="btnClose"/></button>
-	<button class="PesarisButton" id="prlPmtSpltNew"><wgui:text id="btnPlusAdd"/></button>
-	<button class="PesarisButton" id="prlPmtSpltSaveOrder" style="width: 160px;"><wgui:text id="btnReihenfolgespeichern"/>...</button>
+	<button class="PesarisButton" id="prlPmtSpltOverviewClose"><wgui:text id="btnClose"/></button>
+	<button class="PesarisButton" id="prlPmtSpltOverviewNew" style="width: 140px;"><wgui:text id="btnPlusAdd"/></button>
+	<button class="PesarisButton" id="prlPmtSpltSaveOrder" style="width: 200px;"><wgui:text id="btnReihenfolgespeichern"/>...</button>
 </wgui:block name="GUI_paymentSplitOverview">
 
 
@@ -188,17 +188,17 @@
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtBeguenstigter"/></legend>
-					<label for="prlPmtSplt_beneficiary1_line1"><wgui:text id="txtName"         />:</label><input type="text" id="prlPmtSplt_beneficiary1_line1" value="<wgui:var name="beneficiary1_line1"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary1_line2"><wgui:text id="txtAdressZusatz" />:</label><input type="text" id="prlPmtSplt_beneficiary1_line2" value="<wgui:var name="beneficiary1_line2"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary1_line3"><wgui:text id="txtAdresse"      />:</label><input type="text" id="prlPmtSplt_beneficiary1_line3" value="<wgui:var name="beneficiary1_line3"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary1_line4"><wgui:text id="txtPlzOrt"       />:</label><input type="text" id="prlPmtSplt_beneficiary1_line4" value="<wgui:var name="beneficiary1_line4"/>"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line1"><wgui:text id="txtName"         />:</label><input type="text" id="prlPmtSplt_beneficiary1_line1" value="<wgui:var name="beneficiary1_line1"  maxsize="32" />"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line2"><wgui:text id="txtAdressZusatz" />:</label><input type="text" id="prlPmtSplt_beneficiary1_line2" value="<wgui:var name="beneficiary1_line2"  maxsize="32" />"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line3"><wgui:text id="txtAdresse"      />:</label><input type="text" id="prlPmtSplt_beneficiary1_line3" value="<wgui:var name="beneficiary1_line3"  maxsize="32" />"/><br/>
+					<label for="prlPmtSplt_beneficiary1_line4"><wgui:text id="txtPlzOrt"       />:</label><input type="text" id="prlPmtSplt_beneficiary1_line4" value="<wgui:var name="beneficiary1_line4"  maxsize="32" />"/><br/>
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtEndBeguenstigter"/></legend>
-					<label for="prlPmtSplt_beneficiary2_line1"><wgui:text id="txtKonto"        />:</label><input type="text" id="prlPmtSplt_beneficiary2_line1" value="<wgui:var name="beneficiary2_line1"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary2_line2"><wgui:text id="txtName"         />:</label><input type="text" id="prlPmtSplt_beneficiary2_line2" value="<wgui:var name="beneficiary2_line2"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary2_line3"><wgui:text id="txtAdresse"      />:</label><input type="text" id="prlPmtSplt_beneficiary2_line3" value="<wgui:var name="beneficiary2_line3"/>"/><br/>
-					<label for="prlPmtSplt_beneficiary2_line4"><wgui:text id="txtPlzOrt"       />:</label><input type="text" id="prlPmtSplt_beneficiary2_line4" value="<wgui:var name="beneficiary2_line4"/>"/><br/>
+					<label for="prlPmtSplt_beneficiary2_line1"><wgui:text id="txtKonto"        />:</label><input type="text" id="prlPmtSplt_beneficiary2_line1" value="<wgui:var name="beneficiary2_line1"  maxsize="32" />"/><br/>
+					<label for="prlPmtSplt_beneficiary2_line2"><wgui:text id="txtName"         />:</label><input type="text" id="prlPmtSplt_beneficiary2_line2" value="<wgui:var name="beneficiary2_line2"  maxsize="32" />"/><br/>
+					<label for="prlPmtSplt_beneficiary2_line3"><wgui:text id="txtAdresse"      />:</label><input type="text" id="prlPmtSplt_beneficiary2_line3" value="<wgui:var name="beneficiary2_line3"  maxsize="32" />"/><br/>
+					<label for="prlPmtSplt_beneficiary2_line4"><wgui:text id="txtPlzOrt"       />:</label><input type="text" id="prlPmtSplt_beneficiary2_line4" value="<wgui:var name="beneficiary2_line4"  maxsize="32" />"/><br/>
 				</fieldset>
 				<button id="btnInitZahlungssplitt" class="PesarisButton" style="width: 380px; margin: 8px;"><wgui:text id="txtZahlungssplittInit"/></button>
 			</td>
@@ -209,15 +209,15 @@
 						<select id="prlPmtSplt_destination_type">
 							<option value="1"><wgui:text id="txtBank"/></option>
 							<option value="2"><wgui:text id="txtPost"/></option>
-							<option value="3"><wgui:text id="txtCash"/></option>
+<!--						<option value="3"><wgui:text id="txtCash"/></option>	-->
 						</select><br/>
 					<label for="prlPmtSplt_bank_account"><wgui:text id="txtKonto"/>:</label><input type="text" id="prlPmtSplt_bank_account" value="<wgui:var name="bank_account"/>"/><br/>
 <!-- 					<label for="prlPmtSplt_postfinance_account"><wgui:text id="txtPostcheckkonto"/>:</label><input type="text" id="prlPmtSplt_postfinance_account" value="<wgui:var name="postfinance_account"/>"/><br/>	-->
 					<label for="prlPmtSplt_description"><wgui:text id="txtBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value="<wgui:var name="description"/>"/><br/>
-					<label for="prlPmtSplt_bank_swift"><wgui:text id="txtSwiftAdr"/>:</label><input type="text" id="prlPmtSplt_bank_swift" value="<wgui:var name="bank_swift"/>"/><br/>
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtBankLabel"/></legend>
+					<label for="prlPmtSplt_bank_swift"><wgui:text id="txtSwiftAdr"/>:</label><input type="text" id="prlPmtSplt_bank_swift" value="<wgui:var name="bank_swift"/>"/><br/>
 					<label for="prlPmtSplt_beneficiary_bank_line1"><wgui:text id="txtBankName"/>:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line1" value="<wgui:var name="beneficiary_bank_line1"/>"/><br/>
 					<label for="prlPmtSplt_beneficiary_bank_line2"><wgui:text id="txtAdresse"/>:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line2" value="<wgui:var name="beneficiary_bank_line2"/>"/><br/>
 					<label for="prlPmtSplt_beneficiary_bank_line3"><wgui:text id="txtPlzOrt"/>:</label><input type="text" id="prlPmtSplt_beneficiary_bank_line3" value="<wgui:var name="beneficiary_bank_line3"/>"/><br/>
@@ -316,7 +316,7 @@
 		</table>
 	</div>
 	<table style="width: 100%"><tr>
-		<td align="left"><button id="prlPmtSpltClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
+		<td align="left"><button id="btnBankverbindungClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
 		<td align="right">			
 			<button id="btnSaveBankDestinationUndSplit" class="PesarisButton"><wgui:text id="btnSave"/></button></td>
 	</tr></table>
