@@ -344,6 +344,9 @@ class variousFunctions {
 	}
 
 	public function getCurrencyForexRate($curr) {
+		if (strlen(trim($curr)) <1) {
+			$curr = "CHF";
+		}
 		$response = 0;
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT `forex_rate` FROM `payroll_currency` WHERE `core_intl_currency_ID` = '".$curr."' ;", "payroll_getCurrencyForexRate");

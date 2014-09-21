@@ -1384,9 +1384,9 @@ span.edit {
 
 .prlPeriodenFileWrapper { 
 	border:1px solid #999;
-	font-size:12px!important;
-	width: 330px;
-	height: 88px; 
+	font-size:11px!important;
+	width: 350px;
+	height: 115px; 
 	background-color: #F4F4F4;
 	padding: 3px 6px;
 	overflow: auto;

@@ -169,7 +169,6 @@ class employee {
 		$fieldLabels = $system_database_manager->executeQuery("SELECT * FROM `payroll_employee_field_label` WHERE `fieldName`='".addslashes($param["fieldName"])."'", "payroll_getEmployeeFieldDetail");
 
 		$listDef = array();
-
 		if($fieldDef["fieldType"]==4 && $fieldDef["dataSource"]=="payroll_empl_list") {
 			$list = $system_database_manager->executeQuery("SELECT * FROM payroll_empl_list WHERE ListGroup=".$fieldDef["dataSourceGroup"]." LIMIT 1", "payroll_getEmployeeFieldDetail");
 			$listDef["ListGroup"] = $list[0]["ListGroup"];
@@ -556,6 +555,7 @@ class employee {
 			$response["data"] = $result;
 			$response["auxiliaryTables"] = $auxTables;
 		}
+		//communication_interface::alert("getEmployeeDetail:".print_r($response,true));
 		return $response;
 	}
 
@@ -827,14 +827,13 @@ class employee {
 				}
 //			}
 /*
-spezielle felder und sonderfälle:
--> Tabellen
--> Berechnete Werte: Alter, Pensionsdatum, Dienstalter, etc. (Werte gar nicht speichern... 
-	stattdessen nach INSERT oder UPDATE ein weiteres SQL-Statement absetzen, womit die Werte berechnet werden)
--> Mutationen archivieren? Hier oder erst bei Abrechnung/Fixierung?
+		spezielle felder und sonderfälle:
+		-> Tabellen
+		-> Berechnete Werte: Alter, Pensionsdatum, Dienstalter, etc. (Werte gar nicht speichern... 
+			stattdessen nach INSERT oder UPDATE ein weiteres SQL-Statement absetzen, womit die Werte berechnet werden)
+		-> Mutationen archivieren? Hier oder erst bei Abrechnung/Fixierung?
 */
 		}
-		//communication_interface::alert("6***:".count($arrFieldName)); 
 		$arrFieldName = array_unique($arrFieldName); //remove duplicate field names (if any)
 		if(count($arrFieldName)>0) {
 			$response["success"] = false;
@@ -864,6 +863,7 @@ spezielle felder und sonderfälle:
 		$arrMandatoryErr = array();
 		$arrValidityErr = array();
 		$arrCleanTableRows = array();
+		$track = "";
 		foreach($tableset as $tableName=>$tableProperties) {	//looping all tables
 			$arrCleanTableRows[$tableName] = array();
 			foreach($rawFieldData[$tableName] as $tableRow) {	//looping all the submitted table rows
@@ -895,21 +895,32 @@ spezielle felder und sonderfälle:
 					$currentRecID = $arrIdSplit[2];
 					break;
 				}
-				foreach($tableProperties["fields"] as $fieldName=>$fieldProperties) {	//looping all fields in the current table row
+				foreach($tableProperties["fields"] as $fieldName=>$fieldProperties) {	
+				//looping all fields in the current table row
+				
 					$curRawValue = $tableRow[$fieldName];
-					$dbFieldName = str_replace($tableName."_", "", $fieldName); //remove prefix in order to get the proper field name matching the database field name
+					//remove prefix in order to get the proper field name matching the database field name
+					$dbFieldName = str_replace($tableName."_", "", $fieldName); 
+					
 					// checking all submitted fields if they are mandatory
 					if(isset($fieldProperties["properties"]["mandatory"]) && $fieldProperties["properties"]["mandatory"]==1 && trim($curRawValue)=="") {
 						$arrMandatoryErr[] = array($tableName, $tableRow["id"]);
+						$track .= "\n0";
 					} 
 
 					// checking all submitted fields for validity and preparing values for inserting them into the database
 					switch($fieldProperties["properties"]["fieldType"]) {
 					case 1: //Text
 						if($curRawValue!= "" && $fieldProperties["properties"]["regexPattern"]!="") {
-							if(!preg_match($fieldProperties["properties"]["regexPattern"], $curRawValue)) $arrValidityErr[] = array($tableName, $tableRow["id"]);
+							if(!preg_match($fieldProperties["properties"]["regexPattern"], $curRawValue)) {
+								$arrValidityErr[] = array($tableName, $tableRow["id"]);
+								$track .= "\n1a($tableName)";
+							} 
 						}
-						if(strlen($curRawValue) > $fieldProperties["properties"]["maxLength"]) $arrValidityErr[] = array($tableName, $tableRow["id"]);
+						if(strlen($curRawValue) > $fieldProperties["properties"]["maxLength"]) {
+							$arrValidityErr[] = array($tableName, $tableRow["id"]);
+									$track .= "\n1(".$tableName.":".$tableRow["id"].")";
+						} 
 						$currentRow[$dbFieldName] = "'".addslashes($curRawValue)."'";
 						break;
 					case 2: //Checkbox
@@ -917,30 +928,42 @@ spezielle felder und sonderfälle:
 						if($fieldProperties["properties"]["regexPattern"]!="") $regex = $fieldProperties["properties"]["regexPattern"];
 						else $regex = "/^-?[0-9]{1,9}(\.[0-9]{1,6})?$/";
 
-						if(!preg_match($regex, $curRawValue)) $arrValidityErr[] = array($tableName, $tableRow["id"]);
+						if(!preg_match($regex, $curRawValue)) {
+							$arrValidityErr[] = array($tableName, $tableRow["id"]);
+									$track .= "\n3(".$tableName.":".$tableRow["id"].$curRawValue.")";
+						} 
 						$currentRow[$dbFieldName] = addslashes($curRawValue);
 						break;
 					case 4: //Select
-						if($fieldProperties["properties"]["regexPattern"]!="") $regex = $fieldProperties["properties"]["regexPattern"];
-						else $regex = "/^[0-9]{1,9}$/";
-
-						if(!preg_match($regex, $curRawValue)) {
-							$arrValidityErr[] = array($tableName, $tableRow["id"]);
-						}else{
-							if(preg_match("/^[0-9]{1,9}$/", $curRawValue)) {
-								$currentRow[$dbFieldName] = addslashes($curRawValue);
-							}else{
-								$currentRow[$dbFieldName] = "'".addslashes($curRawValue)."'";
+						if($fieldProperties["properties"]["regexPattern"]!="") {
+							$regex = $fieldProperties["properties"]["regexPattern"];	
+						} else {
+							$regex = "/^[0-9]{1,9}$/";
+						}
+						
+						if (strlen($curRawValue) > 0) {
+							if(!preg_match($regex, $curRawValue)) {
+									$arrValidityErr[] = array($tableName, $tableRow["id"]);
+									$track .= "\n4(".$tableName.":".$tableRow["id"].")";
+							} else {
+								if(preg_match("/^[0-9]{1,9}$/", $curRawValue)) {
+									$currentRow[$dbFieldName] = addslashes($curRawValue);
+								}else{
+									$currentRow[$dbFieldName] = "'".addslashes($curRawValue)."'";
+								}
 							}
 						}
 						break;
 					case 5: //Date
 						if(trim($curRawValue)=="") {
 							$currentRow[$dbFieldName] = "'0000-00-00'";
-						}else{
+						} else {
 							if($chkDate->chkDate($curRawValue, 1, $retDate)) {
 								$currentRow[$dbFieldName] = "'".$retDate."'";
-							}else $arrValidityErr[] = array($tableName, $tableRow["id"]);
+							} else {
+								$arrValidityErr[] = array($tableName, $tableRow["id"]);	
+									$track .= "\n5(".$tableName.":".$tableRow["id"]."):".$curRawValue;
+							}
 						}
 						break;
 					}
@@ -949,6 +972,7 @@ spezielle felder und sonderfälle:
 					$currentRow["recModification"] = $currentRecModification;
 					$currentRow["recID"] = $currentRecID;
 					$arrCleanTableRows[$tableName][] = $currentRow;
+					$track .= "\n6".print_r($currentRow, true);
 				}
 			}
 		}
@@ -960,21 +984,17 @@ spezielle felder und sonderfälle:
 			$response["errText"] = "mandatory table fields are empty";
 			$response["tableRows"] = $arrMandatoryErr;
 			//communication_interface::alert(print_r($arrMandatoryErr,true));
-			$arSearch = array("Array", "(", ")", "tblprd");
-			$arReplace = array("Fehlende Informationen:", "", "", "Perioden Tabelle");
-			$err = str_replace($arSearch, $arReplace, print_r($arrValidityErr[0], true));
-			//communication_interface::alert("err530:".$err);
 			$response["success"] = false;			
 			return $response;
 		}
 		if(count($arrValidityErr)>0) {
 //			error_log("\n". date("Ymd-H:i:s arrValidityErr ", time())."INFO ".count($arrValidityErr), 3, "__harald.log");
 //			error_log("\n". date("Ymd-H:i:s arrValidityErr ", time())."INFO ".print_r($arrValidityErr,true), 3, "__harald.log");
+//			communication_interface::alert(count($arrValidityErr)."\ntrack: ".$track."\narrValidityErr:".print_r($arrValidityErr,true));
 			$response["success"] = false;
 			$response["errCode"] = 540;
 			$response["errText"] = "validity check failed (table content)";
 			$response["tableRows"] = $arrValidityErr;
-			//communication_interface::alert("arrValidityErr:".print_r($arrValidityErr,true));
 			$response["success"] = false;
 			return $response;
 		}

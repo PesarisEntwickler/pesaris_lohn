@@ -1,6 +1,24 @@
 Noch offen: 
-[Pkt 1 Mail 12.9.14] Keine gemischten Währungen im DTA-File
-[Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung  andrucken . Beispiel Nestler Paula"
+- [Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung  andrucken . Beispiel Nestler Paula"
+
+2014-09-19
+
+- Validierung Zahlstellen-Währung=Splitt-Auszahlwährung auf GUI Bankverbindung
+- Jetzt auch Auszahlung in USD möglich (USD ist nachgezogen) 
+- Einlesung und Validierung Personalstamm betreffend "Kinderdaten" und "Beschäftigungsdaten" (Fall Farine C.)
+- Nicht-erfüllbare Splitts gehen auf Standardbank des Mitarbeiters
+- Bei "Zahlstelle berücksichtigen, die den Mitarbeitern hinterlegt sind" werden die
+  nicht-erfüllbaren Splitts nur dann der Standardbank des MA zugeführt, 
+  wenn diese auch dieselbe Zahlstelle hinterlegt hat.
+  Sonst bleibt der Rest-Betrag bleiben offen für den nächsten Lauf wo der Benutzer eine Zahlstelle zuvor auswählt.
+
+2014-09-16, 17
+
+- Fremdwährungen werden jetzt separiert in DTA und Journal
+	[Pkt 1 Mail 12.9.14] Keine gemischten Währungen im DTA-File
+- Bankverbindung/Split-Fenster bleibt jetzt stehen, wenn Validierung (> 100%) zuschlägt
+- Wenn Splitt nicht erfüllt wird, wird nun das richtige Bankkonto adressiert
+- Validierung Personalstamm betreffend "Beschäftigungsdaten" gelockert (Fall Farine C.)
 
 2014-09-11, 12 & 15
 
@@ -14,7 +32,7 @@ Noch offen:
 - Im Personalstamm werden nicht nur die fehlerhaften Felder rot hinterlegt, 
 	sondern es gibt jetzt auch eine Meldungsbox mit den Feldern im Klartext  
 	--> [Pkt 1 - TP 2.9.14] "Unverständliche Fehlermeldung im Personalstamm" ist gelöst
-- Umstellung auf DTA TA-836
+- Umstellung auf DTA TA-836 für alle Zahlungen
 
 2014-09-07
 

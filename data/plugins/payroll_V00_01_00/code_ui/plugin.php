@@ -18,7 +18,7 @@ class payroll_UI {
 			$bankID = $functionParameters[0]["bankID"];
 			$empId = $functionParameters[0]["empId"];
 			$dest = blFunctionCall('payroll.auszahlen.getDestinationBankAccount', $empId, $bankID);
-			$checkString = $dest["bank_account"].$dest["beneAddress1"];
+			$checkString = $dest["bank_account"].$dest["beneAddress1"].$dest["beneEndbeguenst2"];
 			//communication_interface::alert(print_r($dest,true));
 			if (strlen($checkString) < 2) {
 				communication_interface::alert("Es wurden keine Eingaben gespeichert.\nDer Splitt wird rueckgaengig gemacht.");
@@ -160,8 +160,8 @@ class payroll_UI {
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenHistory"));
 			$objWindow->windowIcon("auszahlen32.png");
-			$objWindow->windowWidth(600);
-			$objWindow->windowHeight(240); 
+			$objWindow->windowWidth(650);
+			$objWindow->windowHeight(280); 
 			$objWindow->modal(true);	
 			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenHistoryWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 			$objWindow->showWindow();
@@ -249,7 +249,7 @@ class payroll_UI {
 				$data["modus"] = "mitarbeiterdatenBearbeiten";
 				$objWindow = new wgui_window("payroll", "employeeForm");
 				$title = $objWindow->getText("txtMitarbeiterdatenBearbeiten");
-				$objWindow->windowTitle($title); //Mitarbeiterdaten erfassen / aendern
+				$objWindow->windowTitle($title); 
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(830);
 				$objWindow->windowHeight(510);
@@ -326,7 +326,6 @@ class payroll_UI {
 								case 110: //Auxiliary tables
 									$arrFieldsOfInterest = array();
 									$greatRowCollector = array();
-//									$arrDateFields = array();
 									$curAuxField = 0;
 									$arrFieldsOfInterest[] = "id";
 									foreach($fieldDefRecs["data"] as $childRow) {
@@ -360,7 +359,6 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#prlVlTitle').html('* NEUERFASSUNG *');");
 			}
 			communication_interface::jsExecute("prlVlRid = ".$employeeID.";"); //set record ID of current employee (on client side)  
-			//communication_interface::jsExecute("$('#btnBankverbindungUndSplitt').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_BankverbindungBearbeiten', 'empId':".$employeeID.", 'bankID':".$bankdestinationID." }); });");
 			communication_interface::jsExecute("$('#btnBankverbindungUndSplitt').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_UebersichtZahlungssplit', 'empId':".$employeeID.", 'bankID':".$bankdestinationID." }); });");
 			break;
 		case 'payroll.prlVlLoadFormData':
@@ -371,7 +369,6 @@ class payroll_UI {
 			//communication_interface::alert("1*** \nrid:".$functionParameters[0]["rid"]."\ndata:".str_replace(",", "\n", $s).""); //TODO: remove!
 			$ret = blFunctionCall('payroll.saveEmployeeDetail', $functionParameters[0]["rid"], $functionParameters[0]["data"]);
 			if($ret["success"]) {
-				//communication_interface::jsExecute("$('#employeeForm').mb_close();");
 
 				//HIER WERDEN DATEN NEU IN UEBERSICHTSTABELLE GELADEN. 
 				//DAS IST NOCH NICHT OPTIMAL GELOEST, DA *ALLE* DATEN 
@@ -399,6 +396,8 @@ class payroll_UI {
 				communication_interface::jsExecute("prlPsoDataView.endUpdate();");
 				communication_interface::jsExecute("prlPsoDataView.reSort();");
 				communication_interface::jsExecute("prlPsoGrid.invalidate();");
+				
+				communication_interface::jsExecute("  $('#employeeForm').mb_close();  ");  
 
 			}else{
 				//communication_interface::alert("count f:".count($ret['fieldNames']).", count t:".count($ret['tableRows'])."\n".print_r($ret,true));
@@ -536,7 +535,7 @@ class payroll_UI {
 								$data["globalChecked"] = "";
 							}
 							$objWindow = new wgui_window("payroll", "infoBox");
-							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").".");
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten")." - ".$data["LayoutName"]);
 							$objWindow->windowWidth(500);
 							$objWindow->windowHeight(225);
 							$objWindow->loadContent("employees",$data,"employeeEditFormDlg2");
@@ -563,7 +562,7 @@ class payroll_UI {
 						case 'showEditor':
 							$data = array();
 							$objWindow = new wgui_window("payroll", "employeeForm");
-							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").";"); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten")." - ".$data["LayoutName"]); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("employee-edit32.png");
 							$objWindow->windowWidth(820); //710
 							$objWindow->windowHeight(550); //470
@@ -590,8 +589,6 @@ class payroll_UI {
 							break;
 						}
 					}
-//					communication_interface::alert($functionParameters[0]["w"]."/".$functionParameters[0]["id"]);
-//					communication_interface::jsExecute('$("#modalContainer").mb_close();');
 					break;
 				}
 			}
@@ -1632,11 +1629,11 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			communication_interface::jsExecute('prlCalcOvColumns = [ {id: "EmployeeNumber", name: "Pers.Nr.", field: "EmployeeNumber", sortable: true, resizable: true, width: 100},' .
 																	'{id: "Lastname", name: "Nachname", field: "Lastname", sortable: true, resizable: true},' .
 																	'{id: "Firstname", name: "Vorname", field: "Firstname", sortable: true, resizable: true},' .
-																	'{id: "Sex", name: "m/w", field: "Sex", sortable: true, width: 40, cssClass: "txtCenter"},' .
+																	'{id: "Sex", name: "m/w", field: "Sex", sortable: true, width: 50, cssClass: "txtCenter"},' .
 																	'{id: "ProcStatus", name: "Status", field: "ProcStatus", sortable: true, resizable: true},' .
-																	'{id: "grossSalary", name: "Bruttolohn", field: "grossSalary", sortable: true, resizable: true, cssClass: "txtRight", formatter: ' .
+																	'{id: "grossSalary", name: "Bruttolohn", field: "grossSalary", sortable: false, resizable: true, cssClass: "txtRight", formatter: ' .
 																			'function (row, cell, value, columnDef, dataContext) { return $.aafwFormatNumber(value,{aSep: "\'",aDec: "."}); }},' .
-																	'{id: "netSalary", name: "Nettolohn", field: "netSalary", sortable: true, resizable: true, cssClass: "txtRight", formatter: ' .
+																	'{id: "netSalary", name: "Nettolohn", field: "netSalary", sortable: false, resizable: true, cssClass: "txtRight", formatter: ' .
 																			'function (row, cell, value, columnDef, dataContext) { return $.aafwFormatNumber(value,{aSep: "\'",aDec: "."}); }},' .
 																	'{id: "payout", name: "Auszahlung", field: "payout", sortable: true, resizable: true, cssClass: "txtRight", ' .
 																	'formatter: function (row, cell, value, columnDef, dataContext) { return $.aafwFormatNumber(value,{aSep: "\'",aDec: "."}); }}];'); 
@@ -1699,7 +1696,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				$objWindow->windowTitle($objWindow->getText("txtAuszahlungErstellen").": ".$PeriodeDieserMonat);
 				$objWindow->windowIcon("auszahlen32.png");
 				$objWindow->windowWidth(800); 
-				$objWindow->windowHeight(405); 
+				$objWindow->windowHeight(410); 
 				$objWindow->modal(true);	
 				$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenGenerateWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
 				$objWindow->showWindow();
@@ -3240,20 +3237,10 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 						communication_interface::alert("IBAN inkorrekt [CH12 2345 3456 4567 5678]");
 					}
 				} else {
-					//communication_interface::jsExecute("$('#prlPmtSplt_description').val('');");                                        
-
-					communication_interface::jsExecute("$('#prlPmtSplt_bank_swift').val('');");                                        
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line1').val('');");
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line2').val('');");                                   
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line3').val('');");
-
-					communication_interface::jsExecute("$('#prlPmtSplt_bank_swift').attr('disabled',false);");                                        
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line1').attr('disabled',false);");
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line2').attr('disabled',false);");                                   
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary_bank_line3').attr('disabled',false);");
-
-					communication_interface::jsExecute("$('#prlPmtSplt_beneficiary2_line1').css('backgroundColor','#ffacac');   ");
-					communication_interface::alert("IBAN inkorrekt (< 19 Stellen)");
+					if (strlen($IBAN) > 0)  {
+						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary2_line1').css('backgroundColor','#ffacac');   ");
+						communication_interface::alert("IBAN inkorrekt (< 19 Stellen)");
+					}
 				}
 				break;
 
@@ -3994,6 +3981,9 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		if($mysqlDate=="0000-00-00") return "";
 		$newDateArr = array("","","");
 		$fragments = explode("-", $mysqlDate);
+		if (count($fragments) < 2){//Kein Datum der Form yyyy-mm-dd
+			return $mysqlDate;
+		}
 		$dateformat_medium = session_control::getSessionSettings("CORE", "dateformat_medium");
 		switch(preg_replace("/[-\/.]+/", "", str_replace("%", "", strtoupper( $dateformat_medium )))) {
 		case 'YMD':
@@ -4016,8 +4006,10 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		}
 		if(strpos($dateformat_medium, ".") !== false) return implode(".",$newDateArr);
 		else if(strpos($dateformat_medium, "/") !== false) return implode("/",$newDateArr);
-
-		return implode("-",$newDateArr);
+		
+		$ret = implode("-",$newDateArr);
+		//if (strlen($ret) == 0) $ret=$mysqlDate;
+		return $ret;
 	}
 
 	private function getDateRegexPattern() {

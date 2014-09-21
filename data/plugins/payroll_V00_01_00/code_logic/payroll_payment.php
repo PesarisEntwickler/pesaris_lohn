@@ -192,6 +192,26 @@ class payroll_BL_payment {
 		//communication_interface::alert("saveBankDestinationUndSplit:\n param:".print_r($param, true));
 		require_once('payroll_auszahlen.php');
 		$auszahlen = new auszahlen();	
+		
+		communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#fff'); ");						
+		communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#fff'); ");										
+		if ($param["payroll_currency_ID"] != "CHF") {
+			if ($param["selectedZahlstelle"] == "0") {
+				communication_interface::alert("Standard-Zahlstelle ist kein ".$param["payroll_currency_ID"]."-Konto!");
+				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
+				communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
+				return false;
+			} else {
+				$zahlstelle = $auszahlen->getZahlstelle($param["selectedZahlstelle"]);
+				if ($zahlstelle["currency"] != $param["payroll_currency_ID"]) {
+					communication_interface::alert("Zahlstellen-Waehrung (".$zahlstelle["currency"].") ist nicht die Waehrung des Auszahl-Splitts (".$param["payroll_currency_ID"].")");
+					communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
+					communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
+					return false;
+				}
+			}			
+		}
+		
 		$return = 0;
 		$paramBankDest = array();
 		$paramSplitTab = array();
@@ -275,6 +295,9 @@ class payroll_BL_payment {
 		if ($hasSplit) {
 			//communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamSplitTab:".print_r($paramSplitTab, true));
 			$splitRes = $this->savePaymentSplitDetail($paramSplitTab);	
+			if ($splitRes["success"] == false) {
+				return false;
+			}
 		}
 		$bankDestRes = $this->saveBankDestinationDetail($paramBankDest);
 		$return = intval($bankDestRes["errCode"]);

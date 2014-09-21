@@ -54,7 +54,7 @@ class auszahlen {
 					);		 
 	}
 	
-	public function getZahlstelle($ZahlstellenID) {
+	public function getZahlstelle($ZahlstellenID) { 
 		$system_database_manager = system_database_manager::getInstance();
 		$result_bank_source = $system_database_manager->executeQuery("" .
 				"SELECT * FROM  " .
@@ -136,7 +136,7 @@ class auszahlen {
 			WHERE payroll_period_ID=".$periodID." 			
 			;"); 
 		$nr = $this->deleteFilesFromActualPeriod();
-		communication_interface::alert("- Auszahlungssdaten der Periode sind zurueckgesetzt.\n- Die dta- und pdf-Dateien sind geloescht.");
+		//communication_interface::alert("- Auszahlungssdaten der Periode sind zurueckgesetzt.\n- Die dta- und pdf-Dateien sind geloescht.");
 		return true;
 	}
 	
@@ -399,20 +399,21 @@ class auszahlen {
 		}
 		if (strlen(trim($standardBank)) > 0) {
 			if ($standardBank == "Y") {
-				$addOnClause = " AND is_standard_bank = 'Y' ";
+				$addOnClause .= " AND is_standard_bank = 'Y' ";
 			} else {
-				$addOnClause = " AND is_standard_bank <> 'Y' ";
+				$addOnClause .= " AND is_standard_bank <> 'Y' ";
 			}
 		}
-		$system_database_manager = system_database_manager::getInstance();
-		$result_bank_destination = $system_database_manager->executeQuery("				
+		$sql = "				
 			SELECT * FROM
 			 payroll_bank_destination
 			WHERE payroll_employee_ID = ".$employeeID."
 			".$addOnClause." 
 			ORDER BY destination_type, id 
 			LIMIT 1 
-			;"); 				
+			;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result_bank_destination = $system_database_manager->executeQuery($sql); 				
 		$retArray['bank_id'] = "";
 		$retArray['bank_account'] = "";
 		$retArray['beneAddress1'] = "";
@@ -504,56 +505,52 @@ class auszahlen {
 		return $retArray;
 	}
 	
-	public function calcSplitAmount($splitMode, $splitValue, $availAmt, $splittWaehrungEmployee, $zahlstellenWaehrung, $employee_ID ,$account_ID) {
+	public function calcSplitAmount($splitMode, $splitValue, $availAmt, $splitPayCurrency, $zahlstellenWaehrung, $employee_ID ,$account_ID) {
 
 		$payAmount = 0;
 		$wechselkursFremdZuCHF = 1;
 		//$splitValue        : ist der Betrag, der die Splitt-Tabelle für den hier aktuellen Split hergibt
 		//                     dieser ist aber unterschiedlich je nach split_mode
+		//						- bei split_mode = 1 --> Lohnart
+		//						- bei split_mode = 2 --> Prozente
+		//						- bei split_mode = 3 --> Betrag (in CHF oder EUR oder USD)
 		//$availAmt			 : ist der Rest, der man jetzt noch auszahlen kann
 		
 		$Waehrung = "CHF";
-		if ($Waehrung != $splittWaehrungEmployee) {
-			$Waehrung = $splittWaehrungEmployee;
+		if ($Waehrung != $splitPayCurrency) {
+			$Waehrung = $splitPayCurrency;
 		}
 		
-		if(floatval($availAmt) > 0 && floatval($splitValue) <> 0){	
-			switch ( $Waehrung ) {
-				case "EUR":
-					$wechselkursFremdZuCHF = floatval(blFunctionCall("payroll.getCurrencyForexRate", "EUR"));
-				break;
-				case "USD":
-					$wechselkursFremdZuCHF = floatval(blFunctionCall("payroll.getCurrencyForexRate", "USD"));
-				break;
-			}//end switch ( $Waehrung )
+		switch ( $Waehrung ) {
+			case "EUR":
+				$wechselkursFremdZuCHF = floatval(blFunctionCall("payroll.getCurrencyForexRate", "EUR"));
+			break;
+			case "USD":
+				$wechselkursFremdZuCHF = floatval(blFunctionCall("payroll.getCurrencyForexRate", "USD"));
+			break;
+		}//end switch ( $Waehrung )
 
-			switch ( $splitMode ) {
-				case 3://Betrag (im $splitValue steht der Auszahlungssbetrag)
-					$payAmount = floatval($splitValue);
-					break;				
-				case 2: //Prozente (im $splitValue steht die ProzenteZahl)
-					//ein $splitValue="50.00" wird als 50% interpretiert
-					$payAmount = floatval($splitValue) / 100 * floatval($availAmt);
-					break;				
-				case 1://Nach Lohnart
-					//hier ist der $splitValue als das Maximum zu verstehen, 
-					//was man auszahlen kann (bezüglich dieser Lohnart)
-					//--> man muss in der Calculation nachsehen, 
-					//ob im Lohnart-Konto was drin steht und das Maximum bestimmen
-					$maxLohnartAmount = $this->getCurrentPeriodAccountAmount($account_ID, $employee_ID);
-					if($maxLohnartAmount <= 0){
-						$maxLohnartAmount = floatval($splitValue);//max Auszahlung gemäss Splitt-Tabelle
-					} 
-					$payAmount = $maxLohnartAmount;	
-					break;				
-			}//end switch ( $splitMode )
+		switch ( $splitMode ) {
+			case 3://Betrag (im $splitValue steht der Auszahlungssbetrag)
+				$payAmount = floatval($splitValue);
+				break;				
+			case 2: //Prozente (im $splitValue steht die ProzenteZahl)
+				//ein $splitValue="50.00" wird als 50% interpretiert
+				$payAmount = floatval($splitValue) / 100 * floatval($availAmt);
+				break;				
+			case 1://Nach Lohnart
+				//hier ist der $splitValue als das Maximum zu verstehen, 
+				//was man auszahlen kann (bezüglich dieser Lohnart)
+				//--> man muss in der Calculation nachsehen, 
+				//ob im Lohnart-Konto was drin steht und das Maximum bestimmen
+				$maxLohnartAmount = $this->getCurrentPeriodAccountAmount($account_ID, $employee_ID);
+				if($maxLohnartAmount <= 0){
+					$maxLohnartAmount = floatval($splitValue);//max Auszahlung gemäss Splitt-Tabelle
+				} 
+				$payAmount = $maxLohnartAmount;	
+				break;				
+		}//end switch ( $splitMode )
 			
-		}
-		//wenn aber weniger zur Verfügunjg steht, 
-		//weil schon ein Teil mit vorherigem Splitt ausbetzahlt wurde		
-		if( floatval($availAmt) < $payAmount ) {
-			$payAmount = floatval($availAmt);//das wäre dann der Rest
-		}		
 		$payAmountForeignCurrency   = $payAmount;
 		$payAmountSystemCurrencyCHF = $this->rundungAuf5Rappen($payAmountForeignCurrency * $wechselkursFremdZuCHF);
 		
