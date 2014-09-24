@@ -194,22 +194,22 @@ class payroll_BL_payment {
 		$auszahlen = new auszahlen();	
 		
 		communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#fff'); ");						
-		communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#fff'); ");										
+		communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#fff'); ");	
+											
 		if ($param["payroll_currency_ID"] != "CHF") {
-			if ($param["selectedZahlstelle"] == "0") {
+			if ($param["selectedZahlstelle"] == "0") {//Standard-Zahlstelle ist ein CHF-Konto
 				communication_interface::alert("Standard-Zahlstelle ist kein ".$param["payroll_currency_ID"]."-Konto!");
 				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
 				communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
 				return false;
-			} else {
-				$zahlstelle = $auszahlen->getZahlstelle($param["selectedZahlstelle"]);
-				if ($zahlstelle["currency"] != $param["payroll_currency_ID"]) {
-					communication_interface::alert("Zahlstellen-Waehrung (".$zahlstelle["currency"].") ist nicht die Waehrung des Auszahl-Splitts (".$param["payroll_currency_ID"].")");
-					communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
-					communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
-					return false;
-				}
-			}			
+			}
+		}
+		$zahlstelle = $auszahlen->getZahlstelle($param["selectedZahlstelle"]);
+		if ($param["selectedZahlstelle"] != $zahlstelle["currency"]) {
+			communication_interface::alert("Zahlstellen-Waehrung (".$zahlstelle["currency"].") ist nicht die Waehrung des Auszahl-Splitts (".$param["payroll_currency_ID"].")");
+			communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
+			communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
+			return false;
 		}
 		
 		$return = 0;
@@ -569,7 +569,7 @@ class payroll_BL_payment {
 
 		$system_database_manager = system_database_manager::getInstance();
 		foreach($updateSQL as $sql) $system_database_manager->executeUpdate($sql, "payroll_savePaymentSplitOrder");
-		communication_interface::alert("order saved");
+		//communication_interface::alert("order saved");
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;
@@ -696,7 +696,7 @@ class payroll_BL_payment {
 		$hasSplit = $this->getPaymentSplitList($employeeId);
 		$system_database_manager = system_database_manager::getInstance();
 		if(count($hasSplit) <= 0) {
-			communication_interface::alert("hat keine SplitRow");
+			//communication_interface::alert("hat keine SplitRow");
 		} else {
 			//wenn eine Splitt-Row existiert, dann muss es auch eine BankDest-Row geben
 			//diese wird dann kopiert

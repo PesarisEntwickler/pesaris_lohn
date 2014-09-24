@@ -126,20 +126,6 @@ class payroll_UI {
 			$absDataPath = $aafwConfig["paths"]["plugin"]["customerDir"].$db_name."/".$aktuellePeriode4ListingDir."/";
 
 			$data["PeriodenFiles"] = array();
-//			foreach($filelist as $row) {
-//				if(strtolower(substr($row,-4))==".pdf") {
-//					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
-//					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"pdf", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
-//					copy($absDataPath.$row, $absWebPath.$technFilename); 
-//				} 
-//			}
-//			foreach($filelist as $row) {
-//				if(strtolower(substr($row,-4))==".dta") {
-//					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
-//					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>"dta", "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
-//					copy($absDataPath.$row, $absWebPath.$technFilename); 
-//				} 
-//			}
 			foreach($filelist as $row) {
 				if(strtolower(substr($row,-4))==".dta"  ||  strtolower(substr($row,-4))==".pdf"  ||  strtolower(substr($row,-4))==".txt") {
 					$fnArr = explode(".", $row);
@@ -148,27 +134,16 @@ class payroll_UI {
 					copy($absDataPath.$row, $absWebPath.$technFilename); 
 				} 
 			}
-//			foreach($filelist as $row) {
-//				if(strtolower(substr($row,-4))!=".dta"  ||  strtolower(substr($row,-4))!=".pdf"  ||  strtolower(substr($row,-4))!=".txt") {
-//					$fnArr = explode(".", $row);
-//					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
-//					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>$fnArr[1], "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
-//					copy($absDataPath.$row, $absWebPath.$technFilename); 
-//				} 
-//			}
 		
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenHistory"));
 			$objWindow->windowIcon("auszahlen32.png");
 			$objWindow->windowWidth(650);
-			$objWindow->windowHeight(280); 
+			$objWindow->windowHeight(300); 
 			$objWindow->modal(true);	
 			$objWindow->loadContent("auszahlen",$data,"wguiBlockAuszahlenHistoryWindow"); //Template-Datei, zu uebergebende Daten , Template-Blocks
-			$objWindow->showWindow();
-			
+			$objWindow->showWindow();			
 			communication_interface::jsExecute("prlAuszahlenHistoryWindowInit();");
-			
-			//communication_interface::alert("fertig"); 
 			break;
 		case 'payroll.prlPsoEmployeeOverview':
 
@@ -179,8 +154,6 @@ class payroll_UI {
 			$objWindow->windowWidth(850); //750
 			$objWindow->windowHeight(550); //450
 			$objWindow->dockable(true);
-//			$objWindow->buttonMaximize(true);
-//			$objWindow->resizable(true);
 			$objWindow->fullscreen(true);
 			$objWindow->loadContent("employees",$data,"employeeOverview");
 			$objWindow->addEventFunction_onResize("$('#gridEmplOv').height( $('#employeeOverview .o').height() - 60 );");
@@ -1226,8 +1199,7 @@ class payroll_UI {
 
 			$sectionID = $functionParameters[0]["section"];
 			if(!isset($sectionCfg[$sectionID])) {
-				communication_interface::alert("payroll.ConfigEditFormSave ".print_r($functionParameters[0],true));
-//				communication_interface::alert("Diese Funktion ist noch nicht aktiv");
+				communication_interface::alert("Diese Funktion ist noch nicht aktiv\n\npayroll.ConfigEditFormSave ".print_r($functionParameters[0],true));
 				break;
 			}
 
@@ -1276,15 +1248,12 @@ class payroll_UI {
 					}
 				}
 			} else {
-communication_interface::alert("[1219] Error: ".$ret["errText"]." ");
+				//communication_interface::alert("[1219] Error: ".$ret["errText"]." ");
 				communication_interface::jsExecute("$('input[id^=\"prlFormCfg_\"], select[id^=\"prlFormCfg_\"]').css('background-color','');");
 				foreach($ret["fieldNames"] as $fieldName) {
 					$fieldName = isset($sectionCfg[$sectionID]["fieldNameTransl"][$fieldName]) ? $sectionCfg[$sectionID]["fieldNameTransl"][$fieldName] : $fieldName;
 					communication_interface::jsExecute("$('#prlFormCfg_".$fieldName."').css('background-color','#f88');");
 				}
-//				foreach($ret["fieldNames"] as $fieldName) {
-//					 communication_interface::alert($fieldName);
-//				}
 			}
 			break;
 		case 'payroll.ConfigEditFormDelete':
@@ -1359,7 +1328,6 @@ communication_interface::alert("[1219] Error: ".$ret["errText"]." ");
 				communication_interface::jsExecute("$('#prlFormCfgCancel').bind('click', function(e) { $('#modalContainer').mb_close(); });");
 				break;
 			case 2: //dateiupload abgeschlossen... Tarifdaten importieren
-//				communication_interface::alert("gruesse von step 2");
 //				communication_interface::alert(print_r($functionParameters[0],true));
 				if($functionParameters[0]["success"]) {
 					$fm = new file_manager();
@@ -2020,7 +1988,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 						communication_interface::jsExecute("prlCalcFinDATA = {'payroll_year_ID':[ ".implode(",",$yearList)." ],'major_period':[ ".implode(",",$prdList)." ],".implode(",",$dateList).",'FwdEmpl':1,'FwdData':1,'equalDates':".(session_control::getSessionSettings("payroll", "finalizeEqualDates")!="" ? session_control::getSessionSettings("payroll", "finalizeEqualDates") : 0)."};");
 						communication_interface::jsExecute("prlCalcFinCFG = {'chkDate':".$this->getDateRegexPattern()."};");
 						communication_interface::jsExecute("prlCalcFinInit();");
-					}//else communication_interface::alert("no success");
+					}//else 
 				}
 				break;
 			case 1003: //Hilfsfunktion zu 'case 3': Jahres-Wechsel
@@ -2076,7 +2044,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				if(count($functionParameters[0]["messages"])!=0) {
 					$noticeList = blFunctionCall('payroll.savePayslipNotifications', array("payroll_period_ID"=>$functionParameters[0]["payroll_period_ID"], "messages"=>$functionParameters[0]["messages"]));
 					if(!$noticeList["success"]) {
-						communication_interface::alert("payroll.prlCalcOvSettings notif ".$attimeList["errText"]." (error code: ".$attimeList["errCode"].")");
+						communication_interface::alert("payroll.prlCalcOvSettings not if ".$attimeList["errText"]." (error code: ".$attimeList["errCode"].")");
 						break;
 					}
 				}
@@ -2963,7 +2931,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				if($res["success"]) {
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
 				}else{
-					communication_interface::alert("error");
+					communication_interface::alert("error payroll.saveCurrencyList");
 				}
 				break;
 			}
@@ -2975,7 +2943,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				if($res["success"]) {
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
 				}else{
-					communication_interface::alert($res["errText"]);
+					communication_interface::alert("payroll.copyPayrollAccount:".$res["errText"]);
 				}
 			}else{
 				$objWindow = new wgui_window("payroll", "infoBox");
@@ -3234,12 +3202,12 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$land = substr($IBAN,0,2);
 					if (intval($land) > 0) {//Beginnt mit einer Zahl
 						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary2_line1').css('backgroundColor','#ffacac');   ");
-						communication_interface::alert("IBAN inkorrekt [CH12 2345 3456 4567 5678]");
+						communication_interface::alert("IBAN inkorrekt [CH12 2345 3456 4567 5678 9]");
 					}
 				} else {
 					if (strlen($IBAN) > 0)  {
 						communication_interface::jsExecute("$('#prlPmtSplt_beneficiary2_line1').css('backgroundColor','#ffacac');   ");
-						communication_interface::alert("IBAN inkorrekt (< 19 Stellen)");
+						communication_interface::alert("IBAN inkorrekt? (< 19 Stellen)");
 					}
 				}
 				break;
@@ -3573,7 +3541,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				break;
 
 			default: //case 'payroll.paymentSplit' action:'?'
-				communication_interface::alert("case payroll.paymentSplit\n Unterfunktion nicht gefunden\nAction=[".$functionParameters[0]["action"]."]");
+				communication_interface::alert("case payroll.paymentSplit\n Unterfunktion ?\nAction=[".$functionParameters[0]["action"]."]");
 				break;
 			}	
 		default:

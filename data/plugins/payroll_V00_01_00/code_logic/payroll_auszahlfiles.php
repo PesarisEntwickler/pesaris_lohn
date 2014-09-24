@@ -839,7 +839,7 @@ class auszahlfiles {
 				$AuftraggeberAdr3 = "";					
 				if (strlen($ZahlstelleL4) > 1) { $AuftraggeberAdr3 = $ZahlstelleL4; }	
 				if (strlen($ZahlstelleL3) > 1) { $AuftraggeberAdr2 = $ZahlstelleL3; }	
-				if (strlen($ZahlstelleL2) > 1) { $AuftraggeberAdr2 = $AuftraggeberAdr2." ".$ZahlstelleL2; }	
+				if (strlen($ZahlstelleL2) > 1) { $AuftraggeberAdr2 = $ZahlstelleL2." ".$AuftraggeberAdr2; }	
 				$AuftraggeberAdr1 = $ZahlstelleL1;
 				if (strlen($AuftraggeberAdr2)>35) {
 					$AuftraggeberAdr2 = substr($AuftraggeberAdr2,0,35);
@@ -852,6 +852,8 @@ class auszahlfiles {
 						.str_pad($AuftraggeberAdr3, 35)
 						.str_pad(" ",9)
 					, 0, 128);	
+communication_interface::alert("setDTAZeileTyp836()\n".$TA836);					
+					
 				//Segment 03 (Bank)
 					
 				$bankBeneficiary1 = " ";
