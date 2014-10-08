@@ -3,6 +3,8 @@ class payroll_BL {
 
 	public function sysListener($functionName, $functionParameters) {
 
+		//communication_interface::alert("code_ui  functionsName:".$functionName."\n".print_r($functionParameters,true));
+
 		require_once('payroll_various_functions.php'); 
 		$variousFunctions = new variousFunctions();
 					
@@ -70,11 +72,17 @@ class payroll_BL {
 		case 'payroll.auszahlen.getPaymentSplit':
 			return $auszahlen->getPaymentSplit($functionParameters[0],$functionParameters[1],$functionParameters[2],$functionParameters[3],$functionParameters[4]);//=$employeeID, $bankID, $Zahlstelle, $processing_order, LIMIT 1
 		case 'payroll.auszahlen.getEmplFromTrackingTable':
-			return $auszahlen->getEmplFromTrackingTable($functionParameters[0]);
+			return $auszahlen->getEmplFromTrackingTable();
+		case 'payroll.auszahlen.getUncompleteEmplFromTrackingTable':
+			return $auszahlen->getUncompleteEmplFromTrackingTable();
+		case 'payroll.auszahlen.getUncompleteEmplNamesFromTrackingTable':
+			return $auszahlen->getUncompleteEmplNamesFromTrackingTable();
 		case 'payroll.auszahlen.initTrackingTable':
 			return $auszahlen->initTrackingTable();
 		case 'payroll.auszahlen.truncateTrackingTable':
 			return $auszahlen->truncateTrackingTable();
+		case 'payroll.auszahlen.truncateEffectifPayoutTable':
+			return $auszahlen->truncateEffectifPayoutTable();
 		case 'payroll.auszahlen.setAmountAvailableTrackingTable':
 			return $auszahlen->setAmountAvailableTrackingTable($functionParameters[0],$functionParameters[1],$functionParameters[2],$functionParameters[3],$functionParameters[4]);//$periodeID, $employeeID, $splitID, $processingOrder, $newAmountAvalable
 		case 'payroll.auszahlen.getAmountAvailableFromTrackingTable':
@@ -346,6 +354,7 @@ class payroll_BL {
 					$uid = session_control::getSessionInfo("id");
 					$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_ID`=".$uid, "payroll_calculate");
 					$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_change_mng`(`core_user_ID`,`numID`) SELECT ".$uid.",`payroll_employee_ID` FROM `payroll_period_employee` WHERE `payroll_period_ID`=".$payrollPeriodID." AND `processing`!=0", "payroll_calculate");
+					//communication_interface::alert("Lohnabrechnung");
 					return $reports->Payslip(array("payroll_period_ID"=>$payrollPeriodID));
 				}
 			break;

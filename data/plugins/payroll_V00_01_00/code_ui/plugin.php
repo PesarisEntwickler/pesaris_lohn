@@ -30,7 +30,8 @@ class payroll_UI {
 			$periodID = blFunctionCall('payroll.auszahlen.getActualPeriodID');
 			$payroll_period = blFunctionCall('payroll.auszahlen.resetActualPeriodenAuszahlFlags', $periodID);
 			$reset = blFunctionCall('payroll.auszahlen.initTrackingTable');
-			
+			blFunctionCall('payroll.auszahlen.truncateEffectifPayoutTable');
+				
 			communication_interface::jsExecute(" cb('payroll.prlCalcOvProcess',{'functionNumber':5}); ");
 			
 			break; 
@@ -1673,6 +1674,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				break;
 			case 1: //Lohn berechnen
 				blFunctionCall('payroll.calculate');
+				blFunctionCall('payroll.auszahlen.truncateEffectifPayoutTable');
 				$this->prlCalcOvPopulateTable(array("updateTable"=>true));
 				break;
 			case 4: //Fixieren
@@ -3493,19 +3495,29 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnDelete').css('background-color','#eee')");
 				}
 				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) {    cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});     });");
-				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnSave').bind('click', function(e) { prl_BankSourceEdit_btnSave();     cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});   });");
+				//communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnSave').bind('click', function(e) { prl_BankSourceEdit_btnSave();     cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});   });");
+				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnSave').bind('click', function(e) { prl_BankSourceEdit_btnSave();    });");
 				break;
 			case 'GUI_bank_source_save': //case 'payroll.paymentSplit' action:'GUI_bank_source_save'
 				//communication_interface::alert("GUI_bank_source_save > data:".print_r($functionParameters[0]["data"],true));
+				communication_interface::jsExecute("$('#modalContainer input').css('background-color','');");
+				communication_interface::jsExecute("$('#modalContainer select').css('background-color','');");
 				$res = blFunctionCall("payroll.saveBankSourceDetail", $functionParameters[0]["data"]);
 				if($res["success"]) {
-					//communication_interface::alert("GUI_bank_source_save success : company_ID=$company_ID,".$functionParameters[0]["data"]["payroll_company_ID"],true);
 					$company_ID = $functionParameters[0]["data"]["payroll_company_ID"];
-					communication_interface::jsExecute("cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});   ");
+					$err = false;
+					//communication_interface::alert("GUI_bank_source_save success:".print_r($functionParameters[0]["data"],true));
+					if ($functionParameters[0]["data"]["source_type"] < 3) {//Bei 1=Bank und 2=Post
+						if (strlen($functionParameters[0]["data"]["description"]) < 2) {       communication_interface::jsExecute("$('#prlPmtSplt_description').css('background-color','#f88');");  $err=true;}
+						if (strlen($functionParameters[0]["data"]["bank_source_IBAN"]) < 20) { communication_interface::jsExecute("$('#prlPmtSplt_bank_source_IBAN').css('background-color','#f88');");  $err=true;}
+						if (strlen($functionParameters[0]["data"]["bank_source_desc1"]) < 3) { communication_interface::jsExecute("$('#prlPmtSplt_bank_source_desc1').css('background-color','#f88');");  $err=true;}
+						if (strlen($functionParameters[0]["data"]["bank_source_desc2"]) < 3) { communication_interface::jsExecute("$('#prlPmtSplt_bank_source_desc2').css('background-color','#f88');");  $err=true;}
+					}
+					if ($err == false) {
+						 communication_interface::jsExecute("cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});   ");
+					}
 				} else {
 					//communication_interface::alert("GUI_bank_source_save success NOT:",true);
-					communication_interface::jsExecute("$('#modalContainer input').css('background-color','');");
-					communication_interface::jsExecute("$('#modalContainer select').css('background-color','');");
 					foreach($res["fieldNames"] as $fieldName) communication_interface::jsExecute("$('#prlPmtSplt_".$fieldName."').css('background-color','#f88');");
 					communication_interface::alert("error code ".$res["errCode"]."\n".$res["errText"]."\n".print_r($res["fieldNames"]));
 				}

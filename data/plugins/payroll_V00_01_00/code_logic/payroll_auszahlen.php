@@ -434,6 +434,7 @@ class auszahlen {
 		$retArray['nonstandard_banksourcezahlstelle'] = "";
 		$retArray['spesenregelung'] = "";
 		$retArray['bank_dest_currency'] = "";
+		$retArray['splitMode'] = 1;
 		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
 			$retArray['success'] = true;
@@ -456,6 +457,7 @@ class auszahlen {
 			$retArray['spesenregelung']   = $result_bank_destination[0]['expense'];
 			$retArray['nonstandard_banksourcezahlstelle'] = $result_bank_destination[0]['nonstandard_banksourcezahlstelle'];
 			$retArray['bank_dest_currency'] = $result_bank_destination[0]['bank_dest_currency'];
+			$retArray['splitMode'] = $result_bank_destination[0]['destination_type'];
 			switch ( $result_bank_destination[0]['destination_type'] ) {
 				case 1: $retArray['bankpostcash'] = "BANK"; break;
 				case 2: $retArray['bankpostcash'] = "POST"; break;
@@ -642,6 +644,33 @@ class auszahlen {
 		}  
 		return $return;
 	}
+
+	public function getUncompleteEmplFromTrackingTable() {
+		$sql = "SELECT payroll_employee_ID FROM `payroll_auszahlen_tracking` WHERE amount_available > 0.001 AND amount_available <> amount_initial ;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		$return = array();
+		foreach ( $result as $row ) {
+			$return[] = $row["payroll_employee_ID"];
+		}  
+		return $return;
+	}
+	
+	public function getUncompleteEmplNamesFromTrackingTable() {
+		$sql = "
+SELECT T.payroll_employee_ID, T.amount_available, T.amount_initial, E.Firstname, E.Lastname, E.EmployeeNumber, E.City FROM 
+ `payroll_auszahlen_tracking` AS T
+,`payroll_employee` AS E
+WHERE T.amount_available > 0.001 
+AND T.amount_available = T.amount_initial
+AND T.payroll_employee_ID = E.id				
+				;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+
+		return $result;
+	}
+	
 	
 	public function truncateTrackingTable() {
 		$sql = "TRUNCATE `payroll_auszahlen_tracking`;";
@@ -651,6 +680,7 @@ class auszahlen {
 	}
 
 	public function initTrackingTable() {
+		$this->truncateEffectifPayoutTable();
 		$this->truncateTrackingTable();
 		$system_database_manager = system_database_manager::getInstance();
 		$sql = "SELECT * FROM payroll_calculation_current WHERE payroll_account_ID = 8000";
@@ -708,13 +738,32 @@ class auszahlen {
 				     ,"processing_order" => $result[0]["processing_order"] );
 	}
 	
+	public function truncateEffectifPayoutTable() {
+		$sql = "TRUNCATE `payroll_payment_current_effectifpayout`;";
+		//communication_interface::alert($sql);
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeUpdate($sql);
+		return true;
+	}
+
+	public function setEffectifPayoutTable($period_ID,$employee_ID,$split_ID,$amount_CHF,$amount_payout,$currency_ID,$split_mode,$account_ID) {
+		$sql = "
+INSERT INTO `payroll_payment_current_effectifpayout`
+(`payroll_period_ID`,`payroll_employee_ID`,`payroll_payment_split_ID`,`amount_CHF`,`amount_payout`,`currency_ID`,`split_mode`,`payroll_account_ID`)
+VALUES
+(".$period_ID.", ".$employee_ID.", ".$split_ID.", ".$amount_CHF.", ".$amount_payout.", '".$currency_ID."', ".$split_mode.", '".$account_ID."');";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeUpdate($sql);
+		return true;
+	}
+	
 	public function replaceUmlaute($uebergabeWort) {
 		$umlaute = array("'","ä","ö" ,"ü" ,"Ä" ,"Ö" ,"Ü" ,"ß" ,"à","â","á","é","è","Ç","ç","ñ","Ñ","ó","õ","ú");
-		$ersatz = array(" ","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u");
+		$ersatz = array("","ae","oe","ue","Ae","Oe","Ue","ss","a","a","a","e","e","C","c","n","N","o","o","u");
 		$uebergabeWort = str_replace($umlaute,$ersatz,$uebergabeWort);
 		
 		$umlaute = array("&auml;","&ouml;","&uuml;","&Auml;","&Ouml;","&Uuml;","&eacute;","&Eacute;","&ATILDE;&FRAC14;","&Atilde;","&atilde;","&frac14;","Ã¼","Ã¶","¶","Ã©");
-		$ersatz = array( "ae"    ,"oe"    ,"ue"    ,"AE"    ,"OE"    ,"UE"    ,"e"       ,"E"       ,"UE"              ,"UE"      ,"ue"      ,""        ,"ue","o" ,"o","e");
+		$ersatz = array( "ae"    ,"oe"    ,"ue"    ,"AE"    ,"OE"    ,"UE"    ,"e"       ,"E"       ,"UE"              ,"UE"      ,"ue"      ,""        ,"ue","oe" ,"o","e");
 		return str_replace($umlaute,$ersatz,$uebergabeWort);
 	}
 	/**

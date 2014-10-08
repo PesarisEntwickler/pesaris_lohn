@@ -1,6 +1,6 @@
 Noch offen: 
 - [Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung  andrucken . Beispiel Nestler Paula"
-
+ 
 2014-09-19
 
 - Validierung Zahlstellen-Währung=Splitt-Auszahlwährung auf GUI Bankverbindung

@@ -1,12 +1,13 @@
 <?php
+require_once('payroll_auszahlen.php');
 class auszahlfiles {
 	
 	public function setAuszahlFiles($ZahlstellenID, $Personenkreis, $nurZahlstelleBeruecksichtigen, $arrDueDate, $periodeID) {
 		require_once(getcwd()."/web/fpdf17/fpdf.php");
         require_once(getcwd()."/kernel/common-functions/configuration.php");
-		require_once('payroll_auszahlen.php');
-		$auszahlen = new auszahlen();
 
+		$auszahlen = new auszahlen();
+		
 		$dueDateGUI = $arrDueDate[0].".".$arrDueDate[1].".".$arrDueDate[2];
 		$dtaValutaDate = substr($arrDueDate[2], 2).$arrDueDate[1].$arrDueDate[0];
 
@@ -38,13 +39,6 @@ class auszahlfiles {
 			$empArray = $auszahlen->getPeriodZahlstellenMitarbeiterListe($periodeID, -1, $uniqueEmployeeList);
 			$empListe = implode(",",$empArray);
 		}
-//communication_interface::alert("zs:".$zs
-//							."\nZahlstellenID:".$ZahlstellenID
-//							."\nemplFilter:".$emplFilter
-//							."\nempListe:".$empListe
-//							."\nempArray:".print_r($empArray, true)
-//							);	
-//return;
 
 		$employeeList = $auszahlen->getEmployeeDataCurrentPeriod("8000", $empListe);
 
@@ -103,6 +97,7 @@ class auszahlfiles {
   		$RealEffectedEmployees = "";
   		//Iteration über alle Mitarbeiter mit Auszahlung 
 		foreach ( $employeeList['data'] as $row ) { 
+	  		$account_ID = "9999";
 			$employee_ID = $row['id'];
 	  		$retTracking = $auszahlen->getAmountAvailableFromTrackingTable($periodeID, $employee_ID);
 	  		$availAmt = $retTracking["amount_available"];
@@ -192,6 +187,10 @@ class auszahlfiles {
 							//DTA bei Splitt
 							
 							//DTA Journal
+							$split_mode = 1;
+							if (strlen($account_ID) < 1) {
+								$account_ID = "9999";
+							}
 							switch ( $payCurrency ) {
 								case "USD":
 									$splitt++;
@@ -214,6 +213,7 @@ class auszahlfiles {
 
 									// die systemseitige Lohnkontrolle wird in CHF gemacht
 									$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$payAmountCHF);
+									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmount,$payCurrency,$split_mode,$account_ID);
 									break;
 									
 								case "EUR":
@@ -237,6 +237,7 @@ class auszahlfiles {
 
 									// die systemseitige Lohnkontrolle wird in CHF gemacht
 									$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$payAmountCHF);
+									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmount,$payCurrency,$split_mode,$account_ID);
 									break;
 									
 								default://CHF
@@ -261,6 +262,7 @@ class auszahlfiles {
 
 									// die systemseitige Lohnkontrolle wird in CHF gemacht
 									$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$payAmountCHF);
+									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmountCHF,$payCurrency,$split_mode,$account_ID);		
 									break;
 							}//end switch ( $payCurrency )
 		
@@ -321,6 +323,10 @@ class auszahlfiles {
 						//DTA Journal
 						$processingOrder = 999;
 						$splitID = 999;
+						if (strlen($account_ID) < 1) {
+							$account_ID = "9998";
+						}
+						$split_mode = $bene['splitMode'];
 						switch ( $payCurrency ) {
 							case "USD":
 								$Kurs = blFunctionCall("payroll.getCurrencyForexRate", $payCurrency);
@@ -342,6 +348,7 @@ class auszahlfiles {
 								}
 								$dtaJournal_USD .= $this->setDTAJournalZeile($trxNr_USD, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountUSD, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_USD .= $this->setDTAZeile( $dtaValutaDate, $trxNr_USD, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountUSD, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
+								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountUSD,$payCurrency,$split_mode,$account_ID);
 								break;
 								
 							case "EUR":
@@ -364,6 +371,7 @@ class auszahlfiles {
 								}
 								$dtaJournal_EUR .= $this->setDTAJournalZeile($trxNr_EUR, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountEUR, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_EUR .= $this->setDTAZeile( $dtaValutaDate, $trxNr_EUR, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountEUR, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
+								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountEUR,$payCurrency,$split_mode,$account_ID);
 								break;
 								
 							default://CHF
@@ -384,11 +392,13 @@ class auszahlfiles {
 								}
 								$dtaJournal_CHF .= $this->setDTAJournalZeile($trxNr_CHF, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountCHF, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_CHF .= $this->setDTAZeile( $dtaValutaDate, $trxNr_CHF, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountCHF, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
+								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountCHF,$payCurrency,$split_mode,$account_ID);
 								break;
 						}//switch ( $payCurrency )
 						//Abhaken Mitarbeiter mit Lohnbezug
 						$auszahlen->updatePeriodenAuszahlFlag($periodeID, "IN", $employee_ID, "Y");				
 						$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, 0);
+		
 					}						
 				}//if ($amount > 0.001) 				
 			}//end if
@@ -544,6 +554,15 @@ class auszahlfiles {
 			$pdf->MultiCell( 188, 3, $rekap , 0, 'L', 0); 
 			$pdf->Output($fullPath.'REKAP.pdf', 'F');
 			$anzFiles++;
+
+			$openPaymentsNames = $this->getOpenPaymentNames($PeriodeDieserMonat);
+			$pdf = new FPDF('P','mm','A4');
+			$pdf->AddPage();
+			$pdf->SetFont('Courier','',9);
+			$pdf->MultiCell( 188, 3, $openPaymentsNames , 0, 'L', 0); 
+			$pdf->Output($fullPath.'openPayments.pdf', 'F');
+			$anzFiles++;
+
 			
 			system("chmod 666 *");
 			
@@ -755,10 +774,9 @@ class auszahlfiles {
 			$l .= CRLF."Endbeguenstigter: ".CRLF.$endBeguenst1_IBAN." ".$endBeguenst2_Nam." ".$endBeguenst3_Adr." ".$endBeguenst4_Ort;
 		}
 		$l .= CRLF.str_pad("----", $tab1_z2+$tab2_z2+$tab3_z2+$tab4_z2+$end_z2, "-");
+		
 		return $l;
 	}
-	
-	
 	
 	function setDTAZeile(  $dtaValutaDate, $trxNr, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmount, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort) {
 		$ret = "";
@@ -768,6 +786,31 @@ class auszahlfiles {
 		return $ret;
 	}
 	
+	function getOpenPaymentNames($PeriodeDieserMonat) {
+		$auszahlen = new auszahlen();
+		$openPaymentsArr = blFunctionCall('payroll.auszahlen.getUncompleteEmplNamesFromTrackingTable');
+		$ret = "";
+		if (count($openPaymentsArr) > 0) {
+			$ret .= CRLF."Noch nicht ausbezahlte Mitarbeiter      (".$PeriodeDieserMonat.") ".str_pad(date("d.m.Y/H:i"), 22, " ", STR_PAD_LEFT);
+			$ret .= CRLF.str_pad("", 80,"=", STR_PAD_RIGHT);
+			$sum = 0;
+			foreach ( $openPaymentsArr as $openPEmpl ) {
+	       		$ret .= CRLF.str_pad($openPEmpl['EmployeeNumber'], 6,"0", STR_PAD_LEFT);
+	       		$ret .= "  ".str_pad(substr($auszahlen->replaceUmlaute($openPEmpl['Lastname']),0,17), 18," ", STR_PAD_RIGHT);
+	       		$ret .= str_pad(substr($auszahlen->replaceUmlaute($openPEmpl['Firstname']),0,15), 16," ", STR_PAD_RIGHT);
+	       		$ret .= str_pad(substr($auszahlen->replaceUmlaute($openPEmpl['City']),0,18), 20," ", STR_PAD_RIGHT);
+	       		$ret .= "CHF".str_pad($openPEmpl['amount_available'], 15," ", STR_PAD_LEFT);
+	       		$sum += $openPEmpl['amount_available'];
+			}
+			$ret .= CRLF.str_pad("", 80,"=", STR_PAD_RIGHT);
+       		$ret .= CRLF.str_pad("", 62," ", STR_PAD_RIGHT)."CHF".str_pad($sum, 15," ", STR_PAD_LEFT);
+		} else {
+			$ret .= CRLF."Noch nicht ausbezahlte Mitarbeiter      (".$PeriodeDieserMonat.") ".str_pad(date("d.m.Y/H:i"), 22, " ", STR_PAD_LEFT);
+			$ret .= CRLF.str_pad("", 80,"=", STR_PAD_RIGHT);
+			$ret .= CRLF.str_pad("Alle ausbezahlt", 80," ", STR_PAD_LEFT);
+		}
+		return $ret;
+	}
 	
 	function setDTAZeileTyp827(  $dtaValutaDate, $trxNr, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmount, $payCurrency) {
 				$TA827 = "";
@@ -824,7 +867,7 @@ class auszahlfiles {
 					.str_pad($trxNr,5,"0", STR_PAD_LEFT)
 					."836"."1"."0";
 					     // 1 = Lohn/Salaerzahlung
-				//Segment 01	
+	//Segment 01	
 				$TA836.= CRLF.substr("01"
 						.$dtaHeader51stellen
 						."TRXNR".str_pad($trxNr,11,"0", STR_PAD_LEFT)
@@ -834,7 +877,7 @@ class auszahlfiles {
 						.str_pad(number_format($payAmount, 2, ',', "") ,15, " ", STR_PAD_RIGHT)
 						.str_pad(" ",11)
 					, 0, 128);
-				//Segment 02
+	//Segment 02
 				$AuftraggeberAdr2 = "";					
 				$AuftraggeberAdr3 = "";					
 				if (strlen($ZahlstelleL4) > 1) { $AuftraggeberAdr3 = $ZahlstelleL4; }	
@@ -852,10 +895,8 @@ class auszahlfiles {
 						.str_pad($AuftraggeberAdr3, 35)
 						.str_pad(" ",9)
 					, 0, 128);	
-communication_interface::alert("setDTAZeileTyp836()\n".$TA836);					
 					
-				//Segment 03 (Bank)
-					
+				//Segment 03 (Bank)					
 				$bankBeneficiary1 = " ";
 				$bankBeneficiary2 = " ";
 				$bankBeneficiary1 = $beneBank1;
@@ -867,7 +908,7 @@ communication_interface::alert("setDTAZeileTyp836()\n".$TA836);
 						.str_pad(" ",21)
 					, 0, 128);
 					
-				//Segment 04	
+	//Segment 04	
 				$BenAdr1 = $bn1;
 				$BenAdr2 = $bn2." ".$bn3;					
 				$BenAdr3 = $bn4;					
@@ -885,7 +926,7 @@ communication_interface::alert("setDTAZeileTyp836()\n".$TA836);
 						.str_pad(" ",21)
 					, 0, 128);
 										
-				//Segment 05	
+	//Segment 05	
 				$spesen = "0";
 				if (strlen($spesenregelung) == 1) {
 					if (intval($spesenregelung)>0 && intval($spesenregelung)<=2) {

@@ -1,5 +1,5 @@
-DROP TABLE `lohndev`.`core_clearing_banks`;
-CREATE TABLE `lohndev`.`core_clearing_banks` (
+DROP TABLE `core_clearing_banks`;
+CREATE TABLE `core_clearing_banks` (
   `BCNr` VARCHAR(5) NULL,
   `Kurzbez` VARCHAR(45) NULL,
   `BankName` VARCHAR(45) NULL,
@@ -9,7 +9,7 @@ CREATE TABLE `lohndev`.`core_clearing_banks` (
   `Ort` VARCHAR(45) NULL,
   `Postkonto` VARCHAR(45) NULL,
   `SWIFT` VARCHAR(45) NULL);
-INSERT INTO `lohndev`.`core_clearing_banks`
+INSERT INTO `core_clearing_banks`
 VALUES
   ('100','SNB','Schweizerische Nationalbank','Börsenstrasse 15','Postfach 2800','8022','Zürich','30-5-5','SNBZCHZZXXX')
 , ('110','SNB','Schweizerische Nationalbank','Bundesplatz 1','Postfach','3003','Bern','*30-5-5','SNBZCHZZXXX')

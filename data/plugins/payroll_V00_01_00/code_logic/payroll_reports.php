@@ -278,7 +278,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
                  
-                 $query = "  SELECT 
+                 $query = "SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
                                 comp.company_shortname,
                                 accetry.account_no,
@@ -577,7 +577,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
                  
-                 $query = "  SELECT 
+                 $query = "SELECT 
                                 accetry.account_no,
                                 accetry.counter_account_no,
                                 accetry.cost_center,
@@ -676,7 +676,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
                  
-                 $query = "  SELECT 
+                 $query = "SELECT 
                                 accetry.account_no,
                                 accetry.counter_account_no,
                                 SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
@@ -767,7 +767,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  
                  fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
                  
-                 $query = "  SELECT 
+                 $query = "SELECT 
                                 accetry.account_no,
                                 SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
 	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
@@ -948,6 +948,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
 
 	public function Payslip($param) {
+		//communication_interface::alert("reports.php - Payslip() param:".print_r($param,true));
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		$payrollPeriodID = $param["payroll_period_ID"];
@@ -975,20 +976,57 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		else $tableNameSuffix = "entry";
 
 		$payments = array();
-		$result = $system_database_manager->executeQuery("SELECT paym.`payroll_employee_ID`, IF(empl.`Language`='','de',empl.`Language`) as `Language`, bankdst.`destination_type`, bankdst.`beneficiary_bank_line1`, bankdst.`beneficiary_bank_line2`, bankdst.`beneficiary_bank_line3`, bankdst.`beneficiary_bank_line4`, bankdst.`bank_account`, bankdst.`postfinance_account`, paym.`payroll_currency_ID` as `currency`, FORMAT(paym.`amount_payout`,2) as `amount` FROM `payroll_payment_current` paym INNER JOIN `payroll_tmp_change_mng` emplist ON emplist.`numID`=paym.`payroll_employee_ID` AND emplist.`core_user_id`=".$uid." INNER JOIN `payroll_payment_split` spltcfg ON spltcfg.`id`=paym.`payroll_payment_split_ID` INNER JOIN `payroll_bank_destination` bankdst ON bankdst.`id`=spltcfg.`payroll_bank_destination_ID` INNER JOIN `payroll_employee` empl ON empl.`id`=paym.`payroll_employee_ID` WHERE paym.`payroll_period_ID`=".$payrollPeriodID, "payroll_report_Payslip");
+		$result = $system_database_manager->executeQuery(
+				"SELECT 
+				  BANKDEST.`payroll_employee_ID`
+				, IF(EMPLOYEE.`Language`='','de',EMPLOYEE.`Language`) as `Language`
+				, BANKDEST.`destination_type`
+				, BANKDEST.`beneficiary_bank_line1`
+				, BANKDEST.`beneficiary_bank_line2`
+				, BANKDEST.`beneficiary_bank_line3`
+				, BANKDEST.`beneficiary_bank_line4`
+				, BANKDEST.`bank_account`
+				, BANKDEST.`postfinance_account`
+				, PMTCURR.`payroll_currency_ID` as `currency`
+				, FORMAT(PMTCURR.`amount_payout`,2) as `amount` 
+				FROM `payroll_payment_current` PMTCURR 
+				INNER JOIN `payroll_tmp_change_mng` EMPLST 
+					ON EMPLST.`numID`=PMTCURR.`payroll_employee_ID` 
+					AND EMPLST.`core_user_id`=".$uid." 
+				INNER JOIN `payroll_payment_split` PMTSPLT 
+					ON PMTSPLT.`id`=PMTCURR.`payroll_payment_split_ID` 
+				INNER JOIN `payroll_bank_destination` BANKDEST 
+					ON BANKDEST.`id`=PMTSPLT.`payroll_bank_destination_ID` 
+				INNER JOIN `payroll_employee` EMPLOYEE 
+					ON EMPLOYEE.`id`=PMTCURR.`payroll_employee_ID` 
+				WHERE PMTCURR.`payroll_period_ID`=".$payrollPeriodID, "payroll_report_Payslip");
 		foreach($result as $row) {
-			if(!isset($payments[(string)$row["payroll_employee_ID"]])) $payments[(string)$row["payroll_employee_ID"]] = array();
+			if(!isset($payments[(string)$row["payroll_employee_ID"]])) {
+				$payments[(string)$row["payroll_employee_ID"]] = array();
+			}
 			switch($row["destination_type"]) {
 			case 1: $bankName = $row["beneficiary_bank_line1"]; $bankAccount = $row["bank_account"]; break; //Bank
-			case 2: $bankName = "Postfinance"; $bankAccount = $row["postfinance_account"]; break; //Postfinance
+			case 2: $bankName = "PostFinance"; $bankAccount = $row["postfinance_account"]; break; //Postfinance
 			case 3: $bankName = $cashPayment[$row["Language"]]; $bankAccount = ""; break; //Barauszahlung
 			}
-			$payments[(string)$row["payroll_employee_ID"]][] = "\t\t\t\t<Payout>\n\t\t\t\t\t<BankAddrLine1>".$bankName."</BankAddrLine1>\n\t\t\t\t\t<BankAddrLine2>".$row["beneficiary_bank_line2"]."</BankAddrLine2>\n\t\t\t\t\t<BankAddrLine3>".$row["beneficiary_bank_line3"]."</BankAddrLine3>\n\t\t\t\t\t<BankAddrLine4>".$row["beneficiary_bank_line4"]."</BankAddrLine4>\n\t\t\t\t\t<BankAccountNo>".$bankAccount."</BankAccountNo>\n\t\t\t\t\t<PayoutCurrency>".$row["currency"]."</PayoutCurrency>\n\t\t\t\t\t<PayoutAmount>".$row["amount"]."</PayoutAmount>\n\t\t\t\t</Payout>\n";
+			$payments[(string)$row["payroll_employee_ID"]][] = 
+					"\t\t\t\t<Payout>
+					\n\t\t\t\t\t<BankAddrLine1>".$bankName."</BankAddrLine1>
+					\n\t\t\t\t\t<BankAddrLine2>".$row["beneficiary_bank_line2"]."</BankAddrLine2>
+					\n\t\t\t\t\t<BankAddrLine3>".$row["beneficiary_bank_line3"]."</BankAddrLine3>
+					\n\t\t\t\t\t<BankAddrLine4>".$row["beneficiary_bank_line4"]."</BankAddrLine4>
+					\n\t\t\t\t\t<BankAccountNo>".$bankAccount."</BankAccountNo>
+					\n\t\t\t\t\t<PayoutCurrency>".$row["currency"]."</PayoutCurrency>
+					\n\t\t\t\t\t<PayoutAmount>".$row["amount"]."</PayoutAmount>
+					\n\t\t\t\t</Payout>\n";
 		}
 		unset($result);
 
 		$payslipInfo = array();
-		$result = $system_database_manager->executeQuery("SELECT `payroll_payslip_cfg_ID`,`label`,`language`,`field_type`,`field_name` FROM `payroll_payslip_cfg_info` ORDER BY `position`", "payroll_report_Payslip");
+		$result = $system_database_manager->executeQuery(
+				"SELECT `payroll_payslip_cfg_ID`,`label`,`language`,`field_type`,`field_name` 
+				 FROM `payroll_payslip_cfg_info` 
+				 ORDER BY `position`", "payroll_report_Payslip");
 		foreach($result as $row) {
 			if(!isset($payslipInfo[(string)$row["payroll_payslip_cfg_ID"]][$row["language"]])) $payslipInfo[(string)$row["payroll_payslip_cfg_ID"]][$row["language"]] = array();
 			$payslipInfo[(string)$row["payroll_payslip_cfg_ID"]][$row["language"]][] = array("field_type"=>$row["field_type"], "field_name"=>$row["field_name"], "label"=>$row["label"]);
@@ -1007,10 +1045,11 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		}
 		unset($result);
 		unset($payslipInfo);
-//error_log(print_r($payslipCfg,true), 3, "/var/log/daniel.log");
 
 		$employeeFieldsOfInterest = array("id", "EmployeeNumber", "Lastname", "Firstname", "AdditionalAddrLine1", "AdditionalAddrLine2", "AdditionalAddrLine3", "AdditionalAddrLine4", "Street", "ZIP-Code", "City", "Country", "payroll_company_ID", "Language", "payroll_payslip_cfg_ID", "WageCode");
-		$result = $system_database_manager->executeQuery("SELECT DISTINCT `field_name` FROM `payroll_payslip_cfg_info` WHERE `field_type`=0", "payroll_report_Payslip");
+		$result = $system_database_manager->executeQuery(
+				"SELECT DISTINCT `field_name` FROM `payroll_payslip_cfg_info` WHERE `field_type`=0"
+				, "payroll_report_Payslip");
 		foreach($result as $row) $employeeFieldsOfInterest[] = $row["field_name"];
 		unset($result);
 		$employeeFieldsOfInterest = array_unique($employeeFieldsOfInterest);
@@ -1025,7 +1064,19 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$arrFld = array();
 		$listValues = array();
 		foreach($employeeFieldsOfInterest as $fldName) $arrFld[] = "'".$fldName."'";
-		$result = $system_database_manager->executeQuery("SELECT flddef.`fieldName`,IF(flddef.`dataSourceToken`=1,lstgrp.`ListItemToken`,lstgrp.`id`) as ListItemID, lstlbl.`language`, lstlbl.`label` FROM `payroll_employee_field_def` flddef INNER JOIN `payroll_empl_list` lstgrp ON lstgrp.`ListGroup`=flddef.`dataSourceGroup` INNER JOIN `payroll_empl_list_label` lstlbl ON lstlbl.`payroll_empl_list_ID`=lstgrp.`id` WHERE flddef.`fieldType`=4 AND flddef.`dataSource`='payroll_empl_list' AND flddef.`fieldName` IN (".implode(",",$arrFld).")", "payroll_report_Payslip");
+		$result = $system_database_manager->executeQuery(
+				"SELECT flddef.`fieldName`
+				,IF(flddef.`dataSourceToken`=1,lstgrp.`ListItemToken`,lstgrp.`id`) as ListItemID
+				,lstlbl.`language`, lstlbl.`label` 
+				FROM `payroll_employee_field_def` flddef 
+				INNER JOIN `payroll_empl_list` lstgrp 
+					ON lstgrp.`ListGroup`=flddef.`dataSourceGroup` 
+				INNER JOIN `payroll_empl_list_label` lstlbl 
+					ON lstlbl.`payroll_empl_list_ID`=lstgrp.`id` 
+				WHERE flddef.`fieldType`=4 
+				AND flddef.`dataSource`='payroll_empl_list' 
+				AND flddef.`fieldName` IN (".implode(",",$arrFld).")"
+				, "payroll_report_Payslip");
 		foreach($result as $row) $listValues[$row["fieldName"]][$row["ListItemID"]][$row["language"]] = $row["label"];
 		unset($result);
 		unset($arrFld);
@@ -1050,38 +1101,137 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		//Bewegungsdaten auslesen
 		$lastEmpId = 0;
 		$entries = array();
-		$result = $system_database_manager->executeQuery("SELECT calc.`payroll_employee_ID`, calc.`payroll_account_ID`, IF(calc.`label`!='',calc.`label`,IF(calc.`code`!='',CONCAT(acclbl.`label`,' ',calc.`code`),acclbl.`label`)) as `label`, IF(acc.`quantity_print`=1,FORMAT(calc.`quantity`*acc.`quantity_conversion`,IF(acc.`quantity_decimal`=10,2,acc.`quantity_decimal`)),NULL) as `quantity`, IF(acc.`quantity_print`=1 AND acclbl.`quantity_unit`!='',acclbl.`quantity_unit`,NULL) as `quantity_unit`, IF(acc.`rate_print`=1,FORMAT(calc.`rate`*acc.`rate_conversion`,IF(acc.`rate_decimal`=10,2,acc.`rate_decimal`)),NULL) as `rate`, IF(acc.`rate_print`=1 AND acclbl.`rate_unit`!='',acclbl.`rate_unit`,NULL) as `rate_unit`, IF(acc.`amount_print`=1,FORMAT(calc.`amount`*acc.`amount_conversion`,IF(acc.`amount_decimal`=10,2,acc.`amount_decimal`)),NULL) as `amount`, acc.`bold`, acc.`space_before`, acc.`space_after`, prdemp.`payment_date`, prdemp.`interest_date` FROM `payroll_period_employee` prdemp INNER JOIN `payroll_tmp_change_mng` emplist ON emplist.`numID`=prdemp.`payroll_employee_ID` AND emplist.`core_user_id`=".$uid." INNER JOIN `payroll_employee` emp ON emp.`id`=prdemp.`payroll_employee_ID` INNER JOIN `payroll_calculation_".$tableNameSuffix."` calc ON calc.`payroll_period_ID`=prdemp.`payroll_period_ID` AND calc.`payroll_employee_ID`=prdemp.`payroll_employee_ID` INNER JOIN `payroll_account` acc ON calc.`payroll_account_ID`=acc.`id` AND calc.`payroll_year_ID`=acc.`payroll_year_ID` AND (acc.`quantity_print`=1 OR acc.`rate_print`=1 OR acc.`amount_print`=1) LEFT JOIN `payroll_account_label` acclbl ON calc.`payroll_account_ID`=acclbl.`payroll_account_ID` AND calc.`payroll_year_ID`=acclbl.`payroll_year_ID` AND acclbl.`language`=emp.`Language` WHERE prdemp.`payroll_period_ID`=".$payrollPeriodID." AND prdemp.`processing`!=0 ORDER BY calc.`payroll_employee_ID`,calc.`position`,calc.`payroll_account_ID`", "payroll_report_Payslip");
+			$sql =
+			"SELECT " .
+			"calc.`payroll_employee_ID`" .
+			",calc.`payroll_account_ID`" .
+			",IF(calc.`label`!=''" .
+			",calc.`label`" .
+			",IF(calc.`code`!='',CONCAT(acclbl.`label`,' ',calc.`code`),acclbl.`label`)) as `label`" .
+			",IF(acc.`quantity_print`=1,FORMAT(calc.`quantity`*acc.`quantity_conversion`" .
+			",IF(acc.`quantity_decimal`=10,2,acc.`quantity_decimal`)),NULL) as `quantity`" .
+			",IF(acc.`quantity_print`=1 AND acclbl.`quantity_unit`!='',acclbl.`quantity_unit`,NULL) as `quantity_unit`" .
+			",IF(acc.`rate_print`=1,FORMAT(calc.`rate`*acc.`rate_conversion`" .
+			",IF(acc.`rate_decimal`=10,2,acc.`rate_decimal`)),NULL) as `rate`" .
+			",IF(acc.`rate_print`=1 AND acclbl.`rate_unit`!='',acclbl.`rate_unit`,NULL) as `rate_unit`" .
+			",IF(acc.`amount_print`=1,FORMAT(calc.`amount`*acc.`amount_conversion`" .
+			",IF(acc.`amount_decimal`=10,2,acc.`amount_decimal`)),NULL) as `amount`" .
+			",acc.`bold`, acc.`space_before`, acc.`space_after`, prdemp.`payment_date`, prdemp.`interest_date` " .
+			"FROM `payroll_period_employee` prdemp " .
+			"INNER JOIN `payroll_tmp_change_mng` emplist " .
+				"ON emplist.`numID`=prdemp.`payroll_employee_ID` " .
+				"AND emplist.`core_user_id`=".$uid." " .
+			"INNER JOIN `payroll_employee` emp ON emp.`id`=prdemp.`payroll_employee_ID` " .
+			"INNER JOIN `payroll_calculation_".$tableNameSuffix."` calc " .
+				"ON calc.`payroll_period_ID`=prdemp.`payroll_period_ID` " .
+				"AND calc.`payroll_employee_ID`=prdemp.`payroll_employee_ID` " .
+			"INNER JOIN `payroll_account` acc ON calc.`payroll_account_ID`=acc.`id` " .
+				"AND calc.`payroll_year_ID`=acc.`payroll_year_ID` " .
+				"AND (acc.`quantity_print`=1 " .
+				"OR acc.`rate_print`=1 " .
+				"OR acc.`amount_print`=1) " .
+			"LEFT JOIN `payroll_account_label` acclbl " .
+				"ON calc.`payroll_account_ID`=acclbl.`payroll_account_ID` " .
+				"AND calc.`payroll_year_ID`=acclbl.`payroll_year_ID` " .
+				"AND acclbl.`language`=emp.`Language` " .
+			"WHERE prdemp.`payroll_period_ID`=".$payrollPeriodID." " .
+				"AND prdemp.`processing`!=0 " .
+			"ORDER BY calc.`payroll_employee_ID`,calc.`position`,calc.`payroll_account_ID`";
+		$result = $system_database_manager->executeQuery($sql, "payroll_report_Payslip");
+		
+//communication_interface::alert("sql".$sql."\result:".print_r($result,true));
+		
 		foreach($result as $row) {
+// communication_interface::alert("lastEmpId".$lastEmpId."\ncount:".count($entries)."\tentries: ".print_r($entries,true));
 			if($row["payroll_employee_ID"] != $lastEmpId) {
 				if(count($entries)!=0) {
 					$emplData = $employeeDetail[(string)$lastEmpId];
+					//kommt aus Tabelle "payroll_payslip_cfg"
+					// hier ist auch das Underlay, das template (.pdf) hinterlegt
+					//physisch liegt das Template auf data-hidden/CUSTOMER/[DB des Mandanten]/TEMPLATE
 					$templCfg = $payslipCfg[(string)$emplData["payroll_payslip_cfg_ID"]];
-
+// if ($emplData["id"] >= 13 && $emplData["id"] <= 16) {   
+// 	communication_interface::alert($emplData["id"]." emplData: ".print_r($emplData,true)."\n\ntemplCfg: [InfoFields]\n".print_r($templCfg["InfoFields"][$emplData["Language"]],true));
+// }					
 					$infoFields = "";
 					foreach($templCfg["InfoFields"][$emplData["Language"]] as $infoRow) {
 						switch($infoRow["field_type"]) {
 						case 0:
-//$listValues[$row["fieldName"]][$row["ListItemID"]][$row["language"]] = $row["label"];
+// $listValues[$row["fieldName"]][$row["ListItemID"]][$row["language"]] = $row["label"];
 							if(isset($listValues[$infoRow["field_name"]])) {
 								$curValue = $listValues[$infoRow["field_name"]][$emplData[$infoRow["field_name"]]][$emplData["Language"]];
 							}else{
 								$curValue = $emplData[$infoRow["field_name"]];
 							}
-							$infoFields .= "\t\t\t\t<Field>\n\t\t\t\t\t<Name>".$infoRow["field_name"]."</Name>\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>\n\t\t\t\t\t<Value>".$curValue."</Value>\n\t\t\t\t</Field>\n";
-//							$infoFields .= "\t\t\t\t<Field>\n\t\t\t\t\t<Name>".$infoRow["field_name"]."</Name>\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>\n\t\t\t\t\t<Value>".$emplData[$infoRow["field_name"]]."</Value>\n\t\t\t\t</Field>\n";
+							$infoFields .= "\t\t\t\t<Field>" .
+										 "\n\t\t\t\t\t<Name>".$infoRow["field_name"]."</Name>" .
+										 "\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>" .
+										 "\n\t\t\t\t\t<Value>".$curValue."</Value>" .
+										 "\n\t\t\t\t</Field>\n";
+// 							$infoFields .= "\t\t\t\t<Field>\n\t\t\t\t\t<Name>".$infoRow["field_name"]."</Name>" .
+// 										"\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>" .
+// 										"\n\t\t\t\t\t<Value>".$emplData[$infoRow["field_name"]]."</Value>" .
+// 										"\n\t\t\t\t</Field>\n";
 							break;
 						default:
-							$infoFields .= "\t\t\t\t<Field>\n\t\t\t\t\t<Name>IFLD</Name>\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>\n\t\t\t\t\t<Value>".$infoRow["field_type"]."</Value>\n\t\t\t\t</Field>\n";
+							$infoFields .= "\t\t\t\t<Field>" .
+										 "\n\t\t\t\t\t<Name>IFLD</Name>" .
+										 "\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>" .
+										 "\n\t\t\t\t\t<Value>".$infoRow["field_type"]."</Value>" .
+										 "\n\t\t\t\t</Field>\n";
 							break;
 						}
 					}
 					$tmpNote = array();
-					if(isset($notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]])) $tmpNote[] = $notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]];
-					if(isset($notifications[(string)"0"][$emplData["Language"]])) $tmpNote[] = $notifications[(string)"0"][$emplData["Language"]];
-					$curEmpl = "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$emplData["EmployeeNumber"]."</EmployeeNumber>\n\t\t\t<CompanyID>".$emplData["payroll_company_ID"]."</CompanyID>\n\t\t\t<Firstname>".$emplData["Firstname"]."</Firstname>\n\t\t\t<Lastname>".$emplData["Lastname"]."</Lastname>\n".($emplData["AdditionalAddrLine1"]!="" ? "\t\t\t<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").($emplData["AdditionalAddrLine2"]!="" ? "\t\t\t<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").($emplData["AdditionalAddrLine3"]!="" ? "\t\t\t<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").($emplData["AdditionalAddrLine4"]!="" ? "\t\t\t<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "")."\t\t\t<Street>".$emplData["Street"]."</Street>\n\t\t\t<ZIP-Code>".$emplData["ZIP-Code"]."</ZIP-Code>\n\t\t\t<City>".$emplData["City"]."</City>\n\t\t\t<Country>".$emplData["Country"]."</Country>\n\t\t\t<CountryName>".$countryNames[$emplData["Country"]]."</CountryName>\n".$infoByWageCode[$emplData["WageCode"]]."\t\t\t<PaymentDate>".$paymentDate."</PaymentDate>\n\t\t\t<InterestDate>".$interestDate."</InterestDate>\n".(count($tmpNote)!=0 ? "\t\t\t<Notification>".implode("<br/>",$tmpNote)."</Notification>\n" : "")."\t\t\t<DocumentSettings>\n\t\t\t\t<Language>".$emplData["Language"]."</Language>\n\t\t\t\t<DecimalPoint>.</DecimalPoint>\n\t\t\t\t<ThousandsSeparator>'</ThousandsSeparator>\n\t\t\t\t<PdfTemplate>".($templCfg["pdf_template"]!="" ? $pdfTemplateDir.$templCfg["pdf_template"] : "")."</PdfTemplate>\n\t\t\t\t<AddrOffsetLeft>".$templCfg["addr_offset_left"]."</AddrOffsetLeft>\n\t\t\t\t<AddrOffsetTop>".$templCfg["addr_offset_top"]."</AddrOffsetTop>\n\t\t\t\t<InfoOffsetLeft>".$templCfg["info_offset_left"]."</InfoOffsetLeft>\n\t\t\t\t<InfoOffsetTop>".$templCfg["info_offset_top"]."</InfoOffsetTop>\n\t\t\t\t<ContentOffsetLeft>".$templCfg["content_offset_left"]."</ContentOffsetLeft>\n\t\t\t\t<ContentOffsetTop>".$templCfg["content_offset_top"]."</ContentOffsetTop>\n\t\t\t\t<ContentWidth>".$templCfg["content_width"]."</ContentWidth>\n\t\t\t\t<AddrFontName>".$templCfg["addr_font_name"]."</AddrFontName>\n\t\t\t\t<AddrFontSize>".$templCfg["addr_font_size"]."</AddrFontSize>\n\t\t\t\t<InfoFontName>".$templCfg["info_font_name"]."</InfoFontName>\n\t\t\t\t<InfoFontSize>".$templCfg["info_font_size"]."</InfoFontSize>\n\t\t\t\t<ContentFontName>".$templCfg["content_font_name"]."</ContentFontName>\n\t\t\t\t<ContentFontSize>".$templCfg["content_font_size"]."</ContentFontSize>\n\t\t\t\t<ProcessingSuffix>".$templCfg["processing_suffix"]."</ProcessingSuffix>\n\t\t\t</DocumentSettings>\n\t\t\t<InfoFields>\n".$infoFields."\t\t\t</InfoFields>\n\t\t\t<Entries>\n".implode("",$entries)."\t\t\t</Entries>\n\t\t\t<Payouts>\n".(isset($payments[(string)$lastEmpId]) ? implode("", $payments[(string)$lastEmpId]) : "")."\t\t\t</Payouts>\n\t\t</Employee>\n";
+					if(isset($notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]])) {
+						$tmpNote[] = $notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]];
+					}
+					if(isset($notifications[(string)"0"][$emplData["Language"]])) {
+						$tmpNote[] = $notifications[(string)"0"][$emplData["Language"]];
+					}
+					$curEmpl =  "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$emplData["EmployeeNumber"]."</EmployeeNumber>" .
+								"\n\t\t\t<CompanyID>".$emplData["payroll_company_ID"]."</CompanyID>" .
+								"\n\t\t\t<Firstname>".$emplData["Firstname"]."</Firstname>" .
+								"\n\t\t\t<Lastname>".$emplData["Lastname"]."</Lastname>" .
+								"\n".($emplData["AdditionalAddrLine1"]!="" ? "\t\t\t<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").($emplData["AdditionalAddrLine2"]!="" ? "\t\t\t<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").($emplData["AdditionalAddrLine3"]!="" ? "\t\t\t<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").($emplData["AdditionalAddrLine4"]!="" ? "\t\t\t<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "")."\t\t\t<Street>".$emplData["Street"]."</Street>" .
+								"\n\t\t\t<ZIP-Code>".$emplData["ZIP-Code"]."</ZIP-Code>" .
+								"\n\t\t\t<City>".$emplData["City"]."</City>" .
+								"\n\t\t\t<Country>".$emplData["Country"]."</Country>" .
+								"\n\t\t\t<CountryName>".$countryNames[$emplData["Country"]]."</CountryName>" .
+								"\n".$infoByWageCode[$emplData["WageCode"]]."\t\t\t<PaymentDate>".$paymentDate."</PaymentDate>" .
+								"\n\t\t\t<InterestDate>".$interestDate."</InterestDate>" .
+								"\n".(count($tmpNote)!=0 ? "\t\t\t<Notification>".implode("<br/>",$tmpNote)."</Notification>" .
+								"\n" : "")."\t\t\t<DocumentSettings>" .
+								"\n\t\t\t\t<Language>".$emplData["Language"]."</Language>" .
+								"\n\t\t\t\t<DecimalPoint>.</DecimalPoint>" .
+								"\n\t\t\t\t<ThousandsSeparator>'</ThousandsSeparator>" .
+								"\n\t\t\t\t<PdfTemplate>".($templCfg["pdf_template"]!="" ? $pdfTemplateDir.$templCfg["pdf_template"] : "")."</PdfTemplate>" .
+								"\n\t\t\t\t<AddrOffsetLeft>".$templCfg["addr_offset_left"]."</AddrOffsetLeft>" .
+								"\n\t\t\t\t<AddrOffsetTop>".$templCfg["addr_offset_top"]."</AddrOffsetTop>" .
+								"\n\t\t\t\t<InfoOffsetLeft>".$templCfg["info_offset_left"]."</InfoOffsetLeft>" .
+								"\n\t\t\t\t<InfoOffsetTop>".$templCfg["info_offset_top"]."</InfoOffsetTop>" .
+								"\n\t\t\t\t<ContentOffsetLeft>".$templCfg["content_offset_left"]."</ContentOffsetLeft>" .
+								"\n\t\t\t\t<ContentOffsetTop>".$templCfg["content_offset_top"]."</ContentOffsetTop>" .
+								"\n\t\t\t\t<ContentWidth>".$templCfg["content_width"]."</ContentWidth>" .
+								"\n\t\t\t\t<AddrFontName>".$templCfg["addr_font_name"]."</AddrFontName>" .
+								"\n\t\t\t\t<AddrFontSize>".$templCfg["addr_font_size"]."</AddrFontSize>" .
+								"\n\t\t\t\t<InfoFontName>".$templCfg["info_font_name"]."</InfoFontName>" .
+								"\n\t\t\t\t<InfoFontSize>".$templCfg["info_font_size"]."</InfoFontSize>" .
+								"\n\t\t\t\t<ContentFontName>".$templCfg["content_font_name"]."</ContentFontName>" .
+								"\n\t\t\t\t<ContentFontSize>".$templCfg["content_font_size"]."</ContentFontSize>" .
+								"\n\t\t\t\t<ProcessingSuffix>".$templCfg["processing_suffix"]."</ProcessingSuffix>" .
+								"\n\t\t\t</DocumentSettings>" .
+								"\n\t\t\t<InfoFields>\n".$infoFields."\t\t\t</InfoFields>" .
+								"\n\t\t\t<Entries>" .
+								"\n".implode("",$entries)."\t\t\t</Entries>" .
+								"\n\t\t\t<Payouts>\n".(isset($payments[(string)$lastEmpId]) ? implode("", $payments[(string)$lastEmpId]) : "")."\t\t\t</Payouts>" .
+								"\n\t\t</Employee>\n";
+					
+//communication_interface::alert("curEmpl :".$curEmpl);
+communication_interface::alert("entries :\n------------\n".implode("",$entries));
+	
 					fwrite($fp, str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), $curEmpl) );
 				}
-
 				$lastEmpId = $row["payroll_employee_ID"];
 				$entries = array();
 			}
@@ -1132,8 +1282,12 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 				}
 			}
 			$tmpNote = array();
-			if(isset($notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]])) $tmpNote[] = $notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]];
-			if(isset($notifications[(string)"0"][$emplData["Language"]])) $tmpNote[] = $notifications[(string)"0"][$emplData["Language"]];
+			if(isset($notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]])) {
+				$tmpNote[] = $notifications[(string)$emplData["payroll_company_ID"]][$emplData["Language"]];
+			}
+			if(isset($notifications[(string)"0"][$emplData["Language"]])) {
+				$tmpNote[] = $notifications[(string)"0"][$emplData["Language"]];
+			}
 			$curEmpl = "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$emplData["EmployeeNumber"]."</EmployeeNumber>\n\t\t\t<CompanyID>".$emplData["payroll_company_ID"]."</CompanyID>\n\t\t\t<Firstname>".$emplData["Firstname"]."</Firstname>\n\t\t\t<Lastname>".$emplData["Lastname"]."</Lastname>\n".($emplData["AdditionalAddrLine1"]!="" ? "\t\t\t<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").($emplData["AdditionalAddrLine2"]!="" ? "\t\t\t<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").($emplData["AdditionalAddrLine3"]!="" ? "\t\t\t<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").($emplData["AdditionalAddrLine4"]!="" ? "\t\t\t<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "")."\t\t\t<Street>".$emplData["Street"]."</Street>\n\t\t\t<ZIP-Code>".$emplData["ZIP-Code"]."</ZIP-Code>\n\t\t\t<City>".$emplData["City"]."</City>\n\t\t\t<Country>".$emplData["Country"]."</Country>\n\t\t\t<CountryName>".$countryNames[$emplData["Country"]]."</CountryName>\n".$infoByWageCode[$emplData["WageCode"]]."\t\t\t<PaymentDate>".$paymentDate."</PaymentDate>\n\t\t\t<InterestDate>".$interestDate."</InterestDate>\n".(count($tmpNote)!=0 ? "\t\t\t<Notification>".implode("<br/>",$tmpNote)."</Notification>\n" : "")."\t\t\t<DocumentSettings>\n\t\t\t\t<Language>".$emplData["Language"]."</Language>\n\t\t\t\t<DecimalPoint>.</DecimalPoint>\n\t\t\t\t<ThousandsSeparator>'</ThousandsSeparator>\n\t\t\t\t<PdfTemplate>".($templCfg["pdf_template"]!="" ? $pdfTemplateDir.$templCfg["pdf_template"] : "")."</PdfTemplate>\n\t\t\t\t<AddrOffsetLeft>".$templCfg["addr_offset_left"]."</AddrOffsetLeft>\n\t\t\t\t<AddrOffsetTop>".$templCfg["addr_offset_top"]."</AddrOffsetTop>\n\t\t\t\t<InfoOffsetLeft>".$templCfg["info_offset_left"]."</InfoOffsetLeft>\n\t\t\t\t<InfoOffsetTop>".$templCfg["info_offset_top"]."</InfoOffsetTop>\n\t\t\t\t<ContentOffsetLeft>".$templCfg["content_offset_left"]."</ContentOffsetLeft>\n\t\t\t\t<ContentOffsetTop>".$templCfg["content_offset_top"]."</ContentOffsetTop>\n\t\t\t\t<ContentWidth>".$templCfg["content_width"]."</ContentWidth>\n\t\t\t\t<AddrFontName>".$templCfg["addr_font_name"]."</AddrFontName>\n\t\t\t\t<AddrFontSize>".$templCfg["addr_font_size"]."</AddrFontSize>\n\t\t\t\t<InfoFontName>".$templCfg["info_font_name"]."</InfoFontName>\n\t\t\t\t<InfoFontSize>".$templCfg["info_font_size"]."</InfoFontSize>\n\t\t\t\t<ContentFontName>".$templCfg["content_font_name"]."</ContentFontName>\n\t\t\t\t<ContentFontSize>".$templCfg["content_font_size"]."</ContentFontSize>\n\t\t\t\t<ProcessingSuffix>".$templCfg["processing_suffix"]."</ProcessingSuffix>\n\t\t\t</DocumentSettings>\n\t\t\t<InfoFields>\n".$infoFields."\t\t\t</InfoFields>\n\t\t\t<Entries>\n".implode("",$entries)."\t\t\t</Entries>\n\t\t\t<Payouts>\n".(isset($payments[(string)$row["payroll_employee_ID"]]) ? implode("", $payments[(string)$row["payroll_employee_ID"]]) : "")."\t\t\t</Payouts>\n\t\t</Employee>\n";
 			fwrite($fp, str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), $curEmpl) );
 		}
@@ -1143,8 +1297,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 		chdir($newTmpPath);
 
-        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."Payslip.xslt ./data.xml > ./compileme.tex");
-        
+        system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."Payslip.xslt ./data.xml > ./compileme.tex");        
 		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
         
 		system("chmod 666 *");

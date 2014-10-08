@@ -5,7 +5,7 @@ Harald Müller
 https://github.com/PesarisEntwickler/pesaris_lohn.git/trunk
 
 GITHub – online:
-------------------------------------------------
+==========================
 https://github.com/PesarisEntwickler
 Der Account heisst: „PesarisEntwickler“
 Und das Repository dort ist „pesaris_lohn“
@@ -17,31 +17,18 @@ harald.mueller@bluewin.ch
 haraldmueller
 D0nnerstag
 
-==========================================================
 
-Von: Daniel Müller [mailto:daniel.mueller@pesaris.com] 
-Gesendet: Montag, 26. Mai 2014 09:35
-An: Harald G. Mueller
-Cc: 'Pascal Moulin'
-Betreff: Neuer DB-Benutzer
+GoogleDrive
+==========================
+https://drive.google.com/folderview?id=0B73eFeXGXIsHZkdEV2YyZzlnSHM&usp=sharing
 
-Hallo Harald
 
-Bitte verwende für den Datenbank-Zugriff nur noch folgenden Benutzer:
-
+MySQL Datenbank-Zugriff:
+==========================
 Benutzername: remoteadmin
 Passwort: h3iD$N4b
 
-Damit müsste es auch klappen, die Stored Procedures anzuschauen und bei Bedarf zu verändern.
-Darf ich Dich bitten diese Zugangsdaten auch an Ascami weiterzuleiten.
 
-Danke und Gruss
-Daniel
-
-
-GoogleDrive
-=============
-https://drive.google.com/folderview?id=0B73eFeXGXIsHZkdEV2YyZzlnSHM&usp=sharing
 
 
 Zugang
@@ -76,10 +63,10 @@ MySQL
 ==========================
 Conn:	TCP
 Host:	srv2.copronet.ch
+Port:	3306	
 User:	harald
 Pass:	d4$15Tets
 Data:	lohndev
-Port:	3306	
 
 
 Logfile
