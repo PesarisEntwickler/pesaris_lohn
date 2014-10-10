@@ -746,12 +746,12 @@ AND T.payroll_employee_ID = E.id
 		return true;
 	}
 
-	public function setEffectifPayoutTable($period_ID,$employee_ID,$split_ID,$amount_CHF,$amount_payout,$currency_ID,$split_mode,$account_ID) {
+	public function setEffectifPayoutTable($period_ID,$employee_ID,$split_ID,$amount_CHF,$amount_payout,$currency_ID,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3) {
 		$sql = "
 INSERT INTO `payroll_payment_current_effectifpayout`
-(`payroll_period_ID`,`payroll_employee_ID`,`payroll_payment_split_ID`,`amount_CHF`,`amount_payout`,`currency_ID`,`split_mode`,`payroll_account_ID`)
+(`payroll_period_ID`,`payroll_employee_ID`,`payroll_payment_split_ID`,`amount_CHF`,`amount_payout`,`currency_ID`,`split_mode`,`payroll_account_ID`,`benIBAN`,`beneBank1`,`beneBank2`,`beneBank3`)
 VALUES
-(".$period_ID.", ".$employee_ID.", ".$split_ID.", ".$amount_CHF.", ".$amount_payout.", '".$currency_ID."', ".$split_mode.", '".$account_ID."');";
+(".$period_ID.", ".$employee_ID.", ".$split_ID.", ".$amount_CHF.", ".$amount_payout.", '".$currency_ID."', ".$split_mode.", '".$account_ID."', '".$benIBAN."', '".$beneBank1."', '".$beneBank2."', '".$beneBank3."');";
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeUpdate($sql);
 		return true;

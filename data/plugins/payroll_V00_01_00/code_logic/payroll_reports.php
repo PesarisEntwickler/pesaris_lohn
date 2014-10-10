@@ -975,49 +975,62 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		if($periodInfo["locked"]==0 && $periodInfo["finalized"]==0) $tableNameSuffix = "current";
 		else $tableNameSuffix = "entry";
 
+// 		$sql = "SELECT BANKDEST.`payroll_employee_ID`
+// 				, IF(EMPLOYEE.`Language`='','de',EMPLOYEE.`Language`) as `Language`
+// 				, BANKDEST.`destination_type`
+// 				, BANKDEST.`beneficiary_bank_line1`
+// 				, BANKDEST.`beneficiary_bank_line2`
+// 				, BANKDEST.`beneficiary_bank_line3`
+// 				, BANKDEST.`beneficiary_bank_line4`
+// 				, BANKDEST.`bank_account`
+// 				, BANKDEST.`postfinance_account`
+// 				, PMTCURR.`payroll_currency_ID` as `currency`
+// 				, FORMAT(PMTCURR.`amount_payout`,2) as `amount`
+// 				FROM `payroll_payment_current` PMTCURR
+// 				INNER JOIN `payroll_tmp_change_mng` EMPLST
+// 					ON EMPLST.`numID`=PMTCURR.`payroll_employee_ID`
+// 					AND EMPLST.`core_user_id`=".$uid."
+// 				INNER JOIN `payroll_payment_split` PMTSPLT
+// 					ON PMTSPLT.`id`=PMTCURR.`payroll_payment_split_ID`
+// 				INNER JOIN `payroll_bank_destination` BANKDEST
+// 					ON BANKDEST.`id`=PMTSPLT.`payroll_bank_destination_ID`
+// 				INNER JOIN `payroll_employee` EMPLOYEE
+// 					ON EMPLOYEE.`id`=PMTCURR.`payroll_employee_ID`
+// 				WHERE PMTCURR.`payroll_period_ID`=".$payrollPeriodID ;		
+			
+// 		$sql = "SELECT * FROM payroll_payment_current_effectifpayout WHERE payroll_employee_ID = ".$uid."
+// 				AND payroll_period_ID = ".$payrollPeriodID." ORDER BY payroll_employee_ID, payroll_payment_split_ID";
+		
+		$sql = "SELECT * FROM payroll_payment_current_effectifpayout ";
+				//ORDER BY payroll_employee_ID, payroll_payment_split_ID ";
+		
 		$payments = array();
-		$result = $system_database_manager->executeQuery(
-				"SELECT 
-				  BANKDEST.`payroll_employee_ID`
-				, IF(EMPLOYEE.`Language`='','de',EMPLOYEE.`Language`) as `Language`
-				, BANKDEST.`destination_type`
-				, BANKDEST.`beneficiary_bank_line1`
-				, BANKDEST.`beneficiary_bank_line2`
-				, BANKDEST.`beneficiary_bank_line3`
-				, BANKDEST.`beneficiary_bank_line4`
-				, BANKDEST.`bank_account`
-				, BANKDEST.`postfinance_account`
-				, PMTCURR.`payroll_currency_ID` as `currency`
-				, FORMAT(PMTCURR.`amount_payout`,2) as `amount` 
-				FROM `payroll_payment_current` PMTCURR 
-				INNER JOIN `payroll_tmp_change_mng` EMPLST 
-					ON EMPLST.`numID`=PMTCURR.`payroll_employee_ID` 
-					AND EMPLST.`core_user_id`=".$uid." 
-				INNER JOIN `payroll_payment_split` PMTSPLT 
-					ON PMTSPLT.`id`=PMTCURR.`payroll_payment_split_ID` 
-				INNER JOIN `payroll_bank_destination` BANKDEST 
-					ON BANKDEST.`id`=PMTSPLT.`payroll_bank_destination_ID` 
-				INNER JOIN `payroll_employee` EMPLOYEE 
-					ON EMPLOYEE.`id`=PMTCURR.`payroll_employee_ID` 
-				WHERE PMTCURR.`payroll_period_ID`=".$payrollPeriodID, "payroll_report_Payslip");
+		$result = $system_database_manager->executeQuery( $sql, "payroll_report_Payslip");
 		foreach($result as $row) {
 			if(!isset($payments[(string)$row["payroll_employee_ID"]])) {
 				$payments[(string)$row["payroll_employee_ID"]] = array();
 			}
-			switch($row["destination_type"]) {
-			case 1: $bankName = $row["beneficiary_bank_line1"]; $bankAccount = $row["bank_account"]; break; //Bank
-			case 2: $bankName = "PostFinance"; $bankAccount = $row["postfinance_account"]; break; //Postfinance
-			case 3: $bankName = $cashPayment[$row["Language"]]; $bankAccount = ""; break; //Barauszahlung
+// 			switch($row["destination_type"]) {
+// 			case 1: $bankName = $row["beneficiary_bank_line1"]; $bankAccount = $row["bank_account"]; break; //Bank
+// 			case 2: $bankName = "PostFinance"; $bankAccount = $row["postfinance_account"]; break; //Postfinance
+// 			case 3: $bankName = $cashPayment[$row["Language"]]; $bankAccount = ""; break; //Barauszahlung
+//			}
+			$payout = $row["amount_payout"];
+			$payout = number_format($row["amount_payout"], 2, '.', "'");
+			$payoutCHF = "";
+			if ( $row["currency_ID"] != "CHF" ) {
+				$payoutCHF = "(CHF ".number_format($row["amount_CHF"], 2, '.', "'").")";
 			}
 			$payments[(string)$row["payroll_employee_ID"]][] = 
 					"\t\t\t\t<Payout>
-					\n\t\t\t\t\t<BankAddrLine1>".$bankName."</BankAddrLine1>
-					\n\t\t\t\t\t<BankAddrLine2>".$row["beneficiary_bank_line2"]."</BankAddrLine2>
-					\n\t\t\t\t\t<BankAddrLine3>".$row["beneficiary_bank_line3"]."</BankAddrLine3>
-					\n\t\t\t\t\t<BankAddrLine4>".$row["beneficiary_bank_line4"]."</BankAddrLine4>
-					\n\t\t\t\t\t<BankAccountNo>".$bankAccount."</BankAccountNo>
-					\n\t\t\t\t\t<PayoutCurrency>".$row["currency"]."</PayoutCurrency>
-					\n\t\t\t\t\t<PayoutAmount>".$row["amount"]."</PayoutAmount>
+					\n\t\t\t\t\t<BankAddrLine1>".$row["beneBank1"]."</BankAddrLine1>
+					\n\t\t\t\t\t<BankAddrLine2>".$row["beneBank2"]."</BankAddrLine2>
+					\n\t\t\t\t\t<BankAddrLine3>".$row["beneBank3"]."</BankAddrLine3>
+					\n\t\t\t\t\t<BankAddrLine4> </BankAddrLine4>
+					\n\t\t\t\t\t<BankAccountNo>".$row["benIBAN"]."</BankAccountNo>
+					\n\t\t\t\t\t<PayoutCurrency>".$row["currency_ID"]."</PayoutCurrency>
+					\n\t\t\t\t\t<PayoutAmount>".$payout."</PayoutAmount>
+					\n\t\t\t\t\t<PayoutAmountCHF>".$payoutCHF."</PayoutAmountCHF>
 					\n\t\t\t\t</Payout>\n";
 		}
 		unset($result);
@@ -1228,7 +1241,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 								"\n\t\t</Employee>\n";
 					
 //communication_interface::alert("curEmpl :".$curEmpl);
-communication_interface::alert("entries :\n------------\n".implode("",$entries));
+//communication_interface::alert("entries :\n------------\n".implode("",$entries));
 	
 					fwrite($fp, str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), $curEmpl) );
 				}

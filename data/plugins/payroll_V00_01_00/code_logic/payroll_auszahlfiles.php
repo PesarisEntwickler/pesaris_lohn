@@ -213,7 +213,7 @@ class auszahlfiles {
 
 									// die systemseitige Lohnkontrolle wird in CHF gemacht
 									$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$payAmountCHF);
-									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmount,$payCurrency,$split_mode,$account_ID);
+									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmount,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
 									break;
 									
 								case "EUR":
@@ -237,7 +237,7 @@ class auszahlfiles {
 
 									// die systemseitige Lohnkontrolle wird in CHF gemacht
 									$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$payAmountCHF);
-									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmount,$payCurrency,$split_mode,$account_ID);
+									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmount,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
 									break;
 									
 								default://CHF
@@ -262,7 +262,7 @@ class auszahlfiles {
 
 									// die systemseitige Lohnkontrolle wird in CHF gemacht
 									$auszahlen->setAmountAvailableTrackingTable($periodeID, $employee_ID, $splitID, $processingOrder, $availAmt-$payAmountCHF);
-									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmountCHF,$payCurrency,$split_mode,$account_ID);		
+									$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$payAmountCHF,$payAmountCHF,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);		
 									break;
 							}//end switch ( $payCurrency )
 		
@@ -348,7 +348,7 @@ class auszahlfiles {
 								}
 								$dtaJournal_USD .= $this->setDTAJournalZeile($trxNr_USD, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountUSD, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_USD .= $this->setDTAZeile( $dtaValutaDate, $trxNr_USD, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountUSD, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
-								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountUSD,$payCurrency,$split_mode,$account_ID);
+								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountUSD,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
 								break;
 								
 							case "EUR":
@@ -371,7 +371,7 @@ class auszahlfiles {
 								}
 								$dtaJournal_EUR .= $this->setDTAJournalZeile($trxNr_EUR, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountEUR, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_EUR .= $this->setDTAZeile( $dtaValutaDate, $trxNr_EUR, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountEUR, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
-								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountEUR,$payCurrency,$split_mode,$account_ID);
+								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountEUR,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
 								break;
 								
 							default://CHF
@@ -392,7 +392,7 @@ class auszahlfiles {
 								}
 								$dtaJournal_CHF .= $this->setDTAJournalZeile($trxNr_CHF, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountCHF, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_CHF .= $this->setDTAZeile( $dtaValutaDate, $trxNr_CHF, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountCHF, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
-								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountCHF,$payCurrency,$split_mode,$account_ID);
+								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountCHF,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
 								break;
 						}//switch ( $payCurrency )
 						//Abhaken Mitarbeiter mit Lohnbezug
