@@ -55,13 +55,14 @@ class auszahlen {
 	}
 	
 	public function getZahlstelle($ZahlstellenID) { 
+		//communication_interface::alert("getZahlstelle($ZahlstellenID)");
 		$system_database_manager = system_database_manager::getInstance();
 		$result_bank_source = $system_database_manager->executeQuery("" .
 				"SELECT * FROM  " .
 				"payroll_bank_source " .
 				"WHERE id = ".$ZahlstellenID.";");
-		
-		return array("IBAN"    =>$result_bank_source[0]["bank_source_IBAN"]
+		if (count($result_bank_source) > 0) {
+			return array("IBAN"    =>$result_bank_source[0]["bank_source_IBAN"]
 					, "desc"   =>$result_bank_source[0]["description"]
 					, "type"   =>$result_bank_source[0]["source_type"]
 					, "line1"  =>$result_bank_source[0]["bank_source_desc1"]
@@ -71,7 +72,10 @@ class auszahlen {
 					, "company"=>$result_bank_source[0]["payroll_company_ID"]
 					, "carrier"=>$result_bank_source[0]["bank_source_carrier"]
 					, "currency"=>$result_bank_source[0]["bank_source_currency_code"]
-					);		 
+					);
+		} else {
+			return array();
+		}
 	}
 	public function getZahlstellenListe($companyID) {
 		$companyClause = "";
@@ -151,11 +155,14 @@ class auszahlen {
 	public function deleteFilesFromActualPeriod(){
 		$dir = $this->getActualPeriodenDir();
 		$fm = new file_manager();
-		$filelist = $fm->customerSpace()->setPath($dir["relPath"])->listDir(1);  
-		foreach($filelist as $row) {
-			//communication_interface::alert("file=".$row);
-			unlink($dir["absPath"].$row);
-		}
+		$filelist = $fm->customerSpace()->setPath($dir["relPath"])->listDir(1);
+		if (count($filelist)>0){
+			foreach($filelist as $row) {
+				//communication_interface::alert("file=".$row);
+				unlink($dir["absPath"].$row);
+			}
+		}  
+		//communication_interface::alert(print_r($filelist, true));
 		return count($filelist);
 	}
 
@@ -203,17 +210,17 @@ class auszahlen {
 	//Damit werden die Doppelten ignoriert
 		$sql="
 			SELECT * FROM payroll_employee AS emp
-			  INNER JOIN payroll_period_employee AS prdempl 
+			 INNER JOIN payroll_period_employee AS prdempl 
 				ON prdempl.payroll_employee_ID=emp.id 
-				AND prdempl.processing!=0 
+			   AND prdempl.processing!=0 
 			  JOIN payroll_employment_period AS emprd 
 				ON emp.id = emprd.payroll_employee_ID 
-			  INNER JOIN payroll_period AS prd  
-			WHERE prd.id=prdempl.payroll_period_ID 
-				AND prd.finalized=0  
-				AND prd.locked=0
-				AND emp.id 
-					IN (
+			 INNER JOIN payroll_period AS prd  
+			 WHERE prd.id=prdempl.payroll_period_ID 
+			   AND prd.finalized=0  
+			   AND prd.locked=0
+			   AND emp.id 
+			   	IN (
 						SELECT payroll_employee_ID 
 						FROM payroll_calculation_current 
 						WHERE payroll_account_ID 
@@ -433,7 +440,7 @@ class auszahlen {
 		$retArray['bankpostcash'] = "";
 		$retArray['nonstandard_banksourcezahlstelle'] = "";
 		$retArray['spesenregelung'] = "";
-		$retArray['bank_dest_currency'] = "";
+		$retArray['currency'] = "";
 		$retArray['splitMode'] = 1;
 		$retArray['success'] = false;
 		if ( count($result_bank_destination) > 0 ) {
@@ -456,7 +463,7 @@ class auszahlen {
 			$retArray['beneEndbeguenst4'] = $result_bank_destination[0]['beneficiary2_line5'];//Ort
 			$retArray['spesenregelung']   = $result_bank_destination[0]['expense'];
 			$retArray['nonstandard_banksourcezahlstelle'] = $result_bank_destination[0]['nonstandard_banksourcezahlstelle'];
-			$retArray['bank_dest_currency'] = $result_bank_destination[0]['bank_dest_currency'];
+			$retArray['currency'] = $result_bank_destination[0]['bank_dest_currency'];
 			$retArray['splitMode'] = $result_bank_destination[0]['destination_type'];
 			switch ( $result_bank_destination[0]['destination_type'] ) {
 				case 1: $retArray['bankpostcash'] = "BANK"; break;
@@ -645,6 +652,22 @@ class auszahlen {
 		return $return;
 	}
 
+	public function getEmpl_Personenkreis_FromTrackingTable($emplFilter) {
+		$sql = "SELECT id AS payroll_employee_ID FROM 
+ lohndev.payroll_employee AS emp 
+ WHERE emp.id IN (
+	SELECT payroll_employee_ID FROM lohndev.`payroll_auszahlen_tracking` WHERE amount_available > 0.001
+ )				
+ ".$emplFilter;
+		$return = array();
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql);
+		foreach ( $result as $row ) {
+			$return[] = $row["payroll_employee_ID"];
+		}
+		return $return;
+	}
+	
 	public function getUncompleteEmplFromTrackingTable() {
 		$sql = "SELECT payroll_employee_ID FROM `payroll_auszahlen_tracking` WHERE amount_available > 0.001 AND amount_available <> amount_initial ;";
 		$system_database_manager = system_database_manager::getInstance();

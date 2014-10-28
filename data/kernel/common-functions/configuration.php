@@ -119,17 +119,17 @@ $aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 
 //Core Paths Windows industryBilling (Harald)
 
-$aafwConfig["paths"]["file_manager"]["rootPath"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/";
-$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data/";
-$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data/kernel/cache/sessions/";
-$aafwConfig["paths"]["plugin"]["customerDir"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/CUSTOMER/";
-$aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/mysqldump";
-$aafwConfig["paths"]["reports"]["templates"] = "C:/Users/Harald G. Mueller/HM/workspaces_eclipse/pesaris_lohn/payroll/data-hidden/GLOBAL/templates/";
+$aafwConfig["paths"]["file_manager"]["rootPath"] = "C:/git/pesaris_lohn/data-hidden/";
+$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/git/pesaris_lohn/data/";
+$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "C:/git/pesaris_lohn/data/kernel/cache/sessions/";
+$aafwConfig["paths"]["plugin"]["customerDir"] = "C:/git/pesaris_lohn/data-hidden/CUSTOMER/";
+$aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/git/pesaris_lohn/mysqldump";
+$aafwConfig["paths"]["reports"]["templates"] = "C:/git/pesaris_lohn/data-hidden/GLOBAL/templates/";
 
 $aafwConfig["paths"]["utilities"]["xsltproc"] = "C:/Users/Harald G. Mueller/HM/XSLT/bin/xsltproc.exe";
 $aafwConfig["paths"]["utilities"]["pdflatex"] = "C:/Program Files (x86)/MiKTeX 2.9/miktex/bin/pdflatex.exe";
 $aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
-$aafwConfig["paths"]["utilities"]["mysql"] = "C:/Users/Harald G. Mueller/HM/XAMPP/mysql/data";
+$aafwConfig["paths"]["utilities"]["mysql"] = "C:/XAMPP/mysql/data";
 
 ?>

@@ -195,21 +195,26 @@ class payroll_BL_payment {
 		
 		communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#fff'); ");						
 		communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#fff'); ");	
-											
-		if ($param["payroll_currency_ID"] != "CHF") {
-			if ($param["selectedZahlstelle"] == "0") {//Standard-Zahlstelle ist ein CHF-Konto
-				communication_interface::alert("Standard-Zahlstelle ist kein ".$param["payroll_currency_ID"]."-Konto!");
-				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
-				communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
+
+		if ($param["selectedZahlstelle"] == "0") {//Standard-Zahlstelle ist ein CHF-Konto
+			if ($param["currency"] != "CHF") {
+				communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");
+				communication_interface::jsExecute("$('#prlPmtSplt_currency').css('backgroundColor','#ffacac'); ");
+				communication_interface::alert(
+				"Die Standard-Zahlstelle hat die Waehrung CHF\nDas Auszahlungs-Konto hat die Waehrung ".$param["currency"]." 
+						\nWenn die Standard-Zahlstelle gewaehlt ist,\nmuss das Auszahlungs-Konto auch ein CHF-Konto sein!");
 				return false;
 			}
-		}
-		$zahlstelle = $auszahlen->getZahlstelle($param["selectedZahlstelle"]);
-		if ($param["selectedZahlstelle"] != $zahlstelle["currency"]) {
-			communication_interface::alert("Zahlstellen-Waehrung (".$zahlstelle["currency"].") ist nicht die Waehrung des Auszahl-Splitts (".$param["payroll_currency_ID"].")");
-			communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
-			communication_interface::jsExecute("$('#prlPmtSplt_payroll_currency_ID').css('backgroundColor','#ffacac'); ");										
-			return false;
+		} else {
+			$zahlstelle = $auszahlen->getZahlstelle($param["selectedZahlstelle"]);
+			if ($zahlstelle > 0) {	
+				if ($param["currency"] != $zahlstelle["currency"]) {
+					communication_interface::alert("Die Zahlstellen-Waehrung (".$zahlstelle["currency"].") ist nicht die gleiche \nWaehrung wie die des Auszahl-Kontos (".$param["currency"].")");
+					communication_interface::jsExecute("$('#prlPmtSplt_selectedZahlstelle').css('backgroundColor','#ffacac'); ");						
+					communication_interface::jsExecute("$('#prlPmtSplt_currency').css('backgroundColor','#ffacac'); ");										
+					return false;
+				}
+			}			
 		}
 		
 		$return = 0;
@@ -235,7 +240,7 @@ class payroll_BL_payment {
 				$paramSplitTab["split_mode"] 				= $param["split_mode"];
 				$paramSplitTab["payroll_account_ID"] 		= $param["payroll_account_ID"];
 				$paramSplitTab["amount"] 					= $param["amount"];
-				$paramSplitTab["payroll_currency_ID"] 		= $param["payroll_currency_ID"];
+				$paramSplitTab["payroll_currency_ID"] 		= $param["currency"];
 				$paramSplitTab["major_period"] = 0; $paramSplitTab["minor_period"] = 0; $paramSplitTab["major_period_bonus"] = 0; $paramSplitTab["major_period_num"] = 0; $paramSplitTab["minor_period_num"] = 0; $paramSplitTab["major_period_bonus_num"] = 0;
 				if($param["period"]=="") {
 					$paramSplitTab["major_period"] = 1;
@@ -291,6 +296,7 @@ class payroll_BL_payment {
 		$paramBankDest["expense"] 				= strtoupper($param["expense"]);
 		//$paramBankDest["is_standard_bank"] 		= "";
 		$paramBankDest["nonstandard_banksourcezahlstelle"] =  $param["selectedZahlstelle"];
+		$paramBankDest["bank_dest_currency"] =  $param["currency"];;
 		
 		if ($hasSplit) {
 			//communication_interface::alert("saveBankDestinationUndSplit:".$hasSplit["count"]."\nparamSplitTab:".print_r($paramSplitTab, true));

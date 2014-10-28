@@ -56,73 +56,6 @@
 </wgui:block name="GUI_paymentSplitOverview">
 
 
-<wgui:block name="paymentSplitEdit">
-	<!-- dieses GUI ist eliminiert -->
-	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlPmtSpltEdit PesarisWGUI">
-		<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
-				<select id="prlPmtSplt_period">
-					<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
-<!-- 							
-					<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
- 					<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
-					<option value="MPB"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvBonuses"/></option>
-					<option value="MIP"><wgui:text id="txtAlle"/><wgui:text id="txtZwischenzahltage"/></option>
-					<option value="1"><wgui:text id="prlCalcOvMonth01"/></option>
-					<option value="2"><wgui:text id="prlCalcOvMonth02"/></option>
-					<option value="3"><wgui:text id="prlCalcOvMonth03"/></option>
-					<option value="4"><wgui:text id="prlCalcOvMonth04"/></option>
-					<option value="5"><wgui:text id="prlCalcOvMonth05"/></option>
-					<option value="6"><wgui:text id="prlCalcOvMonth06"/></option>
-					<option value="7"><wgui:text id="prlCalcOvMonth07"/></option>
-					<option value="8"><wgui:text id="prlCalcOvMonth08"/></option>
-					<option value="9"><wgui:text id="prlCalcOvMonth09"/></option>
-					<option value="10"><wgui:text id="prlCalcOvMonth10"/></option>
-					<option value="11"><wgui:text id="prlCalcOvMonth11"/></option>
-					<option value="12"><wgui:text id="prlCalcOvMonth12"/></option>
-					<option value="13">13. <wgui:text id="txtMohnatslohn"/></option>
-					<option value="14">14. <wgui:text id="txtMohnatslohn"/></option>
-					<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
-					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
- -->
-				</select><br/>
-		<label for="prlPmtSplt_split_mode"><wgui:text id="txtZuteilkriterium"/>:</label>
-			<select id="prlPmtSplt_split_mode">
-				<option value="2">%</option>
-				<option value="3"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtBetrag"/></option>
-				<option value="1"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtLohnart"/></option>
-			</select><br/>
-		<label for="prlPmtSplt_amount" smd2="Prozent (%):" smd3="Betrag:"></label>
-			<input type="text" id="prlPmtSplt_amount"/><br/>
-		<label for="prlPmtSplt_payroll_account_ID"><wgui:text id="txtLohnart"/>:</label>
-			<input type="text" id="prlPmtSplt_payroll_account_ID"/><br/>
-		<label for="prlPmtSplt_payroll_currency_ID"><wgui:text id="txtWaehrung"/>:</label>
-			<select id="prlPmtSplt_payroll_currency_ID">
-				<option value="CHF">CHF</option>
-				<option value="EUR">EUR</option>
-				<option value="USD">USD</option>
-			</select><br/>
-		<label for="prlPmtSplt_payroll_bank_source_ID"><wgui:text id="txtZahlstelle"/>:</label><select id="prlPmtSplt_payroll_bank_source_ID"><option value="0"><wgui:text id="txtStandardVerwenden"/></option>
-			<wgui:loop name="bankSrcLoop" varname="bank_source_list">
-				<option value='<wgui:loopvar loopname="bankSrcLoop" varname="id"/>'><wgui:loopvar loopname="bankSrcLoop" varname="description"/></option>
-			</wgui:loop name="bankSrcLoop">
-			</select>
-			<button id="prlPmtSplt_BtnBSEdit" class="BtnLSpace"><wgui:text id="btnEditArrow"/></button><br/>
-		<label for="prlPmtSplt_payroll_bank_destination_ID">Bankverbindung Mitarb.:</label><select id="prlPmtSplt_payroll_bank_destination_ID"><option value="0"><wgui:text id="txtStandardVerwenden"/></option>
-			<wgui:loop name="bankDestLoop" varname="bank_destination_list">
-				<option value='<wgui:loopvar loopname="bankDestLoop" varname="id"/>'><wgui:loopvar loopname="bankDestLoop" varname="description"/></option>
-			</wgui:loop name="bankDestLoop">
-			</select> 
-			<button id="prlPmtSplt_BtnBDEdit" class="BtnLSpace"><wgui:text id="btnEditArrow"/></button><br/>
-		<label for="prlPmtSplt_having_rounding">Rundung aktivieren:</label><input type="checkbox" id="prlPmtSplt_having_rounding"/><br/>
-		<label for="prlPmtSplt_round_param">Rundungsparameter:</label><input type="text" id="prlPmtSplt_round_param"/><br/>
-	</div>
-	<button id="prlPmtSpltCancel" class="PesarisButton" ><wgui:text id="btnCancel"/></button>
-	<div style="float: right;"><button id="prlPmtSpltSave" class="PesarisButton" ><wgui:text id="btnSave"/></button></div>
-</wgui:block name="paymentSplitEdit">
-
-
-
-
 <wgui:block name="paymentSplitDelete">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
 		<br/><wgui:text id="txtZahlSplittLoeschenSicher"/><br/>&nbsp;
@@ -163,12 +96,12 @@
 		<input type="hidden" id='prlPmtSplt_bankID' value='<wgui:var name="bankID"/>'/>
 		<table cellpadding="0" cellspacing="0">
 		<tr>
-			<td>
-				<fieldset>
+			<td colspan="2">
+				<fieldset style="background-color: #d2d2d2">
 					<legend>
 						<wgui:text id="txtZahlstelle"/>
 					</legend>
-					<select id="prlPmtSplt_selectedZahlstelle" name="prlPmtSplt_selectedZahlstelle" style="width:370px;margin-bottom:4px;" size="1" >
+					<select id="prlPmtSplt_selectedZahlstelle" name="prlPmtSplt_selectedZahlstelle" style="width:100%; margin-bottom:4px;" size="1" >
 							<option value="0"><wgui:text id="txtStandardZahlstellenVerwenden"/></option>
 						<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
 							<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>">
@@ -184,7 +117,11 @@
 								<wgui:loopvar loopname="zahlstellenLoop" varname="bank_source_desc4"/>
 							</option>
 						</wgui:loop name="zahlstellenLoop">
-					</select><br/>
+					</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtBeguenstigter"/></legend>
@@ -200,7 +137,51 @@
 					<label for="prlPmtSplt_beneficiary2_line3"><wgui:text id="txtAdresse"      />:</label><input type="text" id="prlPmtSplt_beneficiary2_line3" value="<wgui:var name="beneficiary2_line3"  maxsize="32" />"/><br/>
 					<label for="prlPmtSplt_beneficiary2_line4"><wgui:text id="txtPlzOrt"       />:</label><input type="text" id="prlPmtSplt_beneficiary2_line4" value="<wgui:var name="beneficiary2_line4"  maxsize="32" />"/><br/>
 				</fieldset>
+	<!-- Zahlungssplitt wird per plugin-code ein-/ausgeblendet -->
 				<button id="btnInitZahlungssplitt" class="PesarisButton" style="width: 380px; margin: 8px;"><wgui:text id="txtZahlungssplittInit"/></button>
+				<fieldset id="fieldsetZahlungssplitt" >
+					<legend><wgui:text id="txtZahlungssplitt"/></legend>
+
+						<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
+						<select id="prlPmtSplt_period" >
+							<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
+<!-- 							
+							<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
+							<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
+							<option value="MPB"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvBonuses"/></option>
+							<option value="MIP"><wgui:text id="txtAlle"/><wgui:text id="txtZwischenzahltage"/></option>
+							<option value="1"><wgui:text id="prlCalcOvMonth01"/></option>
+							<option value="2"><wgui:text id="prlCalcOvMonth02"/></option>
+							<option value="3"><wgui:text id="prlCalcOvMonth03"/></option>
+							<option value="4"><wgui:text id="prlCalcOvMonth04"/></option>
+							<option value="5"><wgui:text id="prlCalcOvMonth05"/></option>
+							<option value="6"><wgui:text id="prlCalcOvMonth06"/></option>
+							<option value="7"><wgui:text id="prlCalcOvMonth07"/></option>
+							<option value="8"><wgui:text id="prlCalcOvMonth08"/></option>
+							<option value="9"><wgui:text id="prlCalcOvMonth09"/></option>
+							<option value="10"><wgui:text id="prlCalcOvMonth10"/></option>
+							<option value="11"><wgui:text id="prlCalcOvMonth11"/></option>
+							<option value="12"><wgui:text id="prlCalcOvMonth12"/></option>
+							<option value="13">13. <wgui:text id="txtMohnatslohn"/></option>
+							<option value="14">14. <wgui:text id="txtMohnatslohn"/></option>
+							<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
+							<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
+ -->							
+						</select>
+						<br/>
+
+						<label for="prlPmtSplt_split_mode"><wgui:text id="txtZuteilkriterium"/>:</label>
+								<select id="prlPmtSplt_split_mode" style="width: 194px;">
+									<option value="2">%</option>
+									<option value="3"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtBetrag"/></option>
+									<option value="1"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtLohnart"/></option>
+								</select><br/>
+						<label for="prlPmtSplt_amount" smd2="Prozent (%):" smd3="Betrag:"></label>
+							<input type="text" id="prlPmtSplt_amount" style="width: 150px; padding: 0 3px 0 3px;"/>
+							<input type="text" id="prlPmtSplt_anzeigewaehrung" style="width: 26px; padding: 0 3px 0 3px;" disabled="disabled"/><br/>
+						<label for="prlPmtSplt_payroll_account_ID"><wgui:text id="txtLohnart"/>:</label>
+							<input type="text" id="prlPmtSplt_payroll_account_ID" style="width: 190px;"/><br/>
+				</fieldset>
 			</td>
 			<td>
 				<fieldset>
@@ -211,9 +192,15 @@
 							<option value="2"><wgui:text id="txtPost"/></option>
 							<option value="3"><wgui:text id="txtCash"/></option>
 						</select><br/>
-					<label for="prlPmtSplt_bank_account"><wgui:text id="txtKonto"/>:</label><input type="text" id="prlPmtSplt_bank_account" value="<wgui:var name="bank_account"/>"/><br/>
+					<label for="prlPmtSplt_bank_account"><wgui:text id="txtKonto"/>:</label><input type="text" id="prlPmtSplt_bank_account"  style="padding: 0 2px 0 4px; width: 190px;" value="<wgui:var name="bank_account"/>"/><br/>
+					<label for="prlPmtSplt_currency"><wgui:text id="txtWaehrung"/>:</label>
+					<select id="prlPmtSplt_currency" >
+						<option value="CHF">CHF</option>
+						<option value="EUR">EUR</option>
+						<option value="USD">USD</option>
+					</select><br/>
 <!-- 					<label for="prlPmtSplt_postfinance_account"><wgui:text id="txtPostcheckkonto"/>:</label><input type="text" id="prlPmtSplt_postfinance_account" value="<wgui:var name="postfinance_account"/>"/><br/>	-->
-					<label for="prlPmtSplt_description"><wgui:text id="txtBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" value="<wgui:var name="description"/>"/><br/>
+					<label for="prlPmtSplt_description"><wgui:text id="txtBezeichnung"/>:</label><input type="text" id="prlPmtSplt_description" style="padding: 0 0 0 4px; width: 190px;" value="<wgui:var name="description" />"/><br/>
 				</fieldset>
 				<fieldset>
 					<legend><wgui:text id="txtBankLabel"/></legend>
@@ -254,71 +241,11 @@
 				</a>
 			</td>
 		</tr>
-		<tr>
-			<td colspan="2">
-				<fieldset id="fieldsetZahlungssplitt" >
-					<legend><wgui:text id="txtZahlungssplitt"/></legend>
-					  <table style="width: 100%;" cellpadding="0" cellspacing="0"><tr><td>
-						<label for="prlPmtSplt_period"><wgui:text id="txtGueltigFuer"/>:</label>
-						<select id="prlPmtSplt_period" style="width: 190px;">
-							<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
-<!-- 							
-							<option value=""><wgui:text id="txtAlle"/><wgui:text id="txtAbrechnungsperioden"/></option>
-							<option value="MAP"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvMajorPeriods"/></option>
-							<option value="MPB"><wgui:text id="txtAlle"/><wgui:text id="prlCalcOvBonuses"/></option>
-							<option value="MIP"><wgui:text id="txtAlle"/><wgui:text id="txtZwischenzahltage"/></option>
-							<option value="1"><wgui:text id="prlCalcOvMonth01"/></option>
-							<option value="2"><wgui:text id="prlCalcOvMonth02"/></option>
-							<option value="3"><wgui:text id="prlCalcOvMonth03"/></option>
-							<option value="4"><wgui:text id="prlCalcOvMonth04"/></option>
-							<option value="5"><wgui:text id="prlCalcOvMonth05"/></option>
-							<option value="6"><wgui:text id="prlCalcOvMonth06"/></option>
-							<option value="7"><wgui:text id="prlCalcOvMonth07"/></option>
-							<option value="8"><wgui:text id="prlCalcOvMonth08"/></option>
-							<option value="9"><wgui:text id="prlCalcOvMonth09"/></option>
-							<option value="10"><wgui:text id="prlCalcOvMonth10"/></option>
-							<option value="11"><wgui:text id="prlCalcOvMonth11"/></option>
-							<option value="12"><wgui:text id="prlCalcOvMonth12"/></option>
-							<option value="13">13. <wgui:text id="txtMohnatslohn"/></option>
-							<option value="14">14. <wgui:text id="txtMohnatslohn"/></option>
-							<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
-							<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
- -->							
-						</select><br/>
-						<label for="prlPmtSplt_payroll_currency_ID"><wgui:text id="txtWaehrung"/>:</label>
-						<select id="prlPmtSplt_payroll_currency_ID" style="width: 190px;">
-							<option value="CHF">CHF</option>
-							<option value="EUR">EUR</option>
-							<option value="USD">USD</option>
-						</select><br/>
-					  </td>
-					  <td style="width: 6px; border-left:1px solid #999; border-right:1px solid #999;">			
-					  </td>
-					  <td>			
-						<label for="prlPmtSplt_split_mode"><wgui:text id="txtZuteilkriterium"/>:</label>
-								<select id="prlPmtSplt_split_mode" style="width: 194px;">
-									<option value="2">%</option>
-									<option value="3"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtBetrag"/></option>
-									<option value="1"><wgui:text id=""/><wgui:text id=""/><wgui:text id="txtLohnart"/></option>
-								</select><br/>
-						<label for="prlPmtSplt_amount" smd2="Prozent (%):" smd3="Betrag:"></label>
-							<input type="text" id="prlPmtSplt_amount" style="width: 190px;"/><br/>
-						<label for="prlPmtSplt_payroll_account_ID"><wgui:text id="txtLohnart"/>:</label>
-							<input type="text" id="prlPmtSplt_payroll_account_ID" style="width: 190px;"/><br/>
-					  </td>
-					</tr>
-					</table>
-				</fieldset>
-			</td>
-			<td>
-			</td>
-		</tr>
 		</table>
 	</div>
 	<table style="width: 100%"><tr>
 		<td align="left"><button id="btnBankverbindungClose" class="PesarisButton"><wgui:text id="btnClose"/></button></td>
-		<td align="right">			
-			<button id="btnSaveBankDestinationUndSplit" class="PesarisButton"><wgui:text id="btnSave"/></button></td>
+		<td align="right"><button id="btnSaveBankDestinationUndSplit" class="PesarisButton"><wgui:text id="btnSave"/></button></td>
 	</tr></table>
 </wgui:block name="destinationBankEdit">
 

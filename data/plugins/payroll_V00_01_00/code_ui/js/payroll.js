@@ -3834,9 +3834,13 @@ function prlPmtSpltEditInit() {
 			o.val('0.01');
 		}
 	});
+	$('#prlPmtSplt_currency').bind('change', function(e) {
+		alert("prlPmtSplt_currency");
+		document.getElementById("prlPmtSplt_anzeigewaehrung").value = document.getElementById("prlPmtSplt_currency").value);
+	});
 //	$('#prlPmtSpltCancel').bind('click', function(e) {
-//		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
-//	});
+//	cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
+//});
 //	$('#prlPmtSplt_BankSource_Cancel').bind('click', function(e) {
 //		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
 //	});

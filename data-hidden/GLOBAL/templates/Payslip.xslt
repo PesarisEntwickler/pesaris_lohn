@@ -166,22 +166,12 @@ keepaspectratio]{#1}%
 
 <xsl:template match="Payout">
 		&amp;		&amp;	&amp;	&amp;		&amp;		&amp;		&amp;				&amp;			\\[-2mm]
-<xsl:if test="BankAccountNo != ''"><xsl:value-of select="BankAccountNo"/>		&amp;		&amp;	&amp;	&amp;		&amp;		&amp;		&amp;				&amp;			\\
-</xsl:if>
-<xsl:value-of select="BankAddrLine1"/>		&amp;		&amp;<xsl:value-of select="PayoutAmountCHF"/>	&amp;	&amp;	\multicolumn{3}{r}{<xsl:value-of select="PayoutCurrency"/>}
-			&amp;	<xsl:choose>
-						<xsl:when test="substring-before(PayoutAmount, '.') != ''">
-							<xsl:value-of select="translate(substring-before(PayoutAmount, '.'),',',../../DocumentSettings/ThousandsSeparator)"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="PayoutAmount"/></xsl:otherwise></xsl:choose> &amp; 
-							<xsl:if test="substring-after(PayoutAmount, '.') != ''">
-								<xsl:value-of select="../../DocumentSettings/DecimalPoint"/>
-								<xsl:value-of select="substring-after(PayoutAmount, '.')"/>
-							</xsl:if> \\
+<xsl:value-of select="BankAddrLine1"/>		&amp;		&amp;	&amp;	&amp;	\multicolumn{3}{r}{<xsl:value-of select="PayoutCurrency"/>}			&amp;	<xsl:choose><xsl:when test="substring-before(PayoutAmount, '.') != ''"><xsl:value-of select="translate(substring-before(PayoutAmount, '.'),',',../../DocumentSettings/ThousandsSeparator)"/></xsl:when><xsl:otherwise><xsl:value-of select="PayoutAmount"/></xsl:otherwise></xsl:choose> &amp; <xsl:if test="substring-after(PayoutAmount, '.') != ''"><xsl:value-of select="../../DocumentSettings/DecimalPoint"/><xsl:value-of select="substring-after(PayoutAmount, '.')"/></xsl:if> \\
 <xsl:if test="BankAddrLine2 != ''"><xsl:value-of select="BankAddrLine2"/>		&amp;		&amp;	&amp;	&amp;		&amp;		&amp;		&amp;				&amp;			\\
 </xsl:if>
 <xsl:if test="BankAddrLine3 != ''"><xsl:value-of select="BankAddrLine3"/>		&amp;		&amp;	&amp;	&amp;		&amp;		&amp;		&amp;				&amp;			\\
+</xsl:if>
+<xsl:if test="BankAccountNo != ''"><xsl:value-of select="BankAccountNo"/>		&amp;		&amp;	&amp;	&amp;		&amp;		&amp;		&amp;				&amp;			\\
 </xsl:if>
 </xsl:template>
 

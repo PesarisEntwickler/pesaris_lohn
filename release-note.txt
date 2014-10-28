@@ -1,5 +1,20 @@
 Noch offen: 
-- [Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung  andrucken . Beispiel Nestler Paula"
+In Stammdatenverwaltung kann nur eine Mutation gemacht werden
+
+2014-10-27
+- DTA in Section 01 mit Zahlstellen-BCNummer ergänzt
+- Bankverbindung: Währungsfeld nach oben verschoben, inkl. Anpassung der Validierungen.
+- Auzahlen: Einschränkung auf Personenkreis geht wieder
+
+2014-10-21
+- DTA führende Nullen bei Betrag eingeführt (entgegen der SIX-Spezifikation)
+- DTA Absender-Adresse jetzt Firma (=Mandant) statt Absender-Bank (=Zahlstelle) 
+
+2014-10-21
+- DTA erste leere Zeile entfernt
+
+2014-10-10
+- [Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung andrucken" 
  
 2014-09-19
 

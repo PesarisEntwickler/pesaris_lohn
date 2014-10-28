@@ -165,7 +165,7 @@ $textResourceMap["prlPsoBtnFormEdit"] = "Bearbeitungsmasken verwalten";
 $textResourceMap["prlPsoDFltLblFilter"] = "Personalfilter:";
 $textResourceMap["prlPsoDFltAllEmployees"] = "Alle Mitarbeiter";
 $textResourceMap["prlPsoDFltAllEmployeesRestliche"] = "Alle Mitarbeiter (alle restlichen Mitarbeiter)";
-$textResourceMap["prlPsoDFltAllEmployeesToPay"] = "Noch nicht ausbezahlte Mitarbeiter";
+$textResourceMap["prlPsoDFltAllEmployeesToPay"] = "Noch nicht voll ausbezahlte Mitarbeiter";
 
 $textResourceMap["prlVlAlertCloseWnd_Title"] = "Fenster schliessen?";
 $textResourceMap["prlVlAlertCloseWnd_Msg"] = "Die Bearbeitungsmaske ist bereits geoeffnet. Um den Design-Modus zu aktivieren, muss das Fenster zuerst geschlossen werden. Ungespeicherte Daten gehen dabei verloren.<br/><br/>Soll die Maske geschlossen werden?";

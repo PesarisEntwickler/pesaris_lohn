@@ -1,0 +1,6 @@
+01000000            000001410168686   FAL010000183610FAL0100000000001CH4008686001130732001   141024CHF000000011431,50           
+02            Pneu Egger AG Aarau CH AG          c/o Kreutzmann Rechtsanwaelte      8001 Zuerich                                
+03DUBS AG                             5610 Wohlen AG 1                   CH61002582584B6049610                                  
+04Keiner Annak                       Florastrasse 2                     9500 Wil                                                
+05U                                                                                                         2                   
+01000000            00000141016       FAL0100002890000000000011431,50                                                           

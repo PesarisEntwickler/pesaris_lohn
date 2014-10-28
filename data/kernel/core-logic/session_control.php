@@ -98,20 +98,20 @@ class session_control {
 		require_once("system_database_manager.php");
 		$system_database_manager = system_database_manager::getInstance();
 
-//		if(!preg_match( '/^[_a-zA-Z0-9]{2,15}$/', $customerID)) {
-//			return false;
-//		}
-
-        //$system_database_manager->selectDatabase()
-        //		$system_database_manager->overrideDatabaseName($customerID);
-        $result = $system_database_manager->executeQuery("SELECT `databaseName` FROM `customer` WHERE `id`='".addslashes($customerID)."' AND `active`=1", "authenticate employee login");
-        if(count($result) > 0) {
-            $dbName = $result[0]["databaseName"];
-            $system_database_manager->selectDB($dbName);
-            $system_database_manager->defaultDatabaseName($dbName);
-        }else{
-            return false;
-        }
+// 		if ($customerID == "local") {
+// 			$dbName = "lohndev";
+//             $system_database_manager->selectDB($dbName);
+//             $system_database_manager->defaultDatabaseName($dbName);
+// 		} else {
+			$result = $system_database_manager->executeQuery("SELECT `databaseName` FROM `customer` WHERE `id`='".addslashes($customerID)."' AND `active`=1", "authenticate employee login");
+			if(count($result) > 0) {
+				$dbName = $result[0]["databaseName"];
+				$system_database_manager->selectDB($dbName);
+				$system_database_manager->defaultDatabaseName($dbName);
+			}else{
+				return false;
+			}
+// 		}
        
 		$result = $system_database_manager->executeQuery("SELECT id, full_name, email, plugin_settings, uid, language FROM core_user WHERE uid='".addslashes($userID)."' AND pwd=PASSWORD('".addslashes($password)."')", "authenticate employee login");
 		if(count($result) > 0) {

@@ -1334,12 +1334,14 @@ span.edit {
 	width:205px;
 }
 
-.prlPmtSpltEdit input[type=text], #prlPmtSplt_split_mode, #prlPmtSplt_payroll_currency_ID {
+.prlPmtSpltEdit input[type=text], #prlPmtSplt_split_mode {
 	width:100px;
+	padding-left: 2px;
 }
 
 #prlPmtSplt_amount, #prlPmtSplt_round_param {
 	text-align:right;
+	padding-right: 2px;
 }
 
 .prlPmtSpltEdit input[type=checkbox] {
@@ -1362,6 +1364,8 @@ span.edit {
 }
 .prlPmtSpltEditBD input[type=text] {
 	width:190px;
+	padding-left: 2px;
+	
 }
 .prlPmtSpltEditBD label {
 	display:inline-block;
