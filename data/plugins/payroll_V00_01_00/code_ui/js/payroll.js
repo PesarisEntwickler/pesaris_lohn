@@ -3836,7 +3836,7 @@ function prlPmtSpltEditInit() {
 	});
 	$('#prlPmtSplt_currency').bind('change', function(e) {
 		alert("prlPmtSplt_currency");
-		document.getElementById("prlPmtSplt_anzeigewaehrung").value = document.getElementById("prlPmtSplt_currency").value);
+		document.getElementById("prlPmtSplt_anzeigewaehrung").value = document.getElementById("prlPmtSplt_currency").value;
 	});
 //	$('#prlPmtSpltCancel').bind('click', function(e) {
 //	cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
