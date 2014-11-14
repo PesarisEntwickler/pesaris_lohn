@@ -171,9 +171,11 @@ class employee {
 		$listDef = array();
 		if($fieldDef["fieldType"]==4 && $fieldDef["dataSource"]=="payroll_empl_list") {
 			$list = $system_database_manager->executeQuery("SELECT * FROM payroll_empl_list WHERE ListGroup=".$fieldDef["dataSourceGroup"]." LIMIT 1", "payroll_getEmployeeFieldDetail");
-			$listDef["ListGroup"] = $list[0]["ListGroup"];
-			$listDef["ListType"] = $list[0]["ListType"];
-			$listDef["Items"] = array();
+			if (count($list)>0) {
+				$listDef["ListGroup"] = $list[0]["ListGroup"];
+				$listDef["ListType"] = $list[0]["ListType"];
+				$listDef["Items"] = array();
+			}
 
 			$listItems = $system_database_manager->executeQuery("SELECT * FROM payroll_empl_list_label lbl INNER JOIN payroll_empl_list lst ON lst.id=lbl.payroll_empl_list_ID AND lst.ListGroup=".$fieldDef["dataSourceGroup"]." AND deleted=0", "payroll_getEmployeeFieldDetail");
 			foreach($listItems as $listItem) {

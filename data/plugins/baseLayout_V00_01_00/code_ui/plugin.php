@@ -459,7 +459,8 @@ class baseLayout_UI {
 			communication_interface::assign('htmlBody', 'innerHTML', $objWGUI->processTemplate($data,"main")); //code_ui/gui/webbrowser/main.html   session_control::pluginPath("baseLayout")."code_ui/templates/main.html"
 //communication_interface::alert("test");
 //return;
-			communication_interface::assign('splashStatusTxt', 'innerHTML', 'Lade Module...');
+//			communication_interface::assign('splashStatusTxt', 'innerHTML', 'Lade Module...');
+			communication_interface::assign('splashStatusTxt', 'innerHTML', '.');
 			communication_interface::cssFileInclude('web/js/css/redmond/jquery-ui-1.8.7.custom.css','all');
 			communication_interface::cssFileInclude('web/css/layout-default.css','all');
 			communication_interface::cssFileInclude('web/css/mbContainer.css','all');
@@ -480,25 +481,29 @@ class baseLayout_UI {
 			$jqueryLoader .= "}\n";
 			$jqueryLoader .= "var loadJQUERYUI = function() {\n";
 //			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery-ui.js';\n";
-			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery-ui';\n";
+//			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery-ui';\n";
+			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = '...';\n";
 //			$jqueryLoader .= "loadScript('web/js/jquery-ui.js', loadJQUERYLAYOUT);\n";
 			$jqueryLoader .= "loadScript('web/js/jquery-ui-1.10.0.custom.min.js', loadJQUERYLAYOUT);\n";
 			$jqueryLoader .= "};\n";
 			$jqueryLoader .= "var loadJQUERYLAYOUT = function() {\n";
-			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery.layout.js';\n";
+//			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery.layout.js';\n";
+			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = '.....';\n";
 //			$jqueryLoader .= "loadScript('web/js/jquery.layout.js', loadMainScript);\n";
 			$jqueryLoader .= "loadScript('web/js/jquery.layout.min-1.3.0.js', loadMainScript);\n";
 			$jqueryLoader .= "};\n";
 			$jqueryLoader .= "var loadMainScript = function() {\n";
-			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'Init Script';\n";
+			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = '.........';\n";
+//			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'Init Script';\n";
 			$jqueryLoader .= "loadScript('plugins/baseLayout_V00_01_00/code_ui/js/main-init.js', loadJQUERYdone);\n";
 			$jqueryLoader .= "};\n";
 			$jqueryLoader .= "var loadJQUERYdone = function() {\n";
-			$jqueryLoader .= "if(document.getElementById('splashStatusTxt').innerHTML!='restliche JS laden') { document.getElementById('splashStatusTxt').innerHTML = 'restliche JS laden';\n";
+//			$jqueryLoader .= "if(document.getElementById('splashStatusTxt').innerHTML!='restliche JS laden') { document.getElementById('splashStatusTxt').innerHTML = 'restliche JS laden';\n";
+			$jqueryLoader .= "if(document.getElementById('splashStatusTxt').innerHTML!='restliche JS laden') { document.getElementById('splashStatusTxt').innerHTML = '........';\n";
 			$jqueryLoader .= "cb('baseLayout.fireLoadIncludes'); }\n";
 			$jqueryLoader .= "};\n";
-//			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery.js';\n";
-			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery';\n";
+//			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = 'jquery';\n";
+			$jqueryLoader .= "document.getElementById('splashStatusTxt').innerHTML = '. . . . . . . . . . . . . . . .';\n";
 //			$jqueryLoader .= "loadScript('web/js/jquery.js', loadJQUERYUI);\n";
 			$jqueryLoader .= "loadScript('web/js/jquery-1.8.3.min.js', loadJQUERYUI);\n";
 			communication_interface::jsExecute($jqueryLoader);
@@ -556,7 +561,8 @@ class baseLayout_UI {
 		case 'baseLayout.fireLoadMenu':
 			if(session_control::getSessionSettings("baseLayout", "bootStatus")=="fireLoadMenu") break; //TODO: Testen, ob das den IE-Bug behebt...
 			uiFireEvent("core.bootLoadMenu");
-			communication_interface::assign('splashStatusTxt', 'innerHTML', 'Ladevorgang wird abgeschlossen...');
+			//communication_interface::assign('splashStatusTxt', 'innerHTML', 'Ladevorgang wird abgeschlossen...');
+			communication_interface::assign('splashStatusTxt', 'innerHTML', '. . . . . . . . . . .');
 			communication_interface::jsExecute("cb('baseLayout.fireBootComplete');");
 			session_control::setSessionSettings("baseLayout", "bootStatus", "fireLoadMenu", false); //true = save permanently	TODO: Testen, ob das den IE-Bug behebt...
 			break;

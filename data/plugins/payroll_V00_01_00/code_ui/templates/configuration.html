@@ -805,32 +805,50 @@
 <wgui:block name="prlVlFldCfgEditMain">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlVlFldCfg">
 		<fieldset>
-			<legend>Allgemein</legend>
+			<legend><wgui:text id="txtAllgemein"/></legend>
 			<label for="prlVlFldCfg_fieldName">Technischer Feldname:</label><span id="prlVlFldCfg_fieldName"></span><br/>
 			<label for="prlVlFldCfg_fieldType">Typ:</label><span id="prlVlFldCfg_fieldType"></span><br/>
 			<label for="prlVlFldCfg_active">Feld aktiv:</label><input type="checkbox" id="prlVlFldCfg_active"/><br/>
 		</fieldset>
 		<fieldset>
-			<legend>Einstellungen</legend>
-			<div>
+			<legend><wgui:text id="txtEinstellungen"/></legend>
+			<div style="height: 195px;">
 				<label for="prlVlFldCfg_mandatory">Eingabe erforderlich:</label><input type="checkbox" id="prlVlFldCfg_mandatory"/><br/>
-				<label for="prlVlFldCfg_guiWidth">Feldbreite:</label><select id="prlVlFldCfg_guiWidth"><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option></select><br/>
+				<label for="prlVlFldCfg_guiWidth">Feldbreite:</label><select id="prlVlFldCfg_guiWidth" style="width: 100px;"><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option></select><br/>
 				<label for="prlVlFldCfg_displayCode">Code in Listenauswahl anzeigen:</label><input type="checkbox" id="prlVlFldCfg_displayCode"/><br/>
-				<label for="prlVlFldCfg_orderBy">Liste sortieren nach:</label><select id="prlVlFldCfg_orderBy"><option value="0">Listentext</option><option value="1">Code</option><option value="2">Sortierzahl</option></select><br/>
+				<label for="prlVlFldCfg_orderBy">Liste sortieren nach:</label><select id="prlVlFldCfg_orderBy" style="width: 100px;"><option value="0">Listentext</option><option value="1">Code</option><option value="2">Sortierzahl</option></select><br/>
 				<label for="prlVlFldCfg_minVal">Zahlenbereich von:</label><input type="text" id="prlVlFldCfg_minVal"/><br/>
 				<label for="prlVlFldCfg_maxVal">Zahlenbereich bis:</label><input type="text" id="prlVlFldCfg_maxVal"/><br/>
 				<label for="prlVlFldCfg_maxLength">Max. Textl&auml;nge:</label><input type="text" id="prlVlFldCfg_maxLength"/><br/>
 				<p id="prlVlFldCfg_noSettings">Keine Einstellungen m&ouml;glich.</p>
 				<hr id="prlVlFldCfg_hr1"/>
-				<button class="PesarisButton" id="prlVlFldCfg_BtnAdd" style="width: 160px;">Listenwert hinzuf&uuml;gen</button>
-				<hr id="prlVlFldCfg_hr2"/>
-				<select id="prlVlFldCfg_listID"><option value="" token="">-- Listenwert ausw&auml;hlen --</option></select><br/>
-				<button class="PesarisButton" id="prlVlFldCfg_BtnEdit" style="width: 160px;">Listenwert bearbeiten</button>
-				<button class="PesarisButton" id="prlVlFldCfg_BtnDel" style="width: 160px;">Listenwert l&ouml;schen</button>
+					
+					<table id="ListenwerteVerwaltungAnzeige" cellpadding="0" cellspacing="0" width="100%" style="visibility:hidden;">
+					<tr>
+						<td style="font-weight: bold;" valign="middle">
+							<wgui:text id="txtListenwerte"/>:
+							<input type="hidden" name="prlVlFldCfg_ListenFeldName" id="prlVlFldCfg_ListenFeldName" value="" />
+						</td>
+						<td>
+							<select id="prlVlFldCfg_listID"><option value="" token="" style="height: 21px; margin-right: 5px;">-- Listenwert ausw&auml;hlen --</option></select>
+						</td>
+						<td>
+							<!-- button class="PesarisButton" id="prlVlFldCfg_BtnEdit" style="width: 24px; height: 26px; border-style: none; margin-left: 0; margin-right: 5px"><img src="/web/img/blatt_edit24x24.png" /></button -->
+							<button class="PesarisButton" id="prlVlFldCfg_BtnAdd" style="width: 24px; height: 26px; border-style: none; margin-left: 0; margin-right: 0"><img src="/web/img/blatt_plus24x24.png" /></button>
+							<button class="PesarisButton" id="prlVlFldCfg_BtnDel" style="width: 24px; height: 26px; border-style: none; margin-left: 10px;"><img src="/web/img/blatt_minus24x24.png" /></button>
+						</td>
+						<td width="25" id="statusIcon" >
+						</td>
+					</tr>
+					</table>
+					<div id="ListenwerteFldCfgContainer" style="height:63px;overflow-x:hidden;overflow-y:auto;border:0px;">	
+						&nbsp;
+					</div>
+				
 			</div>
 		</fieldset>
 		<fieldset>
-			<legend>Feldbezeichnung</legend>
+			<legend><wgui:text id="txtFeldbezeichnung"/></legend>
 			<div>
 				<wgui:loop name="languageLoop" varname="languageList">
 					<label for="prlVlFldCfg_label_<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"><wgui:loopvar loopname="languageLoop" varname="LanguageName"/></label><input type="text" id="prlVlFldCfg_label_<wgui:loopvar loopname="languageLoop" varname="LanguageCode"/>"/><br/>
@@ -839,7 +857,7 @@
 		</fieldset>
 	</div>
 	<button class="PesarisButton" id="prlVlFldCfgCancel"><wgui:text id="btnClose"/></button>
-	<button class="PesarisButton" id="prlVlFldCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlVlFldCfgSave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="prlVlFldCfgEditMain">
 
 
@@ -847,8 +865,10 @@
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
 	<br/>Sind Sie sicher, dass Sie den Listenwert '<wgui:var name="ItemName"/>' l&ouml;schen wollen?<br/>&nbsp;
 	</div>
-	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;"><wgui:text id="txtY"/></button>
+	<center>
 	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'><wgui:text id="txtN"/></button>
+	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;"><wgui:text id="txtY"/></button>
+	</center>
 </wgui:block name="prlVlFldCfgLstItemDel">
 
 
@@ -869,7 +889,7 @@
 		</fieldset>
 	</div>
 	<button class="PesarisButton" id="prlVlFldCfgLICancel"><wgui:text id="btnCancel"/></button>
-	<button class="PesarisButton" id="prlVlFldCfgLISave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlVlFldCfgLISave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="prlVlFldCfgLstItemEdit">
 
 

@@ -125,17 +125,17 @@ class payroll_UI {
 
 			$absWebPath  = $aafwConfig["paths"]["session_control"]["rootPathData"].PAYMENTVIEWDIR;
 			$absDataPath = $aafwConfig["paths"]["plugin"]["customerDir"].$db_name."/".$aktuellePeriode4ListingDir."/";
-
 			$data["PeriodenFiles"] = array();
-			foreach($filelist as $row) {
-				if(strtolower(substr($row,-4))==".dta"  ||  strtolower(substr($row,-4))==".pdf"  ||  strtolower(substr($row,-4))==".txt") {
-					$fnArr = explode(".", $row);
-					$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
-					$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>$fnArr[1], "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
-					copy($absDataPath.$row, $absWebPath.$technFilename); 
-				} 
+			if (count($filelist)>1) {
+				foreach($filelist as $row) {
+					if(strtolower(substr($row,-4))==".dta"  ||  strtolower(substr($row,-4))==".pdf"  ||  strtolower(substr($row,-4))==".txt") {
+						$fnArr = explode(".", $row);
+						$technFilename = $db_name."_".$PeriodeDieserMonat."_".$row;
+						$data["PeriodenFiles"][] = array("fileName"=>$row, "fileEndg"=>$fnArr[1], "technFilename"=>"/".PAYMENTVIEWDIR.$technFilename);
+						copy($absDataPath.$row, $absWebPath.$technFilename);
+					}
+				}
 			}
-		
 			$objWindow = new wgui_window("payroll", "wndIDAuszahlenPeriodenwahl"); // aufrufendes Plugins, als HTML "id" damit ist das Fenster per JS, resp. jQuery ansprechbar
 			$objWindow->windowTitle($objWindow->getText("txtTitelAuszahlenHistory"));
 			$objWindow->windowIcon("auszahlen32.png");
@@ -207,7 +207,7 @@ class payroll_UI {
 
 			session_control::setSessionSettings("payroll", "psoSettings", serialize($functionParameters[0]), true); //true = save permanently
 			$objWindow = new wgui_window("payroll", "infoBox");
-			$objWindow->windowTitle($objWindow->getText("prlPsoSettings"));
+			$objWindow->windowTitle($objWindow->getText("txtEinstellungen"));
 			$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
 			$objWindow->showInfo();
 			break;
@@ -226,7 +226,7 @@ class payroll_UI {
 				$objWindow->windowTitle($title); 
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(830);
-				$objWindow->windowHeight(510);
+				$objWindow->windowHeight(550);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -536,7 +536,7 @@ class payroll_UI {
 						case 'showEditor':
 							$data = array();
 							$objWindow = new wgui_window("payroll", "employeeForm");
-							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").");// - ".$data["LayoutName"]); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten"));// - ".$data["LayoutName"]); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("employee-edit32.png");
 							$objWindow->windowWidth(820); //710
 							$objWindow->windowHeight(550); //470
@@ -584,31 +584,31 @@ class payroll_UI {
 					if($fieldValuePair[0] == "RetirementDate") $fieldValuePair[1] = $this->convertMySQL2Date($fieldValuePair[1]);
 					communication_interface::jsExecute('if($("#'.$fieldValuePair[0].'").length > 0) $("#'.$fieldValuePair[0].'").val("'.$fieldValuePair[1].'");');
 				}
-			}else{
+			} else {
 				foreach($cb["fieldNames"] as $fieldName) communication_interface::jsExecute("$('#employeeForm #".$fieldName."').css('background-color','#f88');");
 			}
 			break;
 		case 'payroll.prlVlFieldCfg':
+			//communication_interface::alert("payroll.prlVlFieldCfg: ".print_r($functionParameters,true));
 			if(!isset($functionParameters[0]["action"])) $functionParameters[0]["action"] = "default";
 			switch($functionParameters[0]["action"]) {
-			case 'save':
+			case 'save'://'payroll.prlVlFieldCfg'
 				unset($functionParameters[0]["data"]["toggleSettings"]);
-//				communication_interface::alert(print_r($functionParameters[0]["data"],true));
 				$fieldDef = blFunctionCall('payroll.saveEmployeeFieldDetail', $functionParameters[0]["data"]);
 				if($fieldDef["success"]) {
 					communication_interface::jsExecute($this->getEmplFieldDef());
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
-				}else{
+				} else {
 					if($fieldDef["errCode"]==20) {
 						communication_interface::jsExecute("$('input[id^=\"prlVlFldCfg_\"], select[id^=\"prlVlFldCfg_\"]').css('background-color','');");
 						foreach($fieldDef["fieldNames"] as $fieldName) communication_interface::jsExecute("$('#prlVlFldCfg_".$fieldName."').css('background-color','#f88');");
-					}else{
+					} else {
 						communication_interface::alert("Speichern fehlgeschlagen [".$fieldDef["errText"].", Code: ".$fieldDef["errCode"]."]");
 					}
-
 				}
 				break;
-			case 'edit':
+			case 'edit'://'payroll.prlVlFieldCfg'
+				//communication_interface::alert("edit: ".print_r($functionParameters,true));
 				//fieldName auslesen
 				$fieldName = isset($functionParameters[0]["fieldName"]) ? $functionParameters[0]["fieldName"] : "";
 				$loadData = isset($functionParameters[0]["loadData"]) && $functionParameters[0]["loadData"]=="false" ? false : true;
@@ -654,8 +654,8 @@ class payroll_UI {
 				$objWindow = new wgui_window("payroll", "prlVlFldCfgEditMain");
 				$objWindow->windowTitle($objWindow->getText("txtPersonalstammfeldverwalten"));
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(660);
-				$objWindow->windowHeight(510);
+				$objWindow->windowWidth(590);
+				$objWindow->windowHeight(550);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -663,6 +663,25 @@ class payroll_UI {
 				$objWindow->modal(true);
 				$objWindow->loadContent("configuration",$data,"prlVlFldCfgEditMain");
 				$objWindow->showWindow();
+
+				//communication_interface::alert(print_r($curFieldDef["fieldType"], true));
+				if ($curFieldDef["fieldType"] == 4) {// 4 = Liste
+					communication_interface::jsExecute("$('#prlVlFldCfg_ListenFeldName').val('".$fieldName."')");
+						
+					communication_interface::jsExecute(" $('#prlVlFldCfg_listID').bind('change', function() {
+						var vl = $('#prlVlFldCfg_listID').val();
+						$('#ListenwerteFldCfgContainer').html('<table><tr><td>'+vl+'... <img src=\"web/img/working.gif\" /></td></tr></table>');
+							cb('payroll.getPersonalstammListenwerte',{'PersonalstammListenwert':vl, 'fieldName':'".$fieldName."'});
+						});
+					");
+						
+					communication_interface::jsExecute(" $('#prlVlFldCfg_BtnAdd').bind('click', function() {
+						$('#ListenwerteFldCfgContainer').html('<table><tr><td>id NEW</td></tr></table>');
+							cb('payroll.getPersonalstammListenwerte',{'PersonalstammListenwert':'NEW', 'fieldName':'".$fieldName."'});
+						});
+					");					
+				}
+								
 
 				if($loadData) {
 					$roundParam = 0;
@@ -702,13 +721,17 @@ class payroll_UI {
 				//Get language list
 				$languageList = blFunctionCall('payroll.getLanguageList','UseForAccounts');
 				$lngArr = array();
-				if($languageList["success"]) foreach($languageList["data"] as $lngRow) $lngArr[] = array("LanguageCode"=>$lngRow["core_intl_language_ID"], "LanguageName"=>$lngRow["language_name"]);
+				if($languageList["success"]) {
+					foreach($languageList["data"] as $lngRow) {
+						$lngArr[] = array("LanguageCode"=>$lngRow["core_intl_language_ID"], "LanguageName"=>$lngRow["language_name"]);
+					}
+				}
 				$data["languageList"] = $lngArr;
 
 				$objWindow = new wgui_window("payroll", "prlVlFldCfgEditMain");
 				$objWindow->windowTitle("Personalstamm-Feld: Listenwert bearbeiten");
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(660);
+				$objWindow->windowWidth(450);
 				$objWindow->windowHeight(310);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
@@ -717,7 +740,8 @@ class payroll_UI {
 				$objWindow->modal(true);
 				$objWindow->loadContent("configuration",$data,"prlVlFldCfgLstItemEdit");
 				$objWindow->showWindow();
-//				communication_interface::alert("Edit Item");
+				//communication_interface::alert(print_r($data,true));
+				//communication_interface::alert("Personalstamm-Feld: Listenwert bearbeiten\n".print_r($functionParameters[0],true));
 				communication_interface::jsExecute("prlVlFldCfgLoadItem('".($editMode ? $functionParameters[0]["ItemID"] : "")."');");
 				communication_interface::jsExecute("$('#prlVlFldCfgLISave').bind('click', function(e) { prlVlFldCfgChangeItem('".($editMode ? $functionParameters[0]["ItemID"] : "")."'); });");
 				communication_interface::jsExecute("$('#prlVlFldCfgLICancel').bind('click', function(e) { cb('payroll.prlVlFieldCfg',{'action':'edit','loadData':'false'}); });");
@@ -743,7 +767,6 @@ class payroll_UI {
 				$fieldDefRecs = blFunctionCall('payroll.getEmployeeFieldDef');
 				if($fieldDefRecs["success"]) {
 					foreach($fieldDefRecs["data"] as $row) {
-//						if(($row["mandatory"]==0 || $row["system"]==0) && $row["read-only"]==0 && $row["childOf"]=="" && $row["fieldName"]!="id") {
 						if($row["fieldDefEdit"]!=0) $data["field_list"][] = array("fieldName"=>$row["fieldName"], "label"=>$row["label"]);
 					}
 				}
@@ -751,8 +774,8 @@ class payroll_UI {
 				$objWindow = new wgui_window("payroll", "prlVlFldCfgSelect");
 				$objWindow->windowTitle($objWindow->getText("txtPersonalstammfelderverwalten"));
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(520);
-				$objWindow->windowHeight(180);
+				$objWindow->windowWidth(500);
+				$objWindow->windowHeight(170);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -765,6 +788,63 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#modalContainer button').eq(0).bind('click', function(e) { $('#modalContainer').mb_close(); });");
 				communication_interface::jsExecute("$('#modalContainer button').eq(1).bind('click', function(e) { cb('payroll.prlVlFieldCfg', {'action':'edit', 'fieldName':$('#prlVlFldCfg_field').val()}); });");
 				break;
+			}
+			break;
+		case 'payroll.getPersonalstammListenwerte';
+			$personalstammListenwert = $functionParameters[0]["PersonalstammListenwert"];
+			$fieldName = $functionParameters[0]["fieldName"];
+			$code = "";
+			$sort = "";
+			$txt_de = "";
+			$txt_fr = "";
+			if ($personalstammListenwert != "NEW") {
+				$listWerte  = blFunctionCall('payroll.personalstammfelder.getListWerte', $personalstammListenwert);
+				$code = $listWerte["Code"];
+				$sort = $listWerte["Sortierzahl"];
+				if(isset($listWerte["language_de"])) {$txt_de = $listWerte["language_de"]; }
+				if(isset($listWerte["language_fr"])) {$txt_fr = $listWerte["language_fr"]; }
+			}
+			$listInhalt  = "<table class=\'listenWerte\' ><tr><th>Code</th><th>Sortierzahl</th><th>Listentext de</th><th>Listentext fr</th><th>&nbsp;</th></tr>";
+			$listInhalt .= "<tr>  <input type=\'hidden\' id=\'listenWerte_id\' name=\'listenWerte_id\' value=\'".$personalstammListenwert."\'  />";
+			$listInhalt .= "<td><input type=\'text\' id=\'listenWerte_code\' name=\'listenWerte_code\' value=\'".$code."\' style=\'width:40px;text-align: left;\' /></td>";
+			$listInhalt .= "<td><input type=\'text\' id=\'listenWerte_sort\' name=\'listenWerte_sort\' value=\'".$sort."\' style=\'width:40px;text-align: left;\' /></td>";
+			$listInhalt .= "<td><input type=\'text\' id=\'listenWerte_txt_de\' name=\'listenWerte_txt_de\' value=\'".$txt_de."\' style=\'width:130px;text-align: left;\' /></td>";
+			$listInhalt .= "<td><input type=\'text\' id=\'listenWerte_txt_fr\' name=\'listenWerte_txt_fr\' value=\'".$txt_fr."\' style=\'width:130px;text-align: left;\' /></td>";
+			$listInhalt .= "<td id=\"okFeld\"><button class=\"pesarisButton\"  id=\"listenWerte_BtnSave\" style=\"width: 30px; height: 22px; border-style: none; \">OK</button></td>";
+			$listInhalt .= "</tr>";
+			$listInhalt .= "</table>";
+			communication_interface::jsExecute(" $('#ListenwerteFldCfgContainer').html( '$listInhalt' ); ");
+			communication_interface::jsExecute(" $('#listenWerte_BtnSave').bind('click', function(e) { personalstammListenwertSave('".$personalstammListenwert."', '".$fieldName."'); });");
+			communication_interface::jsExecute(" $('#okFeld').css('background-color',''); ");
+			communication_interface::jsExecute(" $('#statusIcon').css('background-image','url(web/img/leer.png)'); ");
+			break;
+		case 'payroll.personalstammfelder_Save_ListenWerte':
+			communication_interface::jsExecute(" $('#okFeld').css('background-color',''); ");
+			communication_interface::jsExecute(" $('#listenWerte_code').css('background-color',''); ");
+			communication_interface::jsExecute(" $('#listenWerte_sort').css('background-color',''); ");
+			communication_interface::jsExecute(" $('#listenWerte_txt_de').css('background-color',''); ");
+			communication_interface::jsExecute(" $('#listenWerte_txt_fr').css('background-color',''); ");
+				
+			//communication_interface::alert('payroll.personalstammfelder_Save_ListenWerte: '.print_r($functionParameters[0],true));
+			$goInto = true;
+			if ( strlen($functionParameters[0]["data"]["code"]) < 1) {communication_interface::jsExecute(" $('#listenWerte_code').css('background-color','#f88'); "); $goInto = false;}
+			if ( strlen($functionParameters[0]["data"]["sort"]) < 1) {communication_interface::jsExecute(" $('#listenWerte_sort').css('background-color','#f88'); "); $goInto = false;}
+			if ( strlen($functionParameters[0]["data"]["txt_de"]) < 1) {communication_interface::jsExecute(" $('#listenWerte_txt_de').css('background-color','#f88'); "); $goInto = false;}
+			if ( strlen($functionParameters[0]["data"]["txt_fr"]) < 1) {communication_interface::jsExecute(" $('#listenWerte_txt_fr').css('background-color','#f88'); "); $goInto = false;}				
+			
+			$fieldName = $functionParameters[0]["fieldName"];
+			if ( $goInto == true) {
+				$saved = blFunctionCall('payroll.personalstammfelder.saveListenWerte', $functionParameters[0]["id"], $functionParameters[0]["data"], $fieldName);
+				if ($saved == true) {
+					communication_interface::jsExecute(" $('#okFeld').css('background-color','lightgreen'); ");
+					communication_interface::jsExecute("  cb('payroll.prlVlFieldCfg', {'action':'edit', 'fieldName':'".$fieldName."'  });  ");
+					communication_interface::jsExecute(" $('#statusIcon').css('background-image','url(web/img/isOK24x24.png)'); ");
+					communication_interface::jsExecute(" $('#statusIcon').css('background-repeat','no-repeat'); ");
+				} else {
+					communication_interface::jsExecute(" $('#okFeld').css('background-color','#f88'); ");
+					communication_interface::jsExecute(" $('#statusIcon').css('background-image','url(web/img/bullet_red16x16.png)'); ");
+					communication_interface::jsExecute(" $('#statusIcon').css('background-repeat','no-repeat'); ");
+				}
 			}
 			break;
 		case 'payroll.OpenConfigMain':
@@ -938,9 +1018,7 @@ class payroll_UI {
 			break;
 		case 'payroll.ConfigFldModOverview': //prefix: prlFldMod
 			$data = array();
-
 			//$data["filter_list"] = ;
-
 			$objWindow = new wgui_window("payroll", "payrollFieldModifierOv");
 			$objWindow->windowTitle("Feld-Modifikatoren");
 			$objWindow->windowIcon("config32.png");
@@ -1570,7 +1648,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			if(isset($assignments[$functionParameters[0]["section"]])) {
 				session_control::setSessionSettings("payroll", $assignments[$functionParameters[0]["section"]], serialize($functionParameters[0]["settings"]), true); //true = save permanently
 				$objWindow = new wgui_window("payroll", "infoBox");
-				$objWindow->windowTitle($objWindow->getText("prlPsoSettings"));
+				$objWindow->windowTitle($objWindow->getText("txtEinstellungen"));
 				$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
 				$objWindow->showInfo();
 			}else communication_interface::alert("wrong section id");
@@ -1621,7 +1699,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 		case 'payroll.calcOvSaveSettings':
 			session_control::setSessionSettings("payroll", "calcOvSettings", serialize($functionParameters[0]), true); //true = save permanently
 			$objWindow = new wgui_window("payroll", "infoBox");
-			$objWindow->windowTitle($objWindow->getText("prlPsoSettings"));
+			$objWindow->windowTitle($objWindow->getText("txtEinstellungen"));
 			$objWindow->setContent("<br/>".$objWindow->getText("prlPsoSettingsSaved")."<br/><br/><button class='PesarisButton' onclick='$(\"#modalContainer\").mb_close();'>".$objWindow->getText("btnOK")."</button>");
 			$objWindow->showInfo();
 			break;
@@ -3572,10 +3650,10 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		switch($eventName) {
 		case 'core.bootLoadMenu':
 			uiFunctionCall('baseLayout.appMenuAddSection','payroll','Lohnbuchhaltung'); 
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten','plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png', 'prlCalcOvOpen();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahldaten',    'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen.openHistoryWindow\');return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm', 'plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png',  'prlPsoOpenEmployeeOverview();return false;');
-			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Stammdatenverwaltung',    'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupaymngr','Lohn bearbeiten',       'plugins/payroll_V00_01_00/code_ui/media/icons/calculator20.png', 'prlCalcOvOpen();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menuAuszahlen','Auszahldaten',        'plugins/payroll_V00_01_00/code_ui/media/icons/auszahlen20.png',  'cb(\'payroll.auszahlen.openHistoryWindow\');return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrempl','Personalstamm',        'plugins/payroll_V00_01_00/code_ui/media/icons/employees20.png',  'prlPsoOpenEmployeeOverview();return false;');
+			uiFunctionCall('baseLayout.appMenuAddItem','payroll','menupayrcnf','Stammdatenverwaltung',  'plugins/payroll_V00_01_00/code_ui/media/icons/config20.png',     'prlCfgOpenMainWindow();return false;');
 			break;
 		case 'core.bootComplete':
 			blFunctionCall('payroll.onBootComplete');

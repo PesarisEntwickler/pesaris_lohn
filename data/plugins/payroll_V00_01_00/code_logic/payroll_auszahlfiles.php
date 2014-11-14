@@ -5,7 +5,7 @@ class auszahlfiles {
 	public function setAuszahlFiles($ZahlstellenID, $Personenkreis, $nurZahlstelleBeruecksichtigen, $arrDueDate, $periodeID) {
 		require_once(getcwd()."/web/fpdf17/fpdf.php");
         require_once(getcwd()."/kernel/common-functions/configuration.php");
-
+		
 		$auszahlen = new auszahlen();
 		
 		$dueDateGUI = $arrDueDate[0].".".$arrDueDate[1].".".$arrDueDate[2];
@@ -99,7 +99,8 @@ class auszahlfiles {
 		$GesamtTotal_CHF = 0;	$GesamtTotal_EUR = 0;	$GesamtTotal_USD = 0;
 		$anzFiles  = 0;
 		$anzZeilenSeite01 = 24; 
-		$anzZeilenSeiteFF = 27;			
+		$anzZeilenSeiteFF = 27;
+		$SeitenNrRekap = 1;		
   		$RealEffectedEmployees = "";
   		//Iteration über alle Mitarbeiter mit Auszahlung 
 		foreach ( $employeeList['data'] as $row ) { 
@@ -339,8 +340,6 @@ class auszahlfiles {
 								$payAmountUSD = $availAmt / $Kurs;
 								$trxNr_OverAll++;
 								$trxNr_USD++;			
-								$SeitenTotal_USD += $payAmountUSD;
-								$GesamtTotal_USD += $payAmountUSD;
 								if ($trxNr_USD == 1) {
 									$dtaJournal_USD .= $this->setDTAJournalHeader("USD", $PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI);
 								}
@@ -351,6 +350,8 @@ class auszahlfiles {
 									$dtaJournal_USD .= $this->setDTAJournalFollowHeader("USD",$SeitenNr_USD, $AuftraggeberFirmaL1, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL3, $ZahlstelleKonto);
 									$SeitenTotal_USD = 0;
 								}
+								$SeitenTotal_USD += $payAmountUSD;
+								$GesamtTotal_USD += $payAmountUSD;
 								$dtaJournal_USD .= $this->setDTAJournalZeile($trxNr_USD, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountUSD, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_USD .= $this->setDTAZeile( $dtaValutaDate, $trxNr_USD, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountUSD, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountUSD,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
@@ -362,8 +363,6 @@ class auszahlfiles {
 								$payAmountEUR = $availAmt / $Kurs;
 								$trxNr_OverAll++;
 								$trxNr_EUR++;			
-								$SeitenTotal_EUR += $payAmountEUR;
-								$GesamtTotal_EUR += $payAmountEUR;
 								if ($trxNr_EUR == 1) {
 									$dtaJournal_EUR .= $this->setDTAJournalHeader("EUR", $PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI);
 								}
@@ -374,6 +373,8 @@ class auszahlfiles {
 									$dtaJournal_EUR .= $this->setDTAJournalFollowHeader("EUR",$SeitenNr_EUR, $AuftraggeberFirmaL1, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL3, $ZahlstelleKonto);
 									$SeitenTotal_EUR = 0;
 								}
+								$SeitenTotal_EUR += $payAmountEUR;
+								$GesamtTotal_EUR += $payAmountEUR;
 								$dtaJournal_EUR .= $this->setDTAJournalZeile($trxNr_EUR, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountEUR, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_EUR .= $this->setDTAZeile( $dtaValutaDate, $trxNr_EUR, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountEUR, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountEUR,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
@@ -383,8 +384,6 @@ class auszahlfiles {
 								$payAmountCHF = $auszahlen->rundungAuf5Rappen($availAmt);
 								$trxNr_OverAll++;
 								$trxNr_CHF++;			
-								$SeitenTotal_CHF += $payAmountCHF;
-								$GesamtTotal_CHF += $payAmountCHF;
 								if ($trxNr_CHF == 1) {
 									$dtaJournal_CHF .= $this->setDTAJournalHeader("CHF", $PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI);
 								}
@@ -395,6 +394,8 @@ class auszahlfiles {
 									$dtaJournal_CHF .= $this->setDTAJournalFollowHeader("CHF",$SeitenNr_CHF, $AuftraggeberFirmaL1, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL3, $ZahlstelleKonto);
 									$SeitenTotal_CHF = 0;
 								}
+								$SeitenTotal_CHF += $payAmountCHF;
+								$GesamtTotal_CHF += $payAmountCHF;
 								$dtaJournal_CHF .= $this->setDTAJournalZeile($trxNr_CHF, $employeeNumber, $bn1, $bn2, $bn3, $bn4, $benIBAN, $beneBank1, $beneBank2, $beneBank3, $payAmountCHF, $payCurrency, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$dtaContent_CHF .= $this->setDTAZeile( $dtaValutaDate, $trxNr_CHF, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $iban, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $benIBAN, $bn1, $bn2, $bn3, $bn4, $PeriodeDieserMonat, $payAmountCHF, $payCurrency, $spesenregelung, $beneBank1, $beneBank2, $beneBank3, $endBeguenst1_IBAN, $endBeguenst2_Nam, $endBeguenst3_Adr, $endBeguenst4_Ort);
 								$auszahlen->setEffectifPayoutTable($periodeID,$employee_ID,$splitID,$availAmt,$payAmountCHF,$payCurrency,$split_mode,$account_ID, $benIBAN, $beneBank1, $beneBank2, $beneBank3);
@@ -518,12 +519,19 @@ class auszahlfiles {
 			$fm->putContents($dtaRekap_USD.$dtaRekap_EUR.$dtaRekap_CHF); 
 			
 			//REKAP
-			$rekap = $this->setRekapHeader($PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI);
-			$filelist = $fm->listDir(0);  
+			$rekap = $this->setRekapHeader($PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI, $SeitenNrRekap++);
+			$filelist = $fm->listDir(0);
+			$y=0;  
 			foreach($filelist as $fileNam) {
 				if(strtolower(substr($fileNam,-6))==".rekap") {//Liest alle ".rekap"-Zwischenfiles
+					$y++;
+					if($y % 4 < 1){ 
+						$rekap .= CRLF.CRLF.CRLF.CRLF.CRLF.CRLF.CRLF.CRLF.CRLF.CRLF;
+						$rekap .= $this->setRekapHeader($PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI, $SeitenNrRekap);
+					}
 					$fm->setFile($fileNam);
 					$rekap .= $fm->getContents($fileNam); 
+					$rekap .= CRLF;
 				} 
 			}
 			$fm->fclose(); 
@@ -587,7 +595,7 @@ class auszahlfiles {
 		return $ret;
 	}
 	
-	function setRekapHeader($PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI) {
+	function setRekapHeader($PeriodeDieserMonat, $AuftraggeberFirmaL1, $AuftraggeberFirmaL2, $AuftraggeberFirmaL3, $ZahlstelleL1, $ZahlstelleL2, $ZahlstelleL3, $ZahlstelleL4, $ZahlstelleKonto, $dueDateGUI, $SeitenNrRekap) {
 		$tab1_top= 35;$tab2_top= 30;$tab3_top= 12;$end_top = 18;
 									$tab4_top2=14;$end_top2 = 4;
 		$tab1_h1 = 35;$tab2_h1 = 20;$tab3_h1 = 25;$end_h1 = 35;
@@ -600,7 +608,7 @@ class auszahlfiles {
 		$h .= CRLF.str_pad(substr($PeriodeDieserMonat, 0, $tab1_top-1), $tab1_top)
 				  .str_pad(substr("Valuta Datum:", 0, $tab2_top-1), $tab2_top)
 				  .str_pad($dueDateGUI, $tab3_top, " ", STR_PAD_LEFT)
-				  .str_pad("", $tab4_top2+$end_top2, " ", STR_PAD_LEFT);
+				  .str_pad("Seite ".$SeitenNrRekap, $end_top, " ", STR_PAD_LEFT);
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3+$tab3_h3+$end_h3, "-");
 		$h .= CRLF;
 		return $h;
@@ -692,7 +700,14 @@ class auszahlfiles {
 		$h .= CRLF.str_pad("", $tab1_h3+$tab2_h3)
 				  .str_pad("GESAMTTOTAL ".$WHRG, $tab3_h3)
 				  .str_pad(number_format($GesamtTotal, 2, '.', "'") , $end_h3, " ", STR_PAD_LEFT);
-		$h .= CRLF;
+		if ($WHRG != "CHF") {
+			$Kurs = blFunctionCall("payroll.getCurrencyForexRate", $WHRG);
+			
+			$h .= CRLF.str_pad(" ", $tab1_h3)
+				  	  .str_pad("Wechselkurs ".$WHRG."/CHF = 1/".$Kurs, $tab1_h3)
+					  .str_pad("(CHF ".number_format($GesamtTotal * $Kurs, 2, '.', "'").")" , $end_h1+18, " ", STR_PAD_LEFT);
+		}
+		$h .= CRLF;				
 		$h .= CRLF.str_pad(" ", $tab1_h3)
 				  .str_pad("DTA-Datei", $tab2_h3).$dtaFileName;
 		$h .= CRLF.str_pad(" ", $tab1_h3)
@@ -866,10 +881,10 @@ class auszahlfiles {
 				$BCNr_kurz = "";
 				$Land = substr($iban,0,2);
 				if ($Land == "CH" || $Land == "AT") {
-					$BankClearingNr = substr($iban, 5,5);
+					$BankClearingNr = substr($iban, 4,5);
 					$BCNr_kurz = trim(intval($BankClearingNr));//die führenden Nullen wegmachen
 				}
-				$dtaHeader51stellen = "000000".str_pad(" ", 12)
+				$dtaHeader51stellen = "000000".str_pad(" ", 12) 
 					."00000"
 					.$dtaValutaDate
 					.str_pad($BCNr_kurz, 7, " ", STR_PAD_RIGHT)
@@ -964,13 +979,14 @@ class auszahlfiles {
 	} 
 
 	function getDTATotalRecordTyp890(  $dtaValutaDate, $trxNr, $payAmount) {
+		$LineNr = $trxNr+1;
 				$TA890 = "";
 				$dtaHeader51stellen = "000000".str_pad(" ", 12)
 					."00000"
 					.$dtaValutaDate
 					.str_pad(" ", 7)
 					."COPRO"
-					.str_pad($trxNr,5,"0", STR_PAD_LEFT)
+					.str_pad($LineNr,5,"0", STR_PAD_LEFT)
 					."890"."1"."0";
 					     // 1 = Lohn/Salaerzahlung
 					

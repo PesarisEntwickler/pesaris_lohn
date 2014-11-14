@@ -37,8 +37,18 @@ class payroll_BL {
 				
 		require_once('payroll_auszahlen.php');
 		$auszahlen = new auszahlen();
-				  
+
+		require_once('payroll_personalstammfelder.php');
+		$personalstammfelder = new personalstammfelder();
+		
+		
 		switch($functionName) {
+			
+		case 'payroll.personalstammfelder.getListWerte':
+			return $personalstammfelder->getListenWerte($functionParameters[0]);
+		case 'payroll.personalstammfelder.saveListenWerte':
+			return $personalstammfelder->saveListenWerte($functionParameters[0],$functionParameters[1],$functionParameters[2]);
+			 
 		case 'payroll.auszahlen.GenerateDataFiles':
 			require_once('payroll_reports.php');
 			$reports = new payroll_BL_reports();		
@@ -126,7 +136,9 @@ class payroll_BL {
 			return $payrollPayment->getClearingBanks($functionParameters[0]);//BCNr
 		case 'payroll.getClearingBank':
 			return $payrollPayment->getClearingBank($functionParameters[0]);//IBAN
-
+		case 'payroll.processPayment':
+			return $payrollPayment->processPayment($functionParameters[0]);
+					
 
 		case 'payroll.getNextCompanyId':
 			return $variousFunctions->getNextCompanyId();
@@ -249,9 +261,7 @@ class payroll_BL {
 		case 'payroll.deleteInsuranceRateDetail':
 			return $insurance->deleteInsuranceRateDetail($functionParameters[0]);
 		
-        case 'payroll.processPayment': 
- 			return $payrollPayment->processPayment($functionParameters[0]); 
-
+			
 		case 'payroll.editFinMgmtAccountingConfig':
 			return $finMgmtAccounting->editFinMgmtAccountingConfig($functionParameters[0]);
 		case 'payroll.getFinMgmtAccountingInfo':

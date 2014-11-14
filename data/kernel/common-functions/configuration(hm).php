@@ -75,6 +75,7 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //Core Paths SRV1
 
 //$aafwConfig["paths"]["file_manager"]["rootPath"] = "/usr/local/www/apache22/data-hidden/";
+//$aafwConfig["paths"]["session_control"]["rootPathData"] = "/usr/local/www/apache22/data/";
 //$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "/usr/local/www/apache22/data/kernel/cache/sessions/";
 //$aafwConfig["paths"]["plugin"]["customerDir"] = "/usr/local/www/apache22/data-hidden/CUSTOMER/";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
@@ -89,6 +90,7 @@ $aafwConfig["international"]["de-de"]["numbers"]["thousands_sep"] = ".";
 //Core Paths SRV2
 /*
 $aafwConfig["paths"]["file_manager"]["rootPath"] = "/usr/local/www/apache22/data-hidden/";
+$aafwConfig["paths"]["session_control"]["rootPathData"] = "/usr/local/www/apache22/data/";
 $aafwConfig["paths"]["session_control"]["sessionCachePath"] = "/usr/local/www/apache22/data/kernel/cache/sessions/";
 $aafwConfig["paths"]["plugin"]["customerDir"] = "/usr/local/www/apache22/data-hidden/CUSTOMER/";
 $aafwConfig["paths"]["plugin"]["mysqldump"] = "/usr/local/bin/mysqldump";
@@ -103,7 +105,6 @@ $aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 //Core Paths Windows Ascami
 
 //$aafwConfig["paths"]["file_manager"]["rootPath"] = "E:/VS/Projects/Presida/pesarisLohn/data-hidden/";
-//$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/VS/mahrens/projects/Presida/PesarisLohn/data/";
 //$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "E:/VS/Projects/Presida/pesarisLohn/data/kernel/cache/sessions/";
 //$aafwConfig["paths"]["plugin"]["customerDir"] = "E:/VS/Projects/Presida/pesarisLohn/data-hidden/CUSTOMER/";
 //$aafwConfig["paths"]["plugin"]["mysqldump"] = "E:/VS/Projects/Presida/pesarisLohn/mysqldump";
@@ -118,17 +119,17 @@ $aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
 
 //Core Paths Windows industryBilling (Harald)
 
-$aafwConfig["paths"]["file_manager"]["rootPath"] = "C:/git/pesaris_lohn/payroll/data-hidden/";
-$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/git/pesaris_lohn/payroll/data/";
-$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "C:/git/pesaris_lohn/payroll/data/kernel/cache/sessions/";
-$aafwConfig["paths"]["plugin"]["customerDir"] = "C:/git/pesaris_lohn/payroll/data-hidden/CUSTOMER/";
-$aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/git/pesaris_lohn/payroll/mysqldump";
-$aafwConfig["paths"]["reports"]["templates"] = "C:/git/pesaris_lohn/payroll/data-hidden/GLOBAL/templates/";
+$aafwConfig["paths"]["file_manager"]["rootPath"] = "C:/pesaris_lohn/data-hidden/";
+$aafwConfig["paths"]["session_control"]["rootPathData"] = "C:/pesaris_lohn/data/";
+$aafwConfig["paths"]["session_control"]["sessionCachePath"] = "C:/pesaris_lohn/data/kernel/cache/sessions/";
+$aafwConfig["paths"]["plugin"]["customerDir"] = "C:/pesaris_lohn/data-hidden/CUSTOMER/";
+$aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/pesaris_lohn/mysqldump";
+$aafwConfig["paths"]["reports"]["templates"] = "C:/pesaris_lohn/data-hidden/GLOBAL/templates/";
 
 $aafwConfig["paths"]["utilities"]["xsltproc"] = "C:/Users/Harald G. Mueller/HM/XSLT/bin/xsltproc.exe";
-$aafwConfig["paths"]["utilities"]["pdflatex"] = "C:/Program Files (x86)/MiKTeX 2.9/miktex/bin/pdflatex.exe";
+$aafwConfig["paths"]["utilities"]["pdflatex"] = "C:/pesaris_lohn/MiKTeX/miktex/bin/pdflatex.exe";
 $aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";
-$aafwConfig["paths"]["utilities"]["mysql"] = "C:/Users/Harald G. Mueller/HM/XAMPP/mysql/data";
+$aafwConfig["paths"]["utilities"]["mysql"] = "C:/XAMPP/mysql/data";
 
 ?>

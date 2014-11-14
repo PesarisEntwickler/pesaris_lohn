@@ -1112,9 +1112,12 @@ ul.prlPrdSetDate {
 
 .prlVlFldCfg label, .prlVlFldCfgLI label {
 	display:inline-block;
-	width:175px;
+	width:280px;
 }
-
+.prlVlFldCfgLI label {
+	display:inline-block;
+	width:150px;
+}
 .prlVlFldCfg input[type=checkbox] {
 	margin-left:0;
 }
@@ -1130,12 +1133,12 @@ ul.prlPrdSetDate {
 }
 
 .prlVlFldCfg fieldset:first-child + fieldset input[type=text], .prlVlFldCfgLI fieldset:first-child input {
-	text-align:right;
+	/* text-align:right; */
 	width:120px;
 }
 
 .prlVlFldCfg fieldset:last-child input, .prlVlFldCfgLI fieldset:last-child input {
-	width:300px;
+	width:180px;
 }
 
 .prlVlFldCfg fieldset:last-child div, .prlVlFldCfgLI fieldset:last-child div {
@@ -1423,5 +1426,10 @@ span.edit {
 	margin: 12px 0 2px 0;
 }
 
-
+.listenWerte {
+	width: 100%;
+}
+.listenWerte th {
+	font-weight: normal;
+}
 

@@ -117,7 +117,7 @@ class fieldmodifier {
 		$response["errCode"] = 0;
 		return $response;
 	}
-
+	
 	
 }
 ?>

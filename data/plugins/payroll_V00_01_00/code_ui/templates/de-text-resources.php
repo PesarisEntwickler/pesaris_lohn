@@ -52,6 +52,9 @@ $textResourceMap["txtBerechnungsdatenVorbereiten"] = "Berechnungsdaten vorbereit
 $textResourceMap["txtWiederherstellungAbgeschlossen"] = "Wiederherstellung abgeschlossen";
 $textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
  
+$textResourceMap["txtListenwerte"] = "Listenwerte";
+$textResourceMap["txtListentext"] = "Listentext";
+
 /* ********* AUSZAHLEN *********** */
 $textResourceMap["txtZahlstellenDerMitarbeiter"] = "Zahlstellen benutzen, die den Mitarbeitern hinterlegt sind";
 $textResourceMap["txtAuszahlungErstellen"] = "Auszahlung erstellen";
@@ -152,7 +155,8 @@ $textResourceMap["txtTableHeadersPaymentSplit"] =
 ********* EMPLOYEES ***********
 */
 $textResourceMap["txtMitarbeiterdatenBearbeiten"] = "Mitarbeiterdaten bearbeiten";
-$textResourceMap["prlPsoSettings"] = "Einstellungen";
+$textResourceMap["txtEinstellungen"] = "Einstellungen";
+$textResourceMap["txtFeldbezeichnung"] = "Feldbezeichnung";
 $textResourceMap["prlPsoSettingsSaved"] = "Die Einstellungen wurden gespeichert.";
 $textResourceMap["prlPsoBtnNew"] = "Neuer Mitarbeiter";
 $textResourceMap["prlPsoBtnDFilter"] = "Personalfilter auswaehlen";
