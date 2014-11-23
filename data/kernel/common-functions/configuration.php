@@ -126,7 +126,7 @@ $aafwConfig["paths"]["plugin"]["customerDir"] = "C:/pesaris_lohn/data-hidden/CUS
 $aafwConfig["paths"]["plugin"]["mysqldump"] = "C:/pesaris_lohn/mysqldump";
 $aafwConfig["paths"]["reports"]["templates"] = "C:/pesaris_lohn/data-hidden/GLOBAL/templates/";
 
-$aafwConfig["paths"]["utilities"]["xsltproc"] = "C:/Users/Harald G. Mueller/HM/XSLT/bin/xsltproc.exe";
+$aafwConfig["paths"]["utilities"]["xsltproc"] = "C:/pesaris_lohn/XSLT1.1.28win/binn/xsltproc.exe";
 $aafwConfig["paths"]["utilities"]["pdflatex"] = "C:/pesaris_lohn/MiKTeX/miktex/bin/pdflatex.exe";
 $aafwConfig["paths"]["utilities"]["stdout"] = "NUL";
 //$aafwConfig["paths"]["utilities"]["mysql"] = "/usr/local/bin/mysql";

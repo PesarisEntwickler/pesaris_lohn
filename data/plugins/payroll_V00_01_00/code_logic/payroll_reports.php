@@ -948,7 +948,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 	}
 
 	public function Payslip($param) {
-		//communication_interface::alert("reports.php - Payslip() param:".print_r($param,true));
+//communication_interface::alert("reports.php - Payslip() param:".print_r($param,true));
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		$payrollPeriodID = $param["payroll_period_ID"];
@@ -1006,15 +1006,12 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		
 		$payments = array();
 		$result = $system_database_manager->executeQuery( $sql, "payroll_report_Payslip");
+//communication_interface::alert($sql."\n".print_r($result, true));
+		$lohnabrechnnug = array();$i=0;
 		foreach($result as $row) {
 			if(!isset($payments[(string)$row["payroll_employee_ID"]])) {
 				$payments[(string)$row["payroll_employee_ID"]] = array();
 			}
-// 			switch($row["destination_type"]) {
-// 			case 1: $bankName = $row["beneficiary_bank_line1"]; $bankAccount = $row["bank_account"]; break; //Bank
-// 			case 2: $bankName = "PostFinance"; $bankAccount = $row["postfinance_account"]; break; //Postfinance
-// 			case 3: $bankName = $cashPayment[$row["Language"]]; $bankAccount = ""; break; //Barauszahlung
-//			}
 			$payout = $row["amount_payout"];
 			$payout = number_format($row["amount_payout"], 2, '.', "'");
 			$payoutCHF = "";
@@ -1032,7 +1029,13 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 					\n\t\t\t\t\t<PayoutAmount>".$payout."</PayoutAmount>
 					\n\t\t\t\t\t<PayoutAmountCHF>".$payoutCHF."</PayoutAmountCHF>
 					\n\t\t\t\t</Payout>\n";
+// 			$lohnabrechnnug[$i]["MA"] = $row["payroll_employee_ID"];
+// 			$lohnabrechnnug[$i]["PayoutAmount"] = $payout;
+// 			$lohnabrechnnug[$i]["beneBank1"] = $row["beneBank1"].", ".$row["beneBank2"].", ".$row["beneBank3"];
+// 			$lohnabrechnnug[$i]["IBAN"] = $row["benIBAN"];
+// 			$i++;
 		}
+//communication_interface::alert("abr  i:".$i."\ncount:".count($lohnabrechnnug)."\n".print_r($lohnabrechnnug, true));
 		unset($result);
 
 		$payslipInfo = array();
@@ -1066,7 +1069,6 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		foreach($result as $row) $employeeFieldsOfInterest[] = $row["field_name"];
 		unset($result);
 		$employeeFieldsOfInterest = array_unique($employeeFieldsOfInterest);
-
 		$infoByWageCode = array();
 		$infoByWageCode["0"] = "\t\t\t<Year>".$periodInfo["payroll_year_ID"]."</Year>\n\t\t\t<PeriodNumber>".$periodInfo["major_period"]."</PeriodNumber>\n\t\t\t<PeriodNumberAssoc>".$periodInfo["major_period_associated"]."</PeriodNumberAssoc>\n\t\t\t<PeriodStartDate>".$periodInfo["Wage_DateFrom"]."</PeriodStartDate>\n\t\t\t<PeriodEndDate>".$periodInfo["Wage_DateTo"]."</PeriodEndDate>\n";	//keine Zuweisung -> Daten von Monatslohn
 		$infoByWageCode["1"] = "\t\t\t<Year>".$periodInfo["payroll_year_ID"]."</Year>\n\t\t\t<PeriodNumber>".$periodInfo["major_period"]."</PeriodNumber>\n\t\t\t<PeriodNumberAssoc>".$periodInfo["major_period_associated"]."</PeriodNumberAssoc>\n\t\t\t<PeriodStartDate>".$periodInfo["HourlyWage_DateFrom"]."</PeriodStartDate>\n\t\t\t<PeriodEndDate>".$periodInfo["HourlyWage_DateTo"]."</PeriodEndDate>\n"; //Stundenlohn
@@ -1097,8 +1099,16 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$arrFld = array();
 		$employeeDetail = array();
 		foreach($employeeFieldsOfInterest as $fldName) $arrFld[] = "emp.`".$fldName."`";
-		$result = $system_database_manager->executeQuery("SELECT ".implode(",", $arrFld)." FROM `payroll_employee` emp INNER JOIN `payroll_tmp_change_mng` emplist ON emplist.`numID`=emp.`id` AND emplist.`core_user_id`=".$uid, "payroll_report_Payslip");
+		$result = $system_database_manager->executeQuery(
+				"SELECT ".implode(",", $arrFld)." 
+				FROM `payroll_employee` emp 
+				INNER JOIN `payroll_tmp_change_mng` emplist ON emplist.`numID`=emp.`id` 
+				AND emplist.`core_user_id`=".$uid, "payroll_report_Payslip");
 		foreach($result as $row) $employeeDetail[(string)$row["id"]] = $row;
+		
+		communication_interface::alert("employees:".print_r($result,true));
+		//communication_interface::alert("employeeDetail:".print_r($employeeDetail,true));
+		
 		unset($arrFld);
 		unset($result);
 

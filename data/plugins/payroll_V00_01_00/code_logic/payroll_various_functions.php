@@ -158,7 +158,7 @@ class variousFunctions {
 
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT payroll_languages.*,core_intl_language_names.language_name FROM payroll_languages INNER JOIN core_intl_language_names ON payroll_languages.core_intl_language_ID=core_intl_language_names.core_intl_language_ID WHERE core_intl_language_names.language_name_language='".session_control::getSessionInfo("language")."'".$auxWHERE." ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.language_name", "payroll_getLanguageList");
-
+		
 		if(count($result) < 1) {
 			$response["success"] = false;
 			$response["errCode"] = 101;
@@ -168,6 +168,7 @@ class variousFunctions {
 			$response["errCode"] = 0;
 			$response["data"] = $result;
 		}
+				
 		return $response;
 	}
 

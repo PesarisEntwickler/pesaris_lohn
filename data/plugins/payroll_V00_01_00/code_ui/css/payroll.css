@@ -304,7 +304,7 @@ label[for=loac_unit] {
 	border:1px solid #888;
 }
 #loacTab1,#loacTab2,#loacTab3,#loacTab4,#loacTab5 {
-	height:370px;
+	height:365px;
 }
 #loacBtnSave {
 	margin-top:5px;
@@ -594,7 +594,8 @@ label[for=prlAccAsg_rem2], #prlAccAsg_rem2 {
 	width:130px;
 }
 #prlAccAsgBtnClose {
-	margin-left:380px;
+	margin-left:10px;
+	margin-right:360px;
 	width:130px;
 }
 
@@ -1363,7 +1364,7 @@ span.edit {
 	overflow-y:auto;
 }
 .prlPmtSpltEditBD select {
-	width:194px;
+	width:196px;
 }
 .prlPmtSpltEditBD input[type=text] {
 	width:190px;
@@ -1380,6 +1381,7 @@ span.edit {
 	padding: 8px;
 	margin: 12px 0 0 0;
 }
+
 .prlPmtSpltEdit_bank_source select, .prlPmtSpltEdit_bank_source input[type=text] {
 	width:200px;
 }

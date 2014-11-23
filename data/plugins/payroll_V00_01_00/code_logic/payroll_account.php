@@ -163,7 +163,10 @@ class account {
 		//load language list
 		$arrLanguagesUsed = array();
 		$errFields = array();
+		require_once('payroll_various_functions.php'); 
+		$variousFunctions = new variousFunctions();
 		$rt = $variousFunctions->getLanguageList("UseForAccounts");
+		
 		foreach($rt["data"] as $langRow) $arrLanguagesUsed[] = $langRow["core_intl_language_ID"];
 
 		foreach($fieldDef as $currentFieldDef) {

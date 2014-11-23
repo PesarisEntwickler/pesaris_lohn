@@ -177,7 +177,7 @@ class employee {
 				$listDef["Items"] = array();
 			}
 
-			$listItems = $system_database_manager->executeQuery("SELECT * FROM payroll_empl_list_label lbl INNER JOIN payroll_empl_list lst ON lst.id=lbl.payroll_empl_list_ID AND lst.ListGroup=".$fieldDef["dataSourceGroup"]." AND deleted=0", "payroll_getEmployeeFieldDetail");
+			$listItems = $system_database_manager->executeQuery("SELECT * FROM payroll_empl_list_label lbl INNER JOIN payroll_empl_list lst ON lst.id=lbl.payroll_empl_list_ID AND lst.ListGroup=".$fieldDef["dataSourceGroup"]." AND deleted=0  ORDER BY lst.ListItemOrder", "payroll_getEmployeeFieldDetail");
 			foreach($listItems as $listItem) {
 				$listDef["Items"][(string)$listItem["id"]]["ListItemToken"] = $listItem["ListItemToken"];
 				$listDef["Items"][(string)$listItem["id"]]["ListItemOrder"] = $listItem["ListItemOrder"];
@@ -330,11 +330,15 @@ class employee {
 			//sortierung
 			if($orderBy==1) {
 				$tmpList = array();
-				foreach($param["data"]["listItems"] as $itemID=>$itemParam) $tmpList[(string)$itemParam["ListItemToken"]] = (string)$itemID;
+				foreach($param["data"]["listItems"] as $itemID=>$itemParam) {
+					$tmpList[(string)$itemParam["ListItemToken"]] = (string)$itemID;
+				}
 				ksort($tmpList);
 				$counter = 0;
 				$tokenOrder = array();
-				foreach($tmpList as $dummy=>$itemID) { $tokenOrder[(string)$itemID] = $counter; $counter++; };
+				foreach($tmpList as $dummy=>$itemID) {
+					$tokenOrder[(string)$itemID] = $counter; $counter++; 
+				}
 				unset($tmpList);
 			}
 

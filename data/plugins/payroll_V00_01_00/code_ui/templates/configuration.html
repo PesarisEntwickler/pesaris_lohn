@@ -64,19 +64,17 @@
 			<div id="gridCfgDasc" style="width:600px;height:500px;"></div>
 		</div>
 		<div id="prlCfgDivTab">
-			<button class="PesarisButton" onclick="cb('payroll.prepareCalculation',{'stage':2});" style="width:300px;"><wgui:text id="txtAbrechnungsdatenvorbereiten"/></button>
-			<button class="PesarisButton" onclick="cb('payroll.payslipConfig', {'f':'templateOv'});" style="width:300px;"><wgui:text id="txtLohnabrechnungsVorlagen"/></button>
+			<button class="" onclick="cb('payroll.prepareCalculation',{'stage':2});" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/pfeil_kreis48.gif" /><br/><wgui:text id="txtAbrechnungsdatenvorbereiten"/></button>
+			<button class="" onclick="cb('payroll.payslipConfig', {'f':'templateOv'});" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/einstellungen_papier48.gif" /><br/><wgui:text id="txtLohnabrechnungsVorlagen"/>...</button>
+			<button class="" onclick="cb('payroll.copyPayrollAccount');" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/duplikat48.gif" /><br/><wgui:text id="txtLohnartkopieren"/>...</button>
 			<br/>
-			<button class="PesarisButton" onclick="cb('payroll.prlVlFieldCfg');" style="width:300px;"><wgui:text id="txtPersonalstammfelderverwalten"/></button>
-			<button class="PesarisButton" onclick="cb('payroll.copyPayrollAccount');" style="width:300px;"><wgui:text id="txtLohnartkopieren"/>...</button>
-			<br/>
-			<button class="PesarisButton" onclick="cb('payroll.currencyConfig');" style="width:300px;"><wgui:text id="txtFremdwaehrungenVerwalten"/></button>
+			<button class="" onclick="cb('payroll.prlVlFieldCfg');" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/file_mann48.gif" /><br/><wgui:text id="txtPersonalstammfelderverwalten"/>...</button>
+			<button class="" onclick="cb('payroll.currencyConfig');" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/taschenrechner48.gif" /><br/><wgui:text id="txtFremdwaehrungenVerwalten"/>...</button>
 			<br/>
 		</div>
 		<div id="prlCfgSysTab">
-			<br/><br/>
-			<button class="PesarisButton" onclick="cb('payroll.dbBackup');" style="width:200px;"><wgui:text id="txtDBBackup"/></button>
-			<button class="PesarisButton" onclick="cb('payroll.dbRestore');" style="width:200px;"><wgui:text id="txtDBRestore"/></button>
+			<button class="" onclick="cb('payroll.dbBackup');" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/pfeil_disks_down48.gif" /><br/><wgui:text id="txtDBBackup"/></button>
+			<button class="" onclick="cb('payroll.dbRestore');" style="width:260px; margin: 10px 5px; background-color: transparent;"><img src="web/img/pfeil_disks48.gif" /><br/><wgui:text id="txtDBRestore"/></button>
 		</div>
 	</div>
 	<ul id="prlCfgOvMenu">
@@ -87,7 +85,7 @@
 
 
 <wgui:block name="payrollAccountForm">
-	<div id="loacTabs">
+	<div id="loacTabs" style="height: 460px;">
 		<ul>
 			<li><a href="#loacTab1"><wgui:text id="loacTab1"/></a></li>
 			<li><a href="#loacTab5"><wgui:text id="loacTab5"/></a></li>
@@ -506,7 +504,7 @@
 
 <wgui:block name="payrollFieldModifierOv">
 	<div id="toolbar" class="ui-widget-header ui-corner-all PesarisWGUI">
-		<button class="PesarisButton" id="prlFldModBtnNew"><wgui:text id="prlFldModBtnNew"/></button>
+		<button id="prlFldModBtnNew"><wgui:text id="prlFldModBtnNew"/></button>
 		<input type="checkbox" id="prlFldModBtnQFilter" /><label for="prlFldModBtnQFilter"><wgui:text id="prlFldModBtnQFilter"/></label>
 	</div>
 	<div id="prlFldModGrd"></div>
@@ -716,7 +714,7 @@
 
 <wgui:block name="selectPayslipCfg">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
-		<button class="PesarisButton" onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":"0","FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-top:10px;margin-bottom:10px;">Neue Vorlage</button><br/>
+		<button class="PesarisButton" onclick='cb("payroll.payslipConfig",{"f":"takeAction","w":"edit","id":"0","FieldDef":(prlVlFieldDef.Lastname==undefined?"0":"1")});' style="margin-top:10px;margin-bottom:10px; width: 140px;">Neue Vorlage</button><br/>
 		<fieldset>
 		<legend>Bestehende Vorlagen</legend>
 		<label for="templateChooser" style="display:inline-block;width:100px;">Vorlage:</label><select id="templateChooser" style="width:300px;margin-bottom:10px;"><option value="0">-- Vorlage ausw&auml;hlen --</option>
@@ -737,7 +735,10 @@
 		<input id="prlPslpCfg_id" type="hidden" />
 		<fieldset class="prlPslpCfgFSR">
 			<legend>Info-Box</legend>
-			<label for="prlPslpCfg_info_font_name">Schrift:</label><select id="prlPslpCfg_info_font_name" tabindex="13"><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select><select id="prlPslpCfg_info_font_size" tabindex="14"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
+			<label for="prlPslpCfg_info_font_name">Schrift:</label>
+				<select id="prlPslpCfg_info_font_name" tabindex="13" style="width:140px;><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select>
+				&nbsp;&nbsp;
+				<select id="prlPslpCfg_info_font_size" tabindex="14" style="width: 40px;><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
 			<label for="prlPslpCfg_info_offset_top">Abstand oben:</label><input id="prlPslpCfg_info_offset_top" type="text" value="" tabindex="15" /> mm<br/>
 			<label for="prlPslpCfg_info_offset_left">Abstand links:</label><input id="prlPslpCfg_info_offset_left" type="text" value="" tabindex="16" /> mm<br/>
 			<hr/>
@@ -760,20 +761,26 @@
 		</fieldset>
 		<fieldset class="prlPslpCfgFSL">
 			<legend>Adresse</legend>
-			<label for="prlPslpCfg_addr_font_name">Schrift:</label><select id="prlPslpCfg_addr_font_name" tabindex="4"><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select><select id="prlPslpCfg_addr_font_size" tabindex="5"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
+			<label for="prlPslpCfg_addr_font_name">Schrift:</label>
+				<select id="prlPslpCfg_addr_font_name" tabindex="4" style="width:140px;><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select>
+				&nbsp;&nbsp;
+				<select id="prlPslpCfg_addr_font_size" tabindex="5" style="width: 40px;"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
 			<label for="prlPslpCfg_addr_offset_top">Abstand oben:</label><input id="prlPslpCfg_addr_offset_top" type="text" value="" tabindex="6" /> mm<br/>
 			<label for="prlPslpCfg_addr_offset_left">Abstand links:</label><input id="prlPslpCfg_addr_offset_left" type="text" value="" tabindex="7" /> mm<br/>
 		</fieldset>
 		<fieldset class="prlPslpCfgFSL">
 			<legend>Lohndaten</legend>
-			<label for="prlPslpCfg_content_font_name">Schrift:</label><select id="prlPslpCfg_content_font_name" tabindex="8"><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select><select id="prlPslpCfg_content_font_size" tabindex="9"><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
+			<label for="prlPslpCfg_content_font_name">Schrift:</label>
+				<select id="prlPslpCfg_content_font_name" tabindex="8" style="width:140px;><option value="phv">Helvetica (Arial)</option><option value="cmss">Computer Modern SansSerif</option><option value="pag">AvantGarde</option><option value="ptm">Times Roman</option><option value="ppl">Palatino</option><option value="cmr">Computer Modern Roman</option><option value="pbk">Bookman</option><option value="cmtt">Computer Modern Typewriter</option></select>
+				&nbsp;&nbsp;
+				<select id="prlPslpCfg_content_font_size" tabindex="9" style="width: 40px;><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><br/>
 			<label for="prlPslpCfg_content_offset_top">Abstand oben:</label><input id="prlPslpCfg_content_offset_top" type="text" value="" tabindex="10" /> mm<br/>
 			<label for="prlPslpCfg_content_offset_left">Abstand links:</label><input id="prlPslpCfg_content_offset_left" type="text" value="" tabindex="11" /> mm<br/>
 			<label for="prlPslpCfg_content_width">Tabellenbreite:</label><input id="prlPslpCfg_content_width" type="text" value="" tabindex="12" /> mm<br/>
 		</fieldset>
 	</div>
 	<button class="PesarisButton" id="prlPslpCfgCancel"><wgui:text id="btnClose"/></button>
-	<button class="PesarisButton" id="prlPslpCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlPslpCfgSave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="editPayslipCfg">
 
 
@@ -788,11 +795,10 @@
 
 <wgui:block name="prlVlFldCfgSelect">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
-	<br/>
-	<label for="prlVlFldCfg_field" style="width: 220px;"><wgui:text id="txtPersonalstammfeldAuswaehlen"/>:</label>&nbsp;&nbsp;&nbsp; 
-	<select id="prlVlFldCfg_field" style="width: 200px;">
+	<label for="prlVlFldCfg_field" style="width: 230px; margin: 12px;"><wgui:text id="txtPersonalstammfeldAuswaehlen"/>:</label><br/>
+	<select id="prlVlFldCfg_field" size="20" style="width: 250px; margin: 12px;">
 	<wgui:loop name="fieldLoop" varname="field_list">
-		<option value="<wgui:loopvar loopname="fieldLoop" varname="fieldName"/>"><wgui:loopvar loopname="fieldLoop" varname="label"/></option>
+		<option value="<wgui:loopvar loopname="fieldLoop" varname="fieldName"/>" ><wgui:loopvar loopname="fieldLoop" varname="label"/></option>
 	</wgui:loop name="fieldLoop">
 	</select>
 	<br/>&nbsp;
@@ -821,13 +827,13 @@
 				<label for="prlVlFldCfg_maxVal">Zahlenbereich bis:</label><input type="text" id="prlVlFldCfg_maxVal"/><br/>
 				<label for="prlVlFldCfg_maxLength">Max. Textl&auml;nge:</label><input type="text" id="prlVlFldCfg_maxLength"/><br/>
 				<p id="prlVlFldCfg_noSettings">Keine Einstellungen m&ouml;glich.</p>
+				
 				<hr id="prlVlFldCfg_hr1"/>
-					
-					<table id="ListenwerteVerwaltungAnzeige" cellpadding="0" cellspacing="0" width="100%" style="visibility:hidden;">
+				
+					<table id="ListenwerteVerwaltungAnzeige" cellpadding="0" cellspacing="0" width="100%" >
 					<tr>
 						<td style="font-weight: bold;" valign="middle">
 							<wgui:text id="txtListenwerte"/>:
-							<input type="hidden" name="prlVlFldCfg_ListenFeldName" id="prlVlFldCfg_ListenFeldName" value="" />
 						</td>
 						<td>
 							<select id="prlVlFldCfg_listID"><option value="" token="" style="height: 21px; margin-right: 5px;">-- Listenwert ausw&auml;hlen --</option></select>
@@ -844,7 +850,6 @@
 					<div id="ListenwerteFldCfgContainer" style="height:63px;overflow-x:hidden;overflow-y:auto;border:0px;">	
 						&nbsp;
 					</div>
-				
 			</div>
 		</fieldset>
 		<fieldset>
@@ -862,15 +867,23 @@
 
 
 <wgui:block name="prlVlFldCfgLstItemDel">
-	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
-	<br/>Sind Sie sicher, dass Sie den Listenwert '<wgui:var name="ItemName"/>' l&ouml;schen wollen?<br/>&nbsp;
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI" style="padding: 5px;">
+		<wgui:var name="displayText"/>
 	</div>
 	<center>
-	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'><wgui:text id="txtN"/></button>
-	<button class="PesarisButton" onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;"><wgui:text id="txtY"/></button>
-	</center>
+	 <button class="PesarisButton" id="prlVlFldCfgLstItemDel_Y" onclick='cb("payroll.prlVlFieldCfg",{"action":"ListItemDel","ItemID":<wgui:var name="ItemID"/>,"commit":1});' style="margin-top:10px;margin-right:10px;"><wgui:text id="txtY"/></button>
+	 <button class="PesarisButton" id="prlVlFldCfgLstItemDel_N" onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'><wgui:text id="txtN"/></button>
+	</center> 
 </wgui:block name="prlVlFldCfgLstItemDel">
 
+<wgui:block name="prlVlFldCfgLstItemDel_Not">
+	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI" style="padding: 5px;">
+		<wgui:var name="displayText"/>
+	</div>
+	<center>
+	 <button class="PesarisButton" id="prlVlFldCfgLstItemDel_N" onclick='cb("payroll.prlVlFieldCfg",{"action":"edit","loadData":"false"});'><wgui:text id="btnOK"/></button>
+	</center>
+</wgui:block name="prlVlFldCfgLstItemDel_Not">
 
 <wgui:block name="prlVlFldCfgLstItemEdit">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlVlFldCfgLI">

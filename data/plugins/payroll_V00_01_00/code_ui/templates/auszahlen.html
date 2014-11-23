@@ -37,17 +37,10 @@
 	<center>
    		<button id="btnAuszahlenClose" name="btnAuszahlenClose" class="PesarisButton"><wgui:text id="btnClose"/></button> 
 	</center>
-
 </wgui:block name="wguiBlockAuszahlenHistoryWindow">
 
 
 <wgui:block name="wguiBlockAuszahlenGenerateWindow">
-	<link rel="stylesheet" href="web/js/jquery-ui-1.8.7.custom/development-bundle/themes/redmond/jquery.ui.all.css">
-	<link rel="stylesheet" href="web/js/jquery-ui-1.8.7.custom/development-bundle/themes/redmond/jquery-ui-1.8.7.custom.css" type="text/css" />
-<!--<script type="text/javascript" src="web/js/jquery-ui-1.8.7.custom/js/jquery-1.4.4.min.js"></script> -->
-   	<script type="text/javascript" src="web/js/jquery-ui-1.8.7.custom/js/jquery-ui-1.8.7.custom.min.js"></script>
- 	<script type="text/javascript" src="web/js/jquery-ui-1.8.7.custom/development-bundle/ui/jquery-ui-1.8.7.custom.js"></script>
-	<script type="text/javascript" src="web/js/jquery-ui-1.8.7.custom/development-bundle/ui/i18n/jquery.ui.datepicker-de.js"></script>
 	<script type="text/javascript">
 		$(function(){
 			$('#datepicker').datepicker({
@@ -58,7 +51,6 @@
 				weekHeader: 'W',
 			    showOn: "button",
 			    buttonImage: "web/img/calendar.png",
-//			    showButtonPanel: true,
 				dateFormat: 'dd.mm.yy',
 				altFormat: 'dd.mm.yy'
 			});

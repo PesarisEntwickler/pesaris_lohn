@@ -9,7 +9,7 @@ GITHub ñ online:
 https://github.com/PesarisEntwickler
 Der Account heisst: ÑPesarisEntwicklerì
 Und das Repository dort ist Ñpesaris_lohnì
-Passwort ist: Ñschowieder‰Versionì
+Passwort ist: ÑschowiederaeVersionì
 
 ==========================================================
 GitHub HM Privat 
@@ -27,8 +27,6 @@ MySQL Datenbank-Zugriff:
 ==========================
 Benutzername: remoteadmin
 Passwort: h3iD$N4b
-
-
 
 
 Zugang
@@ -80,6 +78,7 @@ PWD: A6$LuTc81
 tail -n 20 /var/log/httpd-error.log
 tail -n 20 /var/log/httpd-access.log
 tail -n 20 /var/log/copronet-application.log
+tail -n 20 /var/log/http-copronet.log
 
 (Anzahl der letzten 20 Zeilen)
 

@@ -1,0 +1,3 @@
+open webdev@srv2.copronet.ch 22 
+pass h3rM$8fQ
+get -r icons

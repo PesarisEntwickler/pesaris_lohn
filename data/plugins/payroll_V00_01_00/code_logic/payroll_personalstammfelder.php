@@ -1,10 +1,18 @@
 <?php
 class personalstammfelder {
+	
+	public function check_If_Used($ListenWertArray) {
+		$sql  = "SELECT count(".$ListenWertArray["technFeldname"].") AS Anzahl FROM payroll_employee WHERE ".$ListenWertArray["technFeldname"]." = '".$ListenWertArray["ItemID"]."' ;";
+		$system_database_manager = system_database_manager::getInstance();
+		$result = $system_database_manager->executeQuery($sql, "check_If_Used");
+		//communication_interface::alert("check_If_Used():\n".$sql."\n".print_r($ListenWertArray, true)."\n=:".$result[0]["Anzahl"]."\nresult:".print_r($result, true));
+		return  $result[0]["Anzahl"];
+	}
 
 	public function getListenWerte($personalstammListenwert) {
 		$sql  = "SELECT * FROM payroll_empl_list AS L, payroll_empl_list_label AS LL ";
 		$sql .= " WHERE LL.payroll_empl_list_ID = L.id AND L.id = ".$personalstammListenwert;
-		$sql .= " ORDER BY id, language";
+		$sql .= " ORDER BY id, language, L.ListItemOrder";
 		//communication_interface::alert("getEmplListWerte($personalstammListenwert): ".$sql);
 		
  		$system_database_manager = system_database_manager::getInstance();

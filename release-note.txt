@@ -1,5 +1,10 @@
 Noch offen: 
-In Stammdatenverwaltung kann nur eine Mutation gemacht werden
+	automatisches Transferprogramm für update SRV2 -> SRV1
+
+2014-11-20
+- In Stammdatenverwaltung können Mutation gemacht werden nach dem Auszahlen-Dialog
+- Code verwalten eingebaut
+- Das Löschen von Listen-Werten hat eine Sicherheitsfunktion. Es wird die Verwendung gezählt.
 
 2014-10-27
 - DTA in Section 01 mit Zahlstellen-BCNummer ergänzt
@@ -17,7 +22,6 @@ In Stammdatenverwaltung kann nur eine Mutation gemacht werden
 - [Pkt 1 - TP 28.8.14] auch [Pkt 3 - TP 5.9.14] "Auszahlungsdaten/Splitt-Infos auf Lohnabrechnung andrucken" 
  
 2014-09-19
-
 - Validierung Zahlstellen-Währung=Splitt-Auszahlwährung auf GUI Bankverbindung
 - Jetzt auch Auszahlung in USD möglich (USD ist nachgezogen) 
 - Einlesung und Validierung Personalstamm betreffend "Kinderdaten" und "Beschäftigungsdaten" (Fall Farine C.)

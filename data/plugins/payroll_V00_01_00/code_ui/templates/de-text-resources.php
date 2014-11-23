@@ -54,6 +54,9 @@ $textResourceMap["txtDatenWiederherstellen"] = "Daten wiederherstellen";
  
 $textResourceMap["txtListenwerte"] = "Listenwerte";
 $textResourceMap["txtListentext"] = "Listentext";
+$textResourceMap["txtKeinLoeschen"] = "Kein Loeschen";
+$textResourceMap["txtListenwertNichtLoeschen"] = "Listenwert kann noch nicht geloescht werden. Er wird noch bei #1# Mitarbeitern verwendet.";
+
 
 /* ********* AUSZAHLEN *********** */
 $textResourceMap["txtZahlstellenDerMitarbeiter"] = "Zahlstellen benutzen, die den Mitarbeitern hinterlegt sind";
@@ -181,7 +184,6 @@ $textResourceMap["prlVlEditDlg1LblLayout"] = "Layout:";
 $textResourceMap["prlVlEditDlg1OptChooseLayout"] = "-- Layout auswaehlen --";
 
 $textResourceMap["prlVlEditDlg2LblName"] = "Layout-Name:";
-$textResourceMap["prlVlEditDlg2LblTemporary"] = "temporaer (wird beim Logout geloescht)";
 $textResourceMap["prlVlEditDlg2LblGlobal"] = "allen Benutzern zugaenglich";
 
 $textResourceMap["prlVlSelectFormTitle"] = "Bearbeitungsmaske auswaehlen";
@@ -193,6 +195,13 @@ $textResourceMap["txtSicherLayoutLoeschen2"] = "unwiderruflich l&ouml;schen woll
 
 $textResourceMap["txtProblemBei"] = "Problem bei";
 $textResourceMap["txtFehlerBei"] = "Fehler bei";
+
+$textResourceMap["txtTemporaryFilter"] = "temporaer (wird beim Logout geloescht)";
+
+$textResourceMap["txtKeinLoeschen"] = "Kein L&ouml;schen m&ouml;glich";
+$textResourceMap["txtListenwertKannNichtGeloeschtWerden"] = "Der Listenwert '<b>#1#</b>' aus '<b>#2#</b>' kann nicht gel&ouml;scht werden, weil er noch bei <b>#3#</b> Mitarbeitern in Verwendung ist.";;
+$textResourceMap["txtListenwertWirklichLoeschen"] = "Sind Sie sicher, dass Sie den Listenwert '<b>#1#</b>' aus '<b>#2#</b>' l&ouml;schen wollen?";
+
 
 /*
 ********* CONFIGURATION ***********
@@ -437,9 +446,9 @@ $textResourceMap["prlAccAsg_aid2"] = "LOA";
 $textResourceMap["prlAccAsg_mapsTo"] = "--&gt;";
 $textResourceMap["prlAccAsg_amt2"] = "Proz.";
 $textResourceMap["prlAccAsg_inv2"] = "Vz";
-//$textResourceMap["prlAccAsg_rem2"] = "Rest";
-//$textResourceMap["prlAccAsg_rem2Opt0"] = "0 - Rest auf Stammkonto";
-//$textResourceMap["prlAccAsg_rem2Opt1"] = "1 - Rest auf Konto mit hoechstem Betrag";
+$textResourceMap["prlAccAsg_rem2"] = "Rest";
+$textResourceMap["prlAccAsg_rem2Opt0"] = "0 - Rest auf Stammkonto";
+$textResourceMap["prlAccAsg_rem2Opt1"] = "1 - Rest auf Konto mit hoechstem Betrag";
 $textResourceMap["prlAccAsg_cid3"] = "Firma";
 $textResourceMap["prlAccAsg_eid3"] = "Mitarbeiter";
 $textResourceMap["prlAccAsg_cc3"] = "KST";
@@ -551,6 +560,8 @@ $textResourceMap["txtCalcMenupunkt_BEBUKontierungen"] = "BEBU-Kontierungen";
 $textResourceMap["txtCalcMenupunkt_Lohnabrechnungen"] = "Lohnabrechnungen";
 $textResourceMap["txtCalcMenupunkt_Lohnkonto"] = "Lohnkonto";
 $textResourceMap["txtCalcWarnungen"] = "Beim Abschliessen der Periode sind Warnungen aufgetreten";
+$textResourceMap["txtMitarbeiterauswahl"] = "Mitarbeiterauswahl";
+$textResourceMap["txtLohnartBearbeiten"] = "Lohnart bearbeiten";
 
 /*
 ****** Process payment (payout) ******
@@ -635,7 +646,6 @@ $textResourceMap["prlUtlEfcEdtCheckbox"] = "Vergleichswert:";
 $textResourceMap["prlUtlEfcEdtSelect"] = "Vergleichswert:";
 $textResourceMap["prlUtlEfcEdtBtnSet"] = "&Uuml;bernehmen";
 $textResourceMap["prlUtlEfcGlobalFilter"] = "allen Benutzern zugaenglich";
-$textResourceMap["prlUtlEfcTemporaryFilter"] = "temporaer (wird beim Logout geloescht)";
 
 
 ?>

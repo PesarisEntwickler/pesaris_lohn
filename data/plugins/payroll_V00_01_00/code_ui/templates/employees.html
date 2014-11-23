@@ -77,17 +77,9 @@
 
 <wgui:block name="employeeEditFormDlg2">
 	<label for="layoutName" style="display:inline-block;width:100px;"><wgui:text id="prlVlEditDlg2LblName"/></label><input type="text" id="layoutName" style="width:300px;margin-top:10px;margin-bottom:10px;" value="<wgui:var name="LayoutName"/>"/><br/>
-	<input type="checkbox" 
-			id="layoutTemporary" 
-			style="margin-bottom:10px;" 
-			onclick="if($(this).is(':checked')) { $('#layoutGlobal').removeAttr('checked');$('#layoutGlobal').attr('disabled', 'disabled');}else{ $('#layoutGlobal').removeAttr('disabled');}" 
-			<wgui:var name='tempChecked'/>
-			 />
-			<label for="layoutTemporary"><wgui:text id="prlVlEditDlg2LblTemporary"/></label><br/>
-	<input type="checkbox" id="layoutGlobal" 
-			style="margin-bottom:30px;"
-			<wgui:var name='globalChecked'/>
-			 />
+	<input type="checkbox" 	id="layoutTemporary"  style="margin-bottom:10px;"  onclick="if($(this).is(':checked')) { $('#layoutGlobal').removeAttr('checked'); $('#layoutGlobal').attr('disabled', 'disabled'); }else{ $('#layoutGlobal').removeAttr('disabled');}" <wgui:var name="tempChecked"/>   />&nbsp;
+			<label for="layoutTemporary"><wgui:text id="txtTemporaryFilter"/></label><br/>
+	<input type='checkbox' id='layoutGlobal' style='margin-bottom:30px;' <wgui:var name="globalChecked"/>  />&nbsp;
 			<label for="layoutGlobal"><wgui:text id="prlVlEditDlg2LblGlobal"/></label><br/>
 	<button class="PesarisButton" onclick='cb("payroll.prlVlEditForm",{"f":"layoutOv"});' style="margin-right:20px;"><wgui:text id="btnBack"/></button>
 	<button class="PesarisButton" onclick='if($.trim($("#layoutName").val())!="") cb("payroll.prlVlEditForm",{"f":"takeAction","w":"showEditor","id":<wgui:var name="id"/>,"name":$("#layoutName").val(), "temp":$("#layoutTemporary").is(":checked") ? 1 : 0, "global":$("#layoutGlobal").is(":checked") ? 1 : 0});'><wgui:text id="btnNext"/></button>

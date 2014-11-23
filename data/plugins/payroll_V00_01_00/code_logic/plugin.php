@@ -41,18 +41,21 @@ class payroll_BL {
 		require_once('payroll_personalstammfelder.php');
 		$personalstammfelder = new personalstammfelder();
 		
+		require_once('payroll_reports.php');
+		$reports = new payroll_BL_reports();		
 		
 		switch($functionName) {
 			
+		case 'payroll.personalstammfelder.check_If_Used':
+			return $personalstammfelder->check_If_Used($functionParameters[0]);
 		case 'payroll.personalstammfelder.getListWerte':
 			return $personalstammfelder->getListenWerte($functionParameters[0]);
 		case 'payroll.personalstammfelder.saveListenWerte':
-			return $personalstammfelder->saveListenWerte($functionParameters[0],$functionParameters[1],$functionParameters[2]);
+			return $personalstammfelder->saveListenWerte($functionParameters[0], $functionParameters[1], $functionParameters[2]);
 			 
 		case 'payroll.auszahlen.GenerateDataFiles':
-			require_once('payroll_reports.php');
-			$reports = new payroll_BL_reports();		
 			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1], $functionParameters[2]);
+
 		case 'payroll.auszahlen.getAuszahlMitarbeiteranzahl':
 			return $auszahlen->getAuszahlMitarbeiteranzahl();
 		case 'payroll.auszahlen.getCalculationCurrentPeriodEmployeeList':
@@ -323,9 +326,8 @@ class payroll_BL {
 			return $payslip->savePayslipNotifications($functionParameters[0]);
 
 		case 'payroll.calculationReport':
-				require_once('payroll_reports.php');
-				$reports = new payroll_BL_reports();
-
+//			communication_interface::alert("payroll.calculationReport\n".print_r($functionParameters,true));
+				
 				switch($functionParameters[0]) {
 				case 'GenerateAuszahlenReports':
 					//communication_interface::alert("generate");
@@ -364,7 +366,7 @@ class payroll_BL {
 					$uid = session_control::getSessionInfo("id");
 					$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_ID`=".$uid, "payroll_calculate");
 					$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_change_mng`(`core_user_ID`,`numID`) SELECT ".$uid.",`payroll_employee_ID` FROM `payroll_period_employee` WHERE `payroll_period_ID`=".$payrollPeriodID." AND `processing`!=0", "payroll_calculate");
-					//communication_interface::alert("Lohnabrechnung");
+//communication_interface::alert("jetzt Lohnabrechnung");
 					return $reports->Payslip(array("payroll_period_ID"=>$payrollPeriodID));
 				}
 			break;

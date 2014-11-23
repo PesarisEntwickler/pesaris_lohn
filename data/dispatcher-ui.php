@@ -28,7 +28,7 @@ function dispatcher($functionName)
 
 	$pf = explode(".", $functionName);
 	if(sizeof($pf) < 2) {
-		$objResponse->alert("Invalid function call.");
+		$objResponse->alert("Invalid function call. [1] ".$functionName);
 		return $objResponse;
 	}
 
@@ -71,7 +71,7 @@ function dispatcher($functionName)
 //		session_control::setSessionToken($_COOKIE["aafw"]);
 //		if(!isset($aafwConfig["plugins"][$pf[0]])) {
 		if(!session_control::pluginExists($pf[0])) {
-			$objResponse->alert("Invalid function call.");
+			$objResponse->alert("Invalid function call. [2] ".$pf[0]);
 			return $objResponse;
 		}
 		//Call a local ui function
@@ -82,7 +82,7 @@ function dispatcher($functionName)
 			$SYS_PLUGIN["ui"][$pf[0]]->sysListener($functionName, $arrArgs);
 			return $objResponse;
 		}else{
-			$objResponse->alert("Invalid function call.");
+			$objResponse->alert("Invalid function call. [3]");
 			return $objResponse;
 		}
 	}

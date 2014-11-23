@@ -1371,6 +1371,7 @@ function prlLoacSave() {
 	var exclude = [];
 	var ip = [];
 	var op = [];
+
 	$("#loacTab2 input,#loacTab2 select,#loacTab4 input,#loacTab4 select").each(function(index) { exclude.push($(this).attr('id')); });
 
 	$(prlLoacWnd+' input,'+prlLoacWnd+' select').each(function(index) {
@@ -1386,8 +1387,8 @@ function prlLoacSave() {
 	jsonItem["inploa"] = ip;
 	$("#loacOutLOA option").each(function(index) { op.push([$(this).attr('value'),$(this).attr('fwdfield'),$(this).attr('fwdnegval'),$(this).attr('invertval'),$(this).attr('targetfield')]); });
 	jsonItem["outloa"] = op;
-
-	cb("payroll.prlLoacSave",{"rid":prlLoacRID,"data":jsonItem});
+	
+	cb('payroll.prlLoacSave',{"rid":prlLoacRID,"data":jsonItem});
 }
 
 function prlLoacOpenForm(accId) {
@@ -3656,7 +3657,7 @@ function prlVlFldCfgDataFromJSON() {
 		var o = $('#prlVlFldCfg_listID');
 		o.find('option').not('[value=""]').remove();
 		$.each(prlVlFldCfg.data.listItems, function(k,v) {
-			o.append( $('<option></option>').attr("value", k).attr("token", v.ListItemToken).text( (prlVlFldCfg.data.fields.displayCode==1 ? v.ListItemToken+' - ' : '')+v.labels[prlVlFldCfg.userLanguage]) );
+			o.append( $('<option></option>').attr("value", k).attr("token", v.ListItemToken).text( (prlVlFldCfg.data.fields.displayCode==1 ? v.ListItemOrder+' - '+v.ListItemToken+' - ' : '')+v.labels[prlVlFldCfg.userLanguage]) );
 		});
 		o.html($("option", o).sort(function(a, b) { 
 			return a.text == b.text ? 0 : a.text < b.text ? -1 : 1 
@@ -3721,16 +3722,6 @@ function prlVlFldCfgChangeItem(itemID) {
 	cb('payroll.prlVlFieldCfg',{'action':'edit','loadData':'false'});
 }
 
-function prlVlFldCfgDataToJSON() {
-	$.each(prlVlFldCfg.data.fields, function(k,v) {
-		var o = $('#prlVlFldCfg_'+k);
-		if(o.length!=0) {
-			if(o.is(':checkbox')) prlVlFldCfg.data.fields[k] = o.is(':checked') ? 1 : 0;
-			else prlVlFldCfg.data.fields[k] = o.val();
-		}
-	});
-}
-
 function prlVlFldCfgInit() {
 	$("#prlVlFldCfgSave").bind('click', function() { prlVlFldCfgDataToJSON(); cb('payroll.prlVlFieldCfg', {'action':'save', 'data':prlVlFldCfg}); });
 	$("#prlVlFldCfgCancel").bind('click', function() { $('#modalContainer').mb_close(); });
@@ -3744,10 +3735,20 @@ function prlVlFldCfgInit() {
 		var curMode = $(this).attr('id').substr(15);
 		var vl = $('#prlVlFldCfg_listID').val();
 		if((curMode=='Edit' || curMode=='Del') && vl=='') return false;
-		cb('payroll.prlVlFieldCfg', {'action':'ListItem'+curMode, 'ItemID':vl, 'ItemText':$('#prlVlFldCfg_listID option:selected').text()} );
+		cb('payroll.prlVlFieldCfg', {'action':'ListItem'+curMode, 'ItemID':vl, 'ItemText':$('#prlVlFldCfg_listID option:selected').text() , 'technFeldname':$('#prlVlFldCfg_fieldName').text() } );
 	});
 	
 	prlVlFldCfgDataFromJSON();
+}
+
+function prlVlFldCfgDataToJSON() {
+	$.each(prlVlFldCfg.data.fields, function(k,v) {
+		var o = $('#prlVlFldCfg_'+k);
+		if(o.length!=0) {
+			if(o.is(':checkbox')) prlVlFldCfg.data.fields[k] = o.is(':checked') ? 1 : 0;
+			else prlVlFldCfg.data.fields[k] = o.val();
+		}
+	});
 }
 
 /*
