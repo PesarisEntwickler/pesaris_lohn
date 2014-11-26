@@ -5,7 +5,6 @@ class payroll_BL_reports {
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
-//$now = microtime(true); //TODO: PROFILING START
 //$param = array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"])
 		$periodLabels["de"] = array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
 
@@ -31,7 +30,6 @@ class payroll_BL_reports {
 		$result = $system_database_manager->executeQuery("SELECT payroll_period_ID FROM payroll_calculation_current LIMIT 1", "payroll_report_CalculationJournal");
 		if(count($result)>0) $isCurrentPeriod = $result[0]["payroll_period_ID"]==$payrollPeriodID ? true : false;
 
-//$now = microtime(true); //TODO: PROFILING START
 		$result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, empl.EmployeeNumber, empl.Firstname, empl.Lastname, empl.payroll_company_ID, empl.CodeAHV, empl.CodeALV, empl.CodeUVG, empl.CodeUVGZ1, empl.CodeUVGZ2, empl.CodeBVG, empl.CodeKTG, empl.EmploymentStatus, acc.id as AccountNumber, acclbl.label, calc.quantity, calc.rate, calc.amount, calc.code FROM ".($isCurrentPeriod ? "payroll_calculation_current" : "payroll_calculation_entry")." calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' WHERE calc.payroll_period_ID=".$payrollPeriodID." ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
 		$lastEmployeeID = 0;
 		$entryCollector = array();
@@ -51,48 +49,18 @@ class payroll_BL_reports {
 		}
 		if($singleEmployeeData != "") {
 			//there are still a few more data for writing to the XML file
-//			fwrite($fp, $singleEmployeeData.implode("",$entryCollector)."\t\t\t</Entries>\n\t\t</Employee>\n");
 			fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
 		}
 		fwrite($fp, "\t</Employees>\n</Report>\n");
 		$fm->fclose();
 
-//communication_interface::alert("db+xml: ".(microtime(true) - $now)); //TODO: PROFILING STOP
-//error_log("\ndb+xml: ".(microtime(true) - $now)."\n", 3, "/var/log/copronet-application.log");
-
 		chdir($newTmpPath);
-//$now = microtime(true); //TODO: PROFILING START
 
-//		system("cp ./data.xml /usr/local/www/apache22/data/plugins/payroll_V00_01_00/code_logic/compileme.tex");
         system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."CalculationJournal.xslt ./data.xml > ./compileme.tex");
         
-//communication_interface::alert("xslt: ".(microtime(true) - $now)); //TODO: PROFILING STOP
-//error_log("\nxslt: ".(microtime(true) - $now)."\n", 3, "/var/log/copronet-application.log");
-
-//$now = microtime(true); //TODO: PROFILING START
         system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
 		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
 		system("chmod 666 *");
-//file_put_contents($newTmpPath."/debug.txt", (microtime(true) - $now) ); //TODO: PROFILING STOP
-//communication_interface::alert("pdflatex: ".(microtime(true) - $now)); //TODO: PROFILING STOP
-//error_log("\npdflatex: ".(microtime(true) - $now)."\n", 3, "/var/log/copronet-application.log");
-
-/*
-$now = microtime(true); //TODO: PROFILING START
-		system("latex compileme.tex > /dev/null");
-		system("latex compileme.tex > /dev/null");
-communication_interface::alert("LaTeX: ".(microtime(true) - $now)); //TODO: PROFILING STOP
-$now = microtime(true); //TODO: PROFILING START
-		system("dvips -t landscape compileme.dvi > /dev/null");
-		system("ps2pdf compileme.ps > /dev/null");
-communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TODO: PROFILING STOP
-*/
-//$now = microtime(true); //TODO: PROFILING START
-//		system("rm compileme.aux");
-//		system("rm compileme.dvi");
-//		system("rm compileme.log");
-//		system("rm compileme.ps");
-//communication_interface::alert("rm: ".(microtime(true) - $now)); //TODO: PROFILING STOP
 
 		return $newTmpDirName;
 	}
@@ -139,7 +107,19 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                 // Auswertung nach Mitarbeiter (von Daniel Müller)
                 $reportTemplate = $ReportName;
                 
-                fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Employees>\n");
+                fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">
+                		\n\t<Header>
+                		\n\t\t<Company>
+                		\n\t\t\t<Name>Testfirma AG</Name>
+                		\n\t\t\t<Street>Hauptstrasse 56</Street>
+                		\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>
+                		\n\t\t</Company>
+                		\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>
+                		\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>
+                		\n\t\t<Year>".$param["year"]."</Year>
+                		\n\t\t<Period>".$periodTitle."</Period>
+                		\n\t</Header>
+                		\n\t<Employees>\n");
                 
                 $query = "SELECT 
                                 emp.`id` as EmployeeID, 
@@ -342,20 +322,47 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                                                  "doPageBreak=\"true\""
                                                  :
                                                  "doPageBreak=\"false\"").
-                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+                                          \n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>
+                                          \n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+                                          \n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>
+                                          \n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+                                          \n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+                                          \n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>
+                                          \n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
+                                          \n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
+                                          \n\t\t\t\t\t</Entry>\n";
                      $entryCounter += 1;
                  }
                  if($singleEmployeeData != "") {
                      fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
                  }
-                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 fwrite($fp, "\n\t\t</Companies>
+                 			  \n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
+                 			  \n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
+                 			  \n\t</Corporation>
+                 			  \n</Report>
+                 			  \n");
                  $fm->fclose();
                  break;
              case 3:
                  // Auswertung nach Firma / Konto / Gegenkonto
                  $reportTemplate = "AccountingJournal[Company][Account][Counter_account]"; 
                  
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">
+                 			\n\t<Header>\n\t\t<MainCompany>
+                 			\n\t\t\t<Name>Testfirma AG</Name>
+                 			\n\t\t\t<Street>Hauptstrasse 56</Street>
+                 			\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>
+                 			\n\t\t</MainCompany>
+                 			\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>
+                 			\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>
+                 			\n\t\t<Year>".$param["year"]."</Year>
+                 			\n\t\t<Period>".$periodTitle."</Period>
+                 			\n\t\t<AccountType>".$entryTable."</AccountType>
+                 			\n\t</Header>
+                 			\n\t<Corporation>
+                 			\n\t\t<Companies>\n");
                  
                  $query = "  SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
@@ -423,7 +430,9 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
                  if($singleEmployeeData != "") {
                      fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
                  }
-                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
+                 			  \n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
+                 			  \n\t</Corporation>\n</Report>\n");
                  $fm->fclose();
                  break;
              case 4:
@@ -954,7 +963,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 		$payrollPeriodID = $param["payroll_period_ID"];
 		$uid = session_control::getSessionInfo("id");
 		$language = session_control::getSessionInfo("language");
-		$cashPayment = array("de" => "Barauszahlung", "en" => "Cash payment", "fr" => "Paiement en espÃ¨ces", "it" => "Pagamento in contanti");
+		$cashPayment = array("de" => "Barauszahlung", "en" => "Cash payment", "fr" => "Paiement en espaces", "it" => "Pagamento in contanti");
 
 		$system_database_manager = system_database_manager::getInstance();
 
@@ -1002,7 +1011,6 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 // 				AND payroll_period_ID = ".$payrollPeriodID." ORDER BY payroll_employee_ID, payroll_payment_split_ID";
 		
 		$sql = "SELECT * FROM payroll_payment_current_effectifpayout ";
-				//ORDER BY payroll_employee_ID, payroll_payment_split_ID ";
 		
 		$payments = array();
 		$result = $system_database_manager->executeQuery( $sql, "payroll_report_Payslip");
@@ -1020,15 +1028,15 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 			}
 			$payments[(string)$row["payroll_employee_ID"]][] = 
 					"\t\t\t\t<Payout>
-					\n\t\t\t\t\t<BankAddrLine1>".$row["beneBank1"]."</BankAddrLine1>
-					\n\t\t\t\t\t<BankAddrLine2>".$row["beneBank2"]."</BankAddrLine2>
-					\n\t\t\t\t\t<BankAddrLine3>".$row["beneBank3"]."</BankAddrLine3>
-					\n\t\t\t\t\t<BankAddrLine4> </BankAddrLine4>
-					\n\t\t\t\t\t<BankAccountNo>".$row["benIBAN"]."</BankAccountNo>
-					\n\t\t\t\t\t<PayoutCurrency>".$row["currency_ID"]."</PayoutCurrency>
-					\n\t\t\t\t\t<PayoutAmount>".$payout."</PayoutAmount>
-					\n\t\t\t\t\t<PayoutAmountCHF>".$payoutCHF."</PayoutAmountCHF>
-					\n\t\t\t\t</Payout>\n";
+					\t\t\t\t\t<BankAddrLine1>".$row["beneBank1"]."</BankAddrLine1>
+					\t\t\t\t\t<BankAddrLine2>".$row["beneBank2"]."</BankAddrLine2>
+					\t\t\t\t\t<BankAddrLine3>".$row["beneBank3"]."</BankAddrLine3>
+					\t\t\t\t\t<BankAddrLine4> </BankAddrLine4>
+					\t\t\t\t\t<BankAccountNo>".$row["benIBAN"]."</BankAccountNo>
+					\t\t\t\t\t<PayoutCurrency>".$row["currency_ID"]."</PayoutCurrency>
+					\t\t\t\t\t<PayoutAmount>".$payout."</PayoutAmount>
+					\t\t\t\t\t<PayoutAmountCHF>".$payoutCHF."</PayoutAmountCHF>
+					\t\t\t\t</Payout>\n";
 // 			$lohnabrechnnug[$i]["MA"] = $row["payroll_employee_ID"];
 // 			$lohnabrechnnug[$i]["PayoutAmount"] = $payout;
 // 			$lohnabrechnnug[$i]["beneBank1"] = $row["beneBank1"].", ".$row["beneBank2"].", ".$row["beneBank3"];
@@ -1098,15 +1106,18 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 
 		$arrFld = array();
 		$employeeDetail = array();
+		$mitarbeiterListe = array();
 		foreach($employeeFieldsOfInterest as $fldName) $arrFld[] = "emp.`".$fldName."`";
 		$result = $system_database_manager->executeQuery(
 				"SELECT ".implode(",", $arrFld)." 
 				FROM `payroll_employee` emp 
 				INNER JOIN `payroll_tmp_change_mng` emplist ON emplist.`numID`=emp.`id` 
 				AND emplist.`core_user_id`=".$uid, "payroll_report_Payslip");
-		foreach($result as $row) $employeeDetail[(string)$row["id"]] = $row;
+		foreach($result as $row) {
+			$employeeDetail[(string)$row["id"]] = $row;
+		}
 		
-		communication_interface::alert("employees:".print_r($result,true));
+		//communication_interface::alert("employees:".print_r($result,true));
 		//communication_interface::alert("employeeDetail:".print_r($employeeDetail,true));
 		
 		unset($arrFld);
@@ -1170,7 +1181,7 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 				if(count($entries)!=0) {
 					$emplData = $employeeDetail[(string)$lastEmpId];
 					//kommt aus Tabelle "payroll_payslip_cfg"
-					// hier ist auch das Underlay, das template (.pdf) hinterlegt
+					//hier ist auch das Underlay, das template (.pdf) hinterlegt
 					//physisch liegt das Template auf data-hidden/CUSTOMER/[DB des Mandanten]/TEMPLATE
 					$templCfg = $payslipCfg[(string)$emplData["payroll_payslip_cfg_ID"]];
 // if ($emplData["id"] >= 13 && $emplData["id"] <= 16) {   
@@ -1250,9 +1261,6 @@ communication_interface::alert("divps+ps2pdf: ".(microtime(true) - $now)); //TOD
 								"\n\t\t\t<Payouts>\n".(isset($payments[(string)$lastEmpId]) ? implode("", $payments[(string)$lastEmpId]) : "")."\t\t\t</Payouts>" .
 								"\n\t\t</Employee>\n";
 					
-//communication_interface::alert("curEmpl :".$curEmpl);
-//communication_interface::alert("entries :\n------------\n".implode("",$entries));
-	
 					fwrite($fp, str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), $curEmpl) );
 				}
 				$lastEmpId = $row["payroll_employee_ID"];
