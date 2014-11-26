@@ -362,7 +362,8 @@ class employee {
 				$ListItemToken = $itemParam["ListItemToken"];
 
 				if($updateMode) {
-					$system_database_manager->executeUpdate("UPDATE `payroll_empl_list` SET `ListType`=".$ListType.", `ListItemOrder`=".$ListItemOrder.", `ListItemToken`='".addslashes($ListItemToken)."' WHERE `id`=".$itemID, "payroll_saveEmployeeFieldDetail");
+					//Wird nun Element für Element direkt beim Editieren gespeichert --> saveListenWerte($personalstammListenwerte, $data, $fieldName) 
+					//$system_database_manager->executeUpdate("UPDATE `payroll_empl_list` SET `ListType`=".$ListType.", `ListItemOrder`=".$ListItemOrder.", `ListItemToken`='".addslashes($ListItemToken)."' WHERE `id`=".$itemID, "payroll_saveEmployeeFieldDetail");
 					$itemID4Label = $itemID;
 					$processedItemIDs[] = $itemID;
 				}else{

@@ -1,10 +1,16 @@
 Noch offen: 
-	automatisches Transferprogramm für update SRV2 -> SRV1
+	- (halb-)automatisches? Transferprogramm für update SRV2 -> SRV1
+	- Zahlungsweg auf allen MA der Lohnliste
+	- Eliminate Zero Lines auf der Lohnliste 
+	
+2014-11-26
+- Code verwalten: Sortierungs-Werte werden jetzt permanent gespeichert
 
 2014-11-20
 - In Stammdatenverwaltung können Mutation gemacht werden nach dem Auszahlen-Dialog
 - Code verwalten eingebaut
-- Das Löschen von Listen-Werten hat eine Sicherheitsfunktion. Es wird die Verwendung gezählt.
+- Code verwalten: Das Löschen von Listen-Werten hat nun eine Sicherheitsfunktion. 
+	Es wird die Verwendung gezählt und das Löschen nur zugelassen, wenn keine Verwendung vorhanden ist.
 
 2014-10-27
 - DTA in Section 01 mit Zahlstellen-BCNummer ergänzt

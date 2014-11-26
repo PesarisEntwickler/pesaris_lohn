@@ -7,7 +7,7 @@ class personalstammfelder {
 		$result = $system_database_manager->executeQuery($sql, "check_If_Used");
 		//communication_interface::alert("check_If_Used():\n".$sql."\n".print_r($ListenWertArray, true)."\n=:".$result[0]["Anzahl"]."\nresult:".print_r($result, true));
 		return  $result[0]["Anzahl"];
-	}
+	}  
 
 	public function getListenWerte($personalstammListenwert) {
 		$sql  = "SELECT * FROM payroll_empl_list AS L, payroll_empl_list_label AS LL ";
