@@ -54,7 +54,7 @@ Port:	(nix - default)
 Prot:	sFTP-SSH
 Conn:	Normal
 User:	webdev
-Pass:	h3rM$8fQ
+Pass:	h3rM$f8Q
 
 
 MySQL

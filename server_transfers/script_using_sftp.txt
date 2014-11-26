@@ -1,3 +1,10 @@
-open webdev@srv2.copronet.ch 22 
-pass h3rM$8fQ
-get -r icons
+del data/kernel/cache/sessions/*.dat
+del data/web/transfer/*.pdf
+del data/web/transfer/*.dta
+mget -r cgi-bin
+mget -r data
+mget -r data-hidden
+mget -r error
+mget -r icons
+
+
