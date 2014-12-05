@@ -1,4 +1,4 @@
-﻿<wgui:block name="calculationOverview">
+<wgui:block name="calculationOverview">
 	<div id="tbCalcOvRow1" class="ui-widget-header ui-corner-all">
 		<button id="prlCalcOvBtnNew"><wgui:text id="prlCalcOvBtnNew"/></button>
 		<button id="prlCalcOvBtnSettings"><wgui:text id="prlCalcOvBtnSettings"/></button>
@@ -159,8 +159,8 @@
 			<li>
 				<ul>
 					<li></li>
-					<li>↦</li>
-					<li>↦</li>
+					<li></li>
+					<li></li>
 				</ul>
 			</li>
 			<li>
@@ -215,7 +215,8 @@
 	</div>
 
 	<div id="prlCalcFinErr"></div>
-	<button id="prlCalcFinSave"><wgui:text id="prlCalcFinSave"/></button><button id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlCalcFinSave"><wgui:text id="prlCalcFinSave"/></button>
+	<button class="PesarisButton" id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="calculationFinalize">
 <wgui:block name="prlCalcOvSettings">
 	<div id="prlPrdSetTabs">
@@ -279,32 +280,59 @@
 			<textarea id="prlPrdSet_msg_txt"></textarea>
 		</div>
 	</div>
-	<button id="prlPrdSetSave"><wgui:text id="btnSave"/></button><button id="prlPrdSetCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlPrdSetSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlPrdSetCancel"><wgui:text id="btnCancel"/></button>
 </wgui:block name="prlCalcOvSettings">
 <wgui:block name="prlCalcReportSelector">
+	<br/>
+	<div class="ui-tabs ui-widget-content ui-corner-all">
     <fieldset>
-        Auswertung nach: <select id="prlRepSelReportType">
-            <option value="0">Mitarbeiter</option>
-            <option value="1">Firma / Konto / Gegenkonto / Kst</option>
-            <option value="2">Firma / Kst / Konto / Gegenkonto</option>
-            <option value="3">Firma / Konto / Gegenkonto</option>
-            <option value="4">Firma / Kst</option>
-            <option value="5">Firma / Konto</option>
-            <option value="6">Konto / Gegenkonto / Kst</option>
-            <option value="7">Kst / Konto / Gegenkonto</option>
-            <option value="8">Konto / Gegenkonto</option>
-            <option value="9">Kst</option>
-            <option value="10">Konto</option>
-        </select>
-        <div id="hiddenDiv_Company" style="display: none;">
-            Firma: <input type="text" id="prlRepSelFilterFirma" />
-        </div>
-        <div id="hiddenDiv_CostCenter" style="display: none;">
-            Kst: <input type="text" id="prlRepSelFilterKst" />
-        </div>
+		<table cellspacing="0" cellpadding="0">
+			<tr><td width="160">    
+		        <wgui:text id="txtAuswertungNach"/>: 
+		        </td>
+		        <td>
+		        <select id="prlRepSelReportType">
+		            <option value="0"><wgui:text id="txtOpt0Mitarbeiter"/></option>
+		            <option value="1"><wgui:text id="txtOpt1FirmaKontoGegenkontoKst"/></option>
+		            <option value="2"><wgui:text id="txtOpt2FirmaKstKontoGegenkonto"/></option>
+		            <option value="3"><wgui:text id="txtOpt3FirmaKontoGegenkonto"/></option>
+		            <option value="4"><wgui:text id="txtOpt4FirmaKst"/></option>
+		            <option value="5"><wgui:text id="txtOpt5FirmaKonto"/></option>
+		            <option value="6"><wgui:text id="txtOpt6KontoGegenkontoKst"/></option>
+		            <option value="7"><wgui:text id="txtOpt7KstKontoGegenkonto"/></option>
+		            <option value="8"><wgui:text id="txtOpt8KontoGegenkonto"/></option>
+		            <option value="9"><wgui:text id="txtOpt9Kst"/></option>
+		            <option value="10"><wgui:text id="txtOpt10Konto"/></option>
+		        </select>
+		        </td>
+			</tr>
+			<tr><td colspan="2">    
+		        <div id="hiddenDiv_Company" style="display: none;">
+					<table cellspacing="0" cellpadding="0"><tr><td width="153">
+			            <wgui:text id="prlcfgCmpcTab"/>:
+			          </td><td> 
+			            <input type="text" id="prlRepSelFilterFirma" />
+			        </td></tr></table>
+		        </div>
+		        </td>
+			</tr>
+			<tr><td colspan="2">    
+		        <div id="hiddenDiv_CostCenter" style="display: none;">
+					<table cellspacing="0" cellpadding="0"><tr><td width="153">
+			            <wgui:text id="txtKst"/>: 
+			          </td><td> 
+			            <input type="text" id="prlRepSelFilterKst" />
+			        </td></tr></table>
+		        </div>
+		        </td>
+			</tr>
+		</table>
     </fieldset>
-    <button id="prlRepSelSave">OK</button><button id="prlRepSelCancel">
-        Abbrechen
-    </button>
+    </div>
+    <center>
+	    <button class="PesarisButton" id="prlRepSelSave"><wgui:text id="btnOK"/></button>
+	    <button class="PesarisButton" id="prlRepSelCancel"><wgui:text id="btnClose"/></button>
+    </center>
     <div id="prlRepSelErr"></div>
 </wgui:block name="prlCalcReportSelector">

@@ -6,7 +6,7 @@ class payroll_BL_reports {
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
 //$param = array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"])
-		$periodLabels["de"] = array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
+		$periodLabels["de"] = $this->getPeriodLabels("de");
 
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
@@ -19,7 +19,15 @@ class payroll_BL_reports {
 		$system_database_manager = system_database_manager::getInstance();
 		$fp = $fm->setFile("data.xml")->fopen("w");
 
-		fwrite($fp, "<Report name=\"CalculationJournal\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t</Header>\n\t<Employees>\n");
+		$ReportName = "CalculationJournal";
+        fwrite($fp, 
+               "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                $this->getReportingCompany("Company").
+                $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+                </Header>
+                <Employees>\n");
 
 		//TODO: $param Werte gegen intrusion sichern !!!!!
 		$result = $system_database_manager->executeQuery("SELECT id FROM payroll_period WHERE payroll_year_ID=".$param["year"]." AND major_period=".$param["majorPeriod"]." AND minor_period=".$param["minorPeriod"], "payroll_report_CalculationJournal");
@@ -77,7 +85,7 @@ class payroll_BL_reports {
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
-		$periodLabels["de"] = array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
+		$periodLabels["de"] = $this->getPeriodLabels("de");
 
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
@@ -107,19 +115,14 @@ class payroll_BL_reports {
                 // Auswertung nach Mitarbeiter (von Daniel Müller)
                 $reportTemplate = $ReportName;
                 
-                fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">
-                		\n\t<Header>
-                		\n\t\t<Company>
-                		\n\t\t\t<Name>Testfirma AG</Name>
-                		\n\t\t\t<Street>Hauptstrasse 56</Street>
-                		\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>
-                		\n\t\t</Company>
-                		\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>
-                		\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>
-                		\n\t\t<Year>".$param["year"]."</Year>
-                		\n\t\t<Period>".$periodTitle."</Period>
-                		\n\t</Header>
-                		\n\t<Employees>\n");
+                fwrite($fp, 
+               "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                $this->getReportingCompany("Company").
+                $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>".
+                "\n\t</Header>
+				<Employees>\n");
                 
                 $query = "SELECT 
                                 emp.`id` as EmployeeID, 
@@ -175,8 +178,17 @@ class payroll_BL_reports {
         	case 1:
                 // Auswertung nach Firma / Konto / Gegenkonto / Kst
                 $reportTemplate = "AccountingJournal[Company][Account][Counter_account][Cost_center]"; 
-                
-                fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+
+                fwrite($fp,
+                "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                $this->getReportingCompany("MainCompany").
+                $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>
+                <Corporation>
+                	<Companies>\n");
                 
                 $query = "  SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
@@ -230,19 +242,29 @@ class payroll_BL_reports {
                         $entryCounter = 1;
                         $lastPayrollCompanyID = $row["payroll_company_ID"];
                         $entryCollector = array();
-                        $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                        $singleEmployeeData = "
+						<Company>
+							<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+							<CompanyName>".$row["company_shortname"]."</CompanyName>
+							<Entries>\n";
                     }
                     $runningSumDebitAmount += $row["debit_amount"];
                     $runningSumCreditAmount += $row["credit_amount"];
                     $corporationDebitAmount += $row["debit_amount"];
                     $corporationCreditAmount += $row["credit_amount"];
                     	
-                    $entryCollector[] = "\t\t\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                    $entryCollector[] = "
+					<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+						<Account>".$row["account_no"]."</Account>
+						<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+						<CostCenter>".$row["cost_center"]."</CostCenter>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n";
                     
                     $entryCounter += 1;
                 }
@@ -255,8 +277,17 @@ class payroll_BL_reports {
              case 2:
                  // Auswertung nach Firma / Kst / Konto / Gegenkonto
                  $reportTemplate = "AccountingJournal[Company][Cost_center][Account][Counter_account]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>
+				<Corporation>
+                	<Companies>\n");
                  
                  $query = "SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
@@ -311,58 +342,54 @@ class payroll_BL_reports {
                          $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
-                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                         $singleEmployeeData = "
+                         	<Company>
+                         		<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+                         		<CompanyName>".$row["company_shortname"]."</CompanyName>
+                         		<Entries>\n";
                      }
                      $runningSumDebitAmount += $row["debit_amount"];
                      $runningSumCreditAmount += $row["credit_amount"];
                      $corporationDebitAmount += $row["debit_amount"];
                      $corporationCreditAmount += $row["credit_amount"];
-                     $entryCollector[] = "\t\t\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
-                                          \n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>
-                                          \n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
-                                          \n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>
-                                          \n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>
-                                          \n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>
-                                          \n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>
-                                          \n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
-                                          \n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
-                                          \n\t\t\t\t\t</Entry>\n";
+                     $entryCollector[] = "
+					<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+						<Account>".$row["account_no"]."</Account>
+						<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+						<CostCenter>".$row["cost_center"]."</CostCenter>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n";
                      $entryCounter += 1;
                  }
                  if($singleEmployeeData != "") {
                      fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
                  }
-                 fwrite($fp, "\n\t\t</Companies>
-                 			  \n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
-                 			  \n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
-                 			  \n\t</Corporation>
-                 			  \n</Report>
-                 			  \n");
+                 fwrite($fp, "\t\t</Companies>
+                 			  \t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
+                 			  \t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
+                 			  \t</Corporation>
+                 			  \n</Report>\n");
                  $fm->fclose();
                  break;
              case 3:
                  // Auswertung nach Firma / Konto / Gegenkonto
                  $reportTemplate = "AccountingJournal[Company][Account][Counter_account]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">
-                 			\n\t<Header>\n\t\t<MainCompany>
-                 			\n\t\t\t<Name>Testfirma AG</Name>
-                 			\n\t\t\t<Street>Hauptstrasse 56</Street>
-                 			\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>
-                 			\n\t\t</MainCompany>
-                 			\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>
-                 			\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>
-                 			\n\t\t<Year>".$param["year"]."</Year>
-                 			\n\t\t<Period>".$periodTitle."</Period>
-                 			\n\t\t<AccountType>".$entryTable."</AccountType>
-                 			\n\t</Header>
-                 			\n\t<Corporation>
-                 			\n\t\t<Companies>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>
+				<Corporation>
+					<Companies>\n");
                  
                  $query = "  SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
@@ -402,44 +429,64 @@ class payroll_BL_reports {
                  $entryCollector = array();
                  $singleEmployeeData = "";
                  foreach($result as $row) {
-                     if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
-                         //the employee changed!
-                         if($singleEmployeeData != "") {
-                             //there are data for writing to the XML file
-                             fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
-                         }
-                         $runningSumDebitAmount = 0;
-                         $runningSumCreditAmount = 0;
-                         $entryCounter = 1;
-                         $lastPayrollCompanyID = $row["payroll_company_ID"];
-                         $entryCollector = array();
-                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
-                     }
-                     $runningSumDebitAmount += $row["debit_amount"];
-                     $runningSumCreditAmount += $row["credit_amount"];
-                     $corporationDebitAmount += $row["debit_amount"];
-                     $corporationCreditAmount += $row["credit_amount"];
-                     $entryCollector[] = "\t\t\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
-                     $entryCounter += 1;
+                    if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                    	//the employee changed!
+                    	if($singleEmployeeData != "") {
+                    	     //there are data for writing to the XML file
+                    	     fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
+                    	}
+						$runningSumDebitAmount = 0;
+						$runningSumCreditAmount = 0;
+						$entryCounter = 1;
+						$lastPayrollCompanyID = $row["payroll_company_ID"];
+						$entryCollector = array();
+						$singleEmployeeData = "
+						<Company>
+						<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+							<CompanyName>".$row["company_shortname"]."</CompanyName>
+							<Entries>\n";
+                    }
+                    $runningSumDebitAmount += $row["debit_amount"];
+                    $runningSumCreditAmount += $row["credit_amount"];
+                    $corporationDebitAmount += $row["debit_amount"];
+                    $corporationCreditAmount += $row["credit_amount"];
+                    $entryCollector[] = "
+					<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+						<Account>".$row["account_no"]."</Account>
+						<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n";
+                    $entryCounter += 1;
                  }
                  if($singleEmployeeData != "") {
                      fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
                  }
-                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
-                 			  \n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
-                 			  \n\t</Corporation>\n</Report>\n");
+                 fwrite($fp, "
+                 	</Companies>
+                 		<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
+                 		<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
+                 		</Corporation>\n</Report>\n");
                  $fm->fclose();
                  break;
              case 4:
                  // Auswertung nach Firma / Kst
                  $reportTemplate = "AccountingJournal[Company][Cost_center]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>
+                <Corporation>
+                	<Companies>\n");
                  
                  $query = "  SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
@@ -477,7 +524,7 @@ class payroll_BL_reports {
                  $entryCollector = array();
                  $singleEmployeeData = "";
                  foreach($result as $row) {
-                     if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
+                    if($row["payroll_company_ID"] != $lastPayrollCompanyID) {
                          //the employee changed!
                          if($singleEmployeeData != "") {
                              //there are data for writing to the XML file
@@ -488,19 +535,27 @@ class payroll_BL_reports {
                          $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
-                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
-                     }
-                     $runningSumDebitAmount += $row["debit_amount"];
-                     $runningSumCreditAmount += $row["credit_amount"];
-                     $corporationDebitAmount += $row["debit_amount"];
-                     $corporationCreditAmount += $row["credit_amount"];
-                     $entryCollector[] = "\t\t\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
-                     $entryCounter += 1;
+                         $singleEmployeeData = "
+                         	<Company>
+                         		<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+                         		<CompanyName>".$row["company_shortname"]."</CompanyName>
+                         		<Entries>\n";
+                    }
+                    $runningSumDebitAmount += $row["debit_amount"];
+                    $runningSumCreditAmount += $row["credit_amount"];
+                    $corporationDebitAmount += $row["debit_amount"];
+                    $corporationCreditAmount += $row["credit_amount"];
+                    $entryCollector[] = "
+					<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+						<CostCenter>".$row["cost_center"]."</CostCenter>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n";
+                    $entryCounter += 1;
                  }
                  if($singleEmployeeData != "") {
                      fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
@@ -511,8 +566,17 @@ class payroll_BL_reports {
              case 5:
                  // Auswertung nach Firma / Konto
                  $reportTemplate = "AccountingJournal[Company][Account]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Companies>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>
+                <Corporation>
+                	<Companies>\n");
                  
                  $query = "  SELECT 
                                 IF(accetry.payroll_company_ID = 0, emp.payroll_company_ID, accetry.payroll_company_ID) AS payroll_company_ID,
@@ -560,31 +624,53 @@ class payroll_BL_reports {
                          $entryCounter = 1;
                          $lastPayrollCompanyID = $row["payroll_company_ID"];
                          $entryCollector = array();
-                         $singleEmployeeData = "\t\t\t<Company>\n\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t<CompanyName>".$row["company_shortname"]."</CompanyName>\n\t\t\t\t<Entries>\n";
+                         $singleEmployeeData = "
+                         	<Company>
+                         		<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+                         		<CompanyName>".$row["company_shortname"]."</CompanyName>
+                         		<Entries>\n";
                      }
                      $runningSumDebitAmount += $row["debit_amount"];
                      $runningSumCreditAmount += $row["credit_amount"];
                      $corporationDebitAmount += $row["debit_amount"];
                      $corporationCreditAmount += $row["credit_amount"];
-                     $entryCollector[] = "\t\t\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                        ">\n\t\t\t\t\t\t<CompanyID>".$row["payroll_company_ID"]."</CompanyID>\n\t\t\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t\t\t<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t\t\t<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>\n\t\t\t\t\t</Entry>\n";
+                    $entryCollector[] = "
+					<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
+						<Account>".$row["account_no"]."</Account>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$runningSumDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$runningSumCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n";
                      $entryCounter += 1;
                  }
                  if($singleEmployeeData != "") {
                      fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t\t<CompanyDebitAmount>".$runningSumDebitAmount."</CompanyDebitAmount>\n\t\t\t<CompanyCreditAmount>".$runningSumCreditAmount."</CompanyCreditAmount>\n\t\t</Company>\n");
                  }
-                 fwrite($fp, "\n\t\t</Companies>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
+                 fwrite($fp, "
+                 	</Companies>
+                 		<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>
+                 		<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>
+                 		</Corporation>\n</Report>\n");
                  $fm->fclose();
                  break;
              case 6:
                  // Auswertung nach Konto / Gegenkonto / Kst
                  $reportTemplate = "AccountingJournal[Account][Counter_account][Cost_center]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>				
+                <Corporation>
+              		<Entries>\n");
+                  
                  
                  $query = "SELECT 
                                 accetry.account_no,
@@ -618,12 +704,18 @@ class payroll_BL_reports {
                  foreach($result as $row) {
                      $corporationDebitAmount += $row["debit_amount"];
                      $corporationCreditAmount += $row["credit_amount"];
-                     fwrite($fp, "\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
+
+                     fwrite($fp, 
+                     "<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<Account>".$row["account_no"]."</Account>
+						<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+						<CostCenter>".$row["cost_center"]."</CostCenter>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
@@ -632,10 +724,19 @@ class payroll_BL_reports {
              case 7:
                  // Auswertung nach Kst / Konto / Gegenkonto
                  $reportTemplate = "AccountingJournal[Cost_center][Account][Counter_account]"; 
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>
+                <Corporation>
+              		<Entries>\n");
                  
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
-                 
-                 $query = "  SELECT 
+                 $query = "SELECT 
                                 accetry.account_no,
                                 accetry.counter_account_no,
                                 accetry.cost_center,
@@ -668,12 +769,17 @@ class payroll_BL_reports {
                  foreach($result as $row) {
                      $corporationDebitAmount += $row["debit_amount"];
                      $corporationCreditAmount += $row["credit_amount"];
-                     fwrite($fp, "\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
+                     fwrite($fp, 
+                     "<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<Account>".$row["account_no"]."</Account>
+						<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+						<CostCenter>".$row["cost_center"]."</CostCenter>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n");
                      $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
@@ -682,8 +788,17 @@ class payroll_BL_reports {
              case 8:
                  // Auswertung nach Konto / Gegenkonto
                  $reportTemplate = "AccountingJournal[Account][Counter_account]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>				
+                <Corporation>
+              		<Entries>\n");
                  
                  $query = "SELECT 
                                 accetry.account_no,
@@ -714,13 +829,17 @@ class payroll_BL_reports {
                  foreach($result as $row) {
                      $corporationDebitAmount += $row["debit_amount"];
                      $corporationCreditAmount += $row["credit_amount"];
-                     fwrite($fp, "\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<CounterAccount>".$row["counter_account_no"]."</CounterAccount>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
-                     $entryCounter += 1;
+                     fwrite($fp, 
+                     "<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<Account>".$row["account_no"]."</Account>\
+						<CounterAccount>".$row["counter_account_no"]."</CounterAccount>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n");
+                    $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
                  $fm->fclose();
@@ -728,10 +847,19 @@ class payroll_BL_reports {
              case 9:
                  // Auswertung nach Kst
                  $reportTemplate = "AccountingJournal[Cost_center]"; 
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>				
+                <Corporation>
+              		<Entries>\n");
                  
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
-                 
-                 $query = "  SELECT 
+                 $query = "SELECT 
                                 accetry.cost_center,
                                 SUM(IF(accetry.debitcredit = 0, accetry.amount_local,0)) AS debit_amount,
 	                            SUM(IF(accetry.debitcredit = 1, accetry.amount_local,0)) AS credit_amount,
@@ -759,13 +887,16 @@ class payroll_BL_reports {
                  foreach($result as $row) {
                      $corporationDebitAmount += $row["debit_amount"];
                      $corporationCreditAmount += $row["credit_amount"];
-                     fwrite($fp, "\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<CostCenter>".$row["cost_center"]."</CostCenter>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
-                     $entryCounter += 1;
+                     fwrite($fp, 
+                     "<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<CostCenter>".$row["cost_center"]."</CostCenter>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n");
+                    $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
                  $fm->fclose();
@@ -773,8 +904,17 @@ class payroll_BL_reports {
              case 10:
                  // Auswertung nach Konto
                  $reportTemplate = "AccountingJournal[Account]"; 
-                 
-                 fwrite($fp, "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>\n\t\t<MainCompany>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</MainCompany>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<Period>".$periodTitle."</Period>\n\t\t<AccountType>".$entryTable."</AccountType>\n\t</Header>\n\t<Corporation>\n\t\t<Entries>\n");
+
+                 fwrite($fp,
+                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
+                 $this->getReportingCompany("MainCompany").
+                 $this->getPrintDateTime()."
+				<Year>".$param["year"]."</Year>
+				<Period>".$periodTitle."</Period>
+				<AccountType>".$entryTable."</AccountType>".
+                "\n\t</Header>				
+                 <Corporation>
+                 <Entries>\n");
                  
                  $query = "SELECT 
                                 accetry.account_no,
@@ -800,15 +940,18 @@ class payroll_BL_reports {
                  $entryCounter = 1;
                  $singleEmployeeData = "";
                  foreach($result as $row) {
-                     $corporationDebitAmount += $row["debit_amount"];
-                     $corporationCreditAmount += $row["credit_amount"];
-                     fwrite($fp, "\t\t\t<Entry ".
-                                             ($entryCounter % 30 == 0?
-                                                 "doPageBreak=\"true\""
-                                                 :
-                                                 "doPageBreak=\"false\"").
-                                  ">\n\t\t\t\t<Account>".$row["account_no"]."</Account>\n\t\t\t\t<DebitAmount>".$row["debit_amount"]."</DebitAmount>\n\t\t\t\t<CreditAmount>".$row["credit_amount"]."</CreditAmount>\n\t\t\t\t<EntryText>".$row["entry_text"]."</EntryText>\n\t\t\t\t<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>\n\t\t\t\t<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>\n\t\t\t</Entry>\n");
-                     $entryCounter += 1;
+					$corporationDebitAmount += $row["debit_amount"];
+					$corporationCreditAmount += $row["credit_amount"];
+					fwrite($fp, 
+					"<Entry ".	($entryCounter % 30 == 0?	"doPageBreak=\"true\""	:	"doPageBreak=\"false\"").">
+						<Account>".$row["account_no"]."</Account>
+						<DebitAmount>".$row["debit_amount"]."</DebitAmount>
+						<CreditAmount>".$row["credit_amount"]."</CreditAmount>
+						<EntryText>".$row["entry_text"]."</EntryText>
+						<RunningSumDebitAmount>".$corporationDebitAmount."</RunningSumDebitAmount>
+						<RunningSumCreditAmount>".$corporationCreditAmount."</RunningSumCreditAmount>
+					</Entry>\n");
+                    $entryCounter += 1;
                  }
                  fwrite($fp, "\t\t</Entries>\n\t\t<CorporationDebitAmount>".$corporationDebitAmount."</CorporationDebitAmount>\n\t\t<CorporationCreditAmount>".$corporationCreditAmount."</CorporationCreditAmount>\n\t</Corporation>\n</Report>\n");
                  $fm->fclose();
@@ -894,18 +1037,29 @@ class payroll_BL_reports {
 		//Beschaeftigungsdaten (Ein-/Austritte) pro Mitarbeiter in einen assoziativen Array einlesen
 		$arrEmployeePeriods = array();
 		$result = $system_database_manager->executeQuery("SELECT pep.`payroll_employee_ID`, pep.`DateFrom`, IF(pep.`DateTo`!='0000-00-00',pep.`DateTo`,'') as DateTo FROM `payroll_employment_period` pep INNER JOIN `payroll_tmp_change_mng` emplst ON pep.`payroll_employee_ID`=emplst.`numID` AND emplst.`core_user_id`=".session_control::getSessionInfo("id")." WHERE pep.`DateFrom`<='".$param["year"]."-12-31' AND (pep.`DateTo`>='".$param["year"]."-01-01' OR pep.`DateTo`='0000-00-00') ORDER BY pep.`payroll_employee_ID`, pep.`DateFrom`", "payroll_report_CalculationJournal");
-		foreach($result as $row) if(isset($arrEmployeePeriods["id".$row["payroll_employee_ID"]])) $arrEmployeePeriods["id".$row["payroll_employee_ID"]][] = "\t\t\t\t<Period><From>".$row["DateFrom"]."</From><Until>".$row["DateTo"]."</Until></Period>\n"; else $arrEmployeePeriods["id".$row["payroll_employee_ID"]] = array("\t\t\t\t<Period><From>".$row["DateFrom"]."</From><Until>".$row["DateTo"]."</Until></Period>\n");
-
+		foreach($result as $row) {
+			if(isset($arrEmployeePeriods["id".$row["payroll_employee_ID"]])) {
+				$arrEmployeePeriods["id".$row["payroll_employee_ID"]] = "\t\t\t\t<Period><From>".$row["DateFrom"]."</From><Until>".$row["DateTo"]."</Until></Period>\n";
+			} else {
+				$arrEmployeePeriods["id".$row["payroll_employee_ID"]] = "\t\t\t\t<Period><From>".$row["DateFrom"]."</From><Until>".$row["DateTo"]."</Until></Period>\n";
+			}
+		}
 		$fp = $fm->setFile("data.xml")->fopen("w");
-
-		fwrite($fp, "<Report name=\"PayrollAccountJournal\" lang=\"de\">\n\t<Header>\n\t\t<Company>\n\t\t\t<Name>Testfirma AG</Name>\n\t\t\t<Street>Hauptstrasse 56</Street>\n\t\t\t<ZipCity>1234 Entenhausen</ZipCity>\n\t\t</Company>\n\t\t<PrintDate>".date("d.m.Y")."</PrintDate>\n\t\t<PrintTime>".date("H:i:s")."</PrintTime>\n\t\t<Year>".$param["year"]."</Year>\n\t\t<ExtendedMonthView>".$extendedMonthView."</ExtendedMonthView>\n\t</Header>\n\t<Employees>\n");
-
-		//TODO: $param Werte gegen intrusion sichern !!!!!
-
+		fwrite($fp, "<Report name=\"PayrollAccountJournal\" lang=\"de\">
+		<Header>".$this->getReportingCompany("Company")
+                 .$this->getPrintDateTime()."
+			<Year>".$param["year"]."</Year>
+			<ExtendedMonthView>".$extendedMonthView."</ExtendedMonthView>
+		</Header>
+		<Employees>\n");
 		//TODO: Moegliche, noch zu loesende Probleme: im aktuellen Jahr, ist die aktuelle Periode nicht (oder nur partiell) in "payroll_calculation_entry" gespeichert. Stattdessen sind die Werte aus "payroll_calculation_entry" zu beziehen; zugleich muessen die teilweise vorhandenen Daten in "payroll_calculation_entry" herausgefiltert werden.
 		//TODO: Einzelne MA selektieren (ev. "payroll_tmp_change_mng" verwenden)
-		if($isCurrentYear) $result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, acc.id as AccountNumber, acc.print_account, acclbl.label, SUM(IF(prd.major_period=1,calc.quantity,0)) as prd1q, SUM(IF(prd.major_period=1,calc.amount,0)) as prd1a, SUM(IF(prd.major_period=2,calc.quantity,0)) as prd2q, SUM(IF(prd.major_period=2,calc.amount,0)) as prd2a, SUM(IF(prd.major_period=3,calc.quantity,0)) as prd3q, SUM(IF(prd.major_period=3,calc.amount,0)) as prd3a, SUM(IF(prd.major_period=4,calc.quantity,0)) as prd4q, SUM(IF(prd.major_period=4,calc.amount,0)) as prd4a, SUM(IF(prd.major_period=5,calc.quantity,0)) as prd5q, SUM(IF(prd.major_period=5,calc.amount,0)) as prd5a, SUM(IF(prd.major_period=6,calc.quantity,0)) as prd6q, SUM(IF(prd.major_period=6,calc.amount,0)) as prd6a, SUM(IF(prd.major_period=7,calc.quantity,0)) as prd7q, SUM(IF(prd.major_period=7,calc.amount,0)) as prd7a, SUM(IF(prd.major_period=8,calc.quantity,0)) as prd8q, SUM(IF(prd.major_period=8,calc.amount,0)) as prd8a, SUM(IF(prd.major_period=9,calc.quantity,0)) as prd9q, SUM(IF(prd.major_period=9,calc.amount,0)) as prd9a, SUM(IF(prd.major_period=10,calc.quantity,0)) as prd10q, SUM(IF(prd.major_period=10,calc.amount,0)) as prd10a, SUM(IF(prd.major_period=11,calc.quantity,0)) as prd11q, SUM(IF(prd.major_period=11,calc.amount,0)) as prd11a, SUM(IF(prd.major_period=12,calc.quantity,0)) as prd12q, SUM(IF(prd.major_period=12,calc.amount,0)) as prd12a, SUM(IF(prd.major_period=13,calc.quantity,0)) as prd13q, SUM(IF(prd.major_period=13,calc.amount,0)) as prd13a, SUM(IF(prd.major_period=14,calc.quantity,0)) as prd14q, SUM(IF(prd.major_period=14,calc.amount,0)) as prd14a, SUM(IF(prd.major_period=15,calc.quantity,0)) as prd15q, SUM(IF(prd.major_period=15,calc.amount,0)) as prd15a, SUM(IF(prd.major_period=16,calc.quantity,0)) as prd16q, SUM(IF(prd.major_period=16,calc.amount,0)) as prd16a FROM (SELECT * FROM payroll_calculation_entry INNER JOIN payroll_tmp_change_mng emplst ON emplst.core_user_id=".session_control::getSessionInfo("id")." AND emplst.numID=payroll_calculation_entry.payroll_employee_ID WHERE payroll_year_ID=".$param["year"]." AND payroll_period_ID!=".$payrollPeriodID." UNION SELECT * FROM payroll_calculation_current INNER JOIN payroll_tmp_change_mng emplst ON emplst.core_user_id=".session_control::getSessionInfo("id")." AND emplst.numID=payroll_calculation_current.payroll_employee_ID) calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID AND acc.print_account!=0 INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' INNER JOIN payroll_period prd ON prd.id=calc.payroll_period_ID GROUP BY calc.payroll_employee_ID, acc.id ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
-		else $result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, acc.id as AccountNumber, acc.print_account, acclbl.label, SUM(IF(prd.major_period=1,calc.quantity,0)) as prd1q, SUM(IF(prd.major_period=1,calc.amount,0)) as prd1a, SUM(IF(prd.major_period=2,calc.quantity,0)) as prd2q, SUM(IF(prd.major_period=2,calc.amount,0)) as prd2a, SUM(IF(prd.major_period=3,calc.quantity,0)) as prd3q, SUM(IF(prd.major_period=3,calc.amount,0)) as prd3a, SUM(IF(prd.major_period=4,calc.quantity,0)) as prd4q, SUM(IF(prd.major_period=4,calc.amount,0)) as prd4a, SUM(IF(prd.major_period=5,calc.quantity,0)) as prd5q, SUM(IF(prd.major_period=5,calc.amount,0)) as prd5a, SUM(IF(prd.major_period=6,calc.quantity,0)) as prd6q, SUM(IF(prd.major_period=6,calc.amount,0)) as prd6a, SUM(IF(prd.major_period=7,calc.quantity,0)) as prd7q, SUM(IF(prd.major_period=7,calc.amount,0)) as prd7a, SUM(IF(prd.major_period=8,calc.quantity,0)) as prd8q, SUM(IF(prd.major_period=8,calc.amount,0)) as prd8a, SUM(IF(prd.major_period=9,calc.quantity,0)) as prd9q, SUM(IF(prd.major_period=9,calc.amount,0)) as prd9a, SUM(IF(prd.major_period=10,calc.quantity,0)) as prd10q, SUM(IF(prd.major_period=10,calc.amount,0)) as prd10a, SUM(IF(prd.major_period=11,calc.quantity,0)) as prd11q, SUM(IF(prd.major_period=11,calc.amount,0)) as prd11a, SUM(IF(prd.major_period=12,calc.quantity,0)) as prd12q, SUM(IF(prd.major_period=12,calc.amount,0)) as prd12a, SUM(IF(prd.major_period=13,calc.quantity,0)) as prd13q, SUM(IF(prd.major_period=13,calc.amount,0)) as prd13a, SUM(IF(prd.major_period=14,calc.quantity,0)) as prd14q, SUM(IF(prd.major_period=14,calc.amount,0)) as prd14a, SUM(IF(prd.major_period=15,calc.quantity,0)) as prd15q, SUM(IF(prd.major_period=15,calc.amount,0)) as prd15a, SUM(IF(prd.major_period=16,calc.quantity,0)) as prd16q, SUM(IF(prd.major_period=16,calc.amount,0)) as prd16a FROM payroll_calculation_entry calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID AND acc.print_account!=0 INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' INNER JOIN payroll_period prd ON prd.id=calc.payroll_period_ID INNER JOIN payroll_tmp_change_mng emplst ON emplst.core_user_id=".session_control::getSessionInfo("id")." AND emplst.numID=calc.payroll_employee_ID WHERE calc.payroll_year_ID=".$param["year"]." GROUP BY calc.payroll_employee_ID, acc.id ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
+		if($isCurrentYear) {
+			$result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, acc.id as AccountNumber, acc.print_account, acclbl.label, SUM(IF(prd.major_period=1,calc.quantity,0)) as prd1q, SUM(IF(prd.major_period=1,calc.amount,0)) as prd1a, SUM(IF(prd.major_period=2,calc.quantity,0)) as prd2q, SUM(IF(prd.major_period=2,calc.amount,0)) as prd2a, SUM(IF(prd.major_period=3,calc.quantity,0)) as prd3q, SUM(IF(prd.major_period=3,calc.amount,0)) as prd3a, SUM(IF(prd.major_period=4,calc.quantity,0)) as prd4q, SUM(IF(prd.major_period=4,calc.amount,0)) as prd4a, SUM(IF(prd.major_period=5,calc.quantity,0)) as prd5q, SUM(IF(prd.major_period=5,calc.amount,0)) as prd5a, SUM(IF(prd.major_period=6,calc.quantity,0)) as prd6q, SUM(IF(prd.major_period=6,calc.amount,0)) as prd6a, SUM(IF(prd.major_period=7,calc.quantity,0)) as prd7q, SUM(IF(prd.major_period=7,calc.amount,0)) as prd7a, SUM(IF(prd.major_period=8,calc.quantity,0)) as prd8q, SUM(IF(prd.major_period=8,calc.amount,0)) as prd8a, SUM(IF(prd.major_period=9,calc.quantity,0)) as prd9q, SUM(IF(prd.major_period=9,calc.amount,0)) as prd9a, SUM(IF(prd.major_period=10,calc.quantity,0)) as prd10q, SUM(IF(prd.major_period=10,calc.amount,0)) as prd10a, SUM(IF(prd.major_period=11,calc.quantity,0)) as prd11q, SUM(IF(prd.major_period=11,calc.amount,0)) as prd11a, SUM(IF(prd.major_period=12,calc.quantity,0)) as prd12q, SUM(IF(prd.major_period=12,calc.amount,0)) as prd12a, SUM(IF(prd.major_period=13,calc.quantity,0)) as prd13q, SUM(IF(prd.major_period=13,calc.amount,0)) as prd13a, SUM(IF(prd.major_period=14,calc.quantity,0)) as prd14q, SUM(IF(prd.major_period=14,calc.amount,0)) as prd14a, SUM(IF(prd.major_period=15,calc.quantity,0)) as prd15q, SUM(IF(prd.major_period=15,calc.amount,0)) as prd15a, SUM(IF(prd.major_period=16,calc.quantity,0)) as prd16q, SUM(IF(prd.major_period=16,calc.amount,0)) as prd16a FROM (SELECT * FROM payroll_calculation_entry INNER JOIN payroll_tmp_change_mng emplst ON emplst.core_user_id=".session_control::getSessionInfo("id")." AND emplst.numID=payroll_calculation_entry.payroll_employee_ID WHERE payroll_year_ID=".$param["year"]." AND payroll_period_ID!=".$payrollPeriodID." UNION SELECT * FROM payroll_calculation_current INNER JOIN payroll_tmp_change_mng emplst ON emplst.core_user_id=".session_control::getSessionInfo("id")." AND emplst.numID=payroll_calculation_current.payroll_employee_ID) calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID AND acc.print_account!=0 INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' INNER JOIN payroll_period prd ON prd.id=calc.payroll_period_ID GROUP BY calc.payroll_employee_ID, acc.id ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
+		}
+		else {
+			$result = $system_database_manager->executeQuery("SELECT empl.id as EmployeeID, acc.id as AccountNumber, acc.print_account, acclbl.label, SUM(IF(prd.major_period=1,calc.quantity,0)) as prd1q, SUM(IF(prd.major_period=1,calc.amount,0)) as prd1a, SUM(IF(prd.major_period=2,calc.quantity,0)) as prd2q, SUM(IF(prd.major_period=2,calc.amount,0)) as prd2a, SUM(IF(prd.major_period=3,calc.quantity,0)) as prd3q, SUM(IF(prd.major_period=3,calc.amount,0)) as prd3a, SUM(IF(prd.major_period=4,calc.quantity,0)) as prd4q, SUM(IF(prd.major_period=4,calc.amount,0)) as prd4a, SUM(IF(prd.major_period=5,calc.quantity,0)) as prd5q, SUM(IF(prd.major_period=5,calc.amount,0)) as prd5a, SUM(IF(prd.major_period=6,calc.quantity,0)) as prd6q, SUM(IF(prd.major_period=6,calc.amount,0)) as prd6a, SUM(IF(prd.major_period=7,calc.quantity,0)) as prd7q, SUM(IF(prd.major_period=7,calc.amount,0)) as prd7a, SUM(IF(prd.major_period=8,calc.quantity,0)) as prd8q, SUM(IF(prd.major_period=8,calc.amount,0)) as prd8a, SUM(IF(prd.major_period=9,calc.quantity,0)) as prd9q, SUM(IF(prd.major_period=9,calc.amount,0)) as prd9a, SUM(IF(prd.major_period=10,calc.quantity,0)) as prd10q, SUM(IF(prd.major_period=10,calc.amount,0)) as prd10a, SUM(IF(prd.major_period=11,calc.quantity,0)) as prd11q, SUM(IF(prd.major_period=11,calc.amount,0)) as prd11a, SUM(IF(prd.major_period=12,calc.quantity,0)) as prd12q, SUM(IF(prd.major_period=12,calc.amount,0)) as prd12a, SUM(IF(prd.major_period=13,calc.quantity,0)) as prd13q, SUM(IF(prd.major_period=13,calc.amount,0)) as prd13a, SUM(IF(prd.major_period=14,calc.quantity,0)) as prd14q, SUM(IF(prd.major_period=14,calc.amount,0)) as prd14a, SUM(IF(prd.major_period=15,calc.quantity,0)) as prd15q, SUM(IF(prd.major_period=15,calc.amount,0)) as prd15a, SUM(IF(prd.major_period=16,calc.quantity,0)) as prd16q, SUM(IF(prd.major_period=16,calc.amount,0)) as prd16a FROM payroll_calculation_entry calc INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID AND acc.payroll_year_ID=calc.payroll_year_ID AND acc.print_account!=0 INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id AND acclbl.payroll_year_ID=acc.payroll_year_ID AND acclbl.language='".session_control::getSessionInfo("language")."' INNER JOIN payroll_period prd ON prd.id=calc.payroll_period_ID INNER JOIN payroll_tmp_change_mng emplst ON emplst.core_user_id=".session_control::getSessionInfo("id")." AND emplst.numID=calc.payroll_employee_ID WHERE calc.payroll_year_ID=".$param["year"]." GROUP BY calc.payroll_employee_ID, acc.id ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id", "payroll_report_CalculationJournal");
+		}
 		$lastEmployeeID = 0;
 		$entryCollector = array();
 		$singleEmployeeData = "";
@@ -919,20 +1073,62 @@ class payroll_BL_reports {
 				$curEmplData = $arrEmployees["id".$row["EmployeeID"]];
 				$lastEmployeeID = $row["EmployeeID"];
 				$entryCollector = array();
-				$singleEmployeeData = "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$curEmplData["EmployeeNumber"]."</EmployeeNumber>\n\t\t\t<CompanyID>".$curEmplData["payroll_company_ID"]."</CompanyID>\n\t\t\t<Firstname>".$curEmplData["Firstname"]."</Firstname>\n\t\t\t<Lastname>".$curEmplData["Lastname"]."</Lastname>\n\t\t\t<DateOfBirth>".$curEmplData["DateOfBirth"]."</DateOfBirth>\n\t\t\t<SV-AS-Number>".$curEmplData["SV-AS-Number"]."</SV-AS-Number>\n\t\t\t<CodeAHV>".$curEmplData["CodeAHV"]."</CodeAHV>\n\t\t\t<CodeALV>".$curEmplData["CodeALV"]."</CodeALV>\n\t\t\t<CodeKTG>".$curEmplData["CodeKTG"]."</CodeKTG>\n\t\t\t<CodeUVG>".$curEmplData["CodeUVG"]."</CodeUVG>\n\t\t\t<CodeBVG>".$curEmplData["CodeBVG"]."</CodeBVG>\n\t\t\t<EmploymentPeriods>".implode("",$arrEmployeePeriods["id".$row["EmployeeID"]])."</EmploymentPeriods>\n\t\t\t<Entries>\n";
+				$eid = "id".$lastEmployeeID;
+				$singleEmployeeData = "\t\t\t<Employee>
+				<EmployeeNumber>".$curEmplData["EmployeeNumber"]."</EmployeeNumber>
+				<CompanyID>".$curEmplData["payroll_company_ID"]."</CompanyID>
+				<Firstname>".$curEmplData["Firstname"]."</Firstname>
+				<Lastname>".$curEmplData["Lastname"]."</Lastname>
+				<DateOfBirth>".$curEmplData["DateOfBirth"]."</DateOfBirth>
+				<SV-AS-Number>".$curEmplData["SV-AS-Number"]."</SV-AS-Number>
+				<CodeAHV>".$curEmplData["CodeAHV"]."</CodeAHV>
+				<CodeALV>".$curEmplData["CodeALV"]."</CodeALV>
+				<CodeKTG>".$curEmplData["CodeKTG"]."</CodeKTG>
+				<CodeUVG>".$curEmplData["CodeUVG"]."</CodeUVG>
+				<CodeBVG>".$curEmplData["CodeBVG"]."</CodeBVG>
+				<EmploymentPeriods>"."</EmploymentPeriods>
+				<Entries>
+				";
+				//"<EmploymentPeriods>".implode("",$arrEmployeePeriods["id".$row["EmployeeID"]])."</EmploymentPeriods>
 			}
 			if($row["print_account"]!=1) {
 				$rowTotal = 0.0;
 				for($i=1;$i<17;$i++) $rowTotal += $row["prd".$i."q"];
-				$tagQuantity = "\t\t\t\t\t<quantity><Jan>".$row["prd1q"]."</Jan><Feb>".$row["prd2q"]."</Feb><Mar>".$row["prd3q"]."</Mar><Apr>".$row["prd4q"]."</Apr><May>".$row["prd5q"]."</May><June>".$row["prd6q"]."</June><July>".$row["prd7q"]."</July><Aug>".$row["prd8q"]."</Aug><Sept>".$row["prd9q"]."</Sept><Oct>".$row["prd10q"]."</Oct><Nov>".$row["prd11q"]."</Nov><Dec>".$row["prd12q"]."</Dec><Prd13>".$row["prd13q"]."</Prd13><Prd14>".$row["prd14q"]."</Prd14><Prd15>".$row["prd15q"]."</Prd15><Prd16>".$row["prd16q"]."</Prd16><Total>".$rowTotal."</Total></quantity>\n";
+				$tagQuantity = "
+				<quantity>
+					<Jan>".		$row["prd1q"]	."</Jan>
+					<Feb>".		$row["prd2q"]	."</Feb>
+					<Mar>".		$row["prd3q"]	."</Mar>
+					<Apr>".		$row["prd4q"]	."</Apr>
+					<May>".		$row["prd5q"]	."</May>
+					<June>".	$row["prd6q"]	."</June>
+					<July>".	$row["prd7q"]	."</July>
+					<Aug>".		$row["prd8q"]	."</Aug>
+					<Sept>".	$row["prd9q"]	."</Sept>
+					<Oct>".		$row["prd10q"]	."</Oct>
+					<Nov>".		$row["prd11q"]	."</Nov>
+					<Dec>".		$row["prd12q"]	."</Dec>
+					<Prd13>".	$row["prd13q"]	."</Prd13>
+					<Prd14>".	$row["prd14q"]	."</Prd14>
+					<Prd15>".	$row["prd15q"]	."</Prd15>
+					<Prd16>".	$row["prd16q"]	."</Prd16>
+					<Total>".	$rowTotal		."</Total>
+				</quantity>";
 
-			}else $tagQuantity = "";
+			} else {
+				$tagQuantity = "";
+			}
 			if($row["print_account"]!=2) {
 				$rowTotal = 0.0;
 				for($i=1;$i<17;$i++) $rowTotal += $row["prd".$i."a"];
-				$tagAmount = "\t\t\t\t\t<amount><Jan>".$row["prd1a"]."</Jan><Feb>".$row["prd2a"]."</Feb><Mar>".$row["prd3a"]."</Mar><Apr>".$row["prd4a"]."</Apr><May>".$row["prd5a"]."</May><June>".$row["prd6a"]."</June><July>".$row["prd7a"]."</July><Aug>".$row["prd8a"]."</Aug><Sept>".$row["prd9a"]."</Sept><Oct>".$row["prd10a"]."</Oct><Nov>".$row["prd11a"]."</Nov><Dec>".$row["prd12a"]."</Dec><Prd13>".$row["prd13a"]."</Prd13><Prd14>".$row["prd14a"]."</Prd14><Prd15>".$row["prd15a"]."</Prd15><Prd16>".$row["prd16a"]."</Prd16><Total>".$rowTotal."</Total></amount>\n";
+				$tagAmount = "<amount><Jan>".$row["prd1a"]."</Jan><Feb>".$row["prd2a"]."</Feb><Mar>".$row["prd3a"]."</Mar><Apr>".$row["prd4a"]."</Apr><May>".$row["prd5a"]."</May><June>".$row["prd6a"]."</June><July>".$row["prd7a"]."</July><Aug>".$row["prd8a"]."</Aug><Sept>".$row["prd9a"]."</Sept><Oct>".$row["prd10a"]."</Oct><Nov>".$row["prd11a"]."</Nov><Dec>".$row["prd12a"]."</Dec><Prd13>".$row["prd13a"]."</Prd13><Prd14>".$row["prd14a"]."</Prd14><Prd15>".$row["prd15a"]."</Prd15><Prd16>".$row["prd16a"]."</Prd16><Total>".$rowTotal."</Total></amount>";
 			}else $tagAmount = "";
-			$entryCollector[] = "\t\t\t\t<Entry>\n\t\t\t\t\t<AccountNumber>".$row["AccountNumber"]."</AccountNumber>\n\t\t\t\t\t<AccountName>".$row["label"]."</AccountName>\n".$tagQuantity.$tagAmount."\t\t\t\t</Entry>\n";
+			$entryCollector[] = "<Entry>
+					<AccountNumber>".$row["AccountNumber"]."</AccountNumber>
+					<AccountName>".$row["label"]."</AccountName>
+					".$tagQuantity.$tagAmount."
+				</Entry>
+				";
 		}
 		if($singleEmployeeData != "") {
 			//there are still a few more data for writing to the XML file
@@ -956,8 +1152,8 @@ class payroll_BL_reports {
 		return $newTmpDirName;
 	}
 
-	public function Payslip($param) {
-//communication_interface::alert("reports.php - Payslip() param:".print_r($param,true));
+	public function Payslip($param) {//Lohnkonto
+//communication_interface::alert("reports.php 1 - Payslip() param:".print_r($param,true));
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
 		$payrollPeriodID = $param["payroll_period_ID"];
@@ -984,64 +1180,57 @@ class payroll_BL_reports {
 		if($periodInfo["locked"]==0 && $periodInfo["finalized"]==0) $tableNameSuffix = "current";
 		else $tableNameSuffix = "entry";
 
-// 		$sql = "SELECT BANKDEST.`payroll_employee_ID`
-// 				, IF(EMPLOYEE.`Language`='','de',EMPLOYEE.`Language`) as `Language`
-// 				, BANKDEST.`destination_type`
-// 				, BANKDEST.`beneficiary_bank_line1`
-// 				, BANKDEST.`beneficiary_bank_line2`
-// 				, BANKDEST.`beneficiary_bank_line3`
-// 				, BANKDEST.`beneficiary_bank_line4`
-// 				, BANKDEST.`bank_account`
-// 				, BANKDEST.`postfinance_account`
-// 				, PMTCURR.`payroll_currency_ID` as `currency`
-// 				, FORMAT(PMTCURR.`amount_payout`,2) as `amount`
-// 				FROM `payroll_payment_current` PMTCURR
-// 				INNER JOIN `payroll_tmp_change_mng` EMPLST
-// 					ON EMPLST.`numID`=PMTCURR.`payroll_employee_ID`
-// 					AND EMPLST.`core_user_id`=".$uid."
-// 				INNER JOIN `payroll_payment_split` PMTSPLT
-// 					ON PMTSPLT.`id`=PMTCURR.`payroll_payment_split_ID`
-// 				INNER JOIN `payroll_bank_destination` BANKDEST
-// 					ON BANKDEST.`id`=PMTSPLT.`payroll_bank_destination_ID`
-// 				INNER JOIN `payroll_employee` EMPLOYEE
-// 					ON EMPLOYEE.`id`=PMTCURR.`payroll_employee_ID`
-// 				WHERE PMTCURR.`payroll_period_ID`=".$payrollPeriodID ;		
-			
-// 		$sql = "SELECT * FROM payroll_payment_current_effectifpayout WHERE payroll_employee_ID = ".$uid."
-// 				AND payroll_period_ID = ".$payrollPeriodID." ORDER BY payroll_employee_ID, payroll_payment_split_ID";
-		
-		$sql = "SELECT * FROM payroll_payment_current_effectifpayout ";
 		
 		$payments = array();
-		$result = $system_database_manager->executeQuery( $sql, "payroll_report_Payslip");
-//communication_interface::alert($sql."\n".print_r($result, true));
 		$lohnabrechnnug = array();$i=0;
-		foreach($result as $row) {
-			if(!isset($payments[(string)$row["payroll_employee_ID"]])) {
-				$payments[(string)$row["payroll_employee_ID"]] = array();
+		
+		$sql = "SELECT * FROM payroll_payment_current_effectifpayout ";		
+		$result = $system_database_manager->executeQuery( $sql, "payroll_report_Payslip");
+		
+		$resultParam = $result[0]["payroll_period_ID"];
+//communication_interface::alert("payrollPeriodID:".$payrollPeriodID."\n"."resultParam:".$resultParam."\n".$sql."\n".print_r($result, true));
+		if ($resultParam == $payrollPeriodID) {
+			foreach($result as $row) {
+				if(!isset($payments[(string)$row["payroll_employee_ID"]])) {
+					$payments[(string)$row["payroll_employee_ID"]] = array();
+				}
+				$payout = $row["amount_payout"];
+				$payout = number_format($row["amount_payout"], 2, '.', "'");
+				$payoutCHF = "";
+				if ( $row["currency_ID"] != "CHF" ) {
+					$payoutCHF = "(CHF ".number_format($row["amount_CHF"], 2, '.', "'").")";
+				}
+				$payments[(string)$row["payroll_employee_ID"]][] =  "
+				<Payout>
+					<BankAddrLine1>".$row["beneBank1"]."</BankAddrLine1>
+					<BankAddrLine2>".$row["beneBank2"]."</BankAddrLine2>
+					<BankAddrLine3>".$row["beneBank3"]."</BankAddrLine3>
+					<BankAddrLine4> </BankAddrLine4>
+					<BankAccountNo>".$row["benIBAN"]."</BankAccountNo>
+					<PayoutCurrency>".$row["currency_ID"]."</PayoutCurrency>
+					<PayoutAmount>".$payout."</PayoutAmount>
+					<PayoutAmountCHF>".$payoutCHF."</PayoutAmountCHF>
+				</Payout>\n";
 			}
-			$payout = $row["amount_payout"];
-			$payout = number_format($row["amount_payout"], 2, '.', "'");
-			$payoutCHF = "";
-			if ( $row["currency_ID"] != "CHF" ) {
-				$payoutCHF = "(CHF ".number_format($row["amount_CHF"], 2, '.', "'").")";
+		} else {
+			$sql = "SELECT * FROM payroll_bank_destination ";
+			$result = $system_database_manager->executeQuery( $sql, "payroll_report_Payslip");
+					foreach($result as $row) {
+				if(!isset($payments[(string)$row["payroll_employee_ID"]])) {
+					$payments[(string)$row["payroll_employee_ID"]] = array();
+				}
+				$payments[(string)$row["payroll_employee_ID"]][] = "
+				<Payout>
+					<BankAddrLine1>".$row["beneficiary_bank_line1"]."</BankAddrLine1>
+					<BankAddrLine2>".$row["beneficiary_bank_line2"]."</BankAddrLine2>
+					<BankAddrLine3>".$row["beneficiary_bank_line3"]."</BankAddrLine3>
+					<BankAddrLine4>".$row["beneficiary_bank_line4"]."</BankAddrLine4>
+					<BankAccountNo>".$row["bank_account"]."</BankAccountNo>
+					<PayoutCurrency> </PayoutCurrency>
+					<PayoutAmount> </PayoutAmount>
+					<PayoutAmountCHF> </PayoutAmountCHF>
+				</Payout>\n";
 			}
-			$payments[(string)$row["payroll_employee_ID"]][] = 
-					"\t\t\t\t<Payout>
-					\t\t\t\t\t<BankAddrLine1>".$row["beneBank1"]."</BankAddrLine1>
-					\t\t\t\t\t<BankAddrLine2>".$row["beneBank2"]."</BankAddrLine2>
-					\t\t\t\t\t<BankAddrLine3>".$row["beneBank3"]."</BankAddrLine3>
-					\t\t\t\t\t<BankAddrLine4> </BankAddrLine4>
-					\t\t\t\t\t<BankAccountNo>".$row["benIBAN"]."</BankAccountNo>
-					\t\t\t\t\t<PayoutCurrency>".$row["currency_ID"]."</PayoutCurrency>
-					\t\t\t\t\t<PayoutAmount>".$payout."</PayoutAmount>
-					\t\t\t\t\t<PayoutAmountCHF>".$payoutCHF."</PayoutAmountCHF>
-					\t\t\t\t</Payout>\n";
-// 			$lohnabrechnnug[$i]["MA"] = $row["payroll_employee_ID"];
-// 			$lohnabrechnnug[$i]["PayoutAmount"] = $payout;
-// 			$lohnabrechnnug[$i]["beneBank1"] = $row["beneBank1"].", ".$row["beneBank2"].", ".$row["beneBank3"];
-// 			$lohnabrechnnug[$i]["IBAN"] = $row["benIBAN"];
-// 			$i++;
 		}
 //communication_interface::alert("abr  i:".$i."\ncount:".count($lohnabrechnnug)."\n".print_r($lohnabrechnnug, true));
 		unset($result);
@@ -1059,6 +1248,7 @@ class payroll_BL_reports {
 
 		$payslipCfg = array();
 		$result = $system_database_manager->executeQuery("SELECT * FROM `payroll_payslip_cfg`", "payroll_report_Payslip");
+//communication_interface::alert($sql."\n".print_r($result, true));
 		foreach($result as $row) {
 			$payslipCfg[(string)$row["id"]] = $row;
 			$payslipCfg[(string)$row["id"]]["InfoFields"] = $payslipInfo[(string)$row["id"]];
@@ -1100,7 +1290,9 @@ class payroll_BL_reports {
 				AND flddef.`dataSource`='payroll_empl_list' 
 				AND flddef.`fieldName` IN (".implode(",",$arrFld).")"
 				, "payroll_report_Payslip");
-		foreach($result as $row) $listValues[$row["fieldName"]][$row["ListItemID"]][$row["language"]] = $row["label"];
+		foreach($result as $row) {
+			$listValues[$row["fieldName"]][$row["ListItemID"]][$row["language"]] = $row["label"];
+		}
 		unset($result);
 		unset($arrFld);
 
@@ -1197,22 +1389,18 @@ class payroll_BL_reports {
 							}else{
 								$curValue = $emplData[$infoRow["field_name"]];
 							}
-							$infoFields .= "\t\t\t\t<Field>" .
-										 "\n\t\t\t\t\t<Name>".$infoRow["field_name"]."</Name>" .
-										 "\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>" .
-										 "\n\t\t\t\t\t<Value>".$curValue."</Value>" .
-										 "\n\t\t\t\t</Field>\n";
-// 							$infoFields .= "\t\t\t\t<Field>\n\t\t\t\t\t<Name>".$infoRow["field_name"]."</Name>" .
-// 										"\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>" .
-// 										"\n\t\t\t\t\t<Value>".$emplData[$infoRow["field_name"]]."</Value>" .
-// 										"\n\t\t\t\t</Field>\n";
+							$infoFields .= "\t\t\t\t<Field>
+								<Name>".$infoRow["field_name"]."</Name>
+								<Label>".$infoRow["label"]."</Label>
+								<Value>".$curValue."</Value>
+								</Field>\n";
 							break;
 						default:
-							$infoFields .= "\t\t\t\t<Field>" .
-										 "\n\t\t\t\t\t<Name>IFLD</Name>" .
-										 "\n\t\t\t\t\t<Label>".$infoRow["label"]."</Label>" .
-										 "\n\t\t\t\t\t<Value>".$infoRow["field_type"]."</Value>" .
-										 "\n\t\t\t\t</Field>\n";
+							$infoFields .= "\t\t\t\t<Field>
+								<Name>IFLD</Name>
+								<Label>".$infoRow["label"]."</Label>
+								<Value>".$infoRow["field_type"]."</Value>
+								</Field>\n";
 							break;
 						}
 					}
@@ -1227,7 +1415,12 @@ class payroll_BL_reports {
 								"\n\t\t\t<CompanyID>".$emplData["payroll_company_ID"]."</CompanyID>" .
 								"\n\t\t\t<Firstname>".$emplData["Firstname"]."</Firstname>" .
 								"\n\t\t\t<Lastname>".$emplData["Lastname"]."</Lastname>" .
-								"\n".($emplData["AdditionalAddrLine1"]!="" ? "\t\t\t<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").($emplData["AdditionalAddrLine2"]!="" ? "\t\t\t<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").($emplData["AdditionalAddrLine3"]!="" ? "\t\t\t<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").($emplData["AdditionalAddrLine4"]!="" ? "\t\t\t<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "")."\t\t\t<Street>".$emplData["Street"]."</Street>" .
+								"\n".
+								($emplData["AdditionalAddrLine1"]!="" ? "\t\t\t<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").
+								($emplData["AdditionalAddrLine2"]!="" ? "\t\t\t<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").
+								($emplData["AdditionalAddrLine3"]!="" ? "\t\t\t<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").
+								($emplData["AdditionalAddrLine4"]!="" ? "\t\t\t<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "").
+								"\t\t\t<Street>".$emplData["Street"]."</Street>" .
 								"\n\t\t\t<ZIP-Code>".$emplData["ZIP-Code"]."</ZIP-Code>" .
 								"\n\t\t\t<City>".$emplData["City"]."</City>" .
 								"\n\t\t\t<Country>".$emplData["Country"]."</Country>" .
@@ -1235,7 +1428,8 @@ class payroll_BL_reports {
 								"\n".$infoByWageCode[$emplData["WageCode"]]."\t\t\t<PaymentDate>".$paymentDate."</PaymentDate>" .
 								"\n\t\t\t<InterestDate>".$interestDate."</InterestDate>" .
 								"\n".(count($tmpNote)!=0 ? "\t\t\t<Notification>".implode("<br/>",$tmpNote)."</Notification>" .
-								"\n" : "")."\t\t\t<DocumentSettings>" .
+								"\n" : "").
+								"\t\t\t<DocumentSettings>" .
 								"\n\t\t\t\t<Language>".$emplData["Language"]."</Language>" .
 								"\n\t\t\t\t<DecimalPoint>.</DecimalPoint>" .
 								"\n\t\t\t\t<ThousandsSeparator>'</ThousandsSeparator>" .
@@ -1288,7 +1482,20 @@ class payroll_BL_reports {
 				$designAttributes .= ' spaceAfter="large"'; break;
 			}
 			if($row["bold"]==1) $designAttributes .= ' bold="true"';
-			$entries[] = "\t\t\t\t<Entry".$designAttributes.">\n\t\t\t\t\t<AccountNumber>".$row["payroll_account_ID"]."</AccountNumber>\n\t\t\t\t\t<AccountName>".$row["label"]."</AccountName>\n".($row["quantity"]===NULL ? "" : "\t\t\t\t\t<quantity>".$row["quantity"]."</quantity>\n").($row["quantity_unit"]===NULL ? "" : "\t\t\t\t\t<quantityUnit>".$row["quantity_unit"]."</quantityUnit>\n").($row["rate"]===NULL ? "" : "\t\t\t\t\t<rate>".$row["rate"]."</rate>\n").($row["rate_unit"]===NULL ? "" : "\t\t\t\t\t<rateUnit>".$row["rate_unit"]."</rateUnit>\n").($row["amount"]===NULL ? "" : "\t\t\t\t\t<amount>".$row["amount"]."</amount>\n")."\t\t\t\t</Entry>\n";
+			
+			if (($row["amount"]===NULL || $row["amount"]==0) && ($row["quantity"]===NULL || $row["quantity"]==0)) {
+				$entries[] = "";
+			} else {
+				$entries[] = "\t\t\t\t<Entry".$designAttributes.">
+					<AccountNumber>".$row["payroll_account_ID"]."</AccountNumber>
+					<AccountName>".$row["label"]."</AccountName>
+					".($row["quantity"]===NULL ? "" : "<quantity>".$row["quantity"]."</quantity>
+					").($row["quantity_unit"]===NULL ? "" : "<quantityUnit>".$row["quantity_unit"]."</quantityUnit>
+					").($row["rate"]===NULL ? "" : "<rate>".$row["rate"]."</rate>
+					").($row["rate_unit"]===NULL ? "" : "<rateUnit>".$row["rate_unit"]."</rateUnit>
+					").($row["amount"]===NULL ? "" : "<amount>".$row["amount"]."</amount>
+				")."</Entry>\n";
+			}
 			$paymentDate = $row["payment_date"];
 			$interestDate = $row["interest_date"];
 		}
@@ -1319,7 +1526,50 @@ class payroll_BL_reports {
 			if(isset($notifications[(string)"0"][$emplData["Language"]])) {
 				$tmpNote[] = $notifications[(string)"0"][$emplData["Language"]];
 			}
-			$curEmpl = "\t\t<Employee>\n\t\t\t<EmployeeNumber>".$emplData["EmployeeNumber"]."</EmployeeNumber>\n\t\t\t<CompanyID>".$emplData["payroll_company_ID"]."</CompanyID>\n\t\t\t<Firstname>".$emplData["Firstname"]."</Firstname>\n\t\t\t<Lastname>".$emplData["Lastname"]."</Lastname>\n".($emplData["AdditionalAddrLine1"]!="" ? "\t\t\t<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").($emplData["AdditionalAddrLine2"]!="" ? "\t\t\t<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").($emplData["AdditionalAddrLine3"]!="" ? "\t\t\t<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").($emplData["AdditionalAddrLine4"]!="" ? "\t\t\t<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "")."\t\t\t<Street>".$emplData["Street"]."</Street>\n\t\t\t<ZIP-Code>".$emplData["ZIP-Code"]."</ZIP-Code>\n\t\t\t<City>".$emplData["City"]."</City>\n\t\t\t<Country>".$emplData["Country"]."</Country>\n\t\t\t<CountryName>".$countryNames[$emplData["Country"]]."</CountryName>\n".$infoByWageCode[$emplData["WageCode"]]."\t\t\t<PaymentDate>".$paymentDate."</PaymentDate>\n\t\t\t<InterestDate>".$interestDate."</InterestDate>\n".(count($tmpNote)!=0 ? "\t\t\t<Notification>".implode("<br/>",$tmpNote)."</Notification>\n" : "")."\t\t\t<DocumentSettings>\n\t\t\t\t<Language>".$emplData["Language"]."</Language>\n\t\t\t\t<DecimalPoint>.</DecimalPoint>\n\t\t\t\t<ThousandsSeparator>'</ThousandsSeparator>\n\t\t\t\t<PdfTemplate>".($templCfg["pdf_template"]!="" ? $pdfTemplateDir.$templCfg["pdf_template"] : "")."</PdfTemplate>\n\t\t\t\t<AddrOffsetLeft>".$templCfg["addr_offset_left"]."</AddrOffsetLeft>\n\t\t\t\t<AddrOffsetTop>".$templCfg["addr_offset_top"]."</AddrOffsetTop>\n\t\t\t\t<InfoOffsetLeft>".$templCfg["info_offset_left"]."</InfoOffsetLeft>\n\t\t\t\t<InfoOffsetTop>".$templCfg["info_offset_top"]."</InfoOffsetTop>\n\t\t\t\t<ContentOffsetLeft>".$templCfg["content_offset_left"]."</ContentOffsetLeft>\n\t\t\t\t<ContentOffsetTop>".$templCfg["content_offset_top"]."</ContentOffsetTop>\n\t\t\t\t<ContentWidth>".$templCfg["content_width"]."</ContentWidth>\n\t\t\t\t<AddrFontName>".$templCfg["addr_font_name"]."</AddrFontName>\n\t\t\t\t<AddrFontSize>".$templCfg["addr_font_size"]."</AddrFontSize>\n\t\t\t\t<InfoFontName>".$templCfg["info_font_name"]."</InfoFontName>\n\t\t\t\t<InfoFontSize>".$templCfg["info_font_size"]."</InfoFontSize>\n\t\t\t\t<ContentFontName>".$templCfg["content_font_name"]."</ContentFontName>\n\t\t\t\t<ContentFontSize>".$templCfg["content_font_size"]."</ContentFontSize>\n\t\t\t\t<ProcessingSuffix>".$templCfg["processing_suffix"]."</ProcessingSuffix>\n\t\t\t</DocumentSettings>\n\t\t\t<InfoFields>\n".$infoFields."\t\t\t</InfoFields>\n\t\t\t<Entries>\n".implode("",$entries)."\t\t\t</Entries>\n\t\t\t<Payouts>\n".(isset($payments[(string)$row["payroll_employee_ID"]]) ? implode("", $payments[(string)$row["payroll_employee_ID"]]) : "")."\t\t\t</Payouts>\n\t\t</Employee>\n";
+			$curEmpl = "
+				<Employee>
+					<EmployeeNumber>".$emplData["EmployeeNumber"]."</EmployeeNumber>
+					<CompanyID>".$emplData["payroll_company_ID"]."</CompanyID>
+					<Firstname>".$emplData["Firstname"]."</Firstname>
+					<Lastname>".$emplData["Lastname"]."</Lastname>".
+					($emplData["AdditionalAddrLine1"]!="" ? "<AdditionalAddrLine1>".$emplData["AdditionalAddrLine1"]."</AdditionalAddrLine1>\n" : "").
+					($emplData["AdditionalAddrLine2"]!="" ? "<AdditionalAddrLine2>".$emplData["AdditionalAddrLine2"]."</AdditionalAddrLine2>\n" : "").
+					($emplData["AdditionalAddrLine3"]!="" ? "<AdditionalAddrLine3>".$emplData["AdditionalAddrLine3"]."</AdditionalAddrLine3>\n" : "").
+					($emplData["AdditionalAddrLine4"]!="" ? "<AdditionalAddrLine4>".$emplData["AdditionalAddrLine4"]."</AdditionalAddrLine4>\n" : "")."
+					<Street>".$emplData["Street"]."</Street>
+					<ZIP-Code>".$emplData["ZIP-Code"]."</ZIP-Code>
+					<City>".$emplData["City"]."</City>
+					<Country>".$emplData["Country"]."</Country>
+					<CountryName>".$countryNames[$emplData["Country"]]."</CountryName>"
+					.$infoByWageCode[$emplData["WageCode"]]."
+					<PaymentDate>".$paymentDate."</PaymentDate>
+					<InterestDate>".$interestDate."</InterestDate>".
+					(count($tmpNote)!=0 ? "\t\t\t<Notification>".implode("<br/>",$tmpNote)."</Notification>\n" : "")."
+					<DocumentSettings>
+					<Language>".$emplData["Language"]."</Language>
+					<DecimalPoint>.</DecimalPoint>
+					<ThousandsSeparator>'</ThousandsSeparator>
+					<PdfTemplate>".($templCfg["pdf_template"]!="" ? $pdfTemplateDir.$templCfg["pdf_template"] : "")."</PdfTemplate>
+					<AddrOffsetLeft>".$templCfg["addr_offset_left"]."</AddrOffsetLeft>
+					<AddrOffsetTop>".$templCfg["addr_offset_top"]."</AddrOffsetTop>
+					<InfoOffsetLeft>".$templCfg["info_offset_left"]."</InfoOffsetLeft>
+					<InfoOffsetTop>".$templCfg["info_offset_top"]."</InfoOffsetTop>
+					<ContentOffsetLeft>".$templCfg["content_offset_left"]."</ContentOffsetLeft>
+					<ContentOffsetTop>".$templCfg["content_offset_top"]."</ContentOffsetTop>
+					<ContentWidth>".$templCfg["content_width"]."</ContentWidth>
+					<AddrFontName>".$templCfg["addr_font_name"]."</AddrFontName>
+					<AddrFontSize>".$templCfg["addr_font_size"]."</AddrFontSize>
+					<InfoFontName>".$templCfg["info_font_name"]."</InfoFontName>
+					<InfoFontSize>".$templCfg["info_font_size"]."</InfoFontSize>
+					<ContentFontName>".$templCfg["content_font_name"]."</ContentFontName>
+					<ContentFontSize>".$templCfg["content_font_size"]."</ContentFontSize>
+					<ProcessingSuffix>".$templCfg["processing_suffix"]."</ProcessingSuffix>
+					</DocumentSettings>\n\t\t\t<InfoFields>
+					".$infoFields."\t\t\t</InfoFields>\n\t\t\t<Entries>
+					".implode("",$entries)."\t\t\t</Entries>
+					<Payouts>
+					".(isset($payments[(string)$row["payroll_employee_ID"]]) ? implode("", $payments[(string)$row["payroll_employee_ID"]]) : "")."\t\t\t</Payouts>
+				</Employee>\n";
 			fwrite($fp, str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), $curEmpl) );
 		}
 		unset($payments);
@@ -1424,5 +1674,54 @@ class payroll_BL_reports {
 	}// end function generateAuszahlDataReports($ZahlstellenID, $Personenkreis, $dueDateGUI)
 	
 	
+	
+	public function getReportingCompany($TAGCompanyOrMainCompany) {
+		//TODO: Eine Checkox im Firmenstamm / Stammdaten erstellen um dieses Flag "isReportingCompany = 'Y'" zu verwalten
+		$system_database_manager = system_database_manager::getInstance();
+		$sql = "SELECT * FROM payroll_company LIMIT 1,1 ;";//Default, die erste Firma
+		$result = $system_database_manager->executeQuery($sql, "getReportingCompany");
+		//Defaultbesetzung, die erste Zeile
+			$ReportCompanyXML = "
+			<".$TAGCompanyOrMainCompany.">
+				<Name>".$result[0]["HR-RC-Name"]."</Name>
+				<Street>".$result[0]["Street"]."</Street>
+				<ZipCity>".$result[0]["ZIP-Code"]." ".$result[0]["City"]."</ZipCity>
+			</".$TAGCompanyOrMainCompany.">";
+		//Richtige Abfrage
+		$sql = "SELECT * FROM payroll_company WHERE isReportingCompany = 'Y' ;";
+		$result = $system_database_manager->executeQuery($sql, "getReportingCompany");
+		if (count($result) > 0) {
+			$ReportCompanyXML = "
+			<".$TAGCompanyOrMainCompany.">
+				<Name>".$result[0]["HR-RC-Name"]."</Name>
+				<Street>".$result[0]["Street"]."</Street>
+				<ZipCity>".$result[0]["ZIP-Code"]." ".$result[0]["City"]."</ZipCity>
+			</".$TAGCompanyOrMainCompany.">";
+		}
+		return $ReportCompanyXML;
+	}
+	
+	public function getPeriodLabels($lang) {
+		switch ($lang) {
+			case "en":
+				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
+				break;
+			case "fr":
+				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
+				break;
+			case "it":
+				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
+				break;
+			default: //de
+				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
+				break;
+		}
+	}
+	
+	public function getPrintDateTime() {
+		return "
+			<PrintDate>".date("d.m.Y")."</PrintDate>
+			<PrintTime>".date("H:i:s")."</PrintTime>";
+	}	
 }
 ?>

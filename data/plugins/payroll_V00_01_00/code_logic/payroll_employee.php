@@ -28,21 +28,28 @@ class employee {
 		if($param["prepend_id"]) $columns = "payroll_employee.id,".$columns;
 
 		$system_database_manager = system_database_manager::getInstance();
-//return;
+
 		switch($param["data_source"]) {
 		case 'current_period':
-			$result = $system_database_manager->executeQuery("SELECT ".$columns." " .
-															 "FROM payroll_employee " .
-															 "INNER JOIN payroll_period_employee prdemp ON prdemp.payroll_employee_ID=payroll_employee.id " .
-															 "AND prdemp.processing!=0 " .
-															 "INNER JOIN payroll_period prd " .
-															 "WHERE prd.locked=0 AND prd.finalized=0 " .
-															 "AND prd.id=prdemp.payroll_period_ID".$orderBy, 
-															"payroll_getEmployeeList");
+			$sql = 
+"SELECT ".$columns." " .
+"FROM payroll_employee " .
+"INNER JOIN payroll_period_employee prdemp ON prdemp.payroll_employee_ID=payroll_employee.id " .
+"AND prdemp.processing!=0 " .
+"INNER JOIN payroll_period prd " .
+"WHERE prd.locked=0 AND prd.finalized=0 " .
+"AND prd.id=prdemp.payroll_period_ID".$orderBy;
+			
+			$result = $system_database_manager->executeQuery($sql, "payroll_getEmployeeList");
 			break;
 		case 'calculation_overview':
 			//Kontonummern ermitteln (Brutto-, Netto-Lohn und Auszahlungsbetrag)
-			$q = $system_database_manager->executeQuery("SELECT `AccountType`,`payroll_account_ID` FROM `payroll_account_mapping` WHERE `ProcessingMethod`=1 AND `AccountType` IN (19,20,21)", "payroll_getEmployeeList");
+			$sql = 
+"SELECT `AccountType`,`payroll_account_ID` 
+FROM `payroll_account_mapping` 
+WHERE `ProcessingMethod`=1 
+AND `AccountType` IN (19,20,21)";
+			$q = $system_database_manager->executeQuery($sql, "payroll_getEmployeeList");
 			if(count($q)<1) {
 				$response["success"] = false;
 				$response["errCode"] = 20;
@@ -88,10 +95,35 @@ class employee {
 
 	public function getEmployeeFieldDef() {
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT payroll_employee_field_def.*,payroll_employee_field_label.label FROM payroll_employee_field_def LEFT JOIN payroll_employee_field_label ON payroll_employee_field_def.fieldName=payroll_employee_field_label.fieldName AND payroll_employee_field_label.language='".session_control::getSessionInfo("language")."' ORDER BY payroll_employee_field_def.childOf, payroll_employee_field_def.childOrder, payroll_employee_field_label.label", "payroll_getEmployeeFieldDef");
-//		$result = $system_database_manager->executeQuery("SELECT payroll_employee_field_def.*,payroll_employee_field_label.label FROM payroll_employee_field_def LEFT JOIN payroll_employee_field_label ON payroll_employee_field_def.fieldName=payroll_employee_field_label.fieldName ORDER BY payroll_employee_field_def.childOf, payroll_employee_field_def.childOf, payroll_employee_field_def.childOrder, payroll_employee_field_label.label", "payroll_getEmployeeFieldDef");
+		$sql =
+"SELECT payroll_employee_field_def.*,payroll_employee_field_label.label
+FROM payroll_employee_field_def LEFT JOIN payroll_employee_field_label ON payroll_employee_field_def.fieldName=payroll_employee_field_label.fieldName
+AND payroll_employee_field_label.language='".session_control::getSessionInfo("language")."'
+";
+		
+		$sql = 
+"SELECT payroll_employee_field_def.*,payroll_employee_field_label.label 
+FROM payroll_employee_field_def LEFT JOIN payroll_employee_field_label ON payroll_employee_field_def.fieldName=payroll_employee_field_label.fieldName 
+AND payroll_employee_field_label.language='".session_control::getSessionInfo("language")."' 
+ORDER BY payroll_employee_field_def.childOf, payroll_employee_field_def.childOrder, payroll_employee_field_label.label";
+		$result = $system_database_manager->executeQuery($sql, "payroll_getEmployeeFieldDef");
+//communication_interface::alert("getEmployeeFieldDef()   \n".print_r($result,true));
+// $s = "getEmployeeFieldDef()   \n";
+// $idx = count($result);
+// for ($i = 0; $i < $idx; $i++) {
+// 	$s .= print_r($result[$i]["fieldName"],true) . "\n";
+// }
+// communication_interface::alert($s);
 
-		$emplList = $system_database_manager->executeQuery("SELECT payroll_empl_list.id, payroll_empl_list.ListGroup, payroll_empl_list.ListItemToken, IF(payroll_empl_list.ListType=1,payroll_empl_list_label.label,CONCAT(payroll_empl_list.ListItemToken,' - ',payroll_empl_list_label.label)) as label FROM payroll_empl_list INNER JOIN payroll_empl_list_label ON payroll_empl_list_label.payroll_empl_list_ID=payroll_empl_list.id WHERE payroll_empl_list_label.language='".session_control::getSessionInfo("language")."' AND payroll_empl_list.deleted=0 ORDER BY payroll_empl_list.ListGroup, payroll_empl_list.ListItemOrder, payroll_empl_list_label.label", "payroll_getEmployeeFieldDef");
+		$sql = 
+"SELECT payroll_empl_list.id, payroll_empl_list.ListGroup, payroll_empl_list.ListItemToken, 
+IF(payroll_empl_list.ListType=1,payroll_empl_list_label.label,
+CONCAT(payroll_empl_list.ListItemToken,' - ',payroll_empl_list_label.label)) as label 
+FROM payroll_empl_list INNER JOIN payroll_empl_list_label ON payroll_empl_list_label.payroll_empl_list_ID=payroll_empl_list.id 
+WHERE payroll_empl_list_label.language='".session_control::getSessionInfo("language")."' 
+AND payroll_empl_list.deleted=0 
+ORDER BY payroll_empl_list.ListGroup, payroll_empl_list.ListItemOrder, payroll_empl_list_label.label";
+		$emplList = $system_database_manager->executeQuery($sql, "payroll_getEmployeeFieldDef");
 		foreach($emplList as $row) {
 			if(!isset($listOptions[$row["ListGroup"]])) $listOptions[$row["ListGroup"]] = array();
 			$listOptions[$row["ListGroup"]][] = array("itemID" => $row["id"], "token" => $row["ListItemToken"], "label" => $row["label"]);
@@ -117,7 +149,14 @@ class employee {
 		}
 
 		$insuraceCodeList = array();
-		$inscdList = $system_database_manager->executeQuery("SELECT payroll_insurance_code.InsuranceCode, payroll_insurance_code.payroll_insurance_type_ID, payroll_insurance_code.payroll_company_ID, payroll_insurance_cd_label.label FROM payroll_insurance_code LEFT JOIN payroll_insurance_cd_label ON payroll_insurance_code.id=payroll_insurance_cd_label.payroll_insurance_code_ID AND payroll_insurance_cd_label.language='".session_control::getSessionInfo("language")."' ORDER BY payroll_insurance_code.InsuranceCode", "payroll_getEmployeeFieldDef");
+		$sql = 
+"SELECT payroll_insurance_code.InsuranceCode, payroll_insurance_code.payroll_insurance_type_ID, payroll_insurance_code.payroll_company_ID, payroll_insurance_cd_label.label 
+FROM payroll_insurance_code 
+LEFT JOIN payroll_insurance_cd_label 
+ON payroll_insurance_code.id=payroll_insurance_cd_label.payroll_insurance_code_ID 
+AND payroll_insurance_cd_label.language='".session_control::getSessionInfo("language")."' 
+ORDER BY payroll_insurance_code.InsuranceCode";
+		$inscdList = $system_database_manager->executeQuery($sql, "payroll_getEmployeeFieldDef");
 		foreach($inscdList as $row) {
 			if(!isset($insuraceCodeList[$row["payroll_insurance_type_ID"]])) $insuraceCodeList[$row["payroll_insurance_type_ID"]] = array();
 			$insuraceCodeList[$row["payroll_insurance_type_ID"]][] = array("itemID" => $row["InsuranceCode"], "payroll_company_ID" => $row["payroll_company_ID"], "label" => $row["label"]);
@@ -125,7 +164,13 @@ class employee {
 
 		$languageList = array();
 //		$lngList = $system_database_manager->executeQuery("SELECT payroll_languages.*,core_intl_language_names.language_name FROM payroll_languages INNER JOIN core_intl_language_names ON payroll_languages.core_intl_language_ID=core_intl_language_names.core_intl_language_ID WHERE core_intl_language_names.language_name_language='".session_control::getSessionInfo("language")."'".$auxWHERE." ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.language_name", "payroll_getLanguageList");
-		$lngList = $system_database_manager->executeQuery("SELECT payroll_languages.*,core_intl_language_names.language_name FROM payroll_languages INNER JOIN core_intl_language_names ON payroll_languages.core_intl_language_ID=core_intl_language_names.core_intl_language_ID WHERE core_intl_language_names.language_name_language='".session_control::getSessionInfo("language")."' ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.language_name", "payroll_getLanguageList");
+		$sql = 
+"SELECT payroll_languages.*,core_intl_language_names.language_name 
+FROM payroll_languages INNER JOIN core_intl_language_names 
+ON payroll_languages.core_intl_language_ID=core_intl_language_names.core_intl_language_ID 
+WHERE core_intl_language_names.language_name_language='".session_control::getSessionInfo("language")."' 
+ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.language_name";
+		$lngList = $system_database_manager->executeQuery($sql, "payroll_getLanguageList");
 		foreach($lngList as $row) {
 			$languageList[] = array("itemID" => $row["core_intl_language_ID"], "label" => $row["language_name"]);
 		}
@@ -158,15 +203,16 @@ class employee {
 		}
 
 		$system_database_manager = system_database_manager::getInstance();
-		$fieldDef = $system_database_manager->executeQuery("SELECT * FROM `payroll_employee_field_def` WHERE `fieldName`='".addslashes($param["fieldName"])."'", "payroll_getEmployeeFieldDetail");
-		if(count($fieldDef)==0) {
+		$sql = "SELECT * FROM `payroll_employee_field_def` WHERE `fieldName`='".addslashes($param["fieldName"])."'";
+		$fieldDef = $system_database_manager->executeQuery($sql, "payroll_getEmployeeFieldDetail");
+		if (count($fieldDef)==0) {
 			$response["success"] = false;
 			$response["errCode"] = 20;
 			$response["errText"] = "field not found";
 			return $response;
-		}else $fieldDef = $fieldDef[0];
-
-		$fieldLabels = $system_database_manager->executeQuery("SELECT * FROM `payroll_employee_field_label` WHERE `fieldName`='".addslashes($param["fieldName"])."'", "payroll_getEmployeeFieldDetail");
+		} else $fieldDef = $fieldDef[0];
+		$sql = "SELECT * FROM `payroll_employee_field_label` WHERE `fieldName`='".addslashes($param["fieldName"])."'";
+		$fieldLabels = $system_database_manager->executeQuery($sql, "payroll_getEmployeeFieldDetail");
 
 		$listDef = array();
 		if($fieldDef["fieldType"]==4 && $fieldDef["dataSource"]=="payroll_empl_list") {
@@ -545,10 +591,15 @@ class employee {
 
 		$auxTables = array();
 		if($queryAuxiliaryTables && count($result)>=0) {
-			$fldDef = $system_database_manager->executeQuery("SELECT fieldName, dataSource FROM payroll_employee_field_def WHERE fieldType=110", "payroll_getEmployeeDetail");
+			$sql0 = "SELECT fieldName, dataSource FROM payroll_employee_field_def WHERE fieldType=110";
+			$fldDef = $system_database_manager->executeQuery($sql0, "payroll_getEmployeeDetail");
 			foreach($fldDef as $fldDefRow) {
-				$tbl = $system_database_manager->executeQuery("SELECT * FROM ".$fldDefRow["dataSource"]." WHERE payroll_employee_ID=".$result[0]["id"]." ORDER BY DateFrom", "payroll_getEmployeeDetail");
+				$sql = "SELECT * FROM ".$fldDefRow["dataSource"].
+				      " WHERE payroll_employee_ID=".$result[0]["id"].
+					  " ORDER BY DateFrom";
+				$tbl = $system_database_manager->executeQuery($sql, "payroll_getEmployeeDetail");
 				$auxTables[$fldDefRow["fieldName"]] = $tbl;
+				//if (count($tbl) > 0) communication_interface::alert($sql0."\n\n".print_r($fldDef,true)."\n\nfldDefRow[fieldName]=".$fldDefRow["fieldName"]."\n\n".$sql."\n\ngetEmployeeDetail 556: \n".print_r($tbl,true));
 			}
 		}
 
@@ -562,7 +613,7 @@ class employee {
 			$response["data"] = $result;
 			$response["auxiliaryTables"] = $auxTables;
 		}
-		//communication_interface::alert("getEmployeeDetail:".print_r($response,true));
+		communication_interface::alert("getEmployeeDetail:".print_r($response,true));
 		return $response;
 	}
 
@@ -1055,7 +1106,17 @@ class employee {
 
 			$res = $system_database_manager->executeQuery("SELECT `name`,`value` FROM `core_registry` WHERE `path`='GLOBAL/SETTINGS/CORE/payroll' AND `name` LIKE 'ahv_m%_age_%'", "payroll_closePeriod");
 			foreach($res as $row) $ahvAgeRange[$row["name"]] = $row["value"];
-			$system_database_manager->executeUpdate("UPDATE payroll_employee SET RetirementDate=IF(Sex='M',DATE_ADD(DateOfBirth, INTERVAL ".$ahvAgeRange["ahv_max_age_m"]." YEAR),DATE_ADD(DateOfBirth, INTERVAL ".$ahvAgeRange["ahv_max_age_f"]." YEAR)), Age=(YEAR(CURDATE())-YEAR(DateOfBirth))-(RIGHT(CURDATE(),5)<RIGHT(DateOfBirth,5)), AgeAtPeriodStart=(YEAR('".$datePeriodStart."')-YEAR(DateOfBirth))-(RIGHT('".$datePeriodStart."',5)<RIGHT(DateOfBirth,5)), AgeAtPeriodEnd=(YEAR('".$datePeriodEnd."')-YEAR(DateOfBirth))-(RIGHT('".$datePeriodEnd."',5)<RIGHT(DateOfBirth,5)), YearsOfService=YEAR(CURDATE())-YEAR(SeniorityJoining), MonthsOfService=MONTH(CURDATE())-MONTH(SeniorityJoining) WHERE id=".$id, "payroll_saveEmployeeDetail");
+			$sql = 
+"UPDATE payroll_employee 
+SET RetirementDate=IF(Sex='M',DATE_ADD(DateOfBirth, INTERVAL ".$ahvAgeRange["ahv_max_age_m"]." YEAR),
+DATE_ADD(DateOfBirth, INTERVAL ".$ahvAgeRange["ahv_max_age_f"]." YEAR)), 
+Age=(YEAR(CURDATE())-YEAR(DateOfBirth))-(RIGHT(CURDATE(),5)<RIGHT(DateOfBirth,5)), 
+AgeAtPeriodStart=(YEAR('".$datePeriodStart."')-YEAR(DateOfBirth))-(RIGHT('".$datePeriodStart."',5)<RIGHT(DateOfBirth,5)), 
+AgeAtPeriodEnd=(YEAR('".$datePeriodEnd."')-YEAR(DateOfBirth))-(RIGHT('".$datePeriodEnd."',5)<RIGHT(DateOfBirth,5)), 
+YearsOfService=YEAR(CURDATE())-YEAR(SeniorityJoining), 
+MonthsOfService=MONTH(CURDATE())-MONTH(SeniorityJoining) 
+WHERE id=".$id;
+			$system_database_manager->executeUpdate($sql, "payroll_saveEmployeeDetail");
 			$system_database_manager->executeUpdate("UPDATE payroll_employee SET YearsOfService=YearsOfService-1, MonthsOfService=MonthsOfService+12 WHERE id=".$id." AND MonthsOfService<0", "payroll_saveEmployeeDetail");
 			$system_database_manager->executeUpdate("UPDATE payroll_employee SET YearsOfService=0, MonthsOfService=0 WHERE id=".$id." AND YearsOfService<0", "payroll_saveEmployeeDetail");
 			if($changeMode=="EDIT") {
@@ -1063,7 +1124,7 @@ class employee {
 				$diff = array_diff_assoc($snapshotBefore[0], $snapshotAfter[0]);
 				foreach($diff as $diffFieldName=>$diffFieldValue) $affectedFields["payroll_employee"][] = $diffFieldName;
 			}
-		}else{
+		} else {
 			$response["success"] = false;
 			$response["errCode"] = 1;
 			$response["errText"] = "nothing to save";
@@ -1195,12 +1256,24 @@ class employee {
 			$system_database_manager->executeUpdate("REPLACE INTO `payroll_period_employee`(`payroll_period_ID`,`payroll_employee_ID`,`processing`) VALUES".implode(",",$v), "payroll_addEmployee2Period");
 
 			//QST-Kanton und QST-Code bei allen Mitarbeitern mit QST-Verarbeitung setzen
-			$system_database_manager->executeUpdate("UPDATE `payroll_employee` emp INNER JOIN `payroll_period_employee` prdemp ON prdemp.`payroll_period_ID`=".$payrollPeriodID." AND prdemp.`payroll_employee_ID`=emp.`id` AND prdemp.`payroll_employee_ID` IN (".implode(",", $arrEmpID).") SET prdemp.`DedAtSrcMode`=emp.`DedAtSrcMode`, prdemp.`DedAtSrcCanton`=emp.`DedAtSrcCanton`, prdemp.`DedAtSrcCode`=emp.`DedAtSrcCode` WHERE emp.`DedAtSrcMode`!=1", "payroll_closePeriod");
+			$sql = 
+"UPDATE `payroll_employee` emp INNER JOIN `payroll_period_employee` prdemp ON prdemp.`payroll_period_ID`=".$payrollPeriodID." AND prdemp.`payroll_employee_ID`=emp.`id` AND prdemp.`payroll_employee_ID` IN (".implode(",", $arrEmpID).") 
+SET prdemp.`DedAtSrcMode`=emp.`DedAtSrcMode`, prdemp.`DedAtSrcCanton`=emp.`DedAtSrcCanton`, prdemp.`DedAtSrcCode`=emp.`DedAtSrcCode` 
+WHERE emp.`DedAtSrcMode`!=1";
+			$system_database_manager->executeUpdate($sql, "payroll_closePeriod");
 
 			//`payroll_employee`.`EmploymentStatus` fuer eingefaegte Mitarbeiter neu ermitteln
-			$system_database_manager->executeUpdate("UPDATE `payroll_employee` emp INNER JOIN `payroll_employment_period` empprd ON empprd.`payroll_employee_ID`=emp.`id` AND empprd.`DateFrom`<=LAST_DAY('".$periodStartDate."') AND (empprd.`DateTo`='0000-00-00' OR empprd.`DateTo`>='".$periodStartDate."') SET emp.`EmploymentStatus`=2 WHERE emp.`EmploymentStatus`=1 AND emp.`id` IN (".implode(",", $arrEmpID).")", "payroll_addEmployee2Period");
+			$sql = 
+"UPDATE `payroll_employee` emp INNER JOIN `payroll_employment_period` empprd ON empprd.`payroll_employee_ID`=emp.`id` 
+AND empprd.`DateFrom`<=LAST_DAY('".$periodStartDate."') 
+AND (empprd.`DateTo`='0000-00-00' OR empprd.`DateTo`>='".$periodStartDate."') 
+SET emp.`EmploymentStatus`=2 
+WHERE emp.`EmploymentStatus`=1 
+AND emp.`id` IN (".implode(",", $arrEmpID).")";
+			$system_database_manager->executeUpdate($sql, "payroll_addEmployee2Period");
 			$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_change_mng`(`core_user_id`, `numID`, `alphID`) VALUES".implode(",",$vMng), "payroll_closePeriod");
-			$system_database_manager->executeUpdate("Call payroll_prc_empl_acc(".$uid.", 0, 1, 1, 1, 1, 1, 1)"); //userID INT, internalTransaction TINYINT, wageCodeChange TINYINT, wageBaseChange TINYINT, insuranceChange TINYINT, modifierChange TINYINT, workdaysChange TINYINT, pensiondaysChange TINYINT
+			//userID INT, internalTransaction TINYINT, wageCodeChange TINYINT, wageBaseChange TINYINT, insuranceChange TINYINT, modifierChange TINYINT, workdaysChange TINYINT, pensiondaysChange TINYINT
+			$system_database_manager->executeUpdate("Call payroll_prc_empl_acc(".$uid.", 0, 1, 1, 1, 1, 1, 1)"); 
 			$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_id`=".$uid, "payroll_addEmployee2Period");
 			$system_database_manager->executeUpdate("COMMIT", "payroll_addEmployee2Period");
 
@@ -1221,7 +1294,13 @@ class employee {
 		else $ValidForCalculation = 1;
 
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT * FROM `payroll_empl_filter` WHERE (`ValidForEmplOverview`=".$ValidForEmplOverview." OR `ValidForCalculation`=".$ValidForCalculation.") AND (`GlobalFilter`=1 OR `core_user_id_created`=".session_control::getSessionInfo("id").") ORDER BY `FilterName`", "payroll_getEmployeeFilterList");
+		$sql = 
+"SELECT * FROM `payroll_empl_filter` 
+WHERE (`ValidForEmplOverview`=".$ValidForEmplOverview." 
+OR `ValidForCalculation`=".$ValidForCalculation.") 
+AND (`GlobalFilter`=1 OR `core_user_id_created`=".session_control::getSessionInfo("id").") 
+ORDER BY `FilterName`";
+		$result = $system_database_manager->executeQuery($sql, "payroll_getEmployeeFilterList");
 
 		if(count($result) < 1) {
 			$response["success"] = false;

@@ -227,7 +227,7 @@ class payroll_UI {
 				$objWindow->windowTitle($title); 
 				$objWindow->windowIcon("employee-edit32.png");
 				$objWindow->windowWidth(830);
-				$objWindow->windowHeight(550);
+				$objWindow->windowHeight(710);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -374,7 +374,7 @@ class payroll_UI {
 				
 				communication_interface::jsExecute("  $('#employeeForm').mb_close();  ");  
 
-			}else{
+			} else {
 				//communication_interface::alert("count f:".count($ret['fieldNames']).", count t:".count($ret['tableRows'])."\n".print_r($ret,true));
 
 				$flds = $ret['fieldNames'];
@@ -476,7 +476,7 @@ class payroll_UI {
 					break;
 				case 'layoutOv':
 					$objWindow = new wgui_window("payroll", "infoBox");
-					$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten"));
+					$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").":");
 					$objWindow->windowWidth(500);
 					$objWindow->windowHeight(220);
 
@@ -537,10 +537,10 @@ class payroll_UI {
 						case 'showEditor':
 							$data = array();
 							$objWindow = new wgui_window("payroll", "employeeForm");
-							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten"));// - ".$data["LayoutName"]); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten")." ".$objWindow->getText("txtPersonalstammfelderverwalten"));// - ".$data["LayoutName"]); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("employee-edit32.png");
 							$objWindow->windowWidth(820); //710
-							$objWindow->windowHeight(550); //470
+							$objWindow->windowHeight(710); //470
 							$objWindow->dockable(false);
 							$objWindow->buttonMaximize(false);
 							$objWindow->resizable(false);
@@ -667,7 +667,7 @@ class payroll_UI {
 
 				communication_interface::jsExecute(" $('#prlVlFldCfg_listID').bind('change', function() {
 					var vl = $('#prlVlFldCfg_listID').val();
-					$('#ListenwerteFldCfgContainer').html('<table><tr><td>'+vl+'... <img src=\"web/img/working.gif\" /></td></tr></table>');
+					$('#ListenwerteFldCfgContainer').html('<table><tr><td>search id '+vl+' ... <img src=\"web/img/working.gif\" /></td></tr></table>');
 						cb('payroll.getPersonalstammListenwerte',{'PersonalstammListenwert':vl, 'fieldName':'".$fieldName."'});
 					});
 				");
@@ -787,14 +787,16 @@ class payroll_UI {
 				$fieldDefRecs = blFunctionCall('payroll.getEmployeeFieldDef');
 				if($fieldDefRecs["success"]) {
 					foreach($fieldDefRecs["data"] as $row) {
-						if($row["fieldDefEdit"]!=0) $data["field_list"][] = array("fieldName"=>$row["fieldName"], "label"=>$row["label"]);
+						if($row["fieldDefEdit"]!=0) {
+							$data["field_list"][] = array("fieldName"=>$row["fieldName"], "label"=>$row["label"]);
+						}
+						
 					}
 				}
-
 				$objWindow = new wgui_window("payroll", "prlVlFldCfgSelect");
 				$objWindow->windowTitle($objWindow->getText("txtPersonalstammfelderverwalten"));
 				$objWindow->windowIcon("file_mann32.gif");
-				$objWindow->windowWidth(340);
+				$objWindow->windowWidth(350);
 				$objWindow->windowHeight(500);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
@@ -1513,7 +1515,6 @@ class payroll_UI {
 				}
 				$data["formula_list"] = $formulaArr;
 
-//				$objWindow->windowTitle("Mitarbeiterdaten bearbeiten (<span id="#prlVlTitle"></span>)"); //Mitarbeiterdaten erfassen / aendern		 id='#prlVlTitle'
 				$objWindow->windowTitle($objWindow->getText("txtLohnartBearbeiten") ); 
 				$objWindow->windowIcon("config32.png");
 				$objWindow->windowWidth(870); //710  
@@ -2232,6 +2233,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			}
 			break;
 		case 'payroll.prlCalcOvOutput':
+			$data = array();
 			$fireScripts = true;
 			switch($functionParameters[0]["functionNumber"]) {
 			case 1: //Lohnabrechnungen drucken
@@ -2252,10 +2254,10 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 
                     //show report selection window
                     $objWindow = new wgui_window("payroll", "ReportSelector");
-                    $objWindow->windowTitle("FIBU-Journale: Report Auswahl");
+                    $objWindow->windowTitle(  $objWindow->getText("txtFIBUJournalReportAuswahl") );
                     $objWindow->windowIcon("calculator20.png");
                     $objWindow->windowWidth(480);
-                    $objWindow->windowHeight(200);
+                    $objWindow->windowHeight(220);
                     $objWindow->dockable(false);
                     $objWindow->buttonMaximize(false);
                     $objWindow->resizable(false);
@@ -2294,10 +2296,10 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 
                     //show report selection window
                     $objWindow = new wgui_window("payroll", "ReportSelector");
-                    $objWindow->windowTitle("BEBU-Journale: Report Auswahl");
+                    $objWindow->windowTitle(  $objWindow->getText("txtBEBUJournalReportAuswahl") );
                     $objWindow->windowIcon("calculator20.png");
                     $objWindow->windowWidth(480);
-                    $objWindow->windowHeight(200);
+                    $objWindow->windowHeight(220);
                     $objWindow->dockable(false);
                     $objWindow->buttonMaximize(false);
                     $objWindow->resizable(false);
@@ -2919,7 +2921,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 							foreach($formList["AvailablePDF"] as $row) $data["template_list"][] = array("template"=>$row);
 
 							$objWindow = new wgui_window("payroll", "editPayslipCfg");
-							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten")); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
+							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten").".."); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("config32.png");
 							$objWindow->windowWidth(850);
 							$objWindow->windowHeight(480);

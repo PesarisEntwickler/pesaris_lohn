@@ -463,6 +463,22 @@ $textResourceMap["prlAccAsgOptionCredit"] = "H";
 $textResourceMap["prlAccAsgOptionYes"] = "J";
 $textResourceMap["prlAccAsgOptionNo"] = "N";
 
+$textResourceMap["txtFIBUJournalReportAuswahl"] = "FIBU-Journale: Report Auswahl";
+$textResourceMap["txtBEBUJournalReportAuswahl"] = "BEBU-Journale: Report Auswahl";
+$textResourceMap["txtAuswertungNach"] = "Auswertung nach";
+$textResourceMap["txtKst"] = "Kst";
+$textResourceMap["txtOpt0Mitarbeiter"] = "Mitarbeiter";
+$textResourceMap["txtOpt1FirmaKontoGegenkontoKst"] = "Firma / Konto / Gegenkonto / Kst";
+$textResourceMap["txtOpt2FirmaKstKontoGegenkonto"] = "Firma / Kst / Konto / Gegenkonto";
+$textResourceMap["txtOpt3FirmaKontoGegenkonto"] = "Firma / Konto / Gegenkonto";
+$textResourceMap["txtOpt4FirmaKst"] = "Firma / Kst";
+$textResourceMap["txtOpt5FirmaKonto"] = "Firma / Konto";
+$textResourceMap["txtOpt6KontoGegenkontoKst"] = "Konto / Gegenkonto / Kst";
+$textResourceMap["txtOpt7KstKontoGegenkonto"] = "Kst / Konto / Gegenkonto";
+$textResourceMap["txtOpt8KontoGegenkonto"] = "Konto / Gegenkonto";
+$textResourceMap["txtOpt9Kst"] = "Kst";
+$textResourceMap["txtOpt10Konto"] = "Konto";
+
 
 /*
 ****** CALCULATION ******
