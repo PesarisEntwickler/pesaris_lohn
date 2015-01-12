@@ -539,8 +539,8 @@ class payroll_UI {
 							$objWindow = new wgui_window("payroll", "employeeForm");
 							$objWindow->windowTitle($objWindow->getText("txtLayoutBearbeiten")." ".$objWindow->getText("txtPersonalstammfelderverwalten"));// - ".$data["LayoutName"]); //<-- hier eventuell noch zusaetzlich den Layoutnamen einblenden
 							$objWindow->windowIcon("employee-edit32.png");
-							$objWindow->windowWidth(820); //710
-							$objWindow->windowHeight(710); //470
+							$objWindow->windowWidth(850);
+							$objWindow->windowHeight(740); 
 							$objWindow->dockable(false);
 							$objWindow->buttonMaximize(false);
 							$objWindow->resizable(false);

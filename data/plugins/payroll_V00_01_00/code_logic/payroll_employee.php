@@ -613,7 +613,7 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			$response["data"] = $result;
 			$response["auxiliaryTables"] = $auxTables;
 		}
-		communication_interface::alert("getEmployeeDetail:".print_r($response,true));
+		//communication_interface::alert("getEmployeeDetail:".print_r($response,true));
 		return $response;
 	}
 

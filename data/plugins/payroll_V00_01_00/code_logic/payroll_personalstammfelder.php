@@ -9,12 +9,19 @@ class personalstammfelder {
 		return  $result[0]["Anzahl"];
 	}  
 
+	public function replaceProblemZeichen($uebergabeWort) {
+		$umlaute = array("'",">","<");
+		$ersatz = array("`"," "," ");
+		$uebergabeWort = str_replace($umlaute,$ersatz,$uebergabeWort);	
+		return str_replace($umlaute,$ersatz,$uebergabeWort);
+	}
+	
 	public function getListenWerte($personalstammListenwert) {
 		$sql  = "SELECT * FROM payroll_empl_list AS L, payroll_empl_list_label AS LL ";
 		$sql .= " WHERE LL.payroll_empl_list_ID = L.id AND L.id = ".$personalstammListenwert;
 		$sql .= " ORDER BY id, language, L.ListItemOrder";
 		//communication_interface::alert("getEmplListWerte($personalstammListenwert): ".$sql);
-		
+		 
  		$system_database_manager = system_database_manager::getInstance();
  		$result = $system_database_manager->executeQuery($sql, "getListWerte");
  		$response["id"] = $personalstammListenwert;
@@ -23,12 +30,12 @@ class personalstammfelder {
  		 	$response["Code"] = $result[0]["ListItemToken"];
  		 	$response["Sortierzahl"] = $result[0]["ListItemOrder"];
  		 	$response["Sprachen"] = $result[0]["language"];
- 		 	$response["language_".$result[0]["language"]] = $result[0]["label"];
+ 		 	$response["language_".$result[0]["language"]] = $this->replaceProblemZeichen($result[0]["label"]);
  		}
  		if(count($result) > 1) {
  			for ($i = 1; $i < count($result); $i++) {
  				$response["Sprachen"] = $response["Sprachen"].",".$result[$i]["language"];
- 				$response["language_".$result[$i]["language"]] = $result[$i]["label"];
+ 				$response["language_".$result[$i]["language"]] =  $this->replaceProblemZeichen($result[$i]["label"]);
  			}
  		}
  		//communication_interface::alert("getEmplListWerte($personalstammListenwert): ".print_r($response, true));

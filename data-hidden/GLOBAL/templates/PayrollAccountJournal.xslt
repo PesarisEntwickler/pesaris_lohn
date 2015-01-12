@@ -7,13 +7,13 @@
 
 <xsl:template match="/">\nonstopmode
 \documentclass[<xsl:choose>
-<xsl:when test="count(Report/Header/ExtendedMonthView/*) &gt; 2"><xsl:text>9pt,a3paper</xsl:text></xsl:when>
-<xsl:when test="count(Report/Header/ExtendedMonthView/*) &gt; 1"><xsl:text>10pt,a3paper</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>8pt,a4paper</xsl:text></xsl:otherwise>
+<xsl:when test="count(Report/Header/ExtendedMonthView/*) &gt; 2"><xsl:text>8pt,a3paper</xsl:text></xsl:when>
+<xsl:when test="count(Report/Header/ExtendedMonthView/*) &gt; 1"><xsl:text>9pt,a3paper</xsl:text></xsl:when>
+<xsl:otherwise><xsl:text>9pt,a4paper</xsl:text></xsl:otherwise>
 </xsl:choose>]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage{german,longtable}
-\usepackage[landscape, top=20mm, bottom=25mm, left=10mm, right=10mm]{geometry}
+\usepackage[landscape, top=20mm, bottom=25mm, left=8mm, right=8mm]{geometry}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
 \usepackage{helvet}
@@ -105,8 +105,8 @@
 </xsl:if>
 \rowcolors{2}{lightgray}{}
 \begin{longtable}{ !{\vrule width -1pt}l l c r r r r r r r r r r r r<xsl:if test="/Report/Header/ExtendedMonthView/Prd13"> r</xsl:if><xsl:if test="/Report/Header/ExtendedMonthView/Prd14"> r</xsl:if><xsl:if test="/Report/Header/ExtendedMonthView/Prd15"> r</xsl:if><xsl:if test="/Report/Header/ExtendedMonthView/Prd16"> r</xsl:if>@{\extracolsep{\fill}} r}
-\multicolumn{16}{l}{\hskip-2mm Name: \textbf{<xsl:value-of select="Lastname"/>, <xsl:value-of select="Firstname"/>} \hspace*{2mm}\textbar\hspace*{2mm} Pers.Nr.: \textbf{<xsl:value-of select="EmployeeNumber"/>} \hspace*{2mm}\textbar\hspace*{2mm} Vers.Nr.: <xsl:value-of select="SV-AS-Number"/> \hspace*{2mm}\textbar\hspace*{2mm} Geb.dat.: <xsl:call-template name="FormatDate"><xsl:with-param name="Date" select="DateOfBirth" /></xsl:call-template> \hspace*{2mm}\textbar\hspace*{2mm} <xsl:apply-templates select="EmploymentPeriods/Period"/>}\\
-\multicolumn{12}{l}{\hskip-2mm AHV-Code: <xsl:value-of select="CodeAHV"/> \hspace*{2mm}\textbar\hspace*{2mm} ALV-Code: <xsl:value-of select="CodeALV"/> \hspace*{2mm}\textbar\hspace*{2mm} UVG-Code: <xsl:value-of select="CodeUVG"/> \hspace*{2mm}\textbar\hspace*{2mm} KTG-Code: <xsl:value-of select="CodeKTG"/> \hspace*{2mm}\textbar\hspace*{2mm} BVG-Code: <xsl:value-of select="CodeBVG"/>}&amp;&amp;&amp;&amp;\\
+\multicolumn{16}{l}{\hskip-2mm Name: \textbf{<xsl:value-of select="Lastname"/>, <xsl:value-of select="Firstname"/>} \hspace*{2mm}\textbar\hspace*{2mm} Pers.Nr.: \textbf{<xsl:value-of select="EmployeeNumber"/>} \hspace*{2mm}\textbar\hspace*{2mm} Vers.Nr.: <xsl:value-of select="SV-AS-Number"/> \hspace*{2mm}\textbar\hspace*{2mm} Geb.dat.: <xsl:call-template name="FormatDate"><xsl:with-param name="Date" select="DateOfBirth" /></xsl:call-template> \hspace*{2mm}\textbar\hspace*{2mm} <xsl:apply-templates select="EmploymentPeriods/Period"/>
+\hspace*{2mm}\textbar\hspace*{2mm} AHV-Code: <xsl:value-of select="CodeAHV"/> \hspace*{2mm}\textbar\hspace*{2mm} ALV-Code: <xsl:value-of select="CodeALV"/> \hspace*{2mm}\textbar\hspace*{2mm} UVG-Code: <xsl:value-of select="CodeUVG"/> \hspace*{2mm}\textbar\hspace*{2mm} KTG-Code: <xsl:value-of select="CodeKTG"/> \hspace*{2mm}\textbar\hspace*{2mm} BVG-Code: <xsl:value-of select="CodeBVG"/>}&amp;&amp;&amp;&amp;\\
 \midrule
 <xsl:choose>
 <xsl:when test="/Report/@lang = 'fr'"><xsl:text>\textbf{LOA}&amp;\textbf{Bezeichnung}&amp;\textbf{M/B}&amp;\textbf{Januar}&amp;\textbf{Februar}&amp;\textbf{März}&amp;\textbf{April}&amp;\textbf{Mai}&amp;\textbf{Juni}&amp;\textbf{Juli}&amp;\textbf{August}&amp;\textbf{September}&amp;\textbf{Oktober}&amp;\textbf{November}&amp;\textbf{Dezember}</xsl:text></xsl:when>
