@@ -183,7 +183,7 @@ class insurance {
 					"ContractIdentity"=>array("regex"=>"/^.{0,15}$/", "isText"=>true, "isID"=>false, "isLabel"=>false)
 				);
 
-		require_once('various_functions.php');
+		require_once('payroll_various_functions.php');
 		$variousFunctions = new variousFunctions();
 				
 		$res = $variousFunctions->getLanguageList("UseForAccounts");

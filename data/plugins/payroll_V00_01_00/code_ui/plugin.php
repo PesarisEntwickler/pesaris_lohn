@@ -251,10 +251,14 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#employeeForm .n').html('".$title." (<span id=\"prlVlTitle\"></span>)');");
 			}
 			$MAinfo = "";
-			$employeeID = "";
 			$bankdestinationID = "";
-			if(isset($functionParameters[0]["id"]) && $functionParameters[0]["id"]!="" && $functionParameters[0]["id"]!=0) {
+			$employeeID = -1;
+			if(isset($functionParameters[0]["id"])) {
 				$employeeID = $functionParameters[0]["id"];
+			}
+			if($employeeID < 1) {
+				communication_interface::jsExecute("$('#prlVlTitle').html('* NEUER MITARBEITER *');");
+			}else{
 				$employeeData = blFunctionCall('payroll.getEmployeeDetail',$employeeID,true);
 				if($employeeData["success"]) {
 					$MAinfo = addslashes( $employeeData["data"][0]["EmployeeNumber"]." ".$employeeData["data"][0]["Lastname"].", ".$employeeData["data"][0]["Firstname"] );
@@ -330,8 +334,6 @@ class payroll_UI {
 					if($fieldCollector != "") communication_interface::jsExecute("prlVlFill( [".$fieldCollector."] );");
 					communication_interface::jsExecute("$('#prlVlTitle').html('".$MAinfo."');");
 				}
-			}else{
-				communication_interface::jsExecute("$('#prlVlTitle').html('* NEUERFASSUNG *');");
 			}
 			communication_interface::jsExecute("prlVlRid = ".$employeeID.";"); //set record ID of current employee (on client side)  
 			communication_interface::jsExecute("$('#btnBankverbindungUndSplitt').bind('click', function(e) { cb('payroll.paymentSplit', {'action':'paymentSplitAction_UebersichtZahlungssplit', 'empId':".$employeeID.", 'bankID':".$bankdestinationID." }); });");
@@ -1096,7 +1098,7 @@ class payroll_UI {
 														 ,"BUR-REE-Number"=>"BUR_REE_Number"))
 								,
 				"CfgSyac"=>array("windowTitle"=>"Systemlohnart"
-								, "windowWidth"=>525
+								, "windowWidth"=>550
 								, "windowHeight"=>160
 								, "dataSourceFnc"=>"payroll.getPayrollAccountMappingDetail"
 								, "fieldNameTransl"=>array())
@@ -1114,14 +1116,14 @@ class payroll_UI {
 								, "fieldNameTransl"=>array())
 								,
 				"CfgInscCode"=>array("windowTitle"=>"Versicherungscodes bearbeiten"
-								, "windowWidth"=>550
-								, "windowHeight"=>225
+								, "windowWidth"=>600
+								, "windowHeight"=>250
 								, "dataSourceFnc"=>"payroll.getInsuranceCodeList"
 								, "fieldNameTransl"=>array())
 								,
 				"CfgInscCodeEdt"=>array("windowTitle"=>"Versicherungscodes bearbeiten"
-								, "windowWidth"=>550
-								, "windowHeight"=>250
+								, "windowWidth"=>600
+								, "windowHeight"=>320
 								, "dataSourceFnc"=>"payroll.getInsuranceCodeDetail"
 								, "fieldNameTransl"=>array())
 								,
@@ -1132,7 +1134,7 @@ class payroll_UI {
 								, "fieldNameTransl"=>array())
 								,
 				"CfgDasc"=>array("windowTitle"=>"QST: Kantonale Einstellungen"
-								, "windowWidth"=>510
+								, "windowWidth"=>550
 								, "windowHeight"=>410
 								, "dataSourceFnc"=>"payroll.getDedAtSrcCantonDetail"
 								, "fieldNameTransl"=>array())
@@ -1429,13 +1431,12 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#prlFormCfgCancel').bind('click', function(e) { $('#modalContainer').mb_close(); });");
 				break;
 			case 2: //dateiupload abgeschlossen... Tarifdaten importieren
-//				communication_interface::alert(print_r($functionParameters[0],true));
+				//communication_interface::alert(print_r($functionParameters[0],true));
 				if($functionParameters[0]["success"]) {
 					$fm = new file_manager();
 					if( $fm->setTmpDir($functionParameters[0]["tmpDirToken"]) ) {
-//						communication_interface::alert("path: ".$fm->getFullPath());
-//						communication_interface::alert("file: ".$functionParameters[0]["fileName"]);
-
+						//communication_interface::alert("path: ".$fm->getFullPath());
+						//communication_interface::alert("file: ".$functionParameters[0]["fileName"]);
 						$arr = explode(".",$functionParameters[0]["fileName"]);
 						if(strtolower($arr[count($arr)-1])!="txt") {
 							$fm->deleteDir(); //weil falsche Dateierweiterung, kann TmpDir gleich wieder geloescht werden
@@ -1487,16 +1488,6 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.OpenPayrollAccountForm':
-/*
-	$functionParameters[0]["id"]		<--- account ID
-	$functionParameters[0]["dirty"]
-	$functionParameters[0]["wndStatus"]
-*/
-//			$currentFormId = session_control::getSessionSettings("payroll", "psoCurrentEmplForm");
-//			if($currentFormId!="") {
-//				$formDetail = blFunctionCall('payroll.getEmployeeFormDetail',$currentFormId);
-//			}
-
 			if($functionParameters[0]["wndStatus"]==0) {
 				$objWindow = new wgui_window("payroll", "payrollAccountForm");
 
@@ -1532,16 +1523,6 @@ class payroll_UI {
 				$definitions .= "prlLoacFieldDef = {'id':{'maxlength':5, 'mandatory':true,'rgx':/^[0-9a-zA-Z]{1,5}$/}, 'label_de':{'maxlength':45, 'mandatory':true,'rgx':''}, 'label_fr':{'maxlength':45, 'mandatory':true,'rgx':''}, 'label_it':{'maxlength':45, 'mandatory':true,'rgx':''}, 'max_limit':{'maxlength':9, 'mandatory':true,'rgx':/^[0-9]{1,6}(\.[0-9]{1,2})?$/}, 'deduction':{'maxlength':9, 'mandatory':true,'rgx':/^[0-9]{1,6}(\.[0-9]{1,2})?$/}, 'min_limit':{'maxlength':9, 'mandatory':true,'rgx':/^[0-9]{1,6}(\.[0-9]{1,2})?$/}, 'factor':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,8}(\.[0-9]{1,5})?$/}, 'surcharge':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,8}(\.[0-9]{1,5})?$/}, 'amount':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,8}(\.[0-9]{1,5})?$/}, 'rate':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,8}(\.[0-9]{1,5})?$/}, 'quantity':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,8}(\.[0-9]{1,5})?$/}, 'round_param':{'maxlength':7, 'mandatory':true,'rgx':/^[0-9]{1,2}(\.[0-9]{1,4})?$/}, 'quantity_conversion':{'maxlength':10, 'mandatory':true, 'rgx':/^[0-9]{1,5}(\.[0-9]{1,4})?$/}, 'quantity_unit_de':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'quantity_unit_fr':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'quantity_unit_it':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'rate_conversion':{'maxlength':10, 'mandatory':true, 'rgx':/^[0-9]{1,5}(\.[0-9]{1,4})?$/}, 'rate_unit_de':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'rate_unit_fr':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'rate_unit_it':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'amount_conversion':{'maxlength':10, 'mandatory':true, 'rgx':/^[0-9]{1,5}(\.[0-9]{1,4})?$/}};";
 				communication_interface::jsExecute($definitions);
 				communication_interface::jsExecute("prlLoacInit();");
-/*
-prlLoacLoaAll = {'87':{'number':'123456', 'label':'Monatslohn'},'61':{'number':'654321', 'label':'Stundenlohn'},'12':{'number':'456512', 'label':'AHV'},'103':{'number':'789432', 'label':'UVGZ'},'35':{'number':'355645', 'label':'Überstundenzuschlag'},'109':{'number':'852514', 'label':'Super-LOA'}};
-prlLoacLoaInExcl = []; //array mit IDs, deren LOA nicht zur Auswahl stehen
-prlLoacLoaOutExcl = []; //array mit IDs, deren LOA nicht zur Auswahl stehen
-prlLoacFieldDef = {'account_number':{'maxlength':5, 'mandatory':true,'rgx':/^[0-9a-zA-Z]{1,5}$/}, 'label_de':{'maxlength':45, 'mandatory':true,'rgx':''}, 'label_fr':{'maxlength':45, 'mandatory':true,'rgx':''}, 'label_it':{'maxlength':45, 'mandatory':true,'rgx':''}, 'max_limit':{'maxlength':9, 'mandatory':true,'rgx':/^[0-9]{1,6}(\.[0-9]{1,2})?$/}, 'deduction':{'maxlength':9, 'mandatory':true,'rgx':/^[0-9]{1,6}(\.[0-9]{1,2})?$/}, 'min_limit':{'maxlength':9, 'mandatory':true,'rgx':/^[0-9]{1,6}(\.[0-9]{1,2})?$/}, 'factor':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,7}(\.[0-9]{1,5})?$/}, 'surcharge':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,7}(\.[0-9]{1,5})?$/}, 'amount':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,7}(\.[0-9]{1,5})?$/}, 'rate':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,7}(\.[0-9]{1,5})?$/}, 'quantity':{'maxlength':13, 'mandatory':true,'rgx':/^-?[0-9]{1,7}(\.[0-9]{1,5})?$/}, 'round_param':{'maxlength':7, 'mandatory':true,'rgx':/^[0-9]{1,2}(\.[0-9]{1,4})?$/}, 'quantity_conversion':{'maxlength':10, 'mandatory':true, 'rgx':/^[0-9]{1,5}(\.[0-9]{1,4})?$/}, 'quantity_unit_de':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'quantity_unit_fr':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'quantity_unit_it':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'rate_conversion':{'maxlength':10, 'mandatory':true, 'rgx':/^[0-9]{1,5}(\.[0-9]{1,4})?$/}, 'rate_unit_de':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'rate_unit_fr':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'rate_unit_it':{'maxlength':10, 'mandatory':false, 'rgx':''}, 'amount_conversion':{'maxlength':10, 'mandatory':true, 'rgx':/^[0-9]{1,5}(\.[0-9]{1,4})?$/}};
-
-prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde de l\'AHV', 'label_it':'Lohnardo del Ahavauo', 'sign':'1', 'print_account':'1', 'var_fields':'2', 'accIn':[ {'id':87, 'fwdField':3, 'fwdNegVal':true},{'id':103, 'fwdField':3, 'fwdNegVal':true} ], 'accOut': [ {'id':103, 'fwdField':5, 'fwdNegVal':false} ], 'having_limits':true, 'max_limit':'126000.00', 'deduction':'0.000', 'min_limit':'0.000', 'limits_calc_mode':'1', 'limits_aux_account_ID':'1', 'input_assignment':'3', 'factor':'0.0000', 'surcharge':'0.0000', 'amount':'0.0000', 'rate':'0.0000', 'quantity':'0.0000', 'having_calculation':true, 'calculation_formula':1, 'having_rounding':false, 'round_param':'0.0000', 'output_assignment':'5', 'quantity_conversion':'1.0000', 'quantity_decimal':'10', 'quantity_print':true, 'quantity_unit_de':'', 'quantity_unit_fr':'', 'quantity_unit_it':'', 'rate_conversion':'1.0000', 'rate_decimal':'2', 'rate_print':true, 'rate_unit_de':'%', 'rate_unit_fr':'%', 'rate_unit_it':'%', 'amount_conversion':'1.0000', 'amount_decimal':'10', 'amount_print':true});
-*/
-
-//				communication_interface::jsExecute("$('#prlVlTabContainer').height( $('#employeeForm .o').height() - $('#prlVlTabs .o').height() - 40 );");
 				communication_interface::jsExecute("$('#payrollAccountForm .n').html('Lohnart bearbeiten (<span id=\"prlLoacTitle\"></span>)');");
 			}
 
@@ -1557,7 +1538,6 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 
 
 			if(isset($functionParameters[0]["id"]) && $functionParameters[0]["id"]!="" && $functionParameters[0]["id"]!="0") {
-//communication_interface::alert("id: ".$functionParameters[0]["id"]);
 				$booleanFields = array('having_limits','having_calculation','having_rounding','quantity_print','rate_print','amount_print');
 				$prlAccData = blFunctionCall('payroll.getPayrollAccountDetail',$functionParameters[0]["id"]);
 				if($prlAccData["success"]) {
@@ -1590,7 +1570,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 				communication_interface::jsExecute("prlLoacLoadData({'id':'','processing_order':'0','sign':'0','print_account':'0','var_fields':'0','input_assignment':'3','output_assignment':'5','having_limits':false,'having_calculation':true,'having_rounding':false,'payroll_formula_ID':'0','surcharge':'0.00000','factor':'0.00000','quantity':'0.00000','rate':'0.00000','amount':'0.00000','round_param':'0.0000','limits_aux_account_ID':'0','limits_calc_mode':'0','max_limit':'0.00','min_limit':'0.00','deduction':'0.00','quantity_conversion':'1.0000','quantity_decimal':'10','quantity_print':true,'rate_conversion':'1.0000','rate_decimal':'10','rate_print':true,'amount_conversion':'1.0000','amount_decimal':'10','amount_print':true});");
 
 				//eventually select first tab and set focus to first field
-				communication_interface::jsExecute("$('#prlLoacTitle').html('* NEUERFASSUNG *');");
+				communication_interface::jsExecute("$('#prlLoacTitle').html('** NEUERFASSUNG **');");
 			}
 
 			$definitions = "";
@@ -2391,7 +2371,7 @@ prlLoacLoadData({'account_number':'4456', 'label_de':'AHV', 'label_fr':'Lohnarde
 			$data = array();
 
 			$objWindow = new wgui_window("payroll", "prlCalcDataEditor");
-			$objWindow->windowTitle("Lohndaten bearbeiten");
+			$objWindow->windowTitle($objWindow->getText("prlCalcOvBtnEdit"));
 			$objWindow->windowIcon("calculator32.png");
 			$objWindow->windowWidth(900);
 			$objWindow->windowHeight(510);

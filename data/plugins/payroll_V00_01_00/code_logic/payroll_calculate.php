@@ -8,12 +8,16 @@ class payroll_BL_calculate {
 		return;
 	}
 
-   public function calculate($calculateAll=true) {
-
+	public function calculate($calculateAll=true) {
+   		//communication_interface::alert("calculationDataSave(".print_r($rawData,true));
+   	
 		$uid = session_control::getSessionInfo("id");
 		$system_database_manager = system_database_manager::getInstance();
 
-		$result = $system_database_manager->executeQuery("SELECT `id`,`payroll_year_ID`,`major_period`,`minor_period`,`major_period_associated` FROM `payroll_period` WHERE `locked`=0 AND `finalized`=0", "payroll_calculate");
+		$result = $system_database_manager->executeQuery(
+				"SELECT `id`,`payroll_year_ID`,`major_period`,`minor_period`,`major_period_associated` 
+				FROM `payroll_period` WHERE `locked`=0 AND `finalized`=0"
+				, "payroll_calculate");
 		if(count($result)>0) {
 			$payrollPeriodID = $result[0]["id"];
 			$currentYear = $result[0]["payroll_year_ID"];
@@ -533,12 +537,12 @@ class payroll_BL_calculate {
    
    
    
-   
-   
 	public function calculationDataSave($rawData) {
+		//communication_interface::alert("calculationDataSave(".print_r($rawData,true));
+		
 		require_once('chkDate.php');
-		$chkDate = new chkDate();
-				
+		$chkDate = new chkDate("1970-01-01", 0, "");
+		
 		$arrDeleteIDs = array();
 		$arrAdd = array();
 		$arrEdit = array();
@@ -546,6 +550,7 @@ class payroll_BL_calculate {
 		$arrAffectedEmployeeID = array();
 		foreach($rawData as $currentEmployeeId=>$employeeRows) {
 			$arrAffectedEmployeeID[] = $currentEmployeeId;
+			//communication_interface::alert("calculationDataSave  arrAffectedEmployeeID :".print_r($arrAffectedEmployeeID,true)."\n employeeRows:".print_r($employeeRows, true));
 			foreach($employeeRows as $recID=>$row) {
 				switch($row["action"]) {
 				case 'add':
@@ -637,7 +642,20 @@ class payroll_BL_calculate {
 						return $response;
 					}
 
-					$arrEdit[] = "UPDATE `payroll_employee_account` SET `payroll_employee_ID`=$currentEmployeeId,`payroll_account_ID`='".addslashes($row["payroll_account_ID"])."',`PayrollDataType`=".$row["PayrollDataType"].",`account_text`='".(isset($row["account_text"]) ? addslashes($row["account_text"]) : "")."',`quantity`=".$fldQuantity.",`rate`=".$fldRate.",`amount`=".$fldAmount.",`CostCenter`='".(isset($row["CostCenter"]) ? addslashes($row["CostCenter"]) : "")."',`DateFrom`='".$retDateFrom."',`DateTo`='".$retDateTo."' WHERE id=".$recID;
+					$arrEdit[] = 
+"UPDATE `payroll_employee_account` 
+SET `payroll_employee_ID`=$currentEmployeeId
+,	`payroll_account_ID`='".addslashes($row["payroll_account_ID"])."'
+,	`PayrollDataType`=".$row["PayrollDataType"]."
+,	`account_text`='".(isset($row["account_text"]) ? addslashes($row["account_text"]) : "")."'
+,	`quantity`=".$fldQuantity."
+,	`rate`=".$fldRate."
+,	`amount`=".$fldAmount."
+,	`CostCenter`='".(isset($row["CostCenter"]) ? addslashes($row["CostCenter"]) : "")."'
+,	`DateFrom`='".$retDateFrom."'
+,	`DateTo`='".$retDateTo."' 
+WHERE id=".$recID;
+//communication_interface::alert("calculationDataSave(".print_r($rawData,true)."\n".print_r($arrEdit,true));
 					break;
 				case 'delete':
 					if(!preg_match( '/^[0-9]{1,10}$/', $recID)) $arrErr[] = array("payroll_employee_id"=>$currentEmployeeId, "recid"=>$recID, "field"=>"recid");
@@ -663,11 +681,16 @@ class payroll_BL_calculate {
 			$system_database_manager->executeUpdate($sql, "payroll_calculationDataSave");
 		}
 		if(count($arrAdd)>0) {
-			$sql = "INSERT INTO `payroll_employee_account`(`payroll_employee_ID`,`payroll_account_ID`,`PayrollDataType`,`account_text`,`quantity`,`rate`,`amount`,`max_limit`,`min_limit`,`deduction`,`CostCenter`,`DateFrom`,`DateTo`,`major_period`,`minor_period`,`major_period_bonus`) VALUES".implode(",",$arrAdd);
+			$sql = 
+"INSERT INTO `payroll_employee_account`
+(`payroll_employee_ID`,`payroll_account_ID`,`PayrollDataType`,`account_text`,`quantity`,`rate`,`amount`,`max_limit`,`min_limit`,`deduction`,`CostCenter`,`DateFrom`,`DateTo`,`major_period`,`minor_period`,`major_period_bonus`)
+ VALUES ".implode(",",$arrAdd);
 			$system_database_manager->executeUpdate($sql, "payroll_calculationDataSave");
+communication_interface::alert("payroll_calculate Add\n".$sql."\n\n");
 		}
 		foreach($arrEdit as $sql) {
 			$system_database_manager->executeUpdate($sql, "payroll_calculationDataSave");
+communication_interface::alert("payroll_calculate Edit\n".$sql."\n\n");
 		}
 		$system_database_manager->executeUpdate("COMMIT", "payroll_calculationDataSave");
 

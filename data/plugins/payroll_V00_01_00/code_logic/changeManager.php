@@ -13,7 +13,7 @@ class changeManager {
 		$dedAtSrcSettingsChange = false;
 		$system_database_manager = system_database_manager::getInstance();
 		$uid = session_control::getSessionInfo("id");
-
+		
 		switch($event) {
 		case 'EmployeeChange':
 			$coreFields = $param["affectedFields"]["payroll_employee"];
@@ -90,8 +90,13 @@ class changeManager {
 			$pensiondaysChange = true;
 		}
 
-		if($filterChange) $system_database_manager->executeUpdate("Call payroll_prc_filter_cache(0)", "payroll_changeManager");
-		if($wageCodeChange || $baseWageChange || $insuranceChange || $filterChange || $modifierChange) $system_database_manager->executeUpdate("Call payroll_prc_empl_acc(".$uid.", 0, ".($wageCodeChange?1:0).", ".($baseWageChange?1:0).", ".($insuranceChange?1:0).", ".($filterChange || $modifierChange?1:0).", ".($workdaysChange?1:0).", ".($pensiondaysChange?1:0).")"); //userID INT, internalTransaction TINYINT, wageCodeChange TINYINT, wageBaseChange TINYINT, insuranceChange TINYINT, modifierChange TINYINT, workdaysChange TINYINT, pensiondaysChange TINYINT
+		if($filterChange) {
+			$system_database_manager->executeUpdate("Call payroll_prc_filter_cache(0)", "payroll_changeManager");
+		}
+		if($wageCodeChange || $baseWageChange || $insuranceChange || $filterChange || $modifierChange) {
+			$system_database_manager->executeUpdate(
+			"Call payroll_prc_empl_acc(".$uid.", 0, ".($wageCodeChange?1:0).", ".($baseWageChange?1:0).", ".($insuranceChange?1:0).", ".($filterChange || $modifierChange?1:0).", ".($workdaysChange?1:0).", ".($pensiondaysChange?1:0).")"); 
+		}
 
 		//wenn change nur aufgrund der Aenderung bei einem Employee erfolgt, muessen auch nur dessen Daten neu berechnet werden
 		if($singleEmployeeChange) {
@@ -103,15 +108,27 @@ class changeManager {
 
 			if($proceed) {
 				//WICHTIG... employee darf nur gerechnet werden, wenn processing-Flag (payroll_period_employee) auf 1 steht!!!!
-				$result = $system_database_manager->executeQuery("SELECT `processing` FROM `payroll_period_employee` WHERE `payroll_period_ID`=".$payrollPeriodID." AND `payroll_employee_ID`=".$param["payroll_employee_ID"][0], "payroll_calculate");
-				if(count($result)>0) $proceed = $result[0]["processing"]==1 ? true : false;
-				else $proceed = false;
+				$result = $system_database_manager->executeQuery(
+					"SELECT `processing` FROM `payroll_period_employee` WHERE `payroll_period_ID`=".$payrollPeriodID." AND `payroll_employee_ID`=".$param["payroll_employee_ID"][0], "payroll_calculate");
+				if(count($result)>0) {
+					$proceed = $result[0]["processing"]==1 ? true : false;
+				} else {
+					$proceed = false;
+				}
 			}
 
 			if($proceed) {
-				$system_database_manager->executeUpdate("DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_ID`=".$uid, "payroll_calculate");
-				$system_database_manager->executeUpdate("INSERT INTO `payroll_tmp_change_mng`(`core_user_ID`,`numID`) VALUES(".$uid.",".$param["payroll_employee_ID"][0].")", "payroll_calculate");
-				if($dedAtSrcSettingsChange) $system_database_manager->executeUpdate("UPDATE payroll_period_employee ppe INNER JOIN payroll_period prd ON prd.locked=0 AND prd.finalized=0 AND prd.id=ppe.payroll_period_ID INNER JOIN payroll_tmp_change_mng ptcm ON ppe.payroll_employee_ID=ptcm.numID AND ptcm.core_user_id=".$uid." INNER JOIN payroll_employee emp ON emp.id=ppe.payroll_employee_ID SET ppe.DedAtSrcMode=emp.DedAtSrcMode, ppe.DedAtSrcCanton=emp.DedAtSrcCanton, ppe.DedAtSrcCode=emp.DedAtSrcCode", "payroll_calculate");
+				$system_database_manager->executeUpdate(
+					"DELETE FROM `payroll_tmp_change_mng` WHERE `core_user_ID`=".$uid, "payroll_calculate");
+				$system_database_manager->executeUpdate(
+					"INSERT INTO `payroll_tmp_change_mng`(`core_user_ID`,`numID`) VALUES (".$uid.",".$param["payroll_employee_ID"][0].")", "payroll_calculate");
+				if($dedAtSrcSettingsChange) $system_database_manager->executeUpdate(
+					"UPDATE payroll_period_employee ppe 
+						INNER JOIN payroll_period prd ON prd.locked=0 AND prd.finalized=0 AND prd.id=ppe.payroll_period_ID 
+						INNER JOIN payroll_tmp_change_mng ptcm ON ppe.payroll_employee_ID=ptcm.numID AND ptcm.core_user_id=".$uid." 
+						INNER JOIN payroll_employee emp ON emp.id=ppe.payroll_employee_ID 
+					SET ppe.DedAtSrcMode=emp.DedAtSrcMode, ppe.DedAtSrcCanton=emp.DedAtSrcCanton, ppe.DedAtSrcCode=emp.DedAtSrcCode"
+					, "payroll_calculate");
 				require_once('payroll_calculate.php');
 				$calcs = new payroll_BL_calculate();
 				$calcs->calculate(false); //$calculateAll=false (calculate just one employee)

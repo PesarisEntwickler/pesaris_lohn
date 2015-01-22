@@ -628,9 +628,9 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			return $response;
 		}
 		$id = $param["rid"];
-
+//communication_interface::alert("callbackEmployeeDetail param[fieldName] = \n".print_r($param,true));
 		require_once('chkDate.php');
-		$chkDate = new chkDate();
+		$chkDate = new chkDate("1970-01-01", 0, "");
 		
 		$returnFieldValuePairs = array();
 		switch($param["fieldName"]) {
@@ -745,8 +745,10 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			return $response;
 		}
 
+//communication_interface::alert("saveEmployeeDetail rawFieldData:\n".print_r($rawFieldData,true));
+		
 		require_once('chkDate.php');
-		$chkDate = new chkDate("2013-01-01", 9);
+		$chkDate = new chkDate("1970-01-01", 9);
 
 		$system_database_manager = system_database_manager::getInstance();
 		///////////////////////////////////////////////////
@@ -755,9 +757,12 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		///////////////////////////////////////////////////
 		if($id==0) { // && count($rawFieldData)>0
 			$arrFieldName = array();
-//			foreach($rawFieldData as $name => $value) $arrFieldName[] = "'".addslashes($name)."'";
-//			$result = $system_database_manager->executeQuery("SELECT * FROM payroll_employee_field_def WHERE fieldName IN (".implode(",", $arrFieldName).") AND mandatory=1", "payroll_getEmployeeDetail");
-			$result = $system_database_manager->executeQuery("SELECT fieldName FROM payroll_employee_field_def WHERE fieldName!='id' AND mandatory=1 AND `read-only`=0 AND fieldName NOT LIKE 'tbl%'", "payroll_saveEmployeeDetail");
+			$result = $system_database_manager->executeQuery(
+				"SELECT fieldName FROM payroll_employee_field_def 
+				WHERE fieldName!='id' AND mandatory=1 AND `read-only`=0 AND fieldName NOT LIKE 'tbl%'"
+					, "payroll_saveEmployeeDetail");
+			//communication_interface::alert("saveEmployeeDetail result:\n".print_r($result,true));
+				
 			foreach($result as $row) {
 				if(!isset($rawFieldData[$row["fieldName"]]) || $rawFieldData[$row["fieldName"]]=="") $arrFieldName[] = $row["fieldName"];
 			}
@@ -773,42 +778,19 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		///////////////////////////////////////////////////
 		// get field properties for pending checks
 		///////////////////////////////////////////////////
-/*
-		$arrFieldName = array();
-		$tablesUsed = array();
-//		foreach($rawFieldData as $name => $value) $arrFieldName[] = "'".addslashes($name)."'";
-		foreach($rawFieldData as $name => $value) {
-			if(is_array($value)) {
-				foreach($value as $subelement) {
-					foreach($subelement as $subName=>$subValue) {
-						if($subName!="id") $arrFieldName[] = "'".addslashes($name)."'";
-					}
-				}
-			}else{
-				$arrFieldName[] = "'".addslashes($name)."'";
-			}
-		}
-		$arrFieldName = array_unique($arrFieldName); //remove duplicate field names (if any)
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_employee_field_def WHERE fieldName IN (".implode(",", $arrFieldName).") AND `read-only`=0", "payroll_saveEmployeeDetail");
-*/
 		$arrFormFieldName[] = array();
 		$arrTableName[] = array();
-//		$arrTableFieldName[] = array();
 		foreach($rawFieldData as $name => $value) {
 			if(is_array($value)) {
 				if(count($value)>0) $arrTableName[] = $name;
-//				foreach($value as $subelement) {
-//					foreach($subelement as $subName=>$subValue) {
-//						if($subName!="id") $arrTableFieldName[] = $subName;
-//					}
-//				}
 			}else{
 				$arrFormFieldName[] = $name;
 			}
 		}
-//		$arrTableFieldName = array_unique($arrTableFieldName); //remove duplicate field names (if any)
 		$tableset = array();
-		$result = $system_database_manager->executeQuery("SELECT * FROM payroll_employee_field_def WHERE `read-only`=0", "payroll_saveEmployeeDetail");
+		$result = $system_database_manager->executeQuery(
+			"SELECT * FROM payroll_employee_field_def 
+			WHERE `read-only`=0", "payroll_saveEmployeeDetail");
 		foreach($result as $row) {
 			if(in_array($row["fieldName"], $arrFormFieldName)) {
 				$fieldset[$row["fieldName"]]["properties"] = $row;
@@ -820,14 +802,14 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		}
 //error_log("\n\n".print_r($fieldset,true)."\n\n", 3, "/var/log/copronet-application.log");
 //error_log("\n\n".print_r($tableset,true)."\n\n", 3, "/var/log/copronet-application.log");
-//communication_interface::alert("4***"); //TODO: remove!
 		///////////////////////////////////////////////////
 		// checking all submitted fields if they are mandatory
 		///////////////////////////////////////////////////
 		$arrFieldName = array();
 		foreach($fieldset as $fieldName=>$fieldDetail) {
-//			if(isset($fieldDetail["mandatory"]) && $fieldDetail["mandatory"]==1 && trim($rawFieldData[$fieldName])=="") $arrFieldName[] = $fieldName;
-			if(isset($fieldDetail["properties"]["mandatory"]) && $fieldDetail["properties"]["mandatory"]==1 && trim($rawFieldData[$fieldName])=="") $arrFieldName[] = $fieldName;
+			if(isset($fieldDetail["properties"]["mandatory"]) && $fieldDetail["properties"]["mandatory"]==1 && trim($rawFieldData[$fieldName])=="") {
+				$arrFieldName[] = $fieldName;
+			}
 		}
 		if(count($arrFieldName)>0) {
 			$response["success"] = false;
@@ -836,7 +818,6 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			$response["fieldNames"] = $arrFieldName;
 			return $response;
 		}
-//communication_interface::alert("5***"); //TODO: remove!
 
 		///////////////////////////////////////////////////
 		// checking all submitted fields for validity
@@ -845,7 +826,6 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		$arrFieldName = array();
 		foreach($fieldset as $fieldName=>$fieldDetail) {
 			$curRawValue = $rawFieldData[$fieldName];
-//			if(isset($fieldDetail["fieldType"])) {
 				switch($fieldDetail["properties"]["fieldType"]) {
 				case 1: //Text
 					if($curRawValue!= "" && $fieldDetail["properties"]["regexPattern"]!="") {
@@ -856,7 +836,6 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 					break;
 				case 2: //Checkbox
 				case 3: //Number
-	//				if(trim($curRawValue)=="") $curRawValue="0";
 					if($fieldDetail["properties"]["regexPattern"]!="") $regex = $fieldDetail["properties"]["regexPattern"];
 					else $regex = "/^-?[0-9]{1,9}(\.[0-9]{1,6})?$/";
 
@@ -883,7 +862,7 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 					}else $arrFieldName[] = $fieldName;
 					break;
 				}
-//			}
+
 /*
 		spezielle felder und sonderf�lle:
 		-> Tabellen
@@ -895,11 +874,13 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		$arrFieldName = array_unique($arrFieldName); //remove duplicate field names (if any)
 		if(count($arrFieldName)>0) {
 			$response["success"] = false;
-			$response["errCode"] = 40;
+			$response["errCode"] = 41;
 			$response["errText"] = "validity check failed";
 			$response["fieldNames"] = $arrFieldName;
-			return $response;
+// 			return $response;
 		}
+//communication_interface::alert("arrFieldName : ".print_r($arrFieldName, true));
+//communication_interface::alert("fieldset : ".print_r($fieldset, true));
 //error_log("\n".print_r($fieldset,true)."\n", 3, "/var/log/copronet-application.log");
 //error_log("\n".print_r($arrFieldName,true)."\n", 3, "/var/log/copronet-application.log");
 
@@ -1074,16 +1055,24 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		if($id>0) {
 			$affectedFields["payroll_employee_children"] = $system_database_manager->executeQuery("SELECT * FROM payroll_employee_children WHERE payroll_employee_ID=".$id." ORDER BY id", "payroll_saveEmployeeDetail");
 			$sqlFields = array();
-			foreach($fieldset as $fieldName=>$fieldDetail) if(isset($fieldDetail["value"])) $sqlFields[] = "`".$fieldName."`=".$fieldDetail["value"];
+			foreach($fieldset as $fieldName=>$fieldDetail){
+				if(isset($fieldDetail["value"])) {
+					$sqlFields[] = "`".$fieldName."`=".$fieldDetail["value"];
+				}
+			}
 			$sql = "UPDATE payroll_employee SET ".implode(",", $sqlFields)." WHERE id=".$id;
-		}else{
+		} else {
 			$changeMode = "NEW";
 			$sqlFields = array();
 			$sqlValues = array();
 			foreach($fieldset as $fieldName=>$fieldDetail) {
 				if(isset($fieldDetail["value"])) {
 					$sqlFields[] = "`".$fieldName."`";
-					$sqlValues[] = $fieldDetail["value"];
+					$value = $fieldDetail["value"];
+					if (strlen($value) < 1) {
+						$value = "''";
+					}
+					$sqlValues[] = $value;
 					$affectedFields["payroll_employee"][] = $fieldName;
 				}
 			}
@@ -1091,11 +1080,17 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		}
 		$system_database_manager->executeUpdate("BEGIN", "payroll_saveEmployeeDetail");
 		if(count($sqlFields)>0) {
-			if($changeMode=="EDIT") $snapshotBefore = $system_database_manager->executeQuery("SELECT * FROM payroll_employee WHERE id=".$id, "payroll_saveEmployeeDetail");
-			$system_database_manager->executeUpdate($sql, "payroll_saveEmployeeDetail"); //TODO: Profiling hat ergeben, dass UPDATE Statement alleine schon 20 - 40 ms zur Ausfaehrung benoetigt... kann man das noch optimieren?
+			if($changeMode=="EDIT") $snapshotBefore = $system_database_manager->executeQuery(
+"SELECT * FROM payroll_employee WHERE id=".$id, "payroll_saveEmployeeDetail");
+			$system_database_manager->executeUpdate($sql, "payroll_saveEmployeeDetail");
 			if($id==0) $id = $system_database_manager->getLastInsertId();
 
-			$resDate = $system_database_manager->executeQuery("SELECT CONCAT(payroll_year_ID,'-',major_period,'-01') as datePeriodStart, LAST_DAY(CONCAT(payroll_year_ID,'-',major_period,'-01')) as datePeriodEnd FROM payroll_period WHERE major_period<13 ORDER BY payroll_year_ID DESC, major_period DESC LIMIT 1", "payroll_saveEmployeeDetail");
+			$resDate = $system_database_manager->executeQuery(
+"SELECT CONCAT(payroll_year_ID,'-',major_period,'-01') as datePeriodStart
+, LAST_DAY(CONCAT(payroll_year_ID,'-',major_period,'-01')) as datePeriodEnd 
+FROM payroll_period WHERE major_period<13 
+ORDER BY payroll_year_ID DESC, major_period DESC LIMIT 1"
+, "payroll_saveEmployeeDetail");
 			if(count($resDate)<1) {
 				$response["success"] = false;
 				$response["errCode"] = 666;
@@ -1117,12 +1112,22 @@ YearsOfService=YEAR(CURDATE())-YEAR(SeniorityJoining),
 MonthsOfService=MONTH(CURDATE())-MONTH(SeniorityJoining) 
 WHERE id=".$id;
 			$system_database_manager->executeUpdate($sql, "payroll_saveEmployeeDetail");
-			$system_database_manager->executeUpdate("UPDATE payroll_employee SET YearsOfService=YearsOfService-1, MonthsOfService=MonthsOfService+12 WHERE id=".$id." AND MonthsOfService<0", "payroll_saveEmployeeDetail");
-			$system_database_manager->executeUpdate("UPDATE payroll_employee SET YearsOfService=0, MonthsOfService=0 WHERE id=".$id." AND YearsOfService<0", "payroll_saveEmployeeDetail");
+			$system_database_manager->executeUpdate(
+"UPDATE payroll_employee 
+SET YearsOfService=YearsOfService-1
+, MonthsOfService=MonthsOfService+12 
+WHERE id=".$id." AND MonthsOfService<0", "payroll_saveEmployeeDetail");
+			$system_database_manager->executeUpdate(
+"UPDATE payroll_employee 
+SET YearsOfService=0, MonthsOfService=0 
+WHERE id=".$id." AND YearsOfService<0", "payroll_saveEmployeeDetail");
 			if($changeMode=="EDIT") {
-				$snapshotAfter = $system_database_manager->executeQuery("SELECT * FROM payroll_employee WHERE id=".$id, "payroll_saveEmployeeDetail");
+				$snapshotAfter = $system_database_manager->executeQuery(
+"SELECT * FROM payroll_employee WHERE id=".$id, "payroll_saveEmployeeDetail");
 				$diff = array_diff_assoc($snapshotBefore[0], $snapshotAfter[0]);
-				foreach($diff as $diffFieldName=>$diffFieldValue) $affectedFields["payroll_employee"][] = $diffFieldName;
+				foreach($diff as $diffFieldName=>$diffFieldValue) {
+					$affectedFields["payroll_employee"][] = $diffFieldName;
+				}
 			}
 		} else {
 			$response["success"] = false;
@@ -1179,23 +1184,31 @@ WHERE id=".$id;
 						foreach($tblData["UPDATE"] as $rec) $arrSQL[] = "UPDATE ".$tblName." SET ".$rec[1]." WHERE id=".$rec[0];
 					}
 				}
-//error_log("\n".date("c").": ".print_r($arrSQL,true)."\n", 3, "/var/log/copronet-application.log");
-				foreach($arrSQL as $sql) $system_database_manager->executeUpdate($sql, "payroll_saveEmployeeDetailTbl");
+				//communication_interface::alert(print_r($arrSQL, true));
+				foreach($arrSQL as $sql) {
+					$system_database_manager->executeUpdate($sql, "payroll_saveEmployeeDetailTbl");
+				}
 			}
 		}
 		/// END: Save table content
 
-		$resChldDiff = $system_database_manager->executeQuery("SELECT * FROM payroll_employee_children WHERE payroll_employee_ID=".$id." ORDER BY id", "payroll_saveEmployeeDetail");
+		$resChldDiff = $system_database_manager->executeQuery(
+			"SELECT * FROM payroll_employee_children WHERE payroll_employee_ID=".$id." ORDER BY id", "payroll_saveEmployeeDetail");
 		if($affectedFields["payroll_employee_children"]!=$resChldDiff) {
-			//TODO: Die Ermittlung der Differenz (alle Zeilen innerhalb dieses IFs, ist noch nicht optimal und muss ggf. komplett aeberarbeitet werden. Auch die Funktion array_diff_assoc_recursive...
 			$chldDiff = $this->array_diff_assoc_recursive($affectedFields["payroll_employee_children"], $resChldDiff);
 			if(count($chldDiff)==0) $chldDiff = array("undefined diff");
 			$affectedFields["payroll_employee_children"] = $chldDiff;
-		}else $affectedFields["payroll_employee_children"] = array();
+		} else $affectedFields["payroll_employee_children"] = array();
 
 		require_once('changeManager.php');
 		$changeManager = new changeManager("","");				
-		$changeManager->changeManager("EmployeeChange", array("payroll_employee_ID" => array($id), "affectedFields" => $affectedFields, "activeTransaction"=>true, "chageMode"=>$changeMode)); //Bei INSERT+DELETE sind alle Fields affected, nur bei UPDATE muessen wir genau ermitteln, welche Felder geändert wurden
+		$changeManager->changeManager(
+				"EmployeeChange"
+				, array("payroll_employee_ID" => array($id)
+				, "affectedFields" => $affectedFields
+				, "activeTransaction"=>true
+				, "chageMode"=>$changeMode)); 
+		//Bei INSERT+DELETE sind alle Fields affected, nur bei UPDATE muessen wir genau ermitteln, welche Felder geändert wurden
 
 		$system_database_manager = system_database_manager::getInstance();
 		$system_database_manager->executeUpdate("COMMIT", "payroll_saveEmployeeDetail");
