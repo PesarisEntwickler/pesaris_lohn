@@ -1,7 +1,12 @@
 Noch offen: 
 	- (halb-)automatisches? Transferprogramm für update SRV2 -> SRV1
+
+2015-02-21
+-		
+	
 2015-01-22
 -	BugFix. Speichern Versicherungscode ging nicht.
+-	Speichern bei Lohndaten bearbeiten.
 2015-01-13
 -	BugFix für das Speichern eines Mitarbeiters bei der Neuerfassung
 

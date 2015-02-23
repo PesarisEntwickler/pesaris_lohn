@@ -329,31 +329,52 @@
 
 <wgui:block name="prlFormCfgCmpc">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
-		<input type="hidden" id="prlFormCfg_rid"/>
-		<label for="prlFormCfg_company_shortname"><wgui:text id="prlFormCfg_company_shortname"/>:</label>
-			<input type="text" id="prlFormCfg_company_shortname" style="width: 194px; padding: 0 3px 0 3px;"/> 
-			<input type="text" id="prlFormCfg_id" style="width: 25px; font-weight: bold; text-align: center;" disabled="disabled"/>
-		<br/>
-		<label for="prlFormCfg_HR_RC_Name"><wgui:text id="prlFormCfg_HR_RC_Name"/>:</label>
-			<input type="text" id="prlFormCfg_HR_RC_Name"/>
-		<br/>
-		<label for="prlFormCfg_Street"><wgui:text id="prlFormCfg_Street"/>:</label>
-			<input type="text" id="prlFormCfg_Street"/>
-		<br/>
-		<label for="prlFormCfg_ZIP_Code"><wgui:text id="txtPlzOrt"/>:</label>
-			<input type="text" id="prlFormCfg_ZIP_Code" style="width: 60px;"/>
-			<input type="text" id="prlFormCfg_City" style="width: 164px;"/>
-		<br/>
-		<label for="prlFormCfg_UID_EHRA"><wgui:text id="prlFormCfg_UID_EHRA"/>:</label>
-			<input type="text" id="prlFormCfg_UID_EHRA"/>
-		<br/>
-		<label for="prlFormCfg_BUR_REE_Number"><wgui:text id="prlFormCfg_BUR_REE_Number"/>:</label>
-			<input type="text" id="prlFormCfg_BUR_REE_Number"/>
-		<br/>
-		<br/>
+	<table>
+	<tr>
+		<td>
+			<input type="hidden" id="prlFormCfg_rid"/>
+			<label for="prlFormCfg_company_shortname"><wgui:text id="prlFormCfg_company_shortname"/>:</label>
+				<input type="text" id="prlFormCfg_company_shortname" style="width: 194px; padding: 0 3px 0 3px;"/> 
+				<input type="text" id="prlFormCfg_id" style="width: 25px; font-weight: bold; text-align: center;" disabled="disabled"/>
+			<br/>
+			<label for="prlFormCfg_HR_RC_Name"><wgui:text id="prlFormCfg_HR_RC_Name"/>:</label>
+				<input type="text" id="prlFormCfg_HR_RC_Name"/>
+			<br/>
+			<label for="prlFormCfg_Street"><wgui:text id="prlFormCfg_Street"/>:</label>
+				<input type="text" id="prlFormCfg_Street"/>
+			<br/>
+			<label for="prlFormCfg_ZIP_Code"><wgui:text id="txtPlzOrt"/>:</label>
+				<input type="text" id="prlFormCfg_ZIP_Code" style="width: 60px;"/>
+				<input type="text" id="prlFormCfg_City" style="width: 164px;"/>
+			<br/>
+			<label for="prlFormCfg_UID_EHRA"><wgui:text id="prlFormCfg_UID_EHRA"/>:</label>
+				<input type="text" id="prlFormCfg_UID_EHRA"/>
+			<br/>
+			<label for="prlFormCfg_BUR_REE_Number"><wgui:text id="prlFormCfg_BUR_REE_Number"/>:</label>
+				<input type="text" id="prlFormCfg_BUR_REE_Number"/>
+		</td>
+		<td>
+			<br/>
+			<fieldset>
+				<legend><wgui:text id="txtKontaktperson"/>:</legend>
+			<br/>
+				<label for="prlFormCfg_ContactPers_Name" style="width:100px;"><wgui:text id="prlFormCfg_ContactPers_Name"/>:</label>
+					<input type="text" id="prlFormCfg_ContactPers_Name" maxlength="45" style="width:160px;"/>
+				<br/>
+				<label for="prlFormCfg_ContactPers_Tel" style="width:100px;"><wgui:text id="prlFormCfg_ContactPers_Tel"/>:</label>
+					<input type="text" id="prlFormCfg_ContactPers_Tel" maxlength="45" style="width:160px;"/>
+				<br/>
+				<label for="prlFormCfg_ContactPers_eMail" style="width:100px;"><wgui:text id="prlFormCfg_ContactPers_eMail"/>:</label>
+					<input type="text" id="prlFormCfg_ContactPers_eMail" maxlength="45" style="width:160px;"/>
+				<br/>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
 		<label for="selZahlstelle"><wgui:text id="txtZahlstellen"/>:</label>
 		<br/>
-			<select id="selZahlstelle" name="selZahlstelle" style="width:650px; margin-bottom:4px;" size="4"  >
+			<select id="selZahlstelle" name="selZahlstelle" style="width:100%; margin-bottom:4px;" size="4"  >
 				<wgui:loop name="zahlstellenLoop" varname="zahlstellen_list">
 					<option value="<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>">
 					  [z<wgui:loopvar loopname="zahlstellenLoop" varname="zsID"/>]&nbsp;
@@ -370,6 +391,9 @@
 				</wgui:loop name="zahlstellenLoop">
 			</select>
 			<br/>
+		</td>
+	</tr>
+	</table>
 		
 	</div>
 	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnClose"/></button>
@@ -562,34 +586,46 @@
 <wgui:block name="prlFormCfgDascGlob">
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI prlDasGlobal">
 		<input type="hidden" id="prlFormCfg_id" />
-		<fieldset class="prlDasGlobalFsr">
-			<legend>Lohnarten f&uuml;r den Jahresausgleich</legend>
-			<label for="prlFormCfg_AccountType9">QST-Gutschrift (aktuelle Periode)</label><input type="text" id="prlFormCfg_AccountType9" tabindex="7" /><br/>
-			<label for="prlFormCfg_AccountType16">QST-Abzug (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType16" tabindex="8" /><br/>
-			<label for="prlFormCfg_AccountType17">QST-Gutschrift (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType17" tabindex="9" /><br/>
-			<label for="prlFormCfg_AccountType13">QST-Basis f. JAG kumuliert</label><input type="text" id="prlFormCfg_AccountType13" tabindex="10" /><br/>
-			<label for="prlFormCfg_AccountType14">Satzbest. Einkommen JAG</label><input type="text" id="prlFormCfg_AccountType14" tabindex="11" /><br/>
-			<label for="prlFormCfg_AccountType15">Satzbest. Einkommen JAG (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType15" tabindex="12" /><br/>
-			<label for="prlFormCfg_AccountType12">Besch&auml;ftigungsfaktor kumuliert</label><input type="text" id="prlFormCfg_AccountType12" tabindex="13" /><br/>
-		</fieldset>
-		<fieldset>
-			<legend>Allgemeine QST-Lohnarten</legend>
-			<label for="prlFormCfg_AccountType7">QST-Abzug</label><input type="text" id="prlFormCfg_AccountType7" tabindex="1" /><br/>
-		</fieldset>
-		<fieldset>
-			<legend>Lohnarten f&uuml;r die Satzbestimmung</legend>
-			<label for="prlFormCfg_AccountType5">Satzbestimmendes Einkommen</label><input type="text" id="prlFormCfg_AccountType5" tabindex="2" /><br/>
-			<label for="prlFormCfg_AccountType3">Arbeitstage (30-Tage-Regel)</label><input type="text" id="prlFormCfg_AccountType3" tabindex="3" /><br/>
-			<label for="prlFormCfg_AccountType4">Arbeitstage (effektive Tage)</label><input type="text" id="prlFormCfg_AccountType4" tabindex="4" /><br/>
-			<label for="prlFormCfg_AccountType6">Besch&auml;ftigungsfaktor</label><input type="text" id="prlFormCfg_AccountType6" tabindex="5" /><br/>
-		</fieldset>
-		<fieldset>
-			<legend>Netto-Brutto-Aufrechnung QST</legend>
-			<label for="prlFormCfg_AccountType11">Netto-Brutto-Aufrechnung</label><input type="text" id="prlFormCfg_AccountType11" tabindex="6" /><br/>
-		</fieldset>
+		<table>
+		<tr>
+			<td>
+				<fieldset>
+					<legend>Allgemeine QST-Lohnarten</legend>
+					<label for="prlFormCfg_AccountType7">QST-Abzug</label><input type="text" id="prlFormCfg_AccountType7" tabindex="1" /><br/>
+				</fieldset>
+				<fieldset>
+					<legend>Lohnarten f&uuml;r die Satzbestimmung</legend>
+					<label for="prlFormCfg_AccountType5">Satzbestimmendes Einkommen</label><input type="text" id="prlFormCfg_AccountType5" tabindex="2" /><br/>
+					<label for="prlFormCfg_AccountType3">Arbeitstage (30-Tage-Regel)</label><input type="text" id="prlFormCfg_AccountType3" tabindex="3" /><br/>
+					<label for="prlFormCfg_AccountType4">Arbeitstage (effektive Tage)</label><input type="text" id="prlFormCfg_AccountType4" tabindex="4" /><br/>
+					<label for="prlFormCfg_AccountType6">Besch&auml;ftigungsfaktor</label><input type="text" id="prlFormCfg_AccountType6" tabindex="5" /><br/>
+				</fieldset>
+				<fieldset>
+					<legend>Netto-Brutto-Aufrechnung QST</legend>
+					<label for="prlFormCfg_AccountType11">Netto-Brutto-Aufrechnung</label><input type="text" id="prlFormCfg_AccountType11" tabindex="6" /><br/>
+				</fieldset>
+			</td>
+			<td>
+				<fieldset class="prlDasGlobalFsr">
+					<legend>Lohnarten f&uuml;r den Jahresausgleich</legend>
+					<label for="prlFormCfg_AccountType9">QST-Gutschrift (aktuelle Periode)</label><input type="text" id="prlFormCfg_AccountType9" tabindex="7" /><br/>
+					<label for="prlFormCfg_AccountType16">QST-Abzug (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType16" tabindex="8" /><br/>
+					<label for="prlFormCfg_AccountType17">QST-Gutschrift (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType17" tabindex="9" /><br/>
+					<label for="prlFormCfg_AccountType13">QST-Basis f. JAG kumuliert</label><input type="text" id="prlFormCfg_AccountType13" tabindex="10" /><br/>
+					<label for="prlFormCfg_AccountType14">Satzbest. Einkommen JAG</label><input type="text" id="prlFormCfg_AccountType14" tabindex="11" /><br/>
+					<label for="prlFormCfg_AccountType15">Satzbest. Einkommen JAG (Vorperiode)</label><input type="text" id="prlFormCfg_AccountType15" tabindex="12" /><br/>
+					<label for="prlFormCfg_AccountType12">Besch&auml;ftigungsfaktor kumuliert</label><input type="text" id="prlFormCfg_AccountType12" tabindex="13" /><br/>
+				</fieldset>
+				<fieldset class="prlDasGlobalZulagen" style="float: right;">
+					<legend>Zulagen QST</legend>
+					<label for="prlFormCfg_AccountType18">Zulagen</label><input type="text" id="prlFormCfg_AccountType18" tabindex="14" /><br/>
+				</fieldset>
+			</td>
+		</tr>
+		</table>
 	</div>
 	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnClose"/></button>
-	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgSave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="prlFormCfgDascGlob">
 
 
@@ -625,22 +661,23 @@
 			<option value="ZG">ZG</option>
 			<option value="ZH">ZH</option>
 		</select></br>
-		<fieldset class="dascntAddr">
+		<fieldset class="dascntAddr" style="width: 95%">
 			<legend>Steuerverwaltung</legend>
-			<label for="prlFormCfg_TaxAdminName">Name</label><input type="text" id="prlFormCfg_TaxAdminName" /><br/>
-			<label for="prlFormCfg_TaxAdminStreet">Strasse</label><input type="text" id="prlFormCfg_TaxAdminStreet" /><br/>
-			<label for="prlFormCfg_TaxAdminZIP">PLZ/Ort</label><input type="text" id="prlFormCfg_TaxAdminZIP" /><input type="text" id="prlFormCfg_TaxAdminCity" /><br/>
+			<label for="prlFormCfg_TaxArbeitgeberNummer">Arbeitgebernummer:</label><input type="text" id="prlFormCfg_TaxArbeitgebernummer" /><br/>
+			<label for="prlFormCfg_TaxAdminName">Name:</label><input type="text" id="prlFormCfg_TaxAdminName" /><br/>
+			<label for="prlFormCfg_TaxAdminStreet">Strasse:</label><input type="text" id="prlFormCfg_TaxAdminStreet" /><br/>
+			<label for="prlFormCfg_TaxAdminZIP">PLZ/Ort:</label><input type="text" id="prlFormCfg_TaxAdminZIP" /><input type="text" id="prlFormCfg_TaxAdminCity" /><br/>
 		</fieldset>
-		<fieldset class="dascntSetting">
+		<fieldset class="dascntSetting" style="width: 95%">
 			<legend>Einstellungen</legend>
-			<label for="prlFormCfg_AnnualSettlementMode">Jahresausgleich</label><select id="prlFormCfg_AnnualSettlementMode"><option value="0">Nein</option><option value="1">Ja</option></select><br/>
-			<label for="prlFormCfg_DaysPerMonth">Arbeitstage</label><select id="prlFormCfg_DaysPerMonth"><option value="0">30-Tage-Regel</option><option value="1">effektive Tage</option></select><br/>
-			<label for="prlFormCfg_commission">Provision</label><input type="text" id="prlFormCfg_commission" /> %<br/>
+			<label for="prlFormCfg_AnnualSettlementMode">Jahresausgleich:</label><select id="prlFormCfg_AnnualSettlementMode"><option value="0">Nein</option><option value="1">Ja</option></select><br/>
+			<label for="prlFormCfg_DaysPerMonth">Arbeitstage:</label><select id="prlFormCfg_DaysPerMonth"><option value="0">30-Tage-Regel</option><option value="1">effektive Tage</option></select><br/>
+			<label for="prlFormCfg_commission">Provision:</label><input type="text" id="prlFormCfg_commission" /> %<br/>
 		</fieldset><br/>
-		<fieldset class="dascntAcc">
+		<fieldset class="dascntAcc" style="width: 95%">
 			<legend>Zugewiesene Lohnarten</legend>
-			<label for="prlFormCfg_dasacc1">QST-Basis f&uuml;r Jahresausgleich</label><input type="text" id="prlFormCfg_dasacc1" /><br/>
-			<label for="prlFormCfg_dasacc2">QST-Basis satzbestimmend</label><input type="text" id="prlFormCfg_dasacc2" /><br/>
+			<label for="prlFormCfg_dasacc1">QST-Basis f&uuml;r Jahresausgleich:</label><input type="text" id="prlFormCfg_dasacc1" /><br/>
+			<label for="prlFormCfg_dasacc2">QST-Basis satzbestimmend:</label><input type="text" id="prlFormCfg_dasacc2" /><br/>
 		</fieldset>
 	</div>
 	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnClose"/></button>
@@ -653,13 +690,13 @@
 		<form id="prlCfgDascUplRtFrm" enctype="multipart/form-data" action="rcvfile.php" method="POST" target="dlFrame">
 			<input type="hidden" name="MAX_FILE_SIZE" value="<wgui:var name="MAX_FILE_SIZE"/>" />
 			Tarifdatei ausw&auml;hlen:<br/>
-			<input name="rcvfile" type="file" /><br/>
+			<input name="rcvfile" type="file" style="background-color: #ffa;"/><br/>
 			Bemerkung: Stellen Sie bitte sicher, dass Sie nur Dateien mit der Endung .txt einlesen.
 			<input type="hidden" name="param" value="<wgui:var name="param"/>" />
 		</form>
 	</div>
-	<button class="PesarisButton" id="prlFormCfgSave"><wgui:text id="btnSave"/></button>
-	<button class="PesarisButton" id="prlFormCfgCancel" style="float: right;"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlFormCfgSave" style="float: right;"><wgui:text id="btnSave"/></button>
 	<div id="prlCfgDascUplRtWait"><img src="web/img/working.gif" /></div>
 </wgui:block name="prlCfgDascUplRt">
 

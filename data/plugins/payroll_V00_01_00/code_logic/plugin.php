@@ -43,6 +43,10 @@ class payroll_BL {
 		
 		require_once('payroll_reports.php');
 		$reports = new payroll_BL_reports();		
+
+		require_once('payroll_quellensteuer_abrechnung.php');
+		$qstAuswertg = new payroll_quellensteuerAbrechnung();
+		
 		
 		switch($functionName) {
 			
@@ -55,7 +59,9 @@ class payroll_BL {
 			 
 		case 'payroll.auszahlen.GenerateDataFiles':
 			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1], $functionParameters[2]);
-
+		case 'payroll.getQuellensteuerAbrechnung':
+			return $qstAuswertg->getQuellensteuerAbrechnung($functionParameters[0]);
+					
 		case 'payroll.auszahlen.getAuszahlMitarbeiteranzahl':
 			return $auszahlen->getAuszahlMitarbeiteranzahl();
 		case 'payroll.auszahlen.getCalculationCurrentPeriodEmployeeList':
@@ -179,11 +185,6 @@ class payroll_BL {
 			return $variousFunctions->saveCurrencyForexRate($functionParameters[0],$functionParameters[1]);//"EUR", "1.2222"
 		case 'payroll.prepareCalculation':
 			return $variousFunctions->prepareCalculation($functionParameters[0]);
-//		case 'payroll.getpayrollountFormOverview':
-//			require_once('payroll-fin.php');
-//			$payrollfin = new payroll_BL_fin();
-//			return $payrollfin->getpayrollountForm($functionParameters[0], $functionParameters[1], $functionParameters[2], $functionParameters[3]); //$parampayrollountNumber, $bMonthlySummary, $bAllEntries, $arrYearMonth
-//			break;
 
 		case 'payroll.getEmployee':
 			return $employee->getEmployee($functionParameters[0]);
@@ -326,8 +327,7 @@ class payroll_BL {
 			return $payslip->savePayslipNotifications($functionParameters[0]);
 
 		case 'payroll.calculationReport':
-//			communication_interface::alert("payroll.calculationReport\n".print_r($functionParameters,true));
-				
+//			communication_interface::alert("payroll.calculationReport\n".print_r($functionParameters,true));				
 				switch($functionParameters[0]) {
 				case 'GenerateAuszahlenReports':
 					//communication_interface::alert("generate");

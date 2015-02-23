@@ -51,7 +51,10 @@ class auszahlen {
 					, "land"=>$result_company[0]["Country"]
 					, "uid" =>$result_company[0]["UID-EHRA"]
 					, "bur" =>$result_company[0]["BUR-REE-Number"]
-					);		 
+					, "cnam" =>$result_company[0]["ContactPers-Name"]
+					, "ctel" =>$result_company[0]["ContactPers-Tel"]
+					, "cmail" =>$result_company[0]["ContactPers-eMail"]
+		);		 
 	}
 	
 	public function getZahlstelle($ZahlstellenID) { 

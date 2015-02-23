@@ -327,7 +327,7 @@ function prlVlSave() {
 			});
 			retObj.push({'tabName':$(this).find('a').text(), 'tabID':tabID, 'tabRow':tabRow, 'elements':elementsUsed});
 		});
-//		alert(retObj.toSource()); //TODO: löschen, da nur zu Testzwecken...
+
 		cb("payroll.prlVlSaveFormLayout",{"layoutID":prlVlDesignParam.lid,"layoutName":prlVlDesignParam.lname,"layoutTmp":prlVlDesignParam.tmp,"layoutGlob":prlVlDesignParam.glob,"layoutElements":retObj});
 	}else{
 		var jsonItem = {};
@@ -364,7 +364,6 @@ function prlVlSave() {
 			});
 		});
 		cb("payroll.prlVlSaveFormData",{"rid":prlVlRid,"data":jsonItem});
-//		alert(jsonItem.toSource()); //TODO: löschen, da nur zu Testzwecken...
 	}
 }
 
@@ -833,7 +832,7 @@ function prlCfgOpenMainWindow() {
 	}
 }
 
-var prlCfg = {	'CfgCmpc':{ 'BtnNew':{'obj':'btn','available':true,'function':function() { cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'0'}); }}, 'BtnQFilter':{'obj':'btn','available':true,'function':function() { prlCfgToggleFilterRow(); }}, 'BtnSaveSettings':{'obj':'btn','available':true,'function':function() { prlCfgSaveSettings(); }}, 'BtnInsr':{'obj':'btn','available':false,'function':null}, 'BtnCode':{'obj':'btn','available':false,'function':null}, 'BtnFinMgmtAcc':{'obj':'btn','available':false,'function':0}, 'BtnFldMod':{'obj':'btn','available':false,'function':null}, 'BtnSettings':{'obj':'btn','available':false,'function':null}, 'MnuEdit':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':rid}); }}, 'MnuDelete':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormDelete',{'section':'CfgCmpc','id':rid}); }}, 'grid':{'obj':'grid','available':true,'data':[], 'gridObj':null, 'dataView':null, 'columnFilters':{}, 'columns':[]} }, 
+var prlCfg = {	'CfgCmpc':{ 'BtnNew':{'obj':'btn','available':true,'function':function() { cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'-1', 'src':'mnu'}); }}, 'BtnQFilter':{'obj':'btn','available':true,'function':function() { prlCfgToggleFilterRow(); }}, 'BtnSaveSettings':{'obj':'btn','available':true,'function':function() { prlCfgSaveSettings(); }}, 'BtnInsr':{'obj':'btn','available':false,'function':null}, 'BtnCode':{'obj':'btn','available':false,'function':null}, 'BtnFinMgmtAcc':{'obj':'btn','available':false,'function':0}, 'BtnFldMod':{'obj':'btn','available':false,'function':null}, 'BtnSettings':{'obj':'btn','available':false,'function':null}, 'MnuEdit':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':rid}); }}, 'MnuDelete':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormDelete',{'section':'CfgCmpc','id':rid}); }}, 'grid':{'obj':'grid','available':true,'data':[], 'gridObj':null, 'dataView':null, 'columnFilters':{}, 'columns':[]} }, 
 				'CfgLoac':{ 'BtnNew':{'obj':'btn','available':true,'function':function() { prlLoacOpenForm(0); }}, 'BtnQFilter':{'obj':'btn','available':true,'function':function() { prlCfgToggleFilterRow(); }}, 'BtnSaveSettings':{'obj':'btn','available':true,'function':function() { prlCfgSaveSettings(); }}, 'BtnInsr':{'obj':'btn','available':false,'function':null}, 'BtnCode':{'obj':'btn','available':false,'function':null}, 'BtnFinMgmtAcc':{'obj':'btn','available':true,'function':function() { cb('payroll.FinMgmtAccOpen'); }}, 'BtnFldMod':{'obj':'btn','available':true,'function':function() { cb('payroll.ConfigFldModOverview'); }}, 'BtnSettings':{'obj':'btn','available':false,'function':null}, 'MnuEdit':{'obj':'menuItem','available':true,'function':function(rid) { prlLoacOpenForm(rid); }}, 'MnuDelete':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.prlLoacDelete',{"id":rid}); }}, 'grid':{'obj':'grid','available':true,'data':[], 'gridObj':null, 'dataView':null, 'columnFilters':{}, 'columns':[]} }, 
 				'CfgInsc':{ 'BtnNew':{'obj':'btn','available':true,'function':function() { cb('payroll.ConfigEditFormOpen',{'section':'CfgInsc','id':'0','InsuranceType':$('#prlCfgInscTab select').val()}); }}, 'BtnQFilter':{'obj':'btn','available':true,'function':function() { prlCfgToggleFilterRow(); }}, 'BtnSaveSettings':{'obj':'btn','available':true,'function':function() { prlCfgSaveSettings(); }}, 'BtnInsr':{'obj':'btn','available':true,'function':function() { cb('payroll.ConfigEditFormOpen',{'section':'CfgInscInsr'}); }}, 'BtnCode':{'obj':'btn','available':true,'function':function() { cb('payroll.ConfigEditFormOpen',{'section':'CfgInscCode','InsuranceType':$('#prlCfgInscTab select').val()}); }}, 'BtnFinMgmtAcc':{'obj':'btn','available':false,'function':0}, 'BtnFldMod':{'obj':'btn','available':false,'function':null}, 'BtnSettings':{'obj':'btn','available':false,'function':null}, 'MnuEdit':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormOpen',{'section':'CfgInsc','id':rid,'InsuranceType':$('#prlCfgInscTab select').val()}); }}, 'MnuDelete':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormDelete',{'section':'CfgInsc','id':rid,'InsuranceType':$('#prlCfgInscTab select').val()}); }}, 'grid':{'obj':'grid','available':true,'data':[], 'gridObj':null, 'dataView':null, 'columnFilters':{}, 'columns':[]} }, 
 				'CfgSyac':{ 'BtnNew':{'obj':'btn','available':false,'function':0}, 'BtnQFilter':{'obj':'btn','available':true,'function':function() { prlCfgToggleFilterRow(); }}, 'BtnSaveSettings':{'obj':'btn','available':true,'function':function() { prlCfgSaveSettings(); }}, 'BtnInsr':{'obj':'btn','available':false,'function':null}, 'BtnCode':{'obj':'btn','available':false,'function':null}, 'BtnFinMgmtAcc':{'obj':'btn','available':false,'function':0}, 'BtnFldMod':{'obj':'btn','available':false,'function':null}, 'BtnSettings':{'obj':'btn','available':false,'function':null}, 'MnuEdit':{'obj':'menuItem','available':true,'function':function(rid) { cb('payroll.ConfigEditFormOpen',{'section':'CfgSyac','id':rid}); }}, 'MnuDelete':{'obj':'menuItem','available':false,'function':null}, 'grid':{'obj':'grid','available':true,'data':[], 'gridObj':null, 'dataView':null, 'columnFilters':{}, 'columns':[]} }, 
@@ -1747,6 +1746,9 @@ function prlLoacOpenForm(accId) {
 			cb('payroll.prlCalcOverview');
 		}
 	}
+	
+	
+	
 /*
 *************************************
 ** Calculation Data Editor
@@ -2362,7 +2364,7 @@ function prlRepSelOnReportTypeChange(elem) {
 function prlRepSelSave() {
     var company = $("#prlRepSelFilterFirma").val();
     var kst = $("#prlRepSelFilterKst").val();
-
+ 
     $('#prlRepSelErr').text("");
     
     var emptyRgx = /^\s?$/;
@@ -3848,12 +3850,12 @@ function prlPmtSpltEditInit() {
 		}
 	});
 	$('#prlPmtSplt_currency').bind('change', function(e) {
-		alert("prlPmtSplt_currency");
+		//alert("prlPmtSplt_currency");
 		document.getElementById("prlPmtSplt_anzeigewaehrung").value = document.getElementById("prlPmtSplt_currency").value;
 	});
 //	$('#prlPmtSpltCancel').bind('click', function(e) {
 //	cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
-//});
+//	});
 //	$('#prlPmtSplt_BankSource_Cancel').bind('click', function(e) {
 //		cb('payroll.paymentSplit', {'empId':prlPmtSplt.empId});
 //	});

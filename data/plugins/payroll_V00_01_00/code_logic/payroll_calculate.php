@@ -541,7 +541,7 @@ class payroll_BL_calculate {
 		//communication_interface::alert("calculationDataSave(".print_r($rawData,true));
 		
 		require_once('chkDate.php');
-		$chkDate = new chkDate("1970-01-01", 0, "");
+		$chkDate = new chkDate("1970-01-01", 0);
 		
 		$arrDeleteIDs = array();
 		$arrAdd = array();
@@ -686,11 +686,11 @@ WHERE id=".$recID;
 (`payroll_employee_ID`,`payroll_account_ID`,`PayrollDataType`,`account_text`,`quantity`,`rate`,`amount`,`max_limit`,`min_limit`,`deduction`,`CostCenter`,`DateFrom`,`DateTo`,`major_period`,`minor_period`,`major_period_bonus`)
  VALUES ".implode(",",$arrAdd);
 			$system_database_manager->executeUpdate($sql, "payroll_calculationDataSave");
-communication_interface::alert("payroll_calculate Add\n".$sql."\n\n");
+//communication_interface::alert("payroll_calculate Add\n".$sql."\n\n");
 		}
 		foreach($arrEdit as $sql) {
 			$system_database_manager->executeUpdate($sql, "payroll_calculationDataSave");
-communication_interface::alert("payroll_calculate Edit\n".$sql."\n\n");
+//communication_interface::alert("payroll_calculate Edit\n".$sql."\n\n");
 		}
 		$system_database_manager->executeUpdate("COMMIT", "payroll_calculationDataSave");
 
@@ -711,13 +711,6 @@ communication_interface::alert("payroll_calculate Edit\n".$sql."\n\n");
 		$response["errCode"] = 0;
 		return $response;
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 	
 

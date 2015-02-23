@@ -941,9 +941,7 @@ input#prlFormCfg_TaxAdminCity {
 .prlDasGlobal fieldset {
 	width:365px;
 }
-.prlDasGlobalFsr {
-	float:right!important;
-}
+
 .prlDasGlobal label {
 	display:inline-block;
 	width:270px;

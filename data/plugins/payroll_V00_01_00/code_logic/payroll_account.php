@@ -546,7 +546,9 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 		$system_database_manager = system_database_manager::getInstance();
 		$result = $system_database_manager->executeQuery("SELECT * FROM `payroll_das_account` WHERE `AccountType`>2 AND `DedAtSrcCanton`='' ORDER BY `AccountType`", "payroll_getDedAtSrcGlobalSettings");
 		$res = array();
-		foreach($result as $rec) $res["AccountType".$rec["AccountType"]] = $rec["payroll_account_ID"];
+		foreach($result as $rec) {
+			$res["AccountType".$rec["AccountType"]] = $rec["payroll_account_ID"];
+		}
 
 		$response["success"] = true;
 		$response["errCode"] = 0;
@@ -555,7 +557,7 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 	}
 
 	public function saveDedAtSrcGlobalSettings($param) {
-		$arrAccountType = array(3,4,5,6,7,9,11,12,13,14,15,16,17);
+		$arrAccountType = array(3,4,5,6,7,9,11,12,13,14,15,16,17,18);
 //communication_interface::alert(print_r($param,true));
 
 		$errFields = array();
@@ -597,7 +599,13 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 		}
 
 		$system_database_manager = system_database_manager::getInstance();
-		$result = $system_database_manager->executeQuery("SELECT dascnt.`DedAtSrcCanton` as id, dascnt.*, MAX(IF(dasacc.`AccountType`=1,dasacc.`payroll_account_ID`,'')) as dasacc1, MAX(IF(dasacc.`AccountType`=2,dasacc.`payroll_account_ID`,'')) as dasacc2 FROM `payroll_das_canton` dascnt INNER JOIN `payroll_das_account` dasacc ON dascnt.`DedAtSrcCanton`=dasacc.`DedAtSrcCanton`".$sqlAux." GROUP BY dascnt.`DedAtSrcCanton`", "payroll_getFieldModifierDetail");
+		$result = $system_database_manager->executeQuery(
+		"SELECT dascnt.`DedAtSrcCanton` as id, dascnt.*
+		, MAX(IF(dasacc.`AccountType`=1,dasacc.`payroll_account_ID`,'')) as dasacc1
+		, MAX(IF(dasacc.`AccountType`=2,dasacc.`payroll_account_ID`,'')) as dasacc2 
+		FROM `payroll_das_canton` dascnt 
+		INNER JOIN `payroll_das_account` dasacc ON dascnt.`DedAtSrcCanton`=dasacc.`DedAtSrcCanton`".$sqlAux." 
+		GROUP BY dascnt.`DedAtSrcCanton`", "payroll_getFieldModifierDetail");
 
 		if(count($result) < 1) {
 			$response["success"] = false;
@@ -627,8 +635,9 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 		}
 		$fieldCfg = array(
 					"DedAtSrcCanton"=>array("regex"=>"[a-zA-Z]{2,2}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
-					"TaxAdminName"=>array("regex"=>".{1,60}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
-					"TaxAdminStreet"=>array("regex"=>".{1,60}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
+					"TaxArbeitgebernummer"=>array("regex"=>".{1,50}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
+					"TaxAdminName"=>array("regex"=>".{1,50}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
+					"TaxAdminStreet"=>array("regex"=>".{1,50}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
 					"TaxAdminZIP"=>array("regex"=>"[0-9]{4,4}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
 					"TaxAdminCity"=>array("regex"=>".{1,50}","addQuotes"=>true, "targetTable"=>"payroll_das_canton"),
 					"AnnualSettlementMode"=>array("regex"=>"[01]{1,1}","addQuotes"=>false, "targetTable"=>"payroll_das_canton"),

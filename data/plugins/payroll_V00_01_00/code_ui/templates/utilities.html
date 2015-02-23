@@ -1,3 +1,89 @@
+<wgui:block name="QuellensteuerSelector">
+	<br/>
+	<div class="ui-tabs ui-widget-content ui-corner-all">
+	<table>
+	<tr>
+		<td>
+			<wgui:text id="txtFirmenauswahl" /> 
+		</td>
+		<td>
+			<select id="selFirmenauswahl" style="width:120px;"><!-- id="prlPsSelDBFilter" -->
+			<wgui:loop name="filterLoop" varname="selFirmenListe"><!-- varname="dbFilterList" -->
+				<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="company_shortname"/></option>
+			</wgui:loop name="filterLoop">
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<wgui:text id="txtPeriodenJahr"/> 
+		</td>
+		<td>
+			<select id="selPeriodenJahr" style="width: 120px;"></select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<wgui:text id="txtPeriodeVon"/> 
+		</td>
+		<td>
+			<select id="selPeriodenMonatVon"  style="width:120px;">
+				<optgroup label="<wgui:text id="prlCalcOvMajorPeriods"/>">
+					<option value="1">01 - <wgui:text id="prlCalcOvMonth01"/></option>
+					<option value="2">02 - <wgui:text id="prlCalcOvMonth02"/></option>
+					<option value="3">03 - <wgui:text id="prlCalcOvMonth03"/></option>
+					<option value="4">04 - <wgui:text id="prlCalcOvMonth04"/></option>
+					<option value="5">05 - <wgui:text id="prlCalcOvMonth05"/></option>
+					<option value="6">06 - <wgui:text id="prlCalcOvMonth06"/></option>
+					<option value="7">07 - <wgui:text id="prlCalcOvMonth07"/></option>
+					<option value="8">08 - <wgui:text id="prlCalcOvMonth08"/></option>
+					<option value="9">09 - <wgui:text id="prlCalcOvMonth09"/></option>
+					<option value="10">10 - <wgui:text id="prlCalcOvMonth10"/></option>
+					<option value="11">11 - <wgui:text id="prlCalcOvMonth11"/></option>
+					<option value="12">12 - <wgui:text id="prlCalcOvMonth12"/></option>
+					<option value="13">13</option>
+					<option value="14">14</option>
+				</optgroup>
+				<optgroup label="<wgui:text id="prlCalcOvBonuses"/>">
+					<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
+					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
+				</optgroup>
+			</select>
+		</td>
+		<td>
+			<wgui:text id="txtPeriodeBis"/> 
+		</td>
+		<td>
+			<select id="selPeriodenMonatBis" style="width:120px;">
+				<optgroup label="<wgui:text id="prlCalcOvMajorPeriods"/>">
+					<option value="1">01 - <wgui:text id="prlCalcOvMonth01"/></option>
+					<option value="2">02 - <wgui:text id="prlCalcOvMonth02"/></option>
+					<option value="3">03 - <wgui:text id="prlCalcOvMonth03"/></option>
+					<option value="4">04 - <wgui:text id="prlCalcOvMonth04"/></option>
+					<option value="5">05 - <wgui:text id="prlCalcOvMonth05"/></option>
+					<option value="6">06 - <wgui:text id="prlCalcOvMonth06"/></option>
+					<option value="7">07 - <wgui:text id="prlCalcOvMonth07"/></option>
+					<option value="8">08 - <wgui:text id="prlCalcOvMonth08"/></option>
+					<option value="9">09 - <wgui:text id="prlCalcOvMonth09"/></option>
+					<option value="10">10 - <wgui:text id="prlCalcOvMonth10"/></option>
+					<option value="11">11 - <wgui:text id="prlCalcOvMonth11"/></option>
+					<option value="12">12 - <wgui:text id="prlCalcOvMonth12"/></option>
+					<option value="13">13</option>
+					<option value="14">14</option>
+				</optgroup>
+				<optgroup label="<wgui:text id="prlCalcOvBonuses"/>">
+					<option value="15"><wgui:text id="prlCalcOvBonus"/> 1</option>
+					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
+				</optgroup>
+			</select>
+		</td>
+	</tr>
+	</table>
+	</div>
+	<br/>
+	<button id="selQSTCancel" class="PesarisButton" ><wgui:text id="btnClose"/></button>
+	<button id="selQSTAuswertungOK" name="selQSTAuswertungOK" style="float:right;" class="PesarisButton"><wgui:text id="btnOK"/></button>
+</wgui:block name="QuellensteuerSelector">
 <wgui:block name="EmployeeSelector">
 	<div id="prlPsSelTB" class="ui-widget-header ui-corner-all">
 		<wgui:text id="prlPsSelLblFilter"/> <select id="prlPsSelDBFilter">
@@ -19,7 +105,7 @@
 		<div id="prlPsSelErr"></div>
 	</div>
 	<button id="prlPsSelCancel" class="PesarisButton"><wgui:text id="btnCancel"/></button>
-	<button id="prlPsSelSave"   class="PesarisButton"><wgui:text id="btnOK"/></button>
+	<button id="prlPsSelSave"   class="PesarisButton" style="float:right;"><wgui:text id="btnOK"/></button>
 </wgui:block name="EmployeeSelector">
 <wgui:block name="EmployeeFilterOverview">
 	<div class="ui-tabs ui-widget-content ui-corner-all">

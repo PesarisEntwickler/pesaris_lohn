@@ -61,15 +61,17 @@ class variousFunctions {
 	public function saveCompanyDetail($param) {
 		$fieldCfg = array(
 					"id"=>array("regex"=>"[0-9]{1,9}","addQuotes"=>false),
-					"company_shortname"=>array("regex"=>".{1,60}","addQuotes"=>true),
-					"HR-RC-Name"=>array("regex"=>".{1,60}","addQuotes"=>true),
-					"Street"=>array("regex"=>".{1,60}","addQuotes"=>true),
+					"company_shortname"=>array("regex"=>".{1,50}","addQuotes"=>true),
+					"HR-RC-Name"=>array("regex"=>".{1,50}","addQuotes"=>true),
+					"Street"=>array("regex"=>".{1,50}","addQuotes"=>true),
 					"ZIP-Code"=>array("regex"=>"[0-9]{4,5}","addQuotes"=>true),
 					"City"=>array("regex"=>".{1,50}","addQuotes"=>true),
 					"UID-EHRA"=>array("regex"=>"[A-Z]{3}\-[0-9]{3}\.[0-9]{3}\.[0-9]{3}","addQuotes"=>true),
 					"BUR-REE-Number"=>array("regex"=>".{0,45}","addQuotes"=>true),
-				);
-//					"UID-EHRA"=>array("regex"=>"CH-[0-9]{3}\.[0-9]{1}\.[0-9]{3}\.[0-9]{3}\-[0-9]{1}","addQuotes"=>true),
+ 					"ContactPers-Name"=>array("regex"=>".{0,40}","addQuotes"=>true),
+ 					"ContactPers-Tel"=>array("regex"=>".{0,40}","addQuotes"=>true),
+ 					"ContactPers-eMail"=>array("regex"=>".{0,40}","addQuotes"=>true),
+					);
 
 		///////////////////////////////////////////////////
 		// Mandatory and validity checks

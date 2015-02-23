@@ -630,7 +630,7 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		$id = $param["rid"];
 //communication_interface::alert("callbackEmployeeDetail param[fieldName] = \n".print_r($param,true));
 		require_once('chkDate.php');
-		$chkDate = new chkDate("1970-01-01", 0, "");
+		$chkDate = new chkDate("1970-01-01", 0);
 		
 		$returnFieldValuePairs = array();
 		switch($param["fieldName"]) {
@@ -744,8 +744,12 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			$response["errText"] = "invalid employee id";
 			return $response;
 		}
+   
+		//Zusatz-Validierung
+		if (!isset($rawFieldData["DedAtSrcPercentage"]) || $rawFieldData["DedAtSrcPercentage"] == "" ) {
+			$rawFieldData["DedAtSrcPercentage"] = "0.00";
+		}
 
-//communication_interface::alert("saveEmployeeDetail rawFieldData:\n".print_r($rawFieldData,true));
 		
 		require_once('chkDate.php');
 		$chkDate = new chkDate("1970-01-01", 9);
@@ -761,11 +765,14 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 				"SELECT fieldName FROM payroll_employee_field_def 
 				WHERE fieldName!='id' AND mandatory=1 AND `read-only`=0 AND fieldName NOT LIKE 'tbl%'"
 					, "payroll_saveEmployeeDetail");
-			//communication_interface::alert("saveEmployeeDetail result:\n".print_r($result,true));
+//communication_interface::alert("2 saveEmployeeDetail result:\n".print_r($result,true));
 				
 			foreach($result as $row) {
-				if(!isset($rawFieldData[$row["fieldName"]]) || $rawFieldData[$row["fieldName"]]=="") $arrFieldName[] = $row["fieldName"];
+				if(!isset($rawFieldData[$row["fieldName"]]) || $rawFieldData[$row["fieldName"]]=="") {
+					$arrFieldName[] = $row["fieldName"];
+				}
 			}
+//communication_interface::alert("3 saveEmployeeDetail arrFieldName:\n".print_r($arrFieldName,true));
 			if(count($arrFieldName)>0) {
 				$response["success"] = false;
 				$response["errCode"] = 20;
@@ -879,8 +886,8 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			$response["fieldNames"] = $arrFieldName;
 // 			return $response;
 		}
-//communication_interface::alert("arrFieldName : ".print_r($arrFieldName, true));
-//communication_interface::alert("fieldset : ".print_r($fieldset, true));
+//communication_interface::alert("XX  arrFieldName : ".print_r($arrFieldName, true));
+//communication_interface::alert("YY fieldset : ".print_r($fieldset, true));
 //error_log("\n".print_r($fieldset,true)."\n", 3, "/var/log/copronet-application.log");
 //error_log("\n".print_r($arrFieldName,true)."\n", 3, "/var/log/copronet-application.log");
 
@@ -1061,6 +1068,7 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 				}
 			}
 			$sql = "UPDATE payroll_employee SET ".implode(",", $sqlFields)." WHERE id=".$id;
+//communication_interface::alert("payroll_employee  1064\n".$sql."\n".print_r($sqlFields, true)."\n");
 		} else {
 			$changeMode = "NEW";
 			$sqlFields = array();

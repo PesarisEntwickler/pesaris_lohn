@@ -56,6 +56,7 @@ $textResourceMap["txtListenwerte"] = "Listenwerte";
 $textResourceMap["txtListentext"] = "Listentext";
 $textResourceMap["txtKeinLoeschen"] = "Kein Loeschen";
 $textResourceMap["txtListenwertNichtLoeschen"] = "Listenwert kann noch nicht geloescht werden. Er wird noch bei #1# Mitarbeitern verwendet.";
+$textResourceMap["txtKontaktperson"] = "Kontaktperson";
 
 
 /* ********* AUSZAHLEN *********** */
@@ -266,6 +267,9 @@ $textResourceMap["prlFormCfg_City"] = "Ort";
 $textResourceMap["prlFormCfg_UID_EHRA"] = "Handelsregisternummer (UID)";
 $textResourceMap["prlFormCfg_BUR_REE_Number"] = "BUR-Nummer (Statistik-Nr)";
 $textResourceMap["prlFormCfg_Description"] = "System-LOA (Bezeichnung)";
+$textResourceMap["prlFormCfg_ContactPers_Name"] = "Name";
+$textResourceMap["prlFormCfg_ContactPers_Tel"] = "Telefon";
+$textResourceMap["prlFormCfg_ContactPers_eMail"] = "E-Mail";
 //$textResourceMap["prlFormCfg_payroll_account_ID"] = "Zugewiesene LOA-Nummer";
 $textResourceMap["prlFormCfg_CompanyName"] = "Firmenname";
 $textResourceMap["prlFormCfg_InsuranceID"] = "ID des Versicherers";
@@ -575,6 +579,7 @@ $textResourceMap["txtCalcMenupunkt_FIBUKontierungen"] = "FIBU-Kontierungen";
 $textResourceMap["txtCalcMenupunkt_BEBUKontierungen"] = "BEBU-Kontierungen";
 $textResourceMap["txtCalcMenupunkt_Lohnabrechnungen"] = "Lohnabrechnungen";
 $textResourceMap["txtCalcMenupunkt_Lohnkonto"] = "Lohnkonto";
+$textResourceMap["txtCalcMenupunkt_Quellensteuerabrechnung"] = "QuellensteuerAbrechnung";
 $textResourceMap["txtCalcWarnungen"] = "Beim Abschliessen der Periode sind Warnungen aufgetreten";
 $textResourceMap["txtMitarbeiterauswahl"] = "Mitarbeiterauswahl";
 $textResourceMap["txtLohnartBearbeiten"] = "Lohnart bearbeiten";
@@ -619,6 +624,13 @@ $textResourceMap["prlAccEtr_mgmt_acc_date"] = "Verbuchungsdatum";
 /*
 ****** UTILITIES ******
 */
+//Quellensteuer
+$textResourceMap["txtFirmenauswahl"] = "Firma/Firmen:";
+$textResourceMap["txtPeriodenJahr"] = "Periode Jahr:";
+$textResourceMap["txtPeriodeVon"] = "Monat von:";
+$textResourceMap["txtPeriodeBis"] = "bis:";
+$textResourceMap["txtAlleFirmen"] = "-- Alle --";
+
 
 //EmployeeSelector
 $textResourceMap["prlPsSelFormTitle"] = "Mitarbeiter hinzuf&uuml;gen";

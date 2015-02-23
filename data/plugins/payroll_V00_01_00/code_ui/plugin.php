@@ -76,10 +76,6 @@ class payroll_UI {
 			$zArray = explode("]", $zahlstelle);	
 			$zahlstellenID =  substr($zArray[0], $tokenPos + strlen("[z"));	
 			
-//			communication_interface::alert("payroll.auszahlen.GenerateFiles" .
-//					"\nzahlstellenID=".$zahlstellenID .
-//					"\npersonengruppenIDListe=".$personengruppenIDListe);
-
 			$hatAuszahlFiles = blFunctionCall('payroll.auszahlen.GenerateDataFiles', $zahlstellenID, $personengruppenIDListe, $dueDateFromGUI);
 
 			if ($hatAuszahlFiles > 0) {
@@ -343,7 +339,7 @@ class payroll_UI {
 			break;
 		case 'payroll.prlVlSaveFormData':
 			$s = json_encode($functionParameters[0]["data"]);
-			//communication_interface::alert("1*** \nrid:".$functionParameters[0]["rid"]."\ndata:".str_replace(",", "\n", $s).""); //TODO: remove!
+			//communication_interface::alert("1### \nrid:".$functionParameters[0]["rid"]."\ndata:".str_replace(",", "\n", $s).""); //TODO: remove!
 			$ret = blFunctionCall('payroll.saveEmployeeDetail', $functionParameters[0]["rid"], $functionParameters[0]["data"]);
 			if($ret["success"]) {
 
@@ -684,7 +680,6 @@ class payroll_UI {
 					$roundParam = 0;
 					$withDecimals = strstr($curFieldDef["regexPattern"], "\\.")===false ? false : true;
 					if($withDecimals) $roundParam = strstr($curFieldDef["regexPattern"], "{1,2}")===false ? 5 : 2;
-//communication_interface::alert("withDecimals:".($withDecimals?"true":"false")." / roundParam:".$roundParam);
 
 					$changeActiveFlag = ($curFieldDef["fieldDefEdit"] & 1)!=0 ? "true" : "false";
 					$changeLabels = ($curFieldDef["fieldDefEdit"] & 2)!=0 ? "true" : "false";
@@ -738,14 +733,11 @@ class payroll_UI {
 				$objWindow->modal(true);
 				$objWindow->loadContent("configuration",$data,"prlVlFldCfgLstItemEdit");
 				$objWindow->showWindow();
-				//communication_interface::alert(print_r($data,true));
-				//communication_interface::alert("Personalstamm-Feld: Listenwert bearbeiten\n".print_r($functionParameters[0],true));
 				communication_interface::jsExecute("prlVlFldCfgLoadItem('".($editMode ? $functionParameters[0]["ItemID"] : "")."');");
 				communication_interface::jsExecute("$('#prlVlFldCfgLISave').bind('click', function(e) { prlVlFldCfgChangeItem('".($editMode ? $functionParameters[0]["ItemID"] : "")."'); });");
 				communication_interface::jsExecute("$('#prlVlFldCfgLICancel').bind('click', function(e) { cb('payroll.prlVlFieldCfg',{'action':'edit','loadData':'false'}); });");
 				break;
 			case 'ListItemDel':
-				//communication_interface::alert("ListItemDel:".print_r($functionParameters,true));
 				if(isset($functionParameters[0]["commit"])) {
 					communication_interface::jsExecute("delete prlVlFldCfg.data.listItems['".$functionParameters[0]["ItemID"]."'];");
 					communication_interface::jsExecute("cb('payroll.prlVlFieldCfg',{'action':'edit','loadData':'false'});");
@@ -755,8 +747,7 @@ class payroll_UI {
 					$data["technFeldname"] = $functionParameters[0]["technFeldname"];
 					
 					$ret = blFunctionCall('payroll.personalstammfelder.check_If_Used',$data);
-					
-					//communication_interface::alert("ListItemDel:".$ret);
+
 					if ($ret > 0 ){
 						$objWindow = new wgui_window("payroll", "infoBox");
 						$displayText = $objWindow->getText("txtListenwertKannNichtGeloeschtWerden");
@@ -848,8 +839,6 @@ class payroll_UI {
 			communication_interface::jsExecute(" $('#listenWerte_sort').css('background-color',''); ");
 			communication_interface::jsExecute(" $('#listenWerte_txt_de').css('background-color',''); ");
 			communication_interface::jsExecute(" $('#listenWerte_txt_fr').css('background-color',''); ");
-				
-			//communication_interface::alert('payroll.personalstammfelder_Save_ListenWerte: '.print_r($functionParameters[0],true));
 			$goInto = true;
 			if ( strlen($functionParameters[0]["data"]["code"]) < 1) {communication_interface::jsExecute(" $('#listenWerte_code').css('background-color','#f88'); "); $goInto = false;}
 			if ( strlen($functionParameters[0]["data"]["sort"]) < 1) {communication_interface::jsExecute(" $('#listenWerte_sort').css('background-color','#f88'); "); $goInto = false;}
@@ -942,12 +931,9 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.FormulaEditor':
-//'payroll.FormulaEditor',{'action':'save'}
 			if(!isset($functionParameters[0]["action"])) $functionParameters[0]["action"] = "";
 			switch($functionParameters[0]["action"]) {
 			case 'save':
-//				$functionParameters[0]["data"]
-//communication_interface::alert(print_r($functionParameters[0],true));
 				$ret = blFunctionCall("payroll.saveFormula", $functionParameters[0]["data"]);
 				if($ret["success"]) {
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
@@ -992,7 +978,6 @@ class payroll_UI {
 				communication_interface::jsExecute("prlLoaFeInit();");
 				break;
 			case 'delete':
-//communication_interface::alert(print_r($functionParameters[0],true));
 				if(!isset($functionParameters[0]["commit"])) {
 					$objWindow = new wgui_window("payroll", "infoBox");
 					$objWindow->windowTitle($objWindow->getText("txtLoeschungBestaetigen"));
@@ -1089,13 +1074,16 @@ class payroll_UI {
 		case 'payroll.ConfigEditFormOpen':
 			$sectionCfg = array(
 				"CfgCmpc"=>array("windowTitle"=>"Firma/Company"
-								, "windowWidth"=>720
+								, "windowWidth"=>850
 								, "windowHeight"=>370
 								, "dataSourceFnc"=>"payroll.getCompanyDetail"
 								, "fieldNameTransl"=>array("HR-RC-Name"=>"HR_RC_Name"
 														 ,"ZIP-Code"=>"ZIP_Code"
 														 ,"UID-EHRA"=>"UID_EHRA"
-														 ,"BUR-REE-Number"=>"BUR_REE_Number"))
+														 ,"BUR-REE-Number"=>"BUR_REE_Number"
+														 ,"ContactPers-Name"=>"ContactPers_Name"
+														 ,"ContactPers-Tel"=>"ContactPers_Tel"
+														 ,"ContactPers-eMail"=>"ContactPers_eMail"))
 								,
 				"CfgSyac"=>array("windowTitle"=>"Systemlohnart"
 								, "windowWidth"=>550
@@ -1134,14 +1122,14 @@ class payroll_UI {
 								, "fieldNameTransl"=>array())
 								,
 				"CfgDasc"=>array("windowTitle"=>"QST: Kantonale Einstellungen"
-								, "windowWidth"=>550
-								, "windowHeight"=>410
+								, "windowWidth"=>510
+								, "windowHeight"=>440
 								, "dataSourceFnc"=>"payroll.getDedAtSrcCantonDetail"
 								, "fieldNameTransl"=>array())
 								,
 				"CfgDascGlob"=>array("windowTitle"=>"QST: Globale Einstellungen"
-								, "windowWidth"=>850
-								, "windowHeight"=>330
+								, "windowWidth"=>870
+								, "windowHeight"=>370
 								, "dataSourceFnc"=>"payroll.getDedAtSrcGlobalSettings"
 								, "fieldNameTransl"=>array())
 								,
@@ -1153,26 +1141,28 @@ class payroll_UI {
 								)
 				);
 
-//communication_interface::alert("section:".$functionParameters[0]["section"]." / id:".$functionParameters[0]["id"]);
 			$sectionID = $functionParameters[0]["section"];
 			if(!isset($sectionCfg[$sectionID])) {
 				communication_interface::alert("Diese Funktion ist noch nicht aktiv");
 				break;
 			}
-			$recID = isset($functionParameters[0]["id"]) ? $functionParameters[0]["id"] : 0;
-			$editMode = $recID==0 ? false : true;
+			$recID = 0;
+			if (isset($functionParameters[0]["id"])) {
+				$recID = $functionParameters[0]["id"];
+			}
+			$editMode = $recID<=0 ? false : true;
 			if($sectionID=="CfgDasc" && trim($recID)!="" && strlen(trim($recID))==2) $editMode = true;
 			$data = array();
-//communication_interface::alert("recID:".$recID." / editMode:".($editMode ? "TRUE" : "FALSE"));
 			$nextCompanyId = $recID;
 				//gewisse Masken muessen mit SELECT-Daten gefuellt werden
 				switch($sectionID) {
 				case "CfgCmpc":
 					$zahlstellenDaten = blFunctionCall('payroll.auszahlen.getZahlstellenListe', $recID);
 					if($zahlstellenDaten["success"]) $data["zahlstellen_list"] = $zahlstellenDaten["data"];
-					if ($recID == 0) {
+					if ($recID <= 0) {
 						$nextCompanyId = blFunctionCall('payroll.getNextCompanyId');
-						//communication_interface::alert("neu? ".$nextCompanyId);	
+						communication_interface::alert("Eine neue Firma erfassen...\tNeue id=".$nextCompanyId."\t/".$recID."\n(Die 0-Firma kann nicht bearbeitet werden)");			
+						//communication_interface::alert("neu? nextCompanyId:".$nextCompanyId." recID=".$recID." \n".print_r($data,true));	
 						$data["id"] = $nextCompanyId;				
 						$data["rid"] = $nextCompanyId;				
 						$data["prlFormCfg_id"] = $nextCompanyId;				
@@ -1270,7 +1260,6 @@ class payroll_UI {
 						$arrData[] = "'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
 					}
 				}
-//communication_interface::alert(print_r($arrData,true));
 				communication_interface::jsExecute("prlCfgEditFormInit('".$sectionID."',{".implode(",",$arrData)."});");
 			}
 
@@ -1279,10 +1268,9 @@ class payroll_UI {
 			if($sectionID=="CfgInsc") {
 				communication_interface::jsExecute("$('#prlFormCfg_payroll_insurance_code_ID').bind('change', function(e) { var a=['insr','custno','contrno','descr']; var o=$(this).find(':selected'); $.each(a, function() { $('#prlFormCfg'+this.toString()).val(o.attr(this.toString())); }); });");
 				communication_interface::jsExecute("$('#prlFormCfg_payroll_insurance_code_ID').change();");
-//				communication_interface::jsExecute("$.each(['insr','custno','contrno','descr'], function() { $('#prlFormCfg'+this.toString()).val($('#prlFormCfg_payroll_insurance_code_ID').find(':selected').attr(this.toString())); });");
 			} else if($sectionID=="CfgFldMod") communication_interface::jsExecute("prlCfgFldModToggle();");
 			if($sectionID=="CfgCmpc") {
-				//communication_interface::alert("recID=".$recID.", nextCompanyId=".$nextCompanyId);
+
 				communication_interface::jsExecute("$('#prlFormCfg_id').val('".$nextCompanyId."')");			
 				communication_interface::jsExecute("$('#selZahlstelle').bind('click',    function(e) {cb('payroll.paymentSplit',{'action':'GUI_bank_source_edit','bankId':this.value,'company_ID':'".$recID."'}) } )");			
 				communication_interface::jsExecute("$('#neueZahlstelle').bind('click', function(e) {cb('payroll.paymentSplit',{'action':'GUI_bank_source_edit','bankId':'0',       'company_ID':'".$recID."'}); })");			
@@ -1290,7 +1278,7 @@ class payroll_UI {
 			break;
 		case 'payroll.ConfigEditFormSave':
 			$sectionCfg = array(
-						"CfgCmpc"=>array("saveFnc"=>"payroll.saveCompanyDetail", "fieldNameTransl"=>array("HR-RC-Name"=>"HR_RC_Name","ZIP-Code"=>"ZIP_Code","UID-EHRA"=>"UID_EHRA","BUR-REE-Number"=>"BUR_REE_Number")),
+						"CfgCmpc"=>array("saveFnc"=>"payroll.saveCompanyDetail", "fieldNameTransl"=>array("HR-RC-Name"=>"HR_RC_Name","ZIP-Code"=>"ZIP_Code","UID-EHRA"=>"UID_EHRA","BUR-REE-Number"=>"BUR_REE_Number","ContactPers-Name"=>"ContactPers_Name","ContactPers-Tel"=>"ContactPers_Tel","ContactPers-eMail"=>"ContactPers_eMail")),
 						"CfgSyac"=>array("saveFnc"=>"payroll.savePayrollAccountMappingDetail", "fieldNameTransl"=>array()),
 						"CfgInscInsrEdt"=>array("saveFnc"=>"payroll.saveInsuranceCompanyDetail", "fieldNameTransl"=>array()),
 						"CfgInscCodeEdt"=>array("saveFnc"=>"payroll.saveInsuranceCodeDetail", "fieldNameTransl"=>array()),
@@ -1316,16 +1304,12 @@ class payroll_UI {
 				}
 			}
 
-//communication_interface::alert("1190_".print_r($data,true));
-//communication_interface::alert("1191_".print_r($functionParameters[0],true));
 			if($sectionID=="CfgFldMod") {
 				$data["ModifierType"] = $data["FldModType"]==9 ? 2 : 1;
 				$data["TargetField"] = $data["FldModType"]==9 ? 0 : $data["FldModType"];
 				if($data["TargetType0"]==1) $data["FieldName"] = "";
 			}
 
-//communication_interface::alert("sectionID: ".$sectionID);
-//communication_interface::alert("blFunctionCall: ".$sectionCfg[$sectionID]["saveFnc"]);
 			$ret = blFunctionCall($sectionCfg[$sectionID]["saveFnc"], $data);
 			if($ret["success"]) {
 				if($sectionID=="CfgFldMod") {
@@ -1351,7 +1335,7 @@ class payroll_UI {
 					}
 				}
 			} else {
-				//communication_interface::alert("[1219] Error: ".$ret["errText"]." ");
+
 				communication_interface::jsExecute("$('input[id^=\"prlFormCfg_\"], select[id^=\"prlFormCfg_\"]').css('background-color','');");
 				foreach($ret["fieldNames"] as $fieldName) {
 					$fieldName = isset($sectionCfg[$sectionID]["fieldNameTransl"][$fieldName]) ? $sectionCfg[$sectionID]["fieldNameTransl"][$fieldName] : $fieldName;
@@ -1410,7 +1394,7 @@ class payroll_UI {
 			$step = isset($functionParameters[0]["step"]) ? $functionParameters[0]["step"] : 1;
 			switch($step) {
 			case 1: //form anzeigen
-				$data["MAX_FILE_SIZE"] = "9000000";
+				$data["MAX_FILE_SIZE"] = "90000000";
 				$data["param"] = openssl_encrypt( serialize( array("cb_function"=>"payroll.ConfigImportDasRates","data"=>array("step"=>"2") ) ), "aes128", "pw_rcvfile_pw");
 				$objWindow = new wgui_window("payroll", "prlCfgDascUplRt");
 				$objWindow->windowTitle("QST: Tarifdaten importieren");
@@ -1431,12 +1415,11 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#prlFormCfgCancel').bind('click', function(e) { $('#modalContainer').mb_close(); });");
 				break;
 			case 2: //dateiupload abgeschlossen... Tarifdaten importieren
-				//communication_interface::alert(print_r($functionParameters[0],true));
+
 				if($functionParameters[0]["success"]) {
 					$fm = new file_manager();
 					if( $fm->setTmpDir($functionParameters[0]["tmpDirToken"]) ) {
-						//communication_interface::alert("path: ".$fm->getFullPath());
-						//communication_interface::alert("file: ".$functionParameters[0]["fileName"]);
+
 						$arr = explode(".",$functionParameters[0]["fileName"]);
 						if(strtolower($arr[count($arr)-1])!="txt") {
 							$fm->deleteDir(); //weil falsche Dateierweiterung, kann TmpDir gleich wieder geloescht werden
@@ -1444,7 +1427,7 @@ class payroll_UI {
 							$objWindow->windowTitle("Falsche Dateierweiterung");
 							$objWindow->windowWidth(450);
 							$objWindow->windowHeight(200);
-							$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Falsche Dateierweiterung: Erwartet wurde '.txt', uebermittelt wurde eine Datei mit der Endung '.".strtolower($arr[count($arr)-1])."'.<br/><br/></div><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+							$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Falsche Dateierweiterung: Erwartet wurde '.txt', uebermittelt wurde eine Datei mit der Endung '.".strtolower($arr[count($arr)-1])."'.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 							$objWindow->showAlert();
 						}else{
 							//TODO: soweit ist alles OK -> wir rufen jetzt die BL-Funktion fuer den Import der Tarifdatei auf
@@ -1453,15 +1436,15 @@ class payroll_UI {
 								$objWindow = new wgui_window("payroll", "infoBox");
 								$objWindow->windowTitle("Daten-Import erfolgreich");
 								$objWindow->windowWidth(450);
-								$objWindow->windowHeight(150);
-								$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Der Daten-Import fuer den Kanton ".$ret["canton"]." war erfolgreich.<br/><br/></div><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+								$objWindow->windowHeight(170);
+								$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Der Daten-Import fuer den Kanton ".$ret["canton"]." war erfolgreich.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 								$objWindow->showInfo();
 							}else{
 								$objWindow = new wgui_window("payroll", "infoBox");
 								$objWindow->windowTitle("Daten-Import fehlgeschlagen");
 								$objWindow->windowWidth(420);
 								$objWindow->windowHeight(170);
-								$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Fehlermeldung: ".$ret["errText"]."<br/><br/></div><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+								$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Fehlermeldung: ".$ret["errText"]."<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 								$objWindow->showAlert();
 							}
 						}
@@ -1470,15 +1453,15 @@ class payroll_UI {
 						$objWindow->windowTitle("Dateiuebermittlung fehlgeschlagen");
 						$objWindow->windowWidth(420);
 						$objWindow->windowHeight(170);
-						$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Datei konnte nicht gelesen werden.<br/><br/></div><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+						$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Datei konnte nicht gelesen werden.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 						$objWindow->showAlert();
 					}
 				}else{
 					$objWindow = new wgui_window("payroll", "infoBox");
 					$objWindow->windowTitle("Dateiuebermittlung fehlgeschlagen");
 					$objWindow->windowWidth(420);
-					$objWindow->windowHeight(150);
-					$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Es wurde keine Datei empfangen.<br/><br/></div><button onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+					$objWindow->windowHeight(170);
+					$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Es wurde keine Datei empfangen.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 					$objWindow->showAlert();
 				}
 				break;
@@ -1557,11 +1540,7 @@ class payroll_UI {
 					$arrOut[] = "'accIn':[".implode(",", $accIn)."]";
 					$arrOut[] = "'accOut':[".implode(",", $accOut)."]";
 					communication_interface::jsExecute("prlLoacLoadData({".implode(",", $arrOut)."});");
-//error_log("\n\nprlLoacLoadData({".implode(",", $arrOut)."});\n\n", 3, "/var/log/copronet-application.log");
 					communication_interface::jsExecute("$('#prlLoacTitle').html('".$prlAccData["data"][0]["id"]." - ".$prlAccData["data"][0]["label_".session_control::getSessionInfo("language")]."');");
-/*
-, 'accIn':[ {'id':'87', 'fwdField':3, 'fwdNegVal':true},{'id':103, 'fwdField':3, 'fwdNegVal':true} ], 'accOut': [ {'id':'103, 'fwdField':5, 'fwdNegVal':false} ]
-*/
 				}
 			}else{
 				communication_interface::jsExecute("$('#payrollAccountForm input[id^=\"label_\"],#payrollAccountForm input[id^=\"quantity_unit_\"],#payrollAccountForm input[id^=\"rate_unit_\"]').val();"); //clear all language relevant input fields
@@ -1582,7 +1561,6 @@ class payroll_UI {
 			break;
 		case 'payroll.prlLoacDelete':
 			if(isset($functionParameters[0]["commit"])) {
-//				communication_interface::alert("LOA mit ID ".$functionParameters[0]["id"]." wird geloescht.");
 				$ret = blFunctionCall('payroll.deletePayrollAccount', $functionParameters[0]);
 				if($ret["success"]) {
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
@@ -1600,40 +1578,10 @@ class payroll_UI {
 			}
 			break;
 		case 'payroll.prlLoacSave':
-			//communication_interface::alert("payroll.prlLoacSave: ".print_r($functionParameters,true));
- 			$ret = blFunctionCall('payroll.savePayrollAccount', $functionParameters[0]["rid"], $functionParameters[0]["data"]);
-			
-			//communication_interface::alert('payroll.prlLoacSave::'.print_r($ret, true));
-			
+ 			$ret = blFunctionCall('payroll.savePayrollAccount', $functionParameters[0]["rid"], $functionParameters[0]["data"]);		
  			if($ret["success"]) {
 				communication_interface::jsExecute("$('#payrollAccountForm').mb_close();");
 				$this->prlCfgLoacPopulateTable(array("updateTable"=>true));
-
-				//TODO: HIER WERDEN DATEN NEU IN UEBERSICHTSTABELLE GELADEN. DAS IST NOCH NICHT OPTIMAL GELOEST, DA *ALLE* DATEN NACH JEDER AENDERUNG AN DEN CLIENT GESCHICKT WERDEN!!
-/*
-				$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
-				$tblData = "prlPsoData = [";
-				$firstPass = true;
-				if($employeeList["success"]) {
-					foreach($employeeList["data"] as $row) {
-						$tblData .= $firstPass ? "{" : ", {";
-						$tblRow = "";
-						foreach($row as $fieldName=>$fieldValue) {
-							if($fieldName=="Sex") $fieldValue = $fieldValue=="F" ? "w" : "m"; //TODO: Werte dynamisch ersetzen!
-							$tblRow .= ($tblRow == "" ? "" : ", ")."'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
-						}
-						$tblData .= $tblRow."}";
-						$firstPass = false;
-					}
-				}
-				$tblData .= "];";
-				communication_interface::jsExecute($tblData);
-				communication_interface::jsExecute("prlPsoGrid.invalidate();");
-				communication_interface::jsExecute("prlPsoDataView.setItems(prlPsoData);");
-				communication_interface::jsExecute("prlPsoDataView.refresh();");
-				communication_interface::jsExecute("prlPsoGrid.updateRowCount();");
-				communication_interface::jsExecute("prlPsoGrid.render();");
-*/
  			}else{
 				$objWindow = new wgui_window("payroll", "infoBox");
 				$objWindow->windowTitle("Speichern fehlgeschlagen");
@@ -1647,7 +1595,6 @@ class payroll_UI {
  			}
 			break;
 		case 'payroll.prlCfgSaveSettings':
-//communication_interface::alert(serialize($functionParameters[0]));
 			$assignments = array("CfgCmpc" => "cmpcSettings","CfgLoac" => "loacSettings","CfgInsc" => "inscSettings","CfgSyac" => "syacSettings","CfgDasc" => "dascSettings");
 			if(isset($assignments[$functionParameters[0]["section"]])) {
 				session_control::setSessionSettings("payroll", $assignments[$functionParameters[0]["section"]], serialize($functionParameters[0]["settings"]), true); //true = save permanently
@@ -1672,10 +1619,7 @@ class payroll_UI {
 			$objWindow->addEventFunction_onResize("prlCalcOvGrid.resizeCanvas();");
 			$objWindow->showWindow();
 //error_log("*1*\n", 3, "/var/log/daniel.log");
-
 			$prdInfo = $this->prlCalcOvFillYearPeriodCmb();
-//error_log("prdInfo:\n".print_r($prdInfo,true)."\n", 3, "/var/log/daniel.log");
-
 			communication_interface::jsExecute('prlCalcOvCfg = {statusLabel:["","berechnet","fixiert/ausbezahlt","verbucht"], finAccLabel:" (FIBU)", mgmtAccLabel:" (BEBU)"};');
 			communication_interface::jsExecute('prlCalcOvColumns = [ {id: "EmployeeNumber", name: "Pers.Nr.", field: "EmployeeNumber", sortable: true, resizable: true, width: 100},' .
 																	'{id: "Lastname", name: "Nachname", field: "Lastname", sortable: true, resizable: true},' .
@@ -1862,9 +1806,6 @@ class payroll_UI {
 						break;
 					}
 				}
-				//meldung, falls noch bei keinen MA eine Berechnung gemacht wurde... ohne Berechnung ist naemlich keine Verbuchung moeglich
-//				communication_interface::alert("auszahlen...");
-//				blFunctionCall('payroll.calculate');
 				break;
 			case 2: //Verbuchen
 				if(!isset($functionParameters[0]["subFunction"])) {
@@ -1956,7 +1897,6 @@ class payroll_UI {
 							if(!$ret["success"]) {
 								if(isset($ret["errField"])) {
 									communication_interface::jsExecute("$('#prlAccEtr_".$ret["errField"]."').css('background-color','#f88');");
-//									communication_interface::alert("Ungueltiger Wert im Feld ".$ret["errField"]);
 									break;
 								}else{
 									communication_interface::alert("Fehler [Code ".$ret["errCode"]."]");
@@ -1997,7 +1937,6 @@ class payroll_UI {
 					$ret = blFunctionCall('payroll.getPeriodInformation');
 					if($ret["success"]) {
 						$prdValidity = blFunctionCall('payroll.checkPeriodValidity');
-//						if(!isset($ret["data"]["currentPeriod"]["processingStatus"]["payout"]) || $ret["data"]["currentPeriod"]["processingStatus"]["payout"]==0) {
 						if(isset($prdValidity["error"])) {
 							//kein Mitarbeiter wurde bisher ausbezahlt/fixiert -> abbrechen
 							$objWindow = new wgui_window("payroll", "infoBox");
@@ -2032,7 +1971,6 @@ class payroll_UI {
 						$currentYear = $ret["data"]["info"]["year"];
 						$majorPeriod = $ret["data"]["currentPeriod"]["major_period"];
 						$minorPeriod = $ret["data"]["currentPeriod"]["minor_period"];
-//						$openPeriodFound = false;
 
 						$objWindow = new wgui_window("payroll", "CalculationFinalizeForm");
 
@@ -2095,7 +2033,6 @@ class payroll_UI {
 				break;
 			default:
 				communication_interface::alert("coming soon...");
-//				communication_interface::alert("Processing Data... fnc:".$functionParameters[0]["functionNumber"].", y:".$functionParameters[0]["year"].", majorP:".$functionParameters[0]["majorPeriod"].", minorP:".$functionParameters[0]["minorPeriod"]);
 				break;
 			}
 			break;
@@ -2217,17 +2154,30 @@ class payroll_UI {
 			$fireScripts = true;
 			switch($functionParameters[0]["functionNumber"]) {
 			case 1: //Lohnabrechnungen drucken
-				$docPathID = blFunctionCall('payroll.calculationReport','payslip',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
+				$docPathID = blFunctionCall('payroll.calculationReport'
+						,'payslip'
+						,array("year"=>$functionParameters[0]["year"]
+						,"majorPeriod"=>$functionParameters[0]["majorPeriod"]
+						,"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
 //				$fireScripts = false;
 				break;
 			case 2: //Bewegungsjournal drucken
-//$now = microtime(true); //TODO: PROFILING START
-				$docPathID = blFunctionCall('payroll.calculationReport','calculationJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
-//communication_interface::alert(microtime(true) - $now); //TODO: PROFILING STOP
+				$docPathID = blFunctionCall('payroll.calculationReport'
+						,'calculationJournal'
+						,array("year"=>$functionParameters[0]["year"]
+						,"majorPeriod"=>$functionParameters[0]["majorPeriod"]
+						,"minorPeriod"=>$functionParameters[0]["minorPeriod"]));
 				break;
 			case 3: //FIBU-Kontierungen drucken
                 if(isset($functionParameters[0]["selectedReportType"])) {
-                    $docPathID = blFunctionCall('payroll.calculationReport','finAccJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"], "selectedReportType"=>$functionParameters[0]["selectedReportType"], "company"=>$functionParameters[0]["company"], "cost_center"=>$functionParameters[0]["cost_center"]));
+                    $docPathID = blFunctionCall('payroll.calculationReport'
+                    		,'finAccJournal'
+                    		,array("year"=>$functionParameters[0]["year"]
+                    				,"majorPeriod"=>$functionParameters[0]["majorPeriod"]
+                    				,"minorPeriod"=>$functionParameters[0]["minorPeriod"]
+                    				,"selectedReportType"=>$functionParameters[0]["selectedReportType"]
+                    				,"company"=>$functionParameters[0]["company"]
+                    				,"cost_center"=>$functionParameters[0]["cost_center"]));
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
 				}else{
                     $fireScripts = false;
@@ -2237,7 +2187,7 @@ class payroll_UI {
                     $objWindow->windowTitle(  $objWindow->getText("txtFIBUJournalReportAuswahl") );
                     $objWindow->windowIcon("calculator20.png");
                     $objWindow->windowWidth(480);
-                    $objWindow->windowHeight(220);
+                    $objWindow->windowHeight(165);
                     $objWindow->dockable(false);
                     $objWindow->buttonMaximize(false);
                     $objWindow->resizable(false);
@@ -2269,7 +2219,14 @@ class payroll_UI {
 				break;
 			case 4: //BEBU-Kontierungen drucken
                 if(isset($functionParameters[0]["selectedReportType"])) {
-					$docPathID = blFunctionCall('payroll.calculationReport','mgmtAccJournal',array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"], "selectedReportType"=>$functionParameters[0]["selectedReportType"], "company"=>$functionParameters[0]["company"], "cost_center"=>$functionParameters[0]["cost_center"]));
+					$docPathID = blFunctionCall('payroll.calculationReport'
+							,'mgmtAccJournal'
+							,array("year"=>$functionParameters[0]["year"]
+									,"majorPeriod"=>$functionParameters[0]["majorPeriod"]
+									,"minorPeriod"=>$functionParameters[0]["minorPeriod"]
+									,"selectedReportType"=>$functionParameters[0]["selectedReportType"]
+									,"company"=>$functionParameters[0]["company"]
+									,"cost_center"=>$functionParameters[0]["cost_center"]));
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
 				}else{
                     $fireScripts = false;
@@ -2279,7 +2236,7 @@ class payroll_UI {
                     $objWindow->windowTitle(  $objWindow->getText("txtBEBUJournalReportAuswahl") );
                     $objWindow->windowIcon("calculator20.png");
                     $objWindow->windowWidth(480);
-                    $objWindow->windowHeight(220);
+                    $objWindow->windowHeight(165);
                     $objWindow->dockable(false);
                     $objWindow->buttonMaximize(false);
                     $objWindow->resizable(false);
@@ -2354,6 +2311,47 @@ class payroll_UI {
 					communication_interface::jsExecute("prlPsSelUpdate();");
 				}
 				break;
+			case 6: //Quellensteuer Abrechnung
+				$fireScripts = false;
+
+				//show employee selection window
+				$objWindow = new wgui_window("payroll", "QuellensteuerSelector");
+				
+				$data["selFirmenListe"] = array(); 
+				$data["selFirmenListe"][] = array("id"=>0, "company_shortname"=>$objWindow->getText("txtAlleFirmen"));
+				$ret = blFunctionCall("payroll.getCompanyList");
+				if ($ret["success"]) {
+					foreach($ret["data"] as $row) {
+						$data["selFirmenListe"][] = $row;
+					}
+				}						
+					
+				$objWindow->windowTitle($objWindow->getText("txtCalcMenupunkt_Quellensteuerabrechnung"));
+				$objWindow->windowIcon("employee-edit32.png");
+				$objWindow->windowWidth(480);
+				$objWindow->windowHeight(220);
+				$objWindow->dockable(false);
+				$objWindow->buttonMaximize(false);
+				$objWindow->resizable(false);
+				$objWindow->fullscreen(false);
+				$objWindow->modal(true);
+				$objWindow->loadContent("utilities",$data,"QuellensteuerSelector");
+				$objWindow->showWindow();
+				
+				$prdInfo = $this->setQuellensteuerSelectorDropdowns(array("year"=>$functionParameters[0]["year"]));						
+				//communication_interface::jsExecute("setQuellensteuerSelectorJS();");
+				communication_interface::jsExecute("$('#selQSTCancel').bind('click', function(e) { $('#modalContainer').mb_close(); });");
+				communication_interface::jsExecute("$('#selQSTAuswertungOK').bind('click', function(e) { 
+					var X ='param';
+					var F = document.getElementById('selFirmenauswahl').value;
+					var J = document.getElementById('selPeriodenJahr').value;
+					var V = document.getElementById('selPeriodenMonatVon').value;
+					var B = document.getElementById('selPeriodenMonatBis').value;
+					cb('payroll.QuellensteuerAbrechnung', X, F, J, V, B );
+				});");
+					
+
+				break;
 			default:
 				$fireScripts = false;
 				communication_interface::alert("coming soon...");
@@ -2366,6 +2364,28 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#dlForm').attr('target','dlFrame');");
 				communication_interface::jsExecute("$('#dlForm').submit();");
 			}
+			break;
+		case 'payroll.QuellensteuerAbrechnung':
+			$x = $functionParameters[0];
+			$f = $functionParameters[1];
+			$j = $functionParameters[2];
+			$v = $functionParameters[3];
+			$b = $functionParameters[4];
+			$param = array();
+			$param["param"] = $x;
+			$param["company"] = $f;
+			$param["year"] = $j;
+			$param["von"] = $v;
+			$param["bis"] = $b;
+			$param["majorPeriod"] = $v;
+			$param["minorPeriod"] = 0;
+			$docPathID = blFunctionCall("payroll.getQuellensteuerAbrechnung", $param);
+ 			communication_interface::jsExecute("$('#modalContainer').mb_close();");
+			communication_interface::jsExecute("$('#dlForm input[name=param]').val('".str_replace("'","\\'",serialize(array("tmpPathID"=>$docPathID)))."');");
+			communication_interface::jsExecute("$('#dlForm').attr('action','getfile.php');");
+			communication_interface::jsExecute("$('#dlForm').attr('target','dlFrame');");
+			communication_interface::jsExecute("$('#dlForm').submit();");
+
 			break;
 		case 'payroll.prlCalcDataEditor':
 			$data = array();
@@ -2478,7 +2498,6 @@ $textResourceMap["loacVarFieldsAmountRateQuantity"] = "MENGE + ANSATZ + BETRAG";
 			}else{
 				communication_interface::alert("Fehler ".$res["errCode"]." / ".print_r($res["errFields"],true));
 			}
-//			communication_interface::alert("id:".print_r($functionParameters[0],true));
 			break;
 		case 'payroll.prlCalcDataGetEmplRecs':
 			$queryOption["columns"] = array("payroll_employee_ID", "payroll_account_ID", "account_text", "PayrollDataType", "quantity", "rate", "amount", "CostCenter", "DateFrom", "DateTo");
@@ -2493,12 +2512,12 @@ $textResourceMap["loacVarFieldsAmountRateQuantity"] = "MENGE + ANSATZ + BETRAG";
 						$prlCalcDataEmplArr[] = "{'emplId':'".$row["payroll_employee_ID"]."', 'rid':".$row["id"].", 'accNo':'".$row["payroll_account_ID"]."', 'accTxt':'".str_replace("'","\\'",$row["account_text"])."', 'PayrollDataType':'".$row["PayrollDataType"]."', 'quantity':'".$row["quantity"]."', 'rate':'".$row["rate"]."', 'amount':'".$row["amount"]."', 'cc':'".$row["CostCenter"]."', 'dateFrom':'".$this->convertMySQL2Date($row["DateFrom"])."', 'dateTo':'".$this->convertMySQL2Date($row["DateTo"])."'}";
 /*
 * DB + LOA-Konfig bereinigen (wegen neuer var_fields Codes...)
-TEILW.ERLEDIGT* Neue Funktion: Auslesen der Employee-Var-Daten (Wichtig: Nur bestimmte Recs anzeigen -> FILTERN! [nach Typ und "alle od. nur einzelnen Employee")	PayrollDataType=1, 3 od. 4
+TEILW.ERLEDIGT* Neue Funktion: Auslesen der Employee-Var-Daten 
+(Wichtig: Nur bestimmte Recs anzeigen -> FILTERN! [nach Typ und "alle od. nur einzelnen Employee")	
+PayrollDataType=1, 3 od. 4
 TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 */
-//			communication_interface::alert("id:".$functionParameters[0]);
 			communication_interface::jsExecute("prlCalcDataCurEmpl = [".implode(",", $prlCalcDataEmplArr)."];");
-//			communication_interface::alert($functionParameters[0]." / prlCalcDataCurEmpl = [".implode(",", $prlCalcDataEmplArr)."];");
 			communication_interface::jsExecute("prlCalcDataLoadTbl();");
 			break;
 		case 'payroll.EmployeeSelectorOpen': //employee selection form: Open form
@@ -2519,7 +2538,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			$objWindow->modal(true);
 			$objWindow->loadContent("utilities",$data,"EmployeeSelector");
 			$objWindow->showWindow();
-
 
 			//Get employee list and prepare data in order to fill the client-side table
 			$queryOption["columns"] = array("EmployeeNumber", "Firstname", "Lastname");
@@ -2562,7 +2580,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			communication_interface::jsExecute("prlPsSelUpdate();");
 			break;
 		case 'payroll.EmployeeSelectorSave': //employee selection form: save data
-//			communication_interface::alert("x:".print_r($functionParameters[0],true));
 			$res = blFunctionCall('payroll.addEmployee2Period', $functionParameters[0]);
 			communication_interface::jsExecute("$('#modalContainer').mb_close();");
 			$this->prlCalcOvPopulateTable(array("updateTable"=>true));
@@ -2578,7 +2595,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			if($employeeList["success"]) {
 				foreach($employeeList["data"] as $row) $emplData[] = "'".$row["id"]."':'".str_replace("'","\\'",$row["Lastname"].", ".$row["Firstname"])."'";
 			}
-//communication_interface::alert(implode(",",$emplData));
 
 			//Get payroll account list
 			$accountList = blFunctionCall('payroll.getPayrollAccountList'); //id,payroll_year_ID,label,sign
@@ -2609,7 +2625,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			$objWindow->showWindow();
 
 			communication_interface::jsExecute("prlAccAsgParam = {'savemode':1, 'deleteObj':{}, 'yes':'Ja', 'no':'Nein', 'debit':'S', 'credit':'H', 'companies':{".implode(",",$cpnyData)."}, 'employees':{".implode(",",$emplData)."}, 'loa':{".implode(",",$accData)."}, 'validity':[ ['Wert in Feld \\'','\\' ist ungueltig.'], [ ['cc1', /^.{0,15}$/],['aid1', /^[0-9a-zA-Z]{1,5}$/], ['acc1',/^.{1,15}$/], ['cacc1',/^.{0,15}$/], ['et1',/^.{1,50}$/] ],[ ['cc2',/^.{1,15}$/],['aid2',/^[0-9a-zA-Z]{1,5}$/],['amt2',/^[0-9]{1,3}(\.[0-9]{0,2})?$/] ],[ ['cc3',/^.{0,15}$/],['aid3',/^[0-9a-zA-Z]{1,5}$/],['acc3',/^.{1,15}$/],['cacc3',/^.{0,15}$/],['et3',/^.{1,50}$/] ] ] };");
-			//	prlAccAsgParam = {'savemode':2,'employeeID':123,'companyID':432};
 
 			//Get financial and management accounting information (configuration info)
 			$accConfig = blFunctionCall('payroll.getFinMgmtAccountingInfo');
@@ -2647,7 +2662,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			communication_interface::jsExecute("prlAccAsgInit();");
 			break;
 		case 'payroll.saveAccountAssingment':
-//			communication_interface::alert(print_r($functionParameters[0],true));
 			//editFinMgmtAccountingConfig
 			$ret = blFunctionCall('payroll.editFinMgmtAccountingConfig',$functionParameters[0]);
 			if($ret["success"]) {
@@ -2660,7 +2674,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				if($functionParameters[0]["mode"]=='add') $arrRetObj[] = "'id':'".$ret["id"]."'";
 
 				communication_interface::jsExecute("prlAccAsgRec('".$functionParameters[0]["section"]."', '".$functionParameters[0]["mode"]."', {".implode(",",$arrRetObj)."});");
-//				communication_interface::alert("prlAccAsgRec('".$functionParameters[0]["section"]."', '".$functionParameters[0]["mode"]."', {".implode(",",$arrRetObj)."});");
 			}else{
 				communication_interface::alert("Fehler: ".$ret["errText"]." [Code ".$ret["errCode"]."], Feld:".$ret["fieldName"]);
 			}
@@ -2683,7 +2696,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->loadContent("utilities",$data,"EmployeeFilterEditor");
 				$objWindow->showWindow();
 
-//communication_interface::alert("id:".$functionParameters[0]["id"]);
 				if( isset($functionParameters[0]["id"]) && $functionParameters[0]["id"]>0 ) {
 					$FilterName = "";
 					$ValidForEmplOverview = 1;
@@ -2696,7 +2708,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$critCollector = array();
 					$ret = blFunctionCall('payroll.getEmployeeFilterDetail',array("id"=>$functionParameters[0]["id"]));
 					if($ret["success"]) {
-//communication_interface::alert( print_r($ret["data"],true) );
 						$FilterName = str_replace("'","\\'",$ret["data"]["FilterName"]);
 						$ValidForEmplOverview = $ret["data"]["ValidForEmplOverview"];
 						$ValidForCalculation = $ret["data"]["ValidForCalculation"];
@@ -2717,22 +2728,18 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$jsData = "prlUtlEfc = {'FilterName':'', 'ValidForEmplOverview':'1', 'ValidForCalculation':'1', 'GlobalFilter':'1', 'TemporaryFilter':'0', 'payroll_empl_filter_ID':'0', 'data':[], ";
 				}
 				$jsData .= "'labels':{'Conjunction':['','".$objWindow->getText("prlUtlEfcEdtConjunctionAND")."','".$objWindow->getText("prlUtlEfcEdtConjunctionOR")."'], 'Comparison':['', '=', '&lt;=', '&gt;=', '&lt;&gt;', '&gt;', '&lt;', 'IN'], 'FieldModifier':['', '".mb_strtoupper($objWindow->getText("prlUtlEfcEdtFieldModifierDAY"))."', '".mb_strtoupper($objWindow->getText("prlUtlEfcEdtFieldModifierMONTH"))."', '".mb_strtoupper($objWindow->getText("prlUtlEfcEdtFieldModifierYEAR"))."'], 'Checkbox':['".$objWindow->getText("txtY")."', '".$objWindow->getText("txtN")."']}, 'auxFields':{'ex_activeempl_refdate': {'label': 'Aktive Personen (Stichtag)','type': 91, 'len': 10, 'vMin': 0.0, 'vMax': 0.0, 'disabled': false, 'validate': false, 'mandatory': false, 'rgx': ".$this->getDateRegexPattern().", 'callback': false, 'guiWidth': 'XL', 'inUse': false}, 'ex_activeempl_daterange': {'label': 'Aktive Personen (von/bis)','type': 92, 'len': 10, 'vMin': 0.0, 'vMax': 0.0, 'disabled': false, 'validate': false, 'mandatory': false, 'rgx': ".$this->getDateRegexPattern().", 'callback': false, 'guiWidth': 'XL', 'inUse': false}} };";
-//communication_interface::alert($functionParameters[0]["loadFieldDef"]);
 				if( !isset($functionParameters[0]["loadFieldDef"]) || $functionParameters[0]["loadFieldDef"]==1 ) communication_interface::jsExecute($this->getEmplFieldDef());
 				communication_interface::jsExecute($jsData);
 				communication_interface::jsExecute("prlUtlEfcInit();");
 				break;
 			case 'save':
-//communication_interface::alert( print_r($functionParameters[0],true) );
-//communication_interface::jsExecute("$('#prlUtlEfcErr').text('test');");
+
 				$ret = blFunctionCall("payroll.saveEmployeeFilterDetail", $functionParameters[0]["data"]);
 				if($ret["success"]) {
 					communication_interface::jsExecute("$('#modalContainer').mb_close();");
 					$psoDbFilter = session_control::getSessionSettings("payroll", "psoDbFilter");
 					if($functionParameters[0]["data"]["payroll_empl_filter_ID"] == $psoDbFilter) $this->emplOverviewPopulateTable(array("updateTable"=>true));
 				}else{
-//					communication_interface::alert( print_r($ret,true) );
-//					communication_interface::alert( print_r($functionParameters[0]["data"],true) );
 					communication_interface::alert("Speichern fehlgeschlagen [".$ret["errText"].", Code: ".$ret["errCode"]."]");
 				}
 				break;
@@ -3209,7 +3216,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow = new wgui_window("payroll", "destinationBankEdit");
 				$objWindow->windowTitle($objWindow->getText("txtBankverbindungBearbeiten").$MAInfo); 
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(950);
+				$objWindow->windowWidth(970);	
 				$objWindow->windowHeight($windHeight);
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
@@ -3516,7 +3523,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				break;
 
 			case 'GUI_bank_source_Overview': //case 'payroll.paymentSplit' action:'GUI_bank_source_Overview'
-				//communication_interface::alert("GUI_bank_source_Overview");
 			
 				$res = blFunctionCall('payroll.getPaymentSplitDetail', array("id"=>0, "empId"=>$payrollEmployeeID));
 				$data["list_of_zahlstellen"] = $res["dbview_payroll_bank_source"];
@@ -3548,7 +3554,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 							$display .= $fldVal.", ";
 						}
 					}
-					//communication_interface::alert("->GUI_bank_source_edit  -- editmode --". $display);
 				} else {
 					$data["id"] = 0;
 					//$data["payroll_employee_ID"] = $payrollEmployeeID;
@@ -3578,17 +3583,14 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$objWindow->showWindow();
 
 				if ($editMode) {
-					//communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnDelete').bind('click', function(e) { if($('#prlFormCfg_id').val()==0) return false; cb('payroll.paymentSplit', {'action':'GUI_bank_source_del', 'company_ID': '".$company_ID."' , 'bankId':$('#prlPmtSplt_payroll_bankId').val() });        cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});    });");
 					communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnDelete').bind('click', function(e) {  cb('payroll.paymentSplit', {'action':'GUI_bank_source_del', 'company_ID': '".$company_ID."' , 'bankId':$('#prlPmtSplt_payroll_bankId').val()});           });");
 				} else {
 					communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnDelete').css('background-color','#eee')");
 				}
-				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) {    cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});     });");
-				//communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnSave').bind('click', function(e) { prl_BankSourceEdit_btnSave();     cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});   });");
+				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnCancel').bind('click', function(e) {    cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."', 'src':'bse'});     });");
 				communication_interface::jsExecute("$('#prlPmtSplt_BankSourceEdit_btnSave').bind('click', function(e) { prl_BankSourceEdit_btnSave();    });");
 				break;
-			case 'GUI_bank_source_save': //case 'payroll.paymentSplit' action:'GUI_bank_source_save'
-				//communication_interface::alert("GUI_bank_source_save > data:".print_r($functionParameters[0]["data"],true));
+			case 'GUI_bank_source_save': 
 				communication_interface::jsExecute("$('#modalContainer input').css('background-color','');");
 				communication_interface::jsExecute("$('#modalContainer select').css('background-color','');");
 				$res = blFunctionCall("payroll.saveBankSourceDetail", $functionParameters[0]["data"]);
@@ -3603,7 +3605,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 						if (strlen($functionParameters[0]["data"]["bank_source_desc2"]) < 3) { communication_interface::jsExecute("$('#prlPmtSplt_bank_source_desc2').css('background-color','#f88');");  $err=true;}
 					}
 					if ($err == false) {
-						 communication_interface::jsExecute("cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});   ");
+						 communication_interface::jsExecute("cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."', 'src':'bankSrcErr'});   ");
 					}
 				} else {
 					//communication_interface::alert("GUI_bank_source_save success NOT:",true);
@@ -3617,7 +3619,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				if(isset($functionParameters[0]["todo"])) {
 					//communication_interface::alert("GUI_bank_source_del If");
 					$res = blFunctionCall('payroll.deleteBankSourceDetail', array("id"=>$bankId));
-					communication_interface::jsExecute("cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});");
+					communication_interface::jsExecute("cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."', 'src':'bankSrcErr'});");
 					break;
 				} else {
 					//communication_interface::alert("GUI_bank_source_del Else");
@@ -3629,11 +3631,9 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 					$objWindow->windowHeight(155);
 					$objWindow->loadContent("payment",$data,"GUItemplate_bank_source_Delete");
 					$objWindow->showQuestion();
-					communication_interface::jsExecute("$('#btn_bank_source_Delete_NO').bind('click', function(e) {     cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});         });");
+					communication_interface::jsExecute("$('#btn_bank_source_Delete_NO').bind('click', function(e) {     cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."', 'src':'GUI_bank_source_del'});         });");
 					communication_interface::jsExecute("$('#btn_bank_source_Delete_YES').bind('click', function(e) {    cb('payroll.paymentSplit', {'action':'GUI_bank_source_del', 'company_ID': '".$company_ID."' , 'bankId':'".$bankId."', 'todo':'delete'});  " .
-																												/*	"	alert('Bank deleted');    " .			*/
 																													"	$('#modalContainer').mb_close();    " .
-																												/*  "	cb('payroll.ConfigEditFormOpen',{'section':'CfgCmpc','id':'".$company_ID."'});  " . */
 																													"   });");
 				}
 				break;
@@ -3788,7 +3788,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 										if(!$childRow["mandatory"]) $arrItemCollector[] = "['', '']";
 										foreach($fieldDefRecs["listInsuranceCodes"][$childRow["dataSourceGroup"]] as $optionItem) {
 											$arrItemCollector[] = "['".$optionItem["itemID"]."', '".str_replace("'","\\'",$optionItem["itemID"].($optionItem["label"]!="" ? " - ".$optionItem["label"] : ""))."', ".$optionItem["payroll_company_ID"]."]";
-			//TODO: payroll_company_ID reicht hier alleine nicht aus... im JavaScript muss eine entsprechende Filterfunktion vorgesehen werden!
 										}
 //										$fieldDef .= ($fieldDef=="" ? "" : ",")."'".$row["fieldName"]."': {'label': '".str_replace("'","\\'",$row["label"])."','type': 4, 'len': ".$row["maxLength"].", 'vMin': 0, 'vMax': 0, 'disabled': ".($row["read-only"] ? "true" : "false").", 'validate': false, 'mandatory': false, 'rgx': '', 'callback': ".($row["callback"] ? "true" : "false").", 'guiWidth': '".$row["guiWidth"]."', 'inUse': false, 'options': [".implode(",", $arrItemCollector)."] }";
 										$arrFieldset[] = "'".$childRow["fieldName"]."': {'label': '".$label."','type': 4, 'len': ".$childRow["maxLength"].", 'vMin': 0, 'vMax': 0, 'disabled': ".($childRow["read-only"] ? "true" : "false").", 'validate': false, 'mandatory': false, 'rgx': '', 'callback': ".($childRow["callback"] ? "true" : "false").", 'width': '".$width."', 'inUse': false, 'options': [".implode(",", $arrItemCollector)."] }";
@@ -3809,6 +3808,28 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		return "prlVlFieldDef = {".$fieldDef."};";
 	}
 
+	private function setQuellensteuerSelectorDropdowns($param=null) {
+		$prdInfo = !is_null($param) && isset($param["year"]) ? blFunctionCall('payroll.getPeriodInformation',array("year"=>$param["year"])) : blFunctionCall('payroll.getPeriodInformation');
+		//fill year SELECT
+		communication_interface::jsExecute("$('#selPeriodenJahr').find('option').remove();");
+		communication_interface::jsExecute("$.each([".implode(",",$prdInfo["data"]["years"])."], function() { $('#selPeriodenJahr').append( $('<option></option>').val(this.toString()).html(this.toString()) ) });");
+		//set current year
+		communication_interface::jsExecute("$('#selPeriodenJahr').val(".$prdInfo["data"]["info"]["year"].");");
+		//disable all periods
+		communication_interface::jsExecute("$('#selPeriodenMonatVon').find('option').removeAttr('disabled');");
+		//disable all unused periods
+		$arrPrdALL = array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
+		$arrPrdUsed = array();
+		foreach($prdInfo["data"]["major_period"] as $prdNum=>$prdData) $arrPrdUsed[] = $prdNum;
+		$arrPrdUnused = array_diff($arrPrdALL,$arrPrdUsed);
+		communication_interface::jsExecute("$.each([".implode(",",$arrPrdUnused)."], function() { $('#prlCalcOvMajorPeriod option[value='+this.toString()+']').attr('disabled','disabled') });");
+		//select current period
+		$currentMajorPeriod = isset($prdInfo["data"]["currentPeriod"]) ? $prdInfo["data"]["currentPeriod"]["major_period"] : 1;
+		communication_interface::jsExecute("$('#selPeriodenMonatBis').val(".$currentMajorPeriod.");");
+		return array("currentYear"=>$prdInfo["data"]["info"]["year"], "currentMajorPeriod"=>$currentMajorPeriod);
+	}
+	
+	
 	private function prlCalcOvFillYearPeriodCmb($param=null) {
 		$prdInfo = !is_null($param) && isset($param["year"]) ? blFunctionCall('payroll.getPeriodInformation',array("year"=>$param["year"])) : blFunctionCall('payroll.getPeriodInformation');
 		//fill year SELECT
@@ -3858,9 +3879,8 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		}
 		$tblData .= "];";
 		communication_interface::jsExecute($tblData);
-//error_log(date("c")."\n".$tblData."\nUpdate Table = ".($updateTable?"true":"false")."\n\n", 3, "/var/log/daniel.log");
 		communication_interface::jsExecute('prlCalcOvSetData('.($updateTable?'true':'false').');');
-//communication_interface::jsExecute("prlCalcOvGrid.invalidate();");
+		//communication_interface::jsExecute("prlCalcOvGrid.invalidate();");
 	}
 
 	private function prlCfgCmpcPopulateTable($param=null) {
@@ -3912,15 +3932,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			communication_interface::jsExecute("prlCfg.CfgLoac.grid.dataView.reSort();");
 			communication_interface::jsExecute("prlCfg.CfgLoac.grid.gridObj.invalidate();");
 		}
-/*
-		communication_interface::jsExecute("prlCfgData = [".implode(",", $arrRowCollector)."];");
-		if($updateTable) {
-			communication_interface::jsExecute("prlCfgDataView.beginUpdate();");
-			communication_interface::jsExecute("prlCfgDataView.setItems(prlCfgData);");
-			communication_interface::jsExecute("prlCfgDataView.endUpdate();");
-			communication_interface::jsExecute("prlCfgDataView.reSort();");
-		}
-*/
+
 	}
 
 	private function prlCfgInscPopulateTable($param=null) {
@@ -3997,7 +4009,6 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		}
 
 		communication_interface::jsExecute("prlCfg.CfgDasc.grid.data = [".implode(",", $arrRowCollector)."];");
-//		communication_interface::jsExecute("alert(prlCfg.CfgDasc.grid.data.toSource());");
 		if($updateTable) {
 			communication_interface::jsExecute("prlCfg.CfgDasc.grid.dataView.beginUpdate();");
 			communication_interface::jsExecute("prlCfg.CfgDasc.grid.dataView.setItems(prlCfg.CfgDasc.grid.data);");

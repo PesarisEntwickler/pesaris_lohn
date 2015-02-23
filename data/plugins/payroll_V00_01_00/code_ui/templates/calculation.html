@@ -29,15 +29,7 @@
 					<option value="16"><wgui:text id="prlCalcOvBonus"/> 2</option>
 				</optgroup>
 			</select>
-<!-- 			&nbsp;&nbsp;
-		<wgui:text id="txtZahlstelle"/>:
-			<select id="prlBankSourceReport" style="width: 120px;">
-					<option value="0" selected="selected">--- <wgui:text id="prlPayout_filter_mode_ALL"/> ---</option>
-					<option value="1"></option>
-					<option value="2"></option>
-					<option value="3"></option>
-			</select>
- -->	</div>
+	</div>
 	<div id="tbCalcOvRow2" class="ui-widget-header ui-corner-all">
 		<button id="prlCalcOvBtnEdit"><wgui:text id="prlCalcOvBtnEdit"/></button>
 		<button id="prlCalcOvBtnAddEmpl"><wgui:text id="prlCalcOvBtnAddEmpl"/></button>
@@ -55,10 +47,11 @@
 		</ul>
 		<ul id="prlCalcOvOutputMenu">
 			<li><a href="#" fnc="2"><wgui:text id="txtCalcMenupunkt_KontrollJournal"/></a></li>
-			<li><a href="#" fnc="3"><wgui:text id="txtCalcMenupunkt_FIBUKontierungen"/></a></li>
-			<li><a href="#" fnc="4"><wgui:text id="txtCalcMenupunkt_BEBUKontierungen"/></a></li>
+			<li><a href="#" fnc="3"><wgui:text id="txtCalcMenupunkt_FIBUKontierungen"/>...</a></li>
+			<li><a href="#" fnc="4"><wgui:text id="txtCalcMenupunkt_BEBUKontierungen"/>...</a></li>
 			<li><a href="#" fnc="1"><wgui:text id="txtCalcMenupunkt_Lohnabrechnungen"/></a></li>
-			<li><a href="#" fnc="5"><wgui:text id="txtCalcMenupunkt_Lohnkonto"/></a></li>
+			<li><a href="#" fnc="5"><wgui:text id="txtCalcMenupunkt_Lohnkonto"/>...</a></li>
+			<li><a href="#" fnc="6"><wgui:text id="txtCalcMenupunkt_Quellensteuerabrechnung"/>...&nbsp;</a></li>
 		</ul>
 	</div>
 	<div id="gridCalcOv" style="width:600px;height:500px;"></div>
@@ -87,7 +80,8 @@
 		<li><a href="#" act="2"><wgui:text id="btnDelete"/></a></li>
 	</ul>
 </div>
-<button id="prlCalcDataBtnSave"><wgui:text id="btnSave"/></button><button id="prlCalcDataBtnCancel"><wgui:text id="btnCancel"/></button>
+<button id="prlCalcDataBtnCancel"><wgui:text id="btnCancel"/></button>
+<button id="prlCalcDataBtnSave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="calculationDataEditor">
 <wgui:block name="processPayment">
 <div class="ui-tabs ui-widget-content ui-corner-all">
@@ -100,8 +94,8 @@
 		</wgui:loop name="companyLoop">
 	</select><br/>
 </div>
-<button id="prlPayoutBtnSave"><wgui:text id="prlPayoutBtnSave"/></button>
 <button id="prlPayoutBtnCancel"><wgui:text id="btnCancel"/></button>
+<button id="prlPayoutBtnSave" style="float: right;"><wgui:text id="prlPayoutBtnSave"/></button>
 </wgui:block name="processPayment">
 <wgui:block name="enterAccountingData">
 <div class="ui-tabs ui-widget-content ui-corner-all">
@@ -124,8 +118,8 @@
 	<label for="prlAccEtr_mgmt_acc_date"><wgui:text id="prlAccEtr_mgmt_acc_date"/></label><input type="text" id="prlAccEtr_mgmt_acc_date"/><br/>
 	</fieldset>
 </div>
-<button id="prlAccEtrBtnSave"><wgui:text id="btnSave"/></button>
 <button id="prlAccEtrBtnCancel"><wgui:text id="btnCancel"/></button>
+<button id="prlAccEtrBtnSave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="enterAccountingData">
 <wgui:block name="calculationFinalizeWarning">
 	<div class="ui-tabs ui-widget-content ui-corner-all">
@@ -215,8 +209,8 @@
 	</div>
 
 	<div id="prlCalcFinErr"></div>
-	<button class="PesarisButton" id="prlCalcFinSave"><wgui:text id="prlCalcFinSave"/></button>
 	<button class="PesarisButton" id="prlCalcFinCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlCalcFinSave" style="float: right;"><wgui:text id="prlCalcFinSave"/></button>
 </wgui:block name="calculationFinalize">
 <wgui:block name="prlCalcOvSettings">
 	<div id="prlPrdSetTabs">
@@ -280,8 +274,8 @@
 			<textarea id="prlPrdSet_msg_txt"></textarea>
 		</div>
 	</div>
-	<button class="PesarisButton" id="prlPrdSetSave"><wgui:text id="btnSave"/></button>
 	<button class="PesarisButton" id="prlPrdSetCancel"><wgui:text id="btnCancel"/></button>
+	<button class="PesarisButton" id="prlPrdSetSave" style="float: right;"><wgui:text id="btnSave"/></button>
 </wgui:block name="prlCalcOvSettings">
 <wgui:block name="prlCalcReportSelector">
 	<br/>
@@ -330,9 +324,7 @@
 		</table>
     </fieldset>
     </div>
-    <center>
-	    <button class="PesarisButton" id="prlRepSelSave"><wgui:text id="btnOK"/></button>
-	    <button class="PesarisButton" id="prlRepSelCancel"><wgui:text id="btnClose"/></button>
-    </center>
+    <button class="PesarisButton" id="prlRepSelCancel"><wgui:text id="btnClose"/></button>
+    <button class="PesarisButton" id="prlRepSelSave" style="float: right;"><wgui:text id="btnOK"/></button>
     <div id="prlRepSelErr"></div>
 </wgui:block name="prlCalcReportSelector">

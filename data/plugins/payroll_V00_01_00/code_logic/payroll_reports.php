@@ -3,10 +3,13 @@ class payroll_BL_reports {
 	
 	public function CalculationJournal($param) {
         require_once(getcwd()."/kernel/common-functions/configuration.php");
+        require_once('payroll_reporting_functions.php');
+        $payroll_reporting_functions = new payroll_reporting_functions();
+        
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
 //$param = array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"])
-		$periodLabels["de"] = $this->getPeriodLabels("de");
+		$periodLabels["de"] = $payroll_reporting_functions->getPeriodLabels("de");
 
 //communication_interface::alert("CalculationJournal param=".print_r($param,true));
 		
@@ -24,8 +27,8 @@ class payroll_BL_reports {
 		$ReportName = "CalculationJournal";
         fwrite($fp, 
                "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                $this->getReportingCompany("Company").
-                $this->getPrintDateTime()."
+                $payroll_reporting_functions->getReportingCompany("Company", 0).
+                $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
                 </Header>
@@ -136,9 +139,11 @@ class payroll_BL_reports {
 
 	private function AccountingJournal($param,$ReportName,$entryTable) {
         require_once(getcwd()."/kernel/common-functions/configuration.php");
+        require_once('payroll_reporting_functions.php');
+        $payroll_reporting_functions = new payroll_reporting_functions();
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
-		$periodLabels["de"] = $this->getPeriodLabels("de");
+		$periodLabels["de"] = $payroll_reporting_functions->getPeriodLabels("de");
 
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
@@ -172,8 +177,8 @@ class payroll_BL_reports {
                 
                 fwrite($fp, 
                "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                $this->getReportingCompany("Company").
-                $this->getPrintDateTime()."
+                $payroll_reporting_functions->getReportingCompany("Company", 0).
+                $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>".
                 "\n\t</Header>
@@ -236,8 +241,8 @@ class payroll_BL_reports {
 
                 fwrite($fp,
                 "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                $this->getReportingCompany("MainCompany").
-                $this->getPrintDateTime()."
+                $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -335,8 +340,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -437,8 +442,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -534,8 +539,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -624,8 +629,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -717,8 +722,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -782,8 +787,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -846,8 +851,8 @@ class payroll_BL_reports {
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -906,8 +911,8 @@ ORDER BY    accetry.account_no ,
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -963,8 +968,8 @@ ORDER BY    accetry.account_no ,
 
                  fwrite($fp,
                  "<Report name=\"".$ReportName."\" lang=\"de\">\n\t<Header>".
-                 $this->getReportingCompany("MainCompany").
-                 $this->getPrintDateTime()."
+                 $payroll_reporting_functions->getReportingCompany("MainCompany", 0).
+                 $payroll_reporting_functions->getPrintDateTime()."
 				<Year>".$param["year"]."</Year>
 				<Period>".$periodTitle."</Period>
 				<AccountType>".$entryTable."</AccountType>".
@@ -1037,6 +1042,10 @@ ORDER BY    accetry.account_no ,
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         require_once('payroll_auszahlen.php');
         $auszahlen = new auszahlen();
+        require_once('payroll_reporting_functions.php');
+        $payroll_reporting_functions = new payroll_reporting_functions();
+        
+        $statistikArr = array();
         
         global $aafwConfig;
 		ini_set('memory_limit', '512M');
@@ -1143,8 +1152,8 @@ ORDER BY    accetry.account_no ,
 		}
 		$fp = $fm->setFile("data.xml")->fopen("w");
 		fwrite($fp, "<Report name=\"PayrollAccountJournal\" lang=\"de\">
-		<Header>".$this->getReportingCompany("Company")
-                 .$this->getPrintDateTime()."
+		<Header>".$payroll_reporting_functions->getReportingCompany("Company", 0)
+                 .$payroll_reporting_functions->getPrintDateTime()."
 			<Year>".$param["year"]."</Year>
 			<ExtendedMonthView>".$extendedMonthView."</ExtendedMonthView>
 		</Header>
@@ -1326,10 +1335,12 @@ ORDER BY    accetry.account_no ,
 					";
 				//"<EmploymentPeriods>".implode("",$arrEmployeePeriods["id".$row["EmployeeID"]])."</EmploymentPeriods>
 			}
+			$quantityAbsWerte = 0.0;
 			if($row["print_account"]!=1) {
 				$rowTotal = 0.0;
 				for($i=1;$i<17;$i++) {
 					$rowTotal += $row["prd".$i."q"];
+					$quantityAbsWerte += abs( $row["prd".$i."q"] );
 					if (!isset($rekap[$row["AccountNumber"]]["Perioden"]["prd".$i."q"])) {
 						$rekap[$row["AccountNumber"]]["Perioden"]["prd".$i."q"] = 0;
 					}
@@ -1359,10 +1370,12 @@ ORDER BY    accetry.account_no ,
 				$tagQuantity = "";
 				$hatQ = "N";
 			}
+			$amountAbsWerte = 0.0;
 			if($row["print_account"]!=2) {
 				$rowTotal = 0.0;
 				for($i=1;$i<17;$i++) {
 					$rowTotal += $row["prd".$i."a"];
+					$amountAbsWerte += abs( $row["prd".$i."a"] );
 					if (!isset($rekap[$row["AccountNumber"]]["Perioden"]["prd".$i."a"])) {
 						$rekap[$row["AccountNumber"]]["Perioden"]["prd".$i."a"] = 0;
 					}
@@ -1387,6 +1400,7 @@ ORDER BY    accetry.account_no ,
 						<Prd16>".$row["prd16a"]."</Prd16>
 						<Total>".$rowTotal."</Total>
 					</amount>";
+				//$statistikArr[]=$tagAmount;
 				$hatA = "Y";				
 			} else {
 				$tagAmount = "";
@@ -1397,13 +1411,16 @@ ORDER BY    accetry.account_no ,
 				$lbl = $auszahlen->replaceUmlaute(utf8_decode($lbl));
 				$lbl = trim(substr($lbl."               ",0,13));
 			}
-			$entryCollector[] = "
+			$hatWerte = $quantityAbsWerte + $amountAbsWerte;
+			if ($hatWerte > 0.0 ) {
+				$entryCollector[] = "
 				<Entry>
 					<AccountNumber>".$row["AccountNumber"]."</AccountNumber>
 					<AccountName>".$lbl."</AccountName>
 					".$tagQuantity.$tagAmount."
 				</Entry>
 				";
+			}
 			$rowTotal = 0;
 			
 			if (!isset($rekap[$row["AccountNumber"]]["betroffeneMitarbeiterId"])) {	$rekap[$row["AccountNumber"]]["betroffeneMitarbeiterId"] = "";	} 	
@@ -1440,12 +1457,14 @@ ORDER BY    accetry.account_no ,
 		$rekapEntries = "";
 		$rekapMetaArray = array_keys($rekap);
 		asort($rekapMetaArray);
+		$statistikArr["P"."0"] = 0;
 		foreach ($rekapMetaArray as $lohnart) {
 			//communication_interface::alert("wert: ".$value."\n".print_r($rekap[$value],true));
 			$P = array_keys($rekap[$lohnart]["Perioden"]);
 			$rowTotal = 0;
 			for ($i = 0; $i < 16; $i++) {
 				$rowTotal += $rekap[$lohnart]["Perioden"][$P[$i]];
+				$statistikArr["P".$i] += $rekap[$lohnart]["Perioden"][$P[$i]];
 			}
 			$periodenXML = "<Jan>".  $rekap[$lohnart]["Perioden"][$P[0]]."</Jan>
 						<Feb>".  $rekap[$lohnart]["Perioden"][$P[1]]."</Feb>
@@ -1464,27 +1483,44 @@ ORDER BY    accetry.account_no ,
 						<Prd15>".$rekap[$lohnart]["Perioden"][$P[14]]."</Prd15>
 						<Prd16>".$rekap[$lohnart]["Perioden"][$P[15]]."</Prd16>
 						<Total>$rowTotal</Total>";
-
-			$rekapEntries .= "
+			$hatWerte = abs( $rekap[$lohnart]["Perioden"][$P[0]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[1]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[2]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[3]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[4]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[5]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[6]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[7]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[8]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[9]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[10]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[11]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[12]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[13]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[14]] );
+			$hatWerte += abs( $rekap[$lohnart]["Perioden"][$P[15]] );
+			if ($hatWerte > 0.0) {
+				$rekapEntries .= "
 				<Entry>
 					<AccountNumber>".$rekap[$lohnart]["AccountNumber"]."</AccountNumber>
 					<AccountName>".$rekap[$lohnart]["AccountName"]."</AccountName>
-					";			
-			
-			if ($rekap[$lohnart]["hatA"] == "Y") {
+					";						
+				
+			  if ($rekap[$lohnart]["hatA"] == "Y") {
 				$rekapEntries 
 				.= "<amount>
 						".$periodenXML."
 					</amount>";
-			} else {
+			  } else {
 				$rekapEntries 
 				.= "<quantity>
 						".$periodenXML."
 					</quantity>";
-			}
-			$rekapEntries .= "
+			  }
+				$rekapEntries .= "
 				</Entry>";
-				
+			}
+					
 			//communication_interface::alert("wert: ".$lohnart."\nperiodenXML=".$periodenXML."\nP: ".print_r($P,true)."\n".print_r($rekap[$value]["Perioden"],true));
 			//communication_interface::alert("wert: ".$lohnart."\nperiodenXML=".$periodenXML."\n: ".print_r($rekap,true));
 		}										
@@ -1500,12 +1536,20 @@ ORDER BY    accetry.account_no ,
 		$fm->fclose();
 
 		chdir($newTmpPath);
+		$y = 0;
+		$cnt = count($statistikArr);
+		for ($i = 0; $i < $cnt; $i++) {
+			if ( floatval ($statistikArr["P".$i]) > 0 ) {
+				$y++;
+			}
+		}
+//communication_interface::alert("y:".$y."\nPayrollAccountJournal:".print_r($statistikArr, true)."\narray_count_values:".print_r(array_values($statistikArr),true));
 
-// 		if ($maxMonatsLohn > 100000.00) {
-// 			system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."PayrollAccountJournal_ForLongData.xslt ./data.xml > ./compileme.tex");
-// 		} else {
+		if ($y > 10) {
+			system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."PayrollAccountJournal_ForLongData.xslt ./data.xml > ./compileme.tex");
+		} else {
  			system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."PayrollAccountJournal.xslt ./data.xml > ./compileme.tex");
-// 		}
+		}
 
         system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
 		system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
@@ -2058,55 +2102,6 @@ ORDER BY    accetry.account_no ,
 		return $anzFiles;
 	}// end function generateAuszahlDataReports($ZahlstellenID, $Personenkreis, $dueDateGUI)
 	
-	
-	
-	public function getReportingCompany($TAGCompanyOrMainCompany) {
-		//TODO: Eine Checkox im Firmenstamm / Stammdaten erstellen um dieses Flag "isReportingCompany = 'Y'" zu verwalten
-		$system_database_manager = system_database_manager::getInstance();
-		$sql = "SELECT * FROM payroll_company LIMIT 1,1 ;";//Default, die erste Firma
-		$result = $system_database_manager->executeQuery($sql, "getReportingCompany");
-		//Defaultbesetzung, die erste Zeile
-			$ReportCompanyXML = "
-			<".$TAGCompanyOrMainCompany.">
-				<Name>".$result[0]["HR-RC-Name"]."</Name>
-				<Street>".$result[0]["Street"]."</Street>
-				<ZipCity>".$result[0]["ZIP-Code"]." ".$result[0]["City"]."</ZipCity>
-			</".$TAGCompanyOrMainCompany.">";
-		//Richtige Abfrage
-		$sql = "SELECT * FROM payroll_company WHERE isReportingCompany = 'Y' ;";
-		$result = $system_database_manager->executeQuery($sql, "getReportingCompany");
-		if (count($result) > 0) {
-			$ReportCompanyXML = "
-			<".$TAGCompanyOrMainCompany.">
-				<Name>".$result[0]["HR-RC-Name"]."</Name>
-				<Street>".$result[0]["Street"]."</Street>
-				<ZipCity>".$result[0]["ZIP-Code"]." ".$result[0]["City"]."</ZipCity>
-			</".$TAGCompanyOrMainCompany.">";
-		}
-		return $ReportCompanyXML;
-	}
-	
-	public function getPeriodLabels($lang) {
-		switch ($lang) {
-			case "en":
-				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
-				break;
-			case "fr":
-				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
-				break;
-			case "it":
-				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
-				break;
-			default: //de
-				return array("", "Januar", "Februar", "Maerz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember", "", "", "Gratifikation", "Gratifikation");
-				break;
-		}
-	}
-	
-	public function getPrintDateTime() {
-		return "
-			<PrintDate>".date("d.m.Y")."</PrintDate>
-			<PrintTime>".date("H:i:s")."</PrintTime>";
-	}	
+		
 }
 ?>
