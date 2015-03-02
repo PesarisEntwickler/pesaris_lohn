@@ -3,14 +3,15 @@ class payroll_reporting_functions {
 
 	public function getReportingCompany($TAGCompanyOrMainCompany, $reportingCompany) {
 		//TODO: Eine Checkox im Firmenstamm / Stammdaten erstellen um dieses Flag "isReportingCompany = 'Y'" zu verwalten
-
+		
+		$Firmenzusatz = "";
 		$ReportCompanyXML = "
 				<".$TAGCompanyOrMainCompany.">\n";
-		
 		//Defaultbesetzung, die erste Zeile
 		$sql = "SELECT * FROM payroll_company  LIMIT 1,1 ;";//Default, die erste Firma
-		if ($reportingCompany == 0) {
+		if ($reportingCompany < 0) {
 			$sql = "SELECT * FROM payroll_company WHERE isReportingCompany = 'Y' ;";
+			$Firmenzusatz = " (Auswertung ueber alle Firmen)";
 		} else {
 			$sql = "SELECT * FROM payroll_company WHERE id = ".$reportingCompany." ;";
 		}
@@ -20,7 +21,7 @@ class payroll_reporting_functions {
 		if (count($result) > 0) {
 			$ReportCompanyXML = "
 			<".$TAGCompanyOrMainCompany.">
-				<Name>".$result[0]["HR-RC-Name"]."</Name>
+				<Name>".$result[0]["HR-RC-Name"].$Firmenzusatz."</Name>
 				<Street>".$result[0]["Street"]."</Street>
 				<ZipCity>".$result[0]["ZIP-Code"]." ".$result[0]["City"]."</ZipCity>
 				<ContactPersName>".$result[0]["ContactPers-Name"]."</ContactPersName>

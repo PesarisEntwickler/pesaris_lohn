@@ -7,8 +7,8 @@
 			<wgui:text id="txtFirmenauswahl" /> 
 		</td>
 		<td>
-			<select id="selFirmenauswahl" style="width:120px;"><!-- id="prlPsSelDBFilter" -->
-			<wgui:loop name="filterLoop" varname="selFirmenListe"><!-- varname="dbFilterList" -->
+			<select id="selFirmenauswahl" style="width:120px;">
+			<wgui:loop name="filterLoop" varname="selFirmenListe">
 				<option value="<wgui:loopvar loopname="filterLoop" varname="id"/>"><wgui:loopvar loopname="filterLoop" varname="company_shortname"/></option>
 			</wgui:loop name="filterLoop">
 			</select>

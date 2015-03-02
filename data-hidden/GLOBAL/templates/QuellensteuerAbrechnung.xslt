@@ -33,44 +33,36 @@
 
 \begin{document}
 \vspace*{-7.15mm}
-\begin{longtable}{@{\extracolsep{\fill}}l l l l|r|r|r}
-\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Pers.Nr.</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Pers.Nr.</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Pers.Nr.</xsl:text></xsl:otherwise>
-</xsl:choose>}&amp;\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Name</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Name</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Name</xsl:text></xsl:otherwise>
-</xsl:choose>}&amp;\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>LOA</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>LOA</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>LOA</xsl:text></xsl:otherwise>
-</xsl:choose>}&amp;\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Bezeichnung</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Bezeichnung</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Bezeichnung</xsl:text></xsl:otherwise>
-</xsl:choose>}&amp;\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Menge</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Menge</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Menge</xsl:text></xsl:otherwise>
-</xsl:choose>}&amp;\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Ansatz</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Ansatz</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Ansatz</xsl:text></xsl:otherwise>
-</xsl:choose>}&amp;\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Betrag</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Betrag</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Betrag</xsl:text></xsl:otherwise>
-</xsl:choose>}\\
-\endhead
-<xsl:apply-templates select="Report/Employees"/>
-\end{longtable}
 
+\begin{longtable}{ p{50mm} p{5mm} p{20mm} p{22mm} p{22mm} p{22mm} p{24mm} p{22mm} p{22mm} p{24mm}}
+Nr/Name/Vorname     
+&amp; 
+&amp; Eintritt 
+&amp; Periode 
+&amp;\hfill Brutto-Lohn 
+&amp;\hfill Zulagen 
+&amp;\hfill pfl.Beitrag 
+&amp;\hfill Tarif 
+&amp;\hfill Zivilstand 
+&amp;\hfill Abzug \\
+Versicherungsnummer 
+&amp; 
+&amp; Austritt 
+&amp; von-bis 
+&amp;             
+&amp;         
+&amp;             
+&amp;       
+&amp;\hfill Kinder    
+&amp;  
+\hline
+\\
+\endhead
+<xsl:apply-templates select="Report/CompanyList"/>
+
+\end{longtable}
 \end{document}
 </xsl:template>
-
-
 
 <xsl:template match="Header">
 \fancyhead[LO,LE]{\fontsize{18pt}{18pt}\textbf{<xsl:choose>
@@ -80,24 +72,29 @@
 </xsl:choose>}\\
 \vspace{2mm}
 <xsl:if test="Company/Name != ''">
-	<xsl:value-of select="Company/Name"/> <xsl:value-of select="Company/ContactPersName"/>\\
+	<xsl:value-of select="Company/Name"/>\\
 </xsl:if>
 <xsl:if test="Company/Street != ''">
-	<xsl:value-of select="Company/Street"/> <xsl:value-of select="Company/ContactPersTel"/>\\
+	<xsl:value-of select="Company/Street"/>\\
 </xsl:if>
 <xsl:if test="Company/ZipCity != ''">
-	<xsl:value-of select="Company/ZipCity"/> <xsl:value-of select="Company/ContactPersEMail"/>\\
+	<xsl:value-of select="Company/ZipCity"/>\\
 </xsl:if>}
 \fancyhead[CO,CE]{\textbf{<xsl:choose>
 <xsl:when test="/Report/@lang = 'fr'"><xsl:text>Periode</xsl:text></xsl:when>
 <xsl:when test="/Report/@lang = 'it'"><xsl:text>Periode</xsl:text></xsl:when>
 <xsl:otherwise><xsl:text>Periode</xsl:text></xsl:otherwise>
-</xsl:choose>}: <xsl:value-of select="Period"/>\\
-\textbf{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Canton</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Cantone</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Kanton</xsl:text></xsl:otherwise>
-</xsl:choose>}: <xsl:value-of select="Kanton"/>\\}
+</xsl:choose>:} <xsl:value-of select="Period"/>\\
+\\
+<xsl:if test="Company/ContactPersName != ''">
+	<xsl:value-of select="Company/ContactPersName"/>,
+</xsl:if>
+<xsl:if test="Company/ContactPersTel != ''">
+	<xsl:value-of select="Company/ContactPersTel"/>,
+</xsl:if>
+<xsl:if test="Company/ContactPersEMail != ''">
+	<xsl:value-of select="Company/ContactPersEMail"/>\\
+</xsl:if>}
 \fancyhead[RO,RE]{<xsl:choose>
 <xsl:when test="/Report/@lang = 'fr'"><xsl:text>Date</xsl:text></xsl:when>
 <xsl:when test="/Report/@lang = 'it'"><xsl:text>Dato</xsl:text></xsl:when>
@@ -120,54 +117,120 @@
 </xsl:template>
 
 
-
-<xsl:template match="Employees"><xsl:apply-templates/>
+<xsl:template match="CompanyList">
+<xsl:apply-templates select="Company"/>
 </xsl:template>
 
 
 
-<xsl:template match="Employee"><xsl:if test="position() > 1">\pagebreak
+<xsl:template match="Company"><xsl:if test="position() > 1">\pagebreak
 </xsl:if>
-<xsl:apply-templates select="Entries"/>
-<xsl:apply-templates select="Entries/Entry"/>
+<xsl:apply-templates select="KantonList"/>
+\pagebreak
+\\
+Summe <xsl:value-of select="Krz"/>:
+&amp;\multicolumn{3}{l}{<xsl:value-of select="Name"/>}		
+&amp;\multicolumn{2}{l}{<xsl:value-of select="KontaktpersonName"/>}	
+&amp;\hfill <xsl:value-of select="QSTCompanyTotalPflichtig"/> 	
+&amp;	
+&amp;	
+&amp;\hfill <xsl:value-of select="QSTCompanyTotalAbzug"/>   \\
+
+&amp;\multicolumn{3}{l}{<xsl:value-of select="Strasse"/>}
+&amp;\multicolumn{3}{l}{<xsl:value-of select="KontaktpersonTel"/>}
+&amp;\multicolumn{2}{l}{\hfill Provisionen der Kantone:}
+&amp;\hfill <xsl:value-of select="QSTCompanyTotalAbzugProvision"/> \\ 
+
+&amp;\multicolumn{3}{l}{<xsl:value-of select="PlzOrt"/>}
+&amp;\multicolumn{3}{l}{<xsl:value-of select="KontaktpersonEMail"/>}	
+&amp;\multicolumn{2}{l}{ }
+&amp;\hfill <xsl:value-of select="QSTCompanyTotalAbzugNachProvision"/> \\
 </xsl:template>
 
 
 
-<xsl:template match="Entries">
-<xsl:call-template name="EmployeeRow"/>
+
+<xsl:template match="Kanton"><xsl:if test="position() > 1">\pagebreak
+</xsl:if>
+<xsl:apply-templates select="GemeindeList/Gemeinde"/>
+\pagebreak
+\\
+<xsl:text>Summe Kanton: </xsl:text> \fontsize{14pt}{14pt}\textbf{ <xsl:value-of select="Name"/>} 
+&amp;
+&amp;\multicolumn{4}{l}{<xsl:text>Arbeitgebernummer: </xsl:text> <xsl:value-of select="Arbeitgebernummer"/>}
+&amp;\hfill <xsl:value-of select="QSTKantonTotalPflichtig"/>
+&amp;	
+&amp;	
+&amp;\hfill <xsl:value-of select="QSTKantonTotalAbzug"/>
+\\
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;\multicolumn{2}{l}{\hfill Provision  <xsl:value-of select="ProvisionProzent"/> \%: }
+&amp;\hfill <xsl:value-of select="QSTKantonTotalAbzugProvision"/>
+\\
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;
+&amp;\hfill <xsl:value-of select="QSTKantonTotalAbzugNachProvision"/>\\
 </xsl:template>
 
-<xsl:template name="EmployeeRow">
-<xsl:value-of select="ancestor::*[name()='Employee'][1]/EmployeeNumber"/>&amp;<xsl:value-of select="concat(ancestor::*[name()='Employee'][1]/Lastname,' ',ancestor::*[name()='Employee'][1]/Firstname)"/>&amp;\multicolumn{2}{l|}{\small\emph{<xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>AVS</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>AVS</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>AHV</xsl:text></xsl:otherwise>
-</xsl:choose>: <xsl:value-of select="ancestor::*[name()='Employee'][1]/CodeAHV"/>, <xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>ALV</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>ALV</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>ALV</xsl:text></xsl:otherwise>
-</xsl:choose>: <xsl:value-of select="ancestor::*[name()='Employee'][1]/CodeALV"/>, <xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>KTG</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>KTG</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>KTG</xsl:text></xsl:otherwise>
-</xsl:choose>: <xsl:value-of select="ancestor::*[name()='Employee'][1]/CodeKTG"/>, <xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>UVG</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>UVG</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>UVG</xsl:text></xsl:otherwise>
-</xsl:choose>: <xsl:value-of select="ancestor::*[name()='Employee'][1]/CodeUVG"/>, <xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>BVG</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>BVG</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>BVG</xsl:text></xsl:otherwise>
-</xsl:choose>: <xsl:value-of select="ancestor::*[name()='Employee'][1]/CodeBVG"/>, <xsl:choose>
-<xsl:when test="/Report/@lang = 'fr'"><xsl:text>Status</xsl:text></xsl:when>
-<xsl:when test="/Report/@lang = 'it'"><xsl:text>Status</xsl:text></xsl:when>
-<xsl:otherwise><xsl:text>Status</xsl:text></xsl:otherwise>
-</xsl:choose>: <xsl:value-of select="ancestor::*[name()='Employee'][1]/Status"/>}}&amp;&amp; \\
+
+
+
+<xsl:template match="Gemeinde"><xsl:if test="position() > 1">\pagebreak
+</xsl:if>
+\multicolumn{9}{l}{<xsl:text>Gemeinde </xsl:text> <xsl:value-of select="Name"/>}
+\\
+\\
+<xsl:apply-templates select="MitarbeiterList/Mitarbeiter"/>
+\\
+<xsl:text>Summe Gemeinde:</xsl:text> 
+&amp;\multicolumn{3}{l}{\fontsize{11pt}{11pt}\textbf{<xsl:value-of select="Name"/>} }
+&amp;
+&amp;
+&amp;\hfill <xsl:value-of select="QSTGemeindeTotalPflichtig"/>
+&amp;
+&amp;
+&amp;\hfill <xsl:value-of select="QSTGemeindeTotalAbzug"/>\\
 </xsl:template>
 
 
-<xsl:template match="Entry"><xsl:if test="(position() mod 36) = 0">\pagebreak<xsl:call-template name="EmployeeRow"/></xsl:if>&amp;&amp;<xsl:value-of select="AccountNumber"/>&amp;<xsl:value-of select="AccountName"/><xsl:if test="code"><xsl:value-of select="concat(' ', code)" /></xsl:if>&amp;<xsl:if test="quantity != '' and quantity != 0"><xsl:value-of select="format-number(quantity,&quot;#'##0.00&quot;,'apodot')"/></xsl:if>&amp;<xsl:if test="rate != '' and rate != 0"><xsl:value-of select="format-number(rate,&quot;#'##0.0000&quot;,'apodot')"/></xsl:if>&amp;<xsl:if test="amount != '' and amount != 0"><xsl:value-of select="format-number(amount,&quot;#'##0.000&quot;,'apodot')"/></xsl:if>\\
+
+
+ <xsl:template match="//Mitarbeiter">
+<!-- \begin{longtable}{ p{50mm} p{6mm} p{20mm} p{18mm} p{24mm} p{24mm} p{24mm} p{24mm} p{12mm} p{32mm}}
+ -->\fontsize{11pt}{11pt}\textbf{<xsl:value-of select="MaName"/>} 
+&amp; <xsl:value-of select="MaSex"/>
+&amp; <xsl:value-of select="MaEintritt"/>
+&amp; <xsl:value-of select="MaQSTPeriodeVonBis"/> 
+&amp;\hfill <xsl:value-of select="MaQSTBetragBruttoLohn"/> 
+&amp;\hfill <xsl:value-of select="MaQSTBetragZulagen"/> 
+&amp;\hfill <xsl:value-of select="MaQSTBetragPflichtig"/> 
+&amp;\hfill <xsl:value-of select="MaQSTCode"/> 
+&amp;\hfill <xsl:value-of select="MaZivilstand"/> 
+&amp;\hfill <xsl:value-of select="MaQSTBetragAbzug"/>
+\\
+\ <xsl:value-of select="MaAHVNummer"/> 
+&amp; 
+&amp; <xsl:value-of select="MaAustritt"/> 
+&amp;  
+&amp;             
+&amp;         
+&amp;             
+&amp;       
+&amp;\hfill <xsl:value-of select="MaKinder"/>     
+&amp;  \\
+<!-- \end{longtable} -->
 </xsl:template>
+
 
 </xsl:stylesheet>

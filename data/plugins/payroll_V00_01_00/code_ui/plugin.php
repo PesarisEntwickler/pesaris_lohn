@@ -2318,7 +2318,8 @@ class payroll_UI {
 				$objWindow = new wgui_window("payroll", "QuellensteuerSelector");
 				
 				$data["selFirmenListe"] = array(); 
-				$data["selFirmenListe"][] = array("id"=>0, "company_shortname"=>$objWindow->getText("txtAlleFirmen"));
+				//alle Firmen (id = -1)
+				$data["selFirmenListe"][] = array("id"=>-1, "company_shortname"=>$objWindow->getText("txtAlleFirmen"));
 				$ret = blFunctionCall("payroll.getCompanyList");
 				if ($ret["success"]) {
 					foreach($ret["data"] as $row) {

@@ -2,41 +2,80 @@
 class payroll_quellensteuerAbrechnung {
 /* * * * * * * * * * * * * * * * * * * * * * * * 
  *  Quellensteuer = DeductionAtSource = "das" = "DedAtSrc"  
- *  
- *  XML Struktur ~(DTD):
- * 	Header
- * 		Firma +
- * 			FirmaName
- * 			FirmaAdresse
- * 			FirmaPlzOrt
- * 			KontaktpersonName
- * 			KontaktpersonTel
- * 			KontaktpersonEMail
- * 			Kanton +
- * 				ProvisionProzent
- * 				Arbeitgebernummer
- * 				Gemeinde +
- * 					Person +
- * 						Perioden +
- * 							EmplNummer
- * 							EmplName
- * 							EmplAHV-Nummer
- * 							EmplZivilstand
- * 							EmplAnzahlKinder
- * 							Tarif +
- * 								PeriodeVon
- * 								PeriodeBis
- * 								PeriodeTarif +
- * 									Code
- * 									Status (E=Eintritt, TW=Tarifwechsel)
- * 									DatumBeginn
- * 									DatumEnde
- * 									BetragBruttolohn
- * 									BetragPflichtig
- * 									BetragZulagen
- * 									BetragAbzug
- * 									ProzenteAbzug
- * 
+XML Struktur
+<Report name="QuellensteuerAbrechnung" lang="de">
+	<Header>
+			<Company>
+				<Name>CoproNet/Systemfirma</Name>
+				<Street>Stationsstrasse 1</Street>
+				<ZipCity>8000 Zürich</ZipCity>
+				<ContactPersName>Vorname Name</ContactPersName>
+				<ContactPersTel>079 Systemfirma</ContactPersTel>
+				<ContactPersEMail>vorname.name@copronet.ch</ContactPersEMail>
+			</Company>
+			<PrintDate>27.02.2015</PrintDate>
+			<PrintTime>10:29:12</PrintTime>
+		<Period>Januar  bis  November  2016</Period>
+	</Header>
+	<CompanyList>
+		<Company>
+			<Nr>2</Nr>
+			<Krz>PRESIDA</Krz>
+			<Name>Presida Treuhand AG</Name>
+			<Strasse>Mitteldorfstrasse 37</Strasse>
+			<PlzOrt>5033 Buchs</PlzOrt>
+			<KontaktpersonName>Heinz</KontaktpersonName>
+			<KontaktpersonTel>079 heinz</KontaktpersonTel>
+			<KontaktpersonEMail>h.plues@presida</KontaktpersonEMail>
+			<KantonList>
+				<Kanton>
+					<Name>BL</Name>
+					<Arbeitgebernummer>ArbeitgebernummerBL</Arbeitgebernummer>
+					<GemeindeList>
+						<Gemeinde>
+							<Name>4123 Allschwil</Name>
+							<GdeFirma>2</GdeFirma>
+							<GdeKanton>BL</GdeKanton>
+							<MitarbeiterList>
+								<Mitarbeiter>
+									<MaName>1037, Person QST2</MaName>
+									<MaAHVNummer>667.79.330.118</MaAHVNummer>
+									<MaGeboren>1979-07-30</MaGeboren>
+									<MaSex>M</MaSex>
+									<MaZivilstand>6</MaZivilstand>
+									<MaKinder>0</MaKinder>
+									<MaQSTCode></MaQSTCode>
+									<MaEintritt>eintritt</MaEintritt>
+									<MaAustritt>austritt</MaAustritt>
+									<MaQSTTarifwechsel>E(02.2016) TW(04.2016)</MaQSTTarifwechsel>
+									<MaQSTPeriodeVonBis>02-04</MaQSTPeriodeVonBis>
+									<MaQSTBetragBruttoLohn>49'200.00</MaQSTBetragBruttoLohn>
+									<MaQSTBetragZulagen>0.00</MaQSTBetragZulagen>
+									<MaQSTBetragPflichtig>14'200.00</MaQSTBetragPflichtig>
+									<MaQSTBetragAbzug>-326.00</MaQSTBetragAbzug>
+								</Mitarbeiter>
+							</MitarbeiterList>
+							<QSTGemeindeTotalPflichtig>14'203.00</QSTGemeindeTotalPflichtig>
+							<QSTGemeindeTotalAbzug>-325.00</QSTGemeindeTotalAbzug>
+						</Gemeinde>
+					</GemeindeList>
+					<QSTKantonTotalPflichtig>14'203.00</QSTKantonTotalPflichtig>
+					<QSTKantonTotalAbzug>-325.00</QSTKantonTotalAbzug>
+					<ProvisionProzent>4.00</ProvisionProzent>
+					<QSTKantonTotalAbzugProvision>-13.00</QSTKantonTotalAbzugProvision>
+					<QSTKantonTotalAbzugNachProvision>-312.00</QSTKantonTotalAbzugNachProvision>
+				</Kanton>
+			</KantonList>
+			<QSTCompanyTotalPflichtig>14'203.00</QSTCompanyTotalPflichtig>
+			<QSTCompanyTotalAbzug>-325.00</QSTCompanyTotalAbzug>
+			<QSTCompanyTotalAbzugProvision>-13.00</QSTCompanyTotalAbzugProvision>
+			<QSTCompanyTotalAbzugNachProvision>-312.00</QSTCompanyTotalAbzugNachProvision>
+		</Company>
+	</CompanyList>
+	<QSTReportTotalPflichtig>119'809.00</QSTReportTotalPflichtig>
+	<QSTReportTotalAbzug>-8'043.35</QSTReportTotalAbzug>
+	<QSTReportTotalAbzugProvision>-155.45</QSTReportTotalAbzugProvision>
+	<QSTReportTotalAbzugNachProvision>-7'887.90</QSTReportTotalAbzugNachProvision>
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
@@ -77,7 +116,7 @@ GROUP BY payroll_employee_ID";
 
 function getBetroffeneMaDetailsGemeindenKantone($CompanyID, $EmployeeIDList) {
 	$andWhere = "";
-	if ($CompanyID != 0) {
+	if ($CompanyID >= 0) {
 		$andWhere = " AND payroll_company_ID = ".$CompanyID;
 	}
 	$sql =
@@ -92,14 +131,42 @@ $andWhere.";";
 	$Gemeinden 	= array();
 	$MaDetails 	= array();
 	foreach ($result as $value) {
-		$Company[]		= $value["payroll_company_ID"];
-		$Kantone[]		= $value["payroll_company_ID"]."#".$value["ResidenceCanton"];/* #0-#1 */
-		$Gemeinden[]	= $value["payroll_company_ID"]."#".$value["ResidenceCanton"]."#".$value["ZIP-Code"]."#".$value["City"];/* #0-#3 */
-		$MaDetails[]	= $value["payroll_company_ID"]."#".$value["ResidenceCanton"]."#".$value["ZIP-Code"]."#".$value["City"]."#".$value["id"]/* #0-#4 */
+		$Firma			= $value["payroll_company_ID"];
+		if (intval($value["DedAtSrcCompany"])> 0 ) {
+			$Firma	=	$value["DedAtSrcCompany"];
+		}
+		$Kanton = $value["ResidenceCanton"];
+		if (strlen($value["DedAtSrcCanton"]) > 1) {
+			$Kanton	= $value["DedAtSrcCanton"];
+		}
+		$ZIPCode	= $value["ZIP-Code"];
+		$Gemeinde 	= $value["City"];
+		if (strlen($value["DedAtSrcMunicipality"]) > 1) {
+			//Wenn nur ein Wort angegeben wurde in "QST pol. Gemeinde", dann 
+			//in ZIPCode/Postleitzahl halt nur den Gemeindenamen (ist Gruppierungsmerkmal)
+			//und in Gemeinde dann halt den DedAtSrcCanton
+			$ZIPCode	= $value["DedAtSrcMunicipality"];
+			$Gemeinde	= $value["DedAtSrcCanton"];
+			$z = explode(" ", $value["DedAtSrcMunicipality"]);
+			if (count($z)>1) {//Test ob 2 Teile wie z.B. "5000 Aarau"
+				if (floatval($z[0]) > 999) {//Test ob Postleitzahl
+					$ZIPCode	=	$z[0];
+					$Gemeinde	=	$z[1];
+					//Falls noch mehr Wörter erfasst wurden
+					if (count($z)>2) { 	$Gemeinde	.=	$z[2]; 	}
+					if (count($z)>3) { 	$Gemeinde	.=	$z[3]; 	}
+				}
+			}
+		}
+		$Company[]		= $Firma;
+		$Kantone[]		= $Firma."#".$Kanton;/* #0-#1 */
+		$Gemeinden[]	= $Firma."#".$Kanton."#".$ZIPCode."#".$Gemeinde;/* #0-#3 */
+		$MaDetails[]	= $Firma."#".$Kanton."#".$ZIPCode."#".$Gemeinde."#".$value["id"]/* #0-#4 */
  					 ."#".$value["EmployeeNumber"]."#".$value["Lastname"]."#".$value["Firstname"]."#".$value["PlaceOfOrigin"]."#".$value["Age"]/* #5-#9 */
  					 ."#".$value["AHV-AVS-Number"]."#".$value["DateOfBirth"]."#".$value["Sex"]."#".$value["CivilStatus"]."#".$value["SingleParent"]/* #10-#14 */
  					 ."#".$value["WageCode"]."#".$value["BaseWage"]."#".$value["EmploymentStatus"]."#".$value["AttendedTimeCode"]."#".$value["AttendedTimeHours"]/* #15-#19 */
-					 ."#".$value["EmploymentPercentage"]."#".$value["DedAtSrcMode"]."#".$value["DedAtSrcCode"]."#".$value["DedAtSrcPercentage"]."#".$value["DedAtSrcCompany"]."#".$value["Department"]."#".$value["SV-AS-Number"];/*#20-#26 */
+					 ."#".$value["EmploymentPercentage"]."#".$value["DedAtSrcMode"]."#".$value["DedAtSrcCode"]."#".$value["DedAtSrcPercentage"]."#".$value["DedAtSrcCompany"]/* #20-#24 */
+					 ."#".$value["Department"]."#".$value["SV-AS-Number"]."#"."eintritt"."#"."austritt";/* #25-#28 */
 	}
 	return array("Company"=>array_unique($Company),"MaDetails"=>array_unique($MaDetails),"Gemeinden"=>array_unique($Gemeinden),"Kantone"=>array_unique($Kantone));
 }
@@ -206,7 +273,39 @@ function getSummierteLohnart($MaID, $Jahr, $Von, $Bis, $LohnArt, $Attribut) {
 	return $AttrSumme;
 }
 
+function getMaxEmploymentDate($MaID) {
+	$sql = 
+	"SELECT * FROM payroll_employment_period
+	WHERE payroll_employee_ID = ".$MaID."
+	ORDER BY DateFrom DESC";
+	$system_database_manager = system_database_manager::getInstance();
+	$result = $system_database_manager->executeQuery($sql, "");
+	$DateFrom = "0000-00-00";
+	$DateTo = "0000-00-00";
+	if (count($result)>0) {
+		$DateFrom = $result[0]["DateFrom"];
+		$DateTo = $result[0]["DateTo"];
+	}
+	return array("DateFrom"=>$DateFrom, "DateTo"=>$DateTo);	
+}
+
+function getSwissDatum($DbDate) {
+	$ret = "";
+	if ($DbDate != "0000-00-00") {
+		$DateArr = explode("-", $DbDate);
+		$ret = $DateArr[2].".".$DateArr[1].".".$DateArr[0];
+	}
+	return $ret;
+}
+
 function getQuellensteuerAbrechnung($param) {
+//	communication_interface::alert("getQuellensteuerAbrechnung(): ".print_r($param,true));
+	
+	$Firma	=	$param["company"];
+	$Jahr	=	$param["year"];
+	$Von	=	$param["von"];
+	$Bis	=	$param["bis"];
+	
 	global $aafwConfig;
 	require_once(getcwd()."/kernel/common-functions/configuration.php");
 	require_once('payroll_reporting_functions.php');
@@ -236,10 +335,6 @@ function getQuellensteuerAbrechnung($param) {
 	$newTmpPath = $fm->getFullPath();
 	$fm->setFile("metadata.dat")->putContents( serialize(array("fileFormat"=>"pdf","realFileName"=>"compileme.pdf","transmissionFileName"=>"Quellensteuer-Abrechnung.pdf")) );
 
-	$Firma	=	$param["company"];
-	$Jahr	=	$param["year"];
-	$Von	=	$param["von"];
-	$Bis	=	$param["bis"];
 
 	$periodTitle = $periodLabels[session_control::getSessionInfo("language")][$Von]."  ";
 	$periodTitle.= $periodLabels[session_control::getSessionInfo("language")][0]."  ";
@@ -256,7 +351,6 @@ function getQuellensteuerAbrechnung($param) {
 		<Period>".$periodTitle."</Period>
 	</Header>");
 	
-	
 	$PeriodIDList = $this->getPeriodIDs($Jahr, $Von, $Bis);
 	$QstAcounts = $account->getDedAtSrcGlobalSettings();
 	$EmployeeIDList = $this->getBetroffeneMitarbeiter($PeriodIDList, $QstAcounts["data"]);
@@ -267,16 +361,17 @@ function getQuellensteuerAbrechnung($param) {
 //		communication_interface::alert("Keine betroffenen Mitarbeiter für diese Firma/Company ".count($EmplGdeKant["Company"]));
 		//break;
 //	}
-	communication_interface::alert("Resultate der Vorberechnung: "
-			."Firma $Firma, Jahr $Jahr, Von $Von, Bis $Bis "
-			."\n=========================================="
-			."\nPeriodIDList:".implode(",", $PeriodIDList)
-			."\nQstAccounts :".implode(",", $QstAcounts["data"])
-			."\nEmployees   :".implode(",", $EmployeeIDList)
-			//."\nEmployes    :".implode(",", $EmplGdeKant["MaDetails"])
-			."\nGemeinden   :".implode(",", $EmplGdeKant["Gemeinden"])
-			."\nKantone     :".implode(",", $EmplGdeKant["Kantone"])
-			."\nFirmen Nr   :".implode(",", $EmplGdeKant["Company"])  );
+	
+// 	communication_interface::alert("Resultate der Vorberechnung: "
+// 			."Firma $Firma, Jahr $Jahr, Von $Von, Bis $Bis "
+// 			."\n=========================================="
+// 			."\nPeriodIDList:".implode(",", $PeriodIDList)
+// 			."\nQstAccounts :".implode(",", $QstAcounts["data"])
+// 			."\nEmployees   :".implode(",", $EmployeeIDList)
+// 			//."\nEmployes    :".implode(",", $EmplGdeKant["MaDetails"])
+// 			."\nGemeinden   :".implode(",", $EmplGdeKant["Gemeinden"])
+// 			."\nKantone     :".implode(",", $EmplGdeKant["Kantone"])
+// 			."\nFirmen Nr   :".implode(",", $EmplGdeKant["Company"])  );
 
 	$QSTReportTotalPflichtig	= 0;
 	$QSTReportTotalAbzug		= 0;
@@ -324,6 +419,8 @@ function getQuellensteuerAbrechnung($param) {
 					if ($GdeKantonID == $KantonID && $GdeFirmenID == $FirmenID) {
 						fwrite($fp, $t_____."<Gemeinde>");
 						fwrite($fp, $t______."<Name>".$Gde[2]." ".$Gde[3]."</Name>");
+						fwrite($fp, $t______."<GdeFirma>".$GdeFirmenID."</GdeFirma>");
+						fwrite($fp, $t______."<GdeKanton>".$GdeKantonID."</GdeKanton>");
 						fwrite($fp, $t______."<MitarbeiterList>");
 						foreach ($EmplGdeKant["MaDetails"] as $Mitarbeiter) {
 							$Ma = explode("#", $Mitarbeiter);
@@ -345,6 +442,9 @@ function getQuellensteuerAbrechnung($param) {
 							$MaQSTCode		= $Ma[22];
 							$MaQSTProz 		= $Ma[23];
 							$MaSVASNummer	= $Ma[26];
+							$EinAusTritt	= $this->getMaxEmploymentDate($MaID);
+							$MaEintritt		= $this->getSwissDatum( $EinAusTritt["DateFrom"] );
+							$MaAustritt		= $this->getSwissDatum( $EinAusTritt["DateTo"] );
 							if ($MaPostLeitZahl == $GdePostLeitZahl && $MaKantonID == $GdeKantonID && $MaFirmenID == $GdeFirmenID) {
 								if (strlen(trim($MaSVASNummer)) > 2) {
 									$MaAHVNummer = $MaSVASNummer;
@@ -373,6 +473,8 @@ function getQuellensteuerAbrechnung($param) {
 								fwrite($fp, $t________."<MaZivilstand>".$MaZivilstand."</MaZivilstand>");
 								fwrite($fp, $t________."<MaKinder>".$MaKinder."</MaKinder>");
 								fwrite($fp, $t________."<MaQSTCode>".$MaQSTCode."</MaQSTCode>");
+								fwrite($fp, $t________."<MaEintritt>".$MaEintritt."</MaEintritt>");
+								fwrite($fp, $t________."<MaAustritt>".$MaAustritt."</MaAustritt>");
 								fwrite($fp, $t________."<MaQSTTarifwechsel>".$TW."</MaQSTTarifwechsel>");
 								fwrite($fp, $t________."<MaQSTPeriodeVonBis>".$MaQSTPeriodeVonBis."</MaQSTPeriodeVonBis>");
 								fwrite($fp, $t________."<MaQSTBetragBruttoLohn>".number_format($MaQSTBetragBruttoLohn, 2, '.', "'")."</MaQSTBetragBruttoLohn>");
@@ -399,7 +501,7 @@ function getQuellensteuerAbrechnung($param) {
 				fwrite($fp, $t____."</GemeindeList>");
 				fwrite($fp, $t____."<QSTKantonTotalPflichtig>".number_format($QSTKantonTotalPflichtig, 2, '.', "'")."</QSTKantonTotalPflichtig>");
 				fwrite($fp, $t____."<QSTKantonTotalAbzug>".number_format($QSTKantonTotalAbzug, 2, '.', "'")."</QSTKantonTotalAbzug>");
-				fwrite($fp, $t____."<ProvisionProzent>".number_format($Kt["commission"], 2, '.', "'")." %</ProvisionProzent>");
+				fwrite($fp, $t____."<ProvisionProzent>".number_format($Kt["commission"], 2, '.', "'")."</ProvisionProzent>");
 				fwrite($fp, $t____."<QSTKantonTotalAbzugProvision>".number_format($QSTKantonTotalAbzugProvision, 2, '.', "'")."</QSTKantonTotalAbzugProvision>");
 				fwrite($fp, $t____."<QSTKantonTotalAbzugNachProvision>".number_format($QSTKantonTotalAbzugNachProvision, 2, '.', "'")."</QSTKantonTotalAbzugNachProvision>");
 				fwrite($fp, $t___."</Kanton>");
@@ -427,100 +529,17 @@ function getQuellensteuerAbrechnung($param) {
 	fwrite($fp, $t."<QSTReportTotalAbzugNachProvision>".number_format($QSTReportTotalAbzugNachProvision, 2, '.', "'")."</QSTReportTotalAbzugNachProvision>");
 	fwrite($fp, "\n</Report>\n\n");
 	
-/*
-	$result = $system_database_manager->executeQuery("SELECT id FROM payroll_period WHERE payroll_year_ID=".$Jahr." AND major_period=".$Von." AND minor_period=".$minorPeriod, "payroll_report_CalculationJournal");
-	if(count($result)>0) $payrollPeriodID = $result[0]["id"];
-	else return;
-
-	$isCurrentPeriod = false;
-	$sql = "SELECT payroll_period_ID FROM payroll_calculation_current LIMIT 1";
-	$result = $system_database_manager->executeQuery($sql, "payroll_report_CalculationJournal");
-	if(count($result)>0) $isCurrentPeriod = $result[0]["payroll_period_ID"]==$payrollPeriodID ? true : false;
-
-	$sql = "SELECT
-	  empl.id as EmployeeID
-	, empl.EmployeeNumber
-	, empl.Firstname
-	, empl.Lastname
-	, empl.payroll_company_ID
-	, empl.CodeAHV
-	, empl.CodeALV
-	, empl.CodeUVG
-	, empl.CodeUVGZ1
-	, empl.CodeUVGZ2
-	, empl.CodeBVG
-	, empl.CodeKTG
-	, empl.EmploymentStatus
-	, acc.id as AccountNumber
-	, acclbl.label
-	, calc.quantity
-	, calc.rate
-	, calc.amount
-	, calc.code
-	FROM ".($isCurrentPeriod ? "payroll_calculation_current" : "payroll_calculation_entry")." calc
-	INNER JOIN payroll_employee empl ON empl.id=calc.payroll_employee_ID
-	INNER JOIN payroll_account acc ON acc.id=calc.payroll_account_ID
-	AND acc.payroll_year_ID=calc.payroll_year_ID
-	INNER JOIN payroll_account_label acclbl ON acclbl.payroll_account_ID=acc.id
-	AND acclbl.payroll_year_ID=acc.payroll_year_ID
-	AND acclbl.language='".session_control::getSessionInfo("language")."'
-	WHERE calc.payroll_period_ID=".$payrollPeriodID."
-	ORDER BY empl.Lastname, empl.Firstname, calc.payroll_employee_ID, acc.id";
-	$result = $system_database_manager->executeQuery($sql, "payroll_report_CalculationJournal");
-	$lastEmployeeID = 0;
-	$entryCollector = array();
-	$singleEmployeeData = "";
-	fwrite($fp,"<Employees>\n");
-	foreach($result as $row) {
-		if($row["EmployeeID"] != $lastEmployeeID) {
-			//the employee changed!
-			if($singleEmployeeData != "") {
-				//there are data for writing to the XML file
-				//fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
-				fwrite($fp, $singleEmployeeData.str_replace(array("&","%","#"), array("\\&","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
-			}
-			$lastEmployeeID = $row["EmployeeID"];
-			$entryCollector = array();
-			$singleEmployeeData =
-			"\t\t<Employee>
-		<EmployeeNumber>".$row["EmployeeNumber"]."</EmployeeNumber>
-		<CompanyID>".$row["payroll_company_ID"]."</CompanyID>
-		<Firstname>".$row["Firstname"]."</Firstname>
-		<Lastname>".$row["Lastname"]."</Lastname>
-		<CodeAHV>".$row["CodeAHV"]."</CodeAHV>
-		<CodeALV>".$row["CodeALV"]."</CodeALV>
-		<CodeKTG>".$row["CodeKTG"]."</CodeKTG>
-		<CodeUVG>".$row["CodeUVG"]."</CodeUVG>
-		<CodeBVG>".$row["CodeBVG"]."</CodeBVG>
-		<Status>".$row["EmploymentStatus"]."</Status>
-		<Entries>\n";
-		}
-		$entryCollector[] = "
-		<Entry>
-			<AccountNumber>".$row["AccountNumber"]."</AccountNumber>
-			<AccountName>".$row["label"]."</AccountName>
-			<quantity>".$row["quantity"]."</quantity>
-			<rate>".$row["rate"]."</rate>
-			<amount>".$row["amount"]."</amount>".
-			($row["code"]=="" ? "" : "
-			<code>".$row["code"]."</code>")."
-		</Entry>\n";
-	}
-	if($singleEmployeeData != "") {
-		//there are still a few more data for writing to the XML file
-		fwrite($fp, $singleEmployeeData.str_replace(array("&","_","%","#"), array("\\&","\\_","\\%","\\#"), implode("",$entryCollector))."\t\t\t</Entries>\n\t\t</Employee>\n");
-	}
-	fwrite($fp, "\t</Employees>\n</Report>\n");
-*/	
-	
 	$fm->fclose();
 
-	chdir($newTmpPath);
+	chdir($newTmpPath);	
 
-	system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."QuellensteuerAbrechnung.xslt ./data.xml > ./compileme.tex");
+	system($aafwConfig["paths"]["utilities"]["xsltproc"]." ".$aafwConfig["paths"]["reports"]["templates"]."QuellensteuerAbrechnung.xslt ./data.xml > ./compileme.tex");	
+	//Zwei Mal aufrufen wegen der Seitenzahl X (-->"Seite 1 von X")
 	system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+	system($aafwConfig["paths"]["utilities"]["pdflatex"]." -interaction=batchmode compileme.tex > ".$aafwConfig["paths"]["utilities"]["stdout"]);
+	
 	system("chmod 666 *");
-
+	
 	return $newTmpDirName;
 }
 
