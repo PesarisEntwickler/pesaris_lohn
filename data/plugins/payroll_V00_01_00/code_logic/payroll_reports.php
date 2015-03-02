@@ -11,7 +11,13 @@ class payroll_BL_reports {
 //$param = array("year"=>$functionParameters[0]["year"],"majorPeriod"=>$functionParameters[0]["majorPeriod"],"minorPeriod"=>$functionParameters[0]["minorPeriod"])
 		$periodLabels["de"] = $payroll_reporting_functions->getPeriodLabels("de");
 
-//communication_interface::alert("CalculationJournal param=".print_r($param,true));
+		//$param Werte gegen Intrusion sichern: wenn mindestens eines der $param-Felder einen ungültigen Wert enthaelt wird der Code abgebrochen
+		$arrFields2Check = array("year","majorPeriod","minorPeriod");
+		foreach($arrFields2Check as $cfld) {
+			if(!isset($param[$cfld]) || !preg_match( '/^[0-9]{1,10}$/', $param[$cfld])) {
+				return "";
+			}
+		}
 		
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
@@ -34,7 +40,6 @@ class payroll_BL_reports {
                 </Header>
                 <Employees>\n");
 
-		//TODO: $param Werte gegen intrusion sichern !!!!!
 		$result = $system_database_manager->executeQuery("SELECT id FROM payroll_period WHERE payroll_year_ID=".$param["year"]." AND major_period=".$param["majorPeriod"]." AND minor_period=".$param["minorPeriod"], "payroll_report_CalculationJournal");
 		if(count($result)>0) $payrollPeriodID = $result[0]["id"];
 		else return;
@@ -145,6 +150,14 @@ class payroll_BL_reports {
 		ini_set('memory_limit', '512M');
 		$periodLabels["de"] = $payroll_reporting_functions->getPeriodLabels("de");
 
+		//$param Werte gegen Intrusion sichern: wenn mindestens eines der $param-Felder einen ungültigen Wert enthaelt wird der Code abgebrochen
+		$arrFields2Check = array("year","majorPeriod","minorPeriod");
+		foreach($arrFields2Check as $cfld) {
+			if(!isset($param[$cfld]) || !preg_match( '/^[0-9]{1,10}$/', $param[$cfld])) {
+				return "";
+			}
+		}
+
 		$fm = new file_manager();
 		$newTmpDirName = $fm->createTmpDir();
 		$newTmpPath = $fm->getFullPath();
@@ -156,7 +169,6 @@ class payroll_BL_reports {
 		$system_database_manager = system_database_manager::getInstance();
 		$fp = $fm->setFile("data.xml")->fopen("w");
 
-		//TODO: $param Werte gegen intrusion sichern !!!!!
 		$result = $system_database_manager->executeQuery("SELECT id FROM payroll_period WHERE payroll_year_ID=".$param["year"]." AND major_period=".$param["majorPeriod"]." AND minor_period=".$param["minorPeriod"], "payroll_report_".$ReportName);
 		if(count($result)>0) $payrollPeriodID = $result[0]["id"];
 		else return;
@@ -1567,6 +1579,14 @@ ORDER BY    accetry.account_no ,
 //communication_interface::alert("reports.php 1 - Payslip() param:".print_r($param,true));
         require_once(getcwd()."/kernel/common-functions/configuration.php");
         global $aafwConfig;
+		//$param Werte gegen Intrusion sichern: wenn mindestens eines der $param-Felder einen ungültigen Wert enthaelt wird der Code abgebrochen
+		$arrFields2Check = array("payroll_period_ID");
+		foreach($arrFields2Check as $cfld) {
+			if(!isset($param[$cfld]) || !preg_match( '/^[0-9]{1,10}$/', $param[$cfld])) {
+				return "";
+			}
+		}
+
 		$payrollPeriodID = $param["payroll_period_ID"];
 		$uid = session_control::getSessionInfo("id");
 		$language = session_control::getSessionInfo("language");

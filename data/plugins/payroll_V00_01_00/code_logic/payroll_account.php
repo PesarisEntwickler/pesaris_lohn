@@ -81,7 +81,6 @@ class account {
 	}
 
 	public function savePayrollAccount($id, $rawFieldData) {
-//error_log("\n".date("c").": ".print_r($rawFieldData,true)."\n", 3, "/var/log/copronet-application.log");
 		///////////////////////////////////////////////////
 		// account id must be alphanumeric and non-decimal
 		///////////////////////////////////////////////////
@@ -110,13 +109,28 @@ class account {
 		// the account number (unique id) must not be changed
 		// if there already are entries on this particular account
 		///////////////////////////////////////////////////
-		
-		//TODO: CHECK PROGRAMMIEREN
-		
-		//TODO: SUBMITTED FIELD "id" MUST NOT BE "0" -> CHECK!
 
-		//TODO: CHECKING FOR DUPLICATE IDs!
-		
+		if(isset($rawFieldData["id"]) && preg_match( '/^[0-9a-zA-Z]{1,5}$/', $rawFieldData["id"])) {
+			//The submitted field "id" must not be "0"
+			if(is_numeric($rawFieldData["id"]) && intval($rawFieldData["id"])==0) {
+				$response["success"] = false;
+				$response["errCode"] = 11;
+				$response["errText"] = "id must not be zero";
+				return $response;
+			}
+
+			//Checking for duplicate IDs!
+			if( $rawFieldData["id"] != $id ) {
+				$resDblctChk = $system_database_manager->executeQuery("SELECT id FROM payroll_account WHERE id='".$rawFieldData["id"]."' AND payroll_year_ID=".$currentYear, "payroll_savePayrollAccount");
+				if(count($resDblctChk)>0) {
+					$response["success"] = false;
+					$response["errCode"] = 12;
+					$response["errText"] = "id already exists";
+					return $response;
+				}
+			}
+		}
+
 		//set limits_aux_account_ID to ZERO if there are no limits to calculate
 		if($rawFieldData["having_limits"]!="1") $rawFieldData["limits_aux_account_ID"]=0;
 
@@ -661,15 +675,7 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 			$response["fieldNames"] = $errFields;
 			return $response;
 		}
-/*
-		$updateMode = isset($param["rid"]) && $param["rid"]!="" ? true : false;
-		if($updateMode && !preg_match( '/^[0-9]{1,9}$/', $param["rid"])) {
-			$response["success"] = false;
-			$response["errCode"] = 20;
-			$response["errText"] = "invalid record id";
-			return $response;
-		}
-*/
+
 		if($updateMode) {
 			$sqlUPDATE = array();
 			foreach($fieldCfg as $fieldName=>$fieldParam) {
@@ -703,7 +709,6 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 				$result = $system_database_manager->executeUpdate($sql, "payroll_saveDedAtSrcCantonDetail");
 				$sql = "INSERT INTO `payroll_das_account`(`payroll_account_ID`,`DedAtSrcCanton`,`AccountType`) VALUES('".addslashes($param[$fieldName])."','".addslashes($param["DedAtSrcCanton"])."',".$fieldParam["AccountType"].")";
 				$result = $system_database_manager->executeUpdate($sql, "payroll_saveDedAtSrcCantonDetail");
-//communication_interface::alert("sql: ".$sql);
 			}
 		}
 		$result = $system_database_manager->executeUpdate("COMMIT", "payroll_saveDedAtSrcCantonDetail");
@@ -720,15 +725,31 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 			$response["errText"] = "invalid id";
 			return $response;
 		}
-//communication_interface::alert("deleteBL: ".print_r($param,true));
 
 		$system_database_manager = system_database_manager::getInstance();
+		$resYear = $system_database_manager->executeQuery("SELECT MAX(id) as currentYear FROM payroll_year", "payroll_deleteDedAtSrcCantonDetail");
+		if(count($resYear)!=1) {
+			$response["success"] = false;
+			$response["errCode"] = 15;
+			$response["errText"] = "error while querying current year";
+			return $response;
+		}
+		$currentYear = $resYear[0]["currentYear"];
+
+		//Gibt es im aktuellen Jahr bereits berechnete/verbuchte/ausbezahlte/fixierte Abrechnungen mit dem entsprechenden Kanton? Falls ja, darf der Kanton nicht geloescht werden!
+		$resPrd = $system_database_manager->executeQuery("SELECT 1 FROM `payroll_period_employee` pemp INNER JOIN `payroll_period` prd ON prd.`id`=pemp.`payroll_period_ID` AND prd.`payroll_year_ID`=".$currentYear." WHERE pemp.`processing`>0 AND pemp.`DedAtSrcCanton`='".$param["id"]."' LIMIT 1");
+		if(count($resPrd)!=0) {
+			$response["success"] = false;
+			$response["errCode"] = 20;
+			$response["errText"] = "canton in use";
+			return $response;
+		}
+
 		$system_database_manager->executeUpdate("BEGIN", "payroll_deleteDedAtSrcCantonDetail");
 		$system_database_manager->executeUpdate("DELETE FROM `payroll_das_account` WHERE `DedAtSrcCanton`='".addslashes($param["id"])."' AND `AccountType` IN (1,2)", "payroll_deleteDedAtSrcCantonDetail");
 		$system_database_manager->executeUpdate("DELETE FROM `payroll_das_canton` WHERE `DedAtSrcCanton`='".addslashes($param["id"])."'", "payroll_deleteDedAtSrcCantonDetail");
 		$system_database_manager->executeUpdate("COMMIT", "payroll_deleteDedAtSrcCantonDetail");
 
-		//TODO: Hier muss noch aeberpraeft werden, ob keinem aktiven MA der entsprechende Kanton zugewiesen wurde... sonst darf nämlich nicht geloescht werden!
 		$response["success"] = true;
 		$response["errCode"] = 0;
 		return $response;

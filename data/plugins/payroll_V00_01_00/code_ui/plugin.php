@@ -351,11 +351,12 @@ class payroll_UI {
 				$tblData = "prlPsoData = [";
 				$firstPass = true;
 				if($employeeList["success"]) {
+					$genderAbrv = $this->genderTranslation();
 					foreach($employeeList["data"] as $row) {
 						$tblData .= $firstPass ? "{" : ", {";
 						$tblRow = "";
 						foreach($row as $fieldName=>$fieldValue) {
-							if($fieldName=="Sex") $fieldValue = $fieldValue=="F" ? "w" : "m"; //TODO: Werte dynamisch ersetzen!
+							if($fieldName=="Sex") $fieldValue = $genderAbrv[$fieldValue];
 							$tblRow .= ($tblRow == "" ? "" : ", ")."'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
 						}
 						$tblData .= $tblRow."}";
@@ -3864,6 +3865,8 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		if(isset($param["majorPeriod"])) $queryOption["majorPeriod"] = $param["majorPeriod"];
 		$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
 
+		$genderAbrv = $this->genderTranslation();
+
 		$tblData = "prlCalcOvData = [";
 		$firstPass = true;
 		if($employeeList["success"]) {
@@ -3871,7 +3874,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$tblData .= $firstPass ? "{" : ", {";
 				$tblRow = "";
 				foreach($row as $fieldName=>$fieldValue) {
-					if($fieldName=="Sex") $fieldValue = $fieldValue=="F" ? "w" : "m"; //TODO: Werte dynamisch ersetzen!
+					if($fieldName=="Sex") $fieldValue = $genderAbrv[$fieldValue];
 					$tblRow .= ($tblRow == "" ? "" : ", ")."'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
 				}
 				$tblData .= $tblRow."}";
@@ -4024,11 +4027,13 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 
 		$psoDbFilter = session_control::getSessionSettings("payroll", "psoDbFilter");
 		//Get employee list and prepare data in order to fill the client-side table
-		$defaultTblColumns = array("EmployeeNumber", "Lastname", "Firstname", "Street", "`ZIP-Code`", "City", "Sex");
+		$defaultTblColumns = array("EmployeeNumber", "Lastname", "Firstname", "Street", "`ZIP-Code`", "City", "Sex", "CostCenter");
 		$queryOption["columns"] = $defaultTblColumns;
 		$queryOption["prepend_id"] = true;
 		$queryOption["query_filter"] = $psoDbFilter;
 		$employeeList = blFunctionCall('payroll.getEmployeeList', $queryOption);
+
+		$genderAbrv = $this->genderTranslation();
 
 		$tblData = "prlPsoData = [";
 		$firstPass = true;
@@ -4037,7 +4042,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 				$tblData .= $firstPass ? "{" : ", {";
 				$tblRow = "";
 				foreach($row as $fieldName=>$fieldValue) {
-					if($fieldName=="Sex") $fieldValue = $fieldValue=="F" ? "w" : "m"; //TODO: Werte dynamisch ersetzen!
+					if($fieldName=="Sex") $fieldValue = $genderAbrv[$fieldValue];
 					$tblRow .= ($tblRow == "" ? "" : ", ")."'".$fieldName."':'".str_replace("'","\\'",$fieldValue)."'";
 				}
 				$tblData .= $tblRow."}";
@@ -4046,7 +4051,7 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 		}
 		$tblData .= "];";
 
-		communication_interface::jsExecute('prlPsoColumns = [{id: "EmployeeNumber", name: "Pers.Nr.", field: "EmployeeNumber", sortable: true, resizable: true, width: 60},{id: "Lastname", name: "Nachname", field: "Lastname", sortable: true, resizable: true},{id: "Firstname", name: "Vorname", field: "Firstname", sortable: true, resizable: true},{id: "Street", name: "Strasse", field: "Street", sortable: true, resizable: true, width: 150},{id: "ZIP-Code", name: "PLZ", field: "ZIP-Code", sortable: true, resizable: true, width: 50},{id: "City", name: "Ort", field: "City", sortable: true, resizable: true},{id: "Sex", name: "m/w", field: "Sex", sortable: true, width: 40, cssClass: "txtCenter"}];');
+		communication_interface::jsExecute('prlPsoColumns = [{id: "EmployeeNumber", name: "Pers.Nr.", field: "EmployeeNumber", sortable: true, resizable: true, width: 60},{id: "Lastname", name: "Nachname", field: "Lastname", sortable: true, resizable: true},{id: "Firstname", name: "Vorname", field: "Firstname", sortable: true, resizable: true},{id: "Street", name: "Strasse", field: "Street", sortable: true, resizable: true, width: 150},{id: "ZIP-Code", name: "PLZ", field: "ZIP-Code", sortable: true, resizable: true, width: 50},{id: "City", name: "Ort", field: "City", sortable: true, resizable: true},{id: "Sex", name: "m/w", field: "Sex", sortable: true, width: 40, cssClass: "txtCenter"},{id: "CostCenter", name: "Kostenstelle", field: "CostCenter", sortable: true, width: 60}];');
 		communication_interface::jsExecute($tblData);
 
 		if($updateTable) {
@@ -4057,6 +4062,16 @@ TEILW.ERLEDIGT* Neue Funktion: Speichern der Employee-Var-Daten
 			communication_interface::jsExecute("prlPsoGrid.invalidate();");
 		}
 	}
+
+	private function genderTranslation() {
+		$genderAbrv["de"]["F"] = "w";
+		$genderAbrv["de"]["M"] = "m";
+		$genderAbrv["en"]["F"] = "f";
+		$genderAbrv["en"]["M"] = "m";
+
+		return isset($genderAbrv[session_control::getSessionInfo("language")]) ? $genderAbrv[session_control::getSessionInfo("language")] : $genderAbrv["en"];
+	}
+
 
 	private function convertMySQL2Date($mysqlDate) {
 		if($mysqlDate=="0000-00-00") return "";

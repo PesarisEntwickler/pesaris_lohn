@@ -280,7 +280,6 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 		$withDecimals = strstr($fieldDef["regexPattern"], "\\.")===false ? false : true;
 		$changeActiveFlag = ($fieldDef["fieldDefEdit"] & 1)!=0 ? true : false;
 		$changeLabels = ($fieldDef["fieldDefEdit"] & 2)!=0 ? true : false;
-//communication_interface::alert(print_r($param["data"]["fields"],true));
 
 		$errFields = array();
 		$mainLabelCollector = array();
@@ -355,8 +354,6 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 			}
 		}
 
-//TODO: Achtung: unbedingt noch Mandatory und validity checks auf Listenwerten ausfaehren!!!!
-
 		$system_database_manager->executeUpdate("BEGIN", "payroll_saveEmployeeFieldDetail");
 
 		///////////////////////////////////////////////////
@@ -407,6 +404,35 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 				}
 				$ListItemToken = $itemParam["ListItemToken"];
 
+				if( !preg_match( '/^[0-9]{1,3}$/', $dataSourceGroup) || intval($dataSourceGroup)<0 || intval($dataSourceGroup)>255 ) {
+					$system_database_manager->executeUpdate("ROLLBACK", "payroll_saveEmployeeFieldDetail");
+					$response["success"] = false;
+					$response["errCode"] = 31;
+					$response["errText"] = "invalid field value";
+					return $response;
+				}
+				if( !preg_match( '/^[0-9]{1,3}$/', $ListType) || intval($ListType)<0 || intval($ListType)>255 ) {
+					$system_database_manager->executeUpdate("ROLLBACK", "payroll_saveEmployeeFieldDetail");
+					$response["success"] = false;
+					$response["errCode"] = 32;
+					$response["errText"] = "invalid field value";
+					return $response;
+				}
+				if( !preg_match( '/^[0-9]{1,3}$/', $ListItemOrder) || intval($ListItemOrder)<0 || intval($ListItemOrder)>255 ) {
+					$system_database_manager->executeUpdate("ROLLBACK", "payroll_saveEmployeeFieldDetail");
+					$response["success"] = false;
+					$response["errCode"] = 33;
+					$response["errText"] = "invalid field value";
+					return $response;
+				}
+				if( strlen($ListItemToken) > 45 ) {
+					$system_database_manager->executeUpdate("ROLLBACK", "payroll_saveEmployeeFieldDetail");
+					$response["success"] = false;
+					$response["errCode"] = 34;
+					$response["errText"] = "list item token too long";
+					return $response;
+				}
+
 				if($updateMode) {
 					//Wird nun Element für Element direkt beim Editieren gespeichert --> saveListenWerte($personalstammListenwerte, $data, $fieldName) 
 					//$system_database_manager->executeUpdate("UPDATE `payroll_empl_list` SET `ListType`=".$ListType.", `ListItemOrder`=".$ListItemOrder.", `ListItemToken`='".addslashes($ListItemToken)."' WHERE `id`=".$itemID, "payroll_saveEmployeeFieldDetail");
@@ -418,6 +444,13 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 				}
 
 				foreach($itemParam["labels"] as $lblLng=>$lblTxt) {
+					if( strlen($lblTxt) > 80 ) {
+						$system_database_manager->executeUpdate("ROLLBACK", "payroll_saveEmployeeFieldDetail");
+						$response["success"] = false;
+						$response["errCode"] = 35;
+						$response["errText"] = "list item token too long";
+						return $response;
+					}
 					$system_database_manager->executeUpdate("REPLACE INTO `payroll_empl_list_label`(`payroll_empl_list_ID`, `language`, `label`, `tokenLabel`) VALUES(".$itemID4Label.", '".$lblLng."', '".addslashes($lblTxt)."', '')", "payroll_saveEmployeeFieldDetail");
 				}
 			}
@@ -430,7 +463,6 @@ ORDER BY payroll_languages.DefaultLanguage DESC, core_intl_language_names.langua
 
 		if(count($updateCollector)!=0) $system_database_manager->executeUpdate("UPDATE `payroll_employee_field_def` SET ".implode(",", $updateCollector)." WHERE `fieldName`='".$param["fieldName"]."'", "payroll_saveEmployeeFieldDetail");
 
-//communication_interface::alert(print_r($mainLabelCollector,true));
 		foreach($mainLabelCollector as $lngID=>$lbl) {
 			$system_database_manager->executeUpdate("REPLACE INTO `payroll_employee_field_label`(`fieldName`,`language`,`label`) VALUES('".$param["fieldName"]."','".$lngID."','".addslashes($lbl)."')", "payroll_saveEmployeeFieldDetail");
 		}
