@@ -355,13 +355,7 @@ function getQuellensteuerAbrechnung($param) {
 	$QstAcounts = $account->getDedAtSrcGlobalSettings();
 	$EmployeeIDList = $this->getBetroffeneMitarbeiter($PeriodIDList, $QstAcounts["data"]);
 	$EmplGdeKant = $this->getBetroffeneMaDetailsGemeindenKantone($Firma, $EmployeeIDList);
-	
-//	$countCmp	=	count($EmplGdeKant["Company"]);
-//	if ($countCmp < 1 ) {
-//		communication_interface::alert("Keine betroffenen Mitarbeiter für diese Firma/Company ".count($EmplGdeKant["Company"]));
-		//break;
-//	}
-	
+		
 // 	communication_interface::alert("Resultate der Vorberechnung: "
 // 			."Firma $Firma, Jahr $Jahr, Von $Von, Bis $Bis "
 // 			."\n=========================================="
@@ -380,10 +374,10 @@ function getQuellensteuerAbrechnung($param) {
 	
 	fwrite($fp, $t."<CompanyList>");
 	foreach ($EmplGdeKant["Company"] as $CompanyID) {
-		$QSTCompanyTotalPflichtig	= 0;
-		$QSTCompanyTotalAbzug		= 0;
-		$QSTCompanyTotalProvision	= 0;
-		$QSTCompanyTotalAbzugProvision	= 0;
+		$QSTCompanyTotalPflichtig			= 0;
+		$QSTCompanyTotalAbzug				= 0;
+		$QSTCompanyTotalProvision			= 0;
+		$QSTCompanyTotalAbzugProvision		= 0;
 		$QSTCompanyTotalAbzugNachProvision	= 0;
 		$Firma = $ausz->getCompany($CompanyID);
 		fwrite($fp, $t_."<Company>");
@@ -397,9 +391,9 @@ function getQuellensteuerAbrechnung($param) {
 		fwrite($fp, $t__."<KontaktpersonEMail>".$Firma["cmail"]."</KontaktpersonEMail>");
 		fwrite($fp, $t__."<KantonList>");
 		foreach ($EmplGdeKant["Kantone"] as $Kanton) {
-			$QSTKantonTotalPflichtig 	= 0;
-			$QSTKantonTotalAbzug 		= 0;
-			$QSTKantonTotalAbzugProvision=0;
+			$QSTKantonTotalPflichtig 		= 0;
+			$QSTKantonTotalAbzug 			= 0;
+			$QSTKantonTotalAbzugProvision	= 0;
 			$CantonArr = explode("#",$Kanton);
 			$FirmenID  = $CantonArr[0];
 			$KantonID = $CantonArr[1];	
@@ -456,8 +450,11 @@ function getQuellensteuerAbrechnung($param) {
 								$codeBeginMonat			= $MaQST["vonPeriode"];
 								$codeEndetMonat			= $MaQST["bisPeriode"];
 								$TW = "";
-								if ($Von < $codeBeginMonat) {$TW.="E(".substr("0".$codeBeginMonat,-2).".".$Jahr.")".$MaQST["Code"]." ";}
-								if ($Bis > $codeEndetMonat) {$TW.="TW(".substr("0".$codeEndetMonat,-2).".".$Jahr.")";}
+// 								if ($Von < $codeBeginMonat) {$TW.="E(".substr("0".$codeBeginMonat,-2).".".$Jahr.")".$MaQST["Code"]." ";}
+// 								if ($Bis > $codeEndetMonat) {$TW.="TW(".substr("0".$codeEndetMonat,-2).".".$Jahr.")";}
+								
+								if ($Von <= $codeBeginMonat) {$TW.="E";}
+								if ($Bis >= $codeEndetMonat) {$TW.="TW";}
 								
 								$MaQSTPeriodeVonBis		= substr("0".$codeBeginMonat,-2)."-".substr("0".$codeEndetMonat,-2);//Echte betroffene Periode des MA innerhalb der Report-Periode
 								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "Zulagen");

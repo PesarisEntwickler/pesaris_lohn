@@ -1,0 +1,8 @@
+# Diese Verzeichnisse/Dateien sollen nicht durchsucht werden
+User-agent: *
+Disallow: /dispatcher-ui.php
+Disallow: /getfile.php
+Disallow: /rcvfile.php
+Disallow: /kernel/
+Disallow: /plugins/
+Disallow: /web/transfer/

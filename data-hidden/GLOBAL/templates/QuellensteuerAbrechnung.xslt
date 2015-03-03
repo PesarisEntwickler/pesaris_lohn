@@ -58,7 +58,7 @@ Versicherungsnummer
 \hline
 \\
 \endhead
-<xsl:apply-templates select="Report/CompanyList"/>
+<xsl:apply-templates select="Report"/>
 
 \end{longtable}
 \end{document}
@@ -115,6 +115,38 @@ Versicherungsnummer
 <xsl:otherwise><xsl:text>von</xsl:text></xsl:otherwise>
 </xsl:choose> \pageref{LastPage}\\}
 </xsl:template>
+
+
+
+
+
+
+<xsl:template match="Report"><xsl:if test="position() > 1">\pagebreak
+</xsl:if>
+<xsl:apply-templates select="CompanyList"/>
+\pagebreak
+\\
+&amp;\multicolumn{3}{l}{<xsl:text>G e s a m t t o t a l :</xsl:text>}		
+&amp;\multicolumn{2}{l}{ }	
+&amp;\hfill <xsl:value-of select="QSTReportTotalPflichtig"/> 	
+&amp;	
+&amp;	
+&amp;\hfill <xsl:value-of select="QSTReportTotalAbzug"/>   \\
+
+&amp;\multicolumn{3}{l}{ }
+&amp;\multicolumn{3}{l}{ }
+&amp;\multicolumn{2}{l}{\hfill Provisionen der Kantone:}
+&amp;\hfill <xsl:value-of select="QSTReportTotalAbzugProvision"/> \\ 
+
+&amp;\multicolumn{3}{l}{ }
+&amp;\multicolumn{3}{l}{ }	
+&amp;\multicolumn{2}{l}{ }
+&amp;\hfill <xsl:value-of select="QSTReportTotalAbzugNachProvision"/> \\
+</xsl:template>
+
+
+
+
 
 
 <xsl:template match="CompanyList">
