@@ -105,13 +105,34 @@ function getBetroffeneMitarbeiter($PeriodIDList, $QstAcounts) {
 WHERE payroll_period_ID IN (".implode(",", $PeriodIDList).")
 AND payroll_account_ID  IN (".implode(",", $QstAcounts).")
 GROUP BY payroll_employee_ID";
+//communication_interface::alert($sql);
 	$system_database_manager = system_database_manager::getInstance();
 	$result = $system_database_manager->executeQuery($sql, "");
 	$EmployeeIDs = array();
 	foreach ($result as $value) {
 		$EmployeeIDs[]	=	$value["payroll_employee_ID"];
 	}
-	return $EmployeeIDs;
+	return implode(",", $EmployeeIDs) ;
+}
+
+/* MA mit Zulagen    -> AccountTypeListe = (18) */
+/* QST relevante MA  -> AccountTypeListe = (5,7,9,16,17) */
+function relevanteQSTMitarbeiter($AccountTypListe) {
+	$sql =
+"SELECT payroll_employee_ID, amount FROM  payroll_das_account, payroll_calculation_entry
+where payroll_das_account.payroll_account_ID  =  payroll_calculation_entry.payroll_account_ID
+AND  payroll_year_ID >2018
+AND  AccountType in (".$AccountTypListe.")
+GROUP BY payroll_employee_ID
+ORDER BY payroll_employee_ID ;";
+	$system_database_manager = system_database_manager::getInstance();
+	$result = $system_database_manager->executeQuery($sql, "");
+	$EmployeeIDs = array();
+	foreach ($result as $value) {
+		$EmployeeIDs[]	=	$value["payroll_employee_ID"];
+	}
+	return implode(",", $EmployeeIDs) ;
+	
 }
 
 function getBetroffeneMaDetailsGemeindenKantone($CompanyID, $EmployeeIDList) {
@@ -121,7 +142,7 @@ function getBetroffeneMaDetailsGemeindenKantone($CompanyID, $EmployeeIDList) {
 	}
 	$sql =
 "SELECT * FROM payroll_employee
-WHERE id IN (".implode(",", $EmployeeIDList).")".
+WHERE id IN (".$EmployeeIDList.")".
 $andWhere.";";
 //communication_interface::alert("getBetroffeneMaDetailsGemeindenKantone:\n".$sql."\n\n");
 	$system_database_manager = system_database_manager::getInstance();
@@ -194,65 +215,144 @@ function getQSTKanton($Kanton) {
 	);
 }
 
-function getAnzahlKinder($MaID, $Jahr, $Von, $Bis) {
-	$V = str_pad($Von,2,"0",STR_PAD_LEFT );
-	$B = str_pad($Bis,2,"0",STR_PAD_LEFT );
-	$MaxTag = "31";
-	switch ($Bis) {
-		case 2:		$MaxTag = "29"; break;
-		case 4:		$MaxTag = "30"; break;
-		case 6:		$MaxTag = "30"; break;
-		case 9:		$MaxTag = "30"; break;
-		case 11:	$MaxTag = "30"; break;
-	}	
+// function getAnzahlKinder($MaID, $Jahr, $Von, $Bis) {
+// 	$V = str_pad($Von,2,"0",STR_PAD_LEFT );
+// 	$B = str_pad($Bis,2,"0",STR_PAD_LEFT );
+// 	$MaxTag = "31";
+// 	switch ($Bis) {
+// 		case 2:		$MaxTag = "29"; break;
+// 		case 4:		$MaxTag = "30"; break;
+// 		case 6:		$MaxTag = "30"; break;
+// 		case 9:		$MaxTag = "30"; break;
+// 		case 11:	$MaxTag = "30"; break;
+// 	}	
+// 	$system_database_manager = system_database_manager::getInstance();
+// 	$sql = 
+// 	"SELECT count(*) AS Anzahl FROM payroll_employee_children 
+// 	WHERE payroll_employee_ID = '".$MaID."'
+// 	AND (DateFrom  BETWEEN '".$Jahr."-".$V."-01' AND '".$Jahr."-".$B."-".$MaxTag."')
+// 	AND (DateTo    BETWEEN '".$Jahr."-".$V."-01' AND '".$Jahr."-".$B."-".$MaxTag."'); ";	
+// 	$result = $system_database_manager->executeQuery($sql, "");
+// 	$Anzahl = 0;
+// 	if (count($result)>0) {
+// 		$Anzahl = $result[0]["Anzahl"];
+// 	}
+// 	return $Anzahl;
+// }
+
+function getAnzahlKinder($MaID, $Jahr, $Monat) {
 	$system_database_manager = system_database_manager::getInstance();
-	$sql = 
-	"SELECT count(*) AS Anzahl FROM payroll_employee_children 
-	WHERE payroll_employee_ID = '".$MaID."'
-	AND (DateFrom  BETWEEN '".$Jahr."-".$V."-01' AND '".$Jahr."-".$B."-".$MaxTag."')
-	AND (DateTo    BETWEEN '".$Jahr."-".$V."-01' AND '".$Jahr."-".$B."-".$MaxTag."'); ";	
+	$sql =
+"SELECT SUM(CE.quantity) AS AnzKinder
+FROM payroll_das_account AS A, payroll_calculation_entry AS CE, payroll_period AS P
+WHERE A.payroll_account_ID = CE.payroll_account_ID
+AND CE.payroll_period_ID = P.id
+AND CE.payroll_employee_ID = ".$MaID."
+AND P.payroll_year_ID = ".$Jahr."
+AND P.major_period = ".$Monat."
+AND A.AccountType in (18);";
+   	$result = $system_database_manager->executeQuery($sql, "");
+	$Anzahl = 0;
+	if (count($result)>0) {
+		$Anzahl = $result[0]["AnzKinder"];
+	}
+	$AnzKinderCalculation = intval($Anzahl);
+	
+	//Test ob in der Kinderdatei mehr Kinder drin stehen
+	$sql =
+"SELECT count(id) as AnzKinder FROM payroll_employee_children
+where payroll_employee_ID = ".$MaID;
 	$result = $system_database_manager->executeQuery($sql, "");
 	$Anzahl = 0;
 	if (count($result)>0) {
-		$Anzahl = $result[0]["Anzahl"];
+		$Anzahl = $result[0]["AnzKinder"];
 	}
-	return $Anzahl;
+	$AnzKinderStammdaten = intval($Anzahl);
+	
+	$AnzKinder = $AnzKinderCalculation;
+	if ($AnzKinder < $AnzKinderStammdaten) {
+		$AnzKinder = $AnzKinderStammdaten;
+	}
+	return $AnzKinder;
 }
+
 
 function getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, $Typ) {
 	switch ($Typ) {
-		case "BruttoLohn":	$AccountTyp = 19;	break;
-		case "Zulagen":		$AccountTyp = 18;	break;
-		case "QSTPflichtig":$AccountTyp = 5;	break;
-		case "QSTAbzug": 	$AccountTyp = 7;	break;
+		case "QSTPflichtig":			$AccountTypList = "5";	break;
+		case "QSTAbzug": 				$AccountTypList = "7";	break;
+		case "QSTGutschrift":			$AccountTypList = "9";	break;
+		case "QSTAbzugVorperiode": 		$AccountTypList = "16";	break;
+		case "QSTGutschriftVorperiode": $AccountTypList = "17";	break;
+		case "Zulagen":					$AccountTypList = "18";	break;
+		case "BruttoLohn":				$AccountTypList = "19";	break;
+		case "AlleQSTAbzuege": 			$AccountTypList = "7,9,16,17";	break;
+	}
+	$whereMA = "";
+	if (strlen($MaID) > 0) {
+		$whereMA = "AND CE.payroll_employee_ID = ".$MaID;
 	}
 
 	$sql = 
-	"SELECT min(P.major_period) as Min, max(P.major_period) as Max, sum(amount) AS S, code, count(code) AS CC 
+	"SELECT payroll_employee_ID
+	, min(P.major_period) AS Min
+	, max(P.major_period) AS Max
+	, sum(quantity) AS Q
+	, sum(amount) AS S
+	, code
+	, min(code)   AS minCode
+	, max(code)   AS maxCode
+	, count(code) AS CC 
 	FROM payroll_das_account AS A, payroll_calculation_entry AS CE, payroll_period AS P
 	WHERE A.payroll_account_ID = CE.payroll_account_ID
 	AND CE.payroll_period_ID = P.id
-	AND CE.payroll_employee_ID = ".$MaID."
 	AND P.payroll_year_ID = ".$Jahr."
 	AND P.major_period BETWEEN ".$Von." AND ".$Bis."
-	AND A.AccountType = ".$AccountTyp."
-	GROUP BY code";
-	
+	AND AccountType IN (".$AccountTypList.")
+	".$whereMA."
+    GROUP BY payroll_employee_ID
+	ORDER BY payroll_employee_ID, payroll_period_ID
+	;";
+				
 	$Min = $Von;
 	$Max = $Bis;
+	$Q = 0;
 	$S = 0;
 	$code = "";
+	$minCode = "";
+	$maxCode = "";
 	$CC = 0;
 	$system_database_manager = system_database_manager::getInstance();
 	$result = $system_database_manager->executeQuery($sql, "");
 	if (count($result)>0) {
+		$Q = $result[0]["Q"];
 		$S = $result[0]["S"];
 		$Min = $result[0]["Min"];
 		$Max = $result[0]["Max"];
 		$code = $result[0]["code"];
 		$CC = $result[0]["CC"];
+		$minCode = $result[0]["minCode"];
+		$maxCode = $result[0]["maxCode"];
 	}
-	return array("vonPeriode"=>$Min,"bisPeriode"=>$Max,"Summe"=>$S,"Code"=>$code,"CountCode"=>$CC);
+	
+	$result = $system_database_manager->executeQuery($sql, "");
+	$MA = array();
+	if (strlen($MaID) == 0) {
+		foreach ($result as $value) {
+			$MA[] = $value["payroll_employee_ID"];
+		}
+	}
+	$MAList = implode(",", $MA);
+	return array("vonPeriode"=>$Min
+				,"bisPeriode"=>$Max
+				,"Quantity"=>$Q
+				,"Summe"=>$S
+				,"Code"=>$code
+				,"CountCode"=>$CC
+				,"MAList"=>$MAList
+				,"sql"=>$sql
+				,"minCode"=>$minCode
+				,"maxCode"=>$maxCode);
 }
 
 function getSummierteLohnart($MaID, $Jahr, $Von, $Bis, $LohnArt, $Attribut) {
@@ -266,9 +366,9 @@ function getSummierteLohnart($MaID, $Jahr, $Von, $Bis, $LohnArt, $Attribut) {
 	AND CE.payroll_account_ID = ".$LohnArt;
 	$system_database_manager = system_database_manager::getInstance();
 	$result = $system_database_manager->executeQuery($sql, "");
-	$AttrSumme = 0;
+	$AttrSumme = 0.0;
 	foreach ($result as $r) {
-		$AttrSumme += $r[$Attribut];
+		$AttrSumme += floatval($r[$Attribut]);
 	}
 	return $AttrSumme;
 }
@@ -353,9 +453,14 @@ function getQuellensteuerAbrechnung($param) {
 	
 	$PeriodIDList = $this->getPeriodIDs($Jahr, $Von, $Bis);
 	$QstAcounts = $account->getDedAtSrcGlobalSettings();
-	$EmployeeIDList = $this->getBetroffeneMitarbeiter($PeriodIDList, $QstAcounts["data"]);
+	//$EmployeeIDList = $this->getBetroffeneMitarbeiter($PeriodIDList, $QstAcounts["data"]);
+	$AlleMA_mitQSTAbzuegen	= $this->getQSTPeriodenSumme("", $Jahr, $Von, $Bis, "AlleQSTAbzuege");
+	$EmployeeIDList = $AlleMA_mitQSTAbzuegen["MAList"];
 	$EmplGdeKant = $this->getBetroffeneMaDetailsGemeindenKantone($Firma, $EmployeeIDList);
-		
+
+// 	$MaQST			= $this->getQSTPeriodenSumme(36, $Jahr, $Von, $Bis, "AlleQSTAbzuege");
+// 	communication_interface::alert(print_r($MaQST, true));
+	
 // 	communication_interface::alert("Resultate der Vorberechnung: "
 // 			."Firma $Firma, Jahr $Jahr, Von $Von, Bis $Bis "
 // 			."\n=========================================="
@@ -404,8 +509,8 @@ function getQuellensteuerAbrechnung($param) {
 				fwrite($fp, $t____."<Arbeitgebernummer>".$Kt["TaxArbeitgebernummer"]."</Arbeitgebernummer>");
 				fwrite($fp, $t____."<GemeindeList>");
 				foreach ($EmplGdeKant["Gemeinden"] as $Gemeinde) {
-					$QSTGemeindeTotalPflichtig	= 3;
-					$QSTGemeindeTotalAbzug 	= 1;
+					$QSTGemeindeTotalPflichtig	= 0;
+					$QSTGemeindeTotalAbzug 		= 0;
 					$Gde = explode("#",$Gemeinde);
 					$GdeFirmenID = $Gde[0];
 					$GdeKantonID = $Gde[1];
@@ -433,7 +538,7 @@ function getQuellensteuerAbrechnung($param) {
 							$MaBasisLohn	= $Ma[16];
 							$MaEmplPercent	= $Ma[20];
 							$MaQSTModus		= $Ma[21];
-							$MaQSTCode		= $Ma[22];
+							$MaQSTCodeMA	= $Ma[22];
 							$MaQSTProz 		= $Ma[23];
 							$MaSVASNummer	= $Ma[26];
 							$EinAusTritt	= $this->getMaxEmploymentDate($MaID);
@@ -443,25 +548,31 @@ function getQuellensteuerAbrechnung($param) {
 								if (strlen(trim($MaSVASNummer)) > 2) {
 									$MaAHVNummer = $MaSVASNummer;
 								}
-								$MaKinder	= $this->getAnzahlKinder($MaID, $Jahr, $Von, $Bis);
+								$MaKinder	= $this->getAnzahlKinder($MaID, $Jahr, $Bis);//rechnet die Anzahl Kinder am Ende der Auswertungsperiode
 								$MaQSTBetragBruttoLohn	= $this->getSummierteLohnart($MaID, $Jahr, $Von, $Bis, "5000", "amount");//5000[amount] ist BruttoLohn
 								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "QSTPflichtig");
-								$MaQSTBetragPflichtig	= $MaQST["Summe"];
+								$MaQSTBetragPflichtig	= floatval($MaQST["Summe"]);
 								$codeBeginMonat			= $MaQST["vonPeriode"];
 								$codeEndetMonat			= $MaQST["bisPeriode"];
 								$TW = "";
-// 								if ($Von < $codeBeginMonat) {$TW.="E(".substr("0".$codeBeginMonat,-2).".".$Jahr.")".$MaQST["Code"]." ";}
-// 								if ($Bis > $codeEndetMonat) {$TW.="TW(".substr("0".$codeEndetMonat,-2).".".$Jahr.")";}
-								
-								if ($Von <= $codeBeginMonat) {$TW.="E";}
-								if ($Bis >= $codeEndetMonat) {$TW.="TW";}
-								
+								if ($Von != $codeBeginMonat) {
+									$TW = "E";
+								}
+								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "AlleQSTAbzuege");
+								$MaQSTBetragAbzug		= floatval($MaQST["Summe"]);
+								$MaQSTCodeVorher 		= "";
+								$MaQSTCodeAktuell		= $MaQSTCodeMA;
+								if ($MaQST["minCode"] != $MaQST["maxCode"]) {
+									$TW = "TW";
+									if ($MaQSTCodeAktuell  != $MaQST["minCode"]) {
+										$MaQSTCodeVorher ="(".$MaQST["minCode"].")";
+									} else {
+										$MaQSTCodeVorher ="(".$MaQST["maxCode"].")";
+									}
+								}
 								$MaQSTPeriodeVonBis		= substr("0".$codeBeginMonat,-2)."-".substr("0".$codeEndetMonat,-2);//Echte betroffene Periode des MA innerhalb der Report-Periode
 								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "Zulagen");
-								$MaQSTBetragZulagen		= $MaQST["Summe"];
-								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "QSTAbzug");
-								$MaQSTBetragAbzug		= $MaQST["Summe"];
-								
+								$MaQSTBetragZulagen		= floatval($MaQST["Summe"]);
 								fwrite($fp, $t_______."<Mitarbeiter>");
 								fwrite($fp, $t________."<MaName>".$MaName."</MaName>");
 								fwrite($fp, $t________."<MaAHVNummer>".$MaAHVNummer."</MaAHVNummer>");
@@ -469,7 +580,8 @@ function getQuellensteuerAbrechnung($param) {
 								fwrite($fp, $t________."<MaSex>".$MaSex."</MaSex>");
 								fwrite($fp, $t________."<MaZivilstand>".$MaZivilstand."</MaZivilstand>");
 								fwrite($fp, $t________."<MaKinder>".$MaKinder."</MaKinder>");
-								fwrite($fp, $t________."<MaQSTCode>".$MaQSTCode."</MaQSTCode>");
+								fwrite($fp, $t________."<MaQSTCodeVorher>".$MaQSTCodeVorher."</MaQSTCodeVorher>");
+								fwrite($fp, $t________."<MaQSTCode>".$MaQSTCodeAktuell."</MaQSTCode>");
 								fwrite($fp, $t________."<MaEintritt>".$MaEintritt."</MaEintritt>");
 								fwrite($fp, $t________."<MaAustritt>".$MaAustritt."</MaAustritt>");
 								fwrite($fp, $t________."<MaQSTTarifwechsel>".$TW."</MaQSTTarifwechsel>");

@@ -1393,15 +1393,22 @@ class payroll_UI {
 			break;
 		case 'payroll.ConfigImportDasRates':
 			$step = isset($functionParameters[0]["step"]) ? $functionParameters[0]["step"] : 1;
+			//communication_interface::alert("payroll.ConfigImportDasRates:".print_r($functionParameters,true));
 			switch($step) {
-			case 1: //form anzeigen
-				$data["MAX_FILE_SIZE"] = "90000000";
-				$data["param"] = openssl_encrypt( serialize( array("cb_function"=>"payroll.ConfigImportDasRates","data"=>array("step"=>"2") ) ), "aes128", "pw_rcvfile_pw");
+			case 1: //form anzeigen       
+				$data["MAX_FILE_SIZE"] = "990000000";
+				$data["param"] = openssl_encrypt( 
+									serialize(	array("cb_function"=>"payroll.ConfigImportDasRates" ,"data"=>array("step"=>"2")  ) 
+									)	,"aes128"
+										,"pw_rcvfile_pw"
+										, 0
+										, "0123456781234567"
+								);
 				$objWindow = new wgui_window("payroll", "prlCfgDascUplRt");
 				$objWindow->windowTitle("QST: Tarifdaten importieren");
 				$objWindow->windowIcon("config32.png");
-				$objWindow->windowWidth(550);
-				$objWindow->windowHeight(200);
+				$objWindow->windowWidth(380); 
+				$objWindow->windowHeight(250); 
 				$objWindow->dockable(false);
 				$objWindow->buttonMaximize(false);
 				$objWindow->resizable(false);
@@ -1416,11 +1423,10 @@ class payroll_UI {
 				communication_interface::jsExecute("$('#prlFormCfgCancel').bind('click', function(e) { $('#modalContainer').mb_close(); });");
 				break;
 			case 2: //dateiupload abgeschlossen... Tarifdaten importieren
-
 				if($functionParameters[0]["success"]) {
 					$fm = new file_manager();
-					if( $fm->setTmpDir($functionParameters[0]["tmpDirToken"]) ) {
-
+					$transfer = $fm->setTmpDir($functionParameters[0]["tmpDirToken"]);
+					if( $transfer ) {
 						$arr = explode(".",$functionParameters[0]["fileName"]);
 						if(strtolower($arr[count($arr)-1])!="txt") {
 							$fm->deleteDir(); //weil falsche Dateierweiterung, kann TmpDir gleich wieder geloescht werden
@@ -1453,7 +1459,7 @@ class payroll_UI {
 						$objWindow = new wgui_window("payroll", "infoBox");
 						$objWindow->windowTitle("Dateiuebermittlung fehlgeschlagen");
 						$objWindow->windowWidth(420);
-						$objWindow->windowHeight(170);
+						$objWindow->windowHeight(180);
 						$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Datei konnte nicht gelesen werden.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 						$objWindow->showAlert();
 					}
@@ -1461,8 +1467,8 @@ class payroll_UI {
 					$objWindow = new wgui_window("payroll", "infoBox");
 					$objWindow->windowTitle("Dateiuebermittlung fehlgeschlagen");
 					$objWindow->windowWidth(420);
-					$objWindow->windowHeight(170);
-					$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Es wurde keine Datei empfangen.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
+					$objWindow->windowHeight(180);
+					$objWindow->setContent("<div class=\"ui-tabs ui-widget-content ui-corner-all PesarisWGUI center\"><br/>Es wurde keine Datei empfangen<br/>oder die Datei ist zu gross.<br/><br/></div><button class='PesarisButton' style='float: right;' onclick='$(\"#modalContainer\").mb_close();'>OK</button>");
 					$objWindow->showAlert();
 				}
 				break;

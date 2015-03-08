@@ -1,6 +1,7 @@
 <?php 
 $textResourceMap["btnOK"] 			= "OK";
 $textResourceMap["btnSave"] 		= "Speichern";//<wgui:text id="btnSave"/>
+$textResourceMap["btnUpload"] 		= "Upload &amp Import";
 $textResourceMap["btnSaveSettings"] = "Einstellungen speichern";
 $textResourceMap["btnCancel"] 		= "Abbrechen";
 $textResourceMap["btnChange"] 		= "&Auml;ndern";

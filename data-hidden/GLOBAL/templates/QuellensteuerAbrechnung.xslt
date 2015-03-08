@@ -34,7 +34,7 @@
 \begin{document}
 \vspace*{-7.15mm}
 
-\begin{longtable}{ p{50mm} p{5mm} p{20mm} p{22mm} p{22mm} p{22mm} p{24mm} p{22mm} p{22mm} p{24mm}}
+\begin{longtable}{ p{48mm} p{7mm} p{20mm} p{22mm} p{22mm} p{22mm} p{24mm} p{22mm} p{22mm} p{24mm}}
 Nr/Name/Vorname     
 &amp; 
 &amp; Eintritt 
@@ -241,7 +241,7 @@ Summe <xsl:value-of select="Krz"/>:
  <xsl:template match="//Mitarbeiter">
 <!-- \begin{longtable}{ p{50mm} p{6mm} p{20mm} p{18mm} p{24mm} p{24mm} p{24mm} p{24mm} p{12mm} p{32mm}}
  -->\fontsize{11pt}{11pt}\textbf{<xsl:value-of select="MaName"/>} 
-&amp; <xsl:value-of select="MaSex"/>
+&amp; <xsl:value-of select="MaQSTTarifwechsel"/>
 &amp; <xsl:value-of select="MaEintritt"/>
 &amp; <xsl:value-of select="MaQSTPeriodeVonBis"/> 
 &amp;\hfill <xsl:value-of select="MaQSTBetragBruttoLohn"/> 
@@ -258,11 +258,13 @@ Summe <xsl:value-of select="Krz"/>:
 &amp;             
 &amp;         
 &amp;             
-&amp;       
+&amp;\hfill <xsl:value-of select="MaQSTCodeVorher"/>
 &amp;\hfill <xsl:value-of select="MaKinder"/>     
 &amp;  \\
 <!-- \end{longtable} -->
 </xsl:template>
+
+<!--  <xsl:value-of select="MaSex"/> -->
 
 
 </xsl:stylesheet>

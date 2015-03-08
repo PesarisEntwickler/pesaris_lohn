@@ -770,6 +770,7 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 		}
 		$validCantons = array("AG", "AI", "AR", "BE", "BL", "BS", "FR", "GE", "GL", "GR", "JU", "LU", "NE", "NW", "OW", "SG", "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH");
 
+		
 		$fm = new file_manager();
 		if( $fm->setTmpDir($param["tmpDirToken"]) ) {
 			$arr = explode(".",$param["fileName"]);
@@ -781,17 +782,21 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 				$response["errText"] = "wrong file extension";
 				return $response;
 			}else{
+				$response["success"] = false;
+				$response["errCode"] = 40;
+				$response["errText"] = "";
 				//soweit ist alles OK -> wir rufen jetzt die BL-Funktion fuer den Import der Tarifdatei auf
 				$system_database_manager = system_database_manager::getInstance();
 				$system_database_manager->executeUpdate("TRUNCATE TABLE `payroll_tmp_qst_import`", "payroll_importDedAtSrcRates");
 				$system_database_manager->executeUpdate("BEGIN", "payroll_importDedAtSrcRates");
-				//war zuvor "LOAD DATA LOCAL INFILE"
+
 				$system_database_manager->executeUpdate("LOAD DATA INFILE '".$fm->getFullPath().$param["fileName"]."' INTO TABLE `payroll_tmp_qst_import` LINES TERMINATED BY '\n' STARTING BY '' IGNORE 1 LINES (@var1) SET transaction_type=SUBSTR(@var1,4,1), canton=SUBSTR(@var1,5,2), rate_code=SUBSTR(@var1,7,10), canton=SUBSTR(@var1,5,2), date_from=str_to_date(SUBSTR(@var1,17,8),'%Y%m%d'), taxable_income=SUBSTR(@var1,25,9)/100, step_rate=SUBSTR(@var1,34,9)/100, sex=SUBSTR(@var1,43,1), children=SUBSTR(@var1,45,1), tax_amount=SUBSTR(@var1,46,9)/100, tax_rate=SUBSTR(@var1,55,5)", "payroll_importDedAtSrcRates");
 				$system_database_manager->executeUpdate("DELETE FROM payroll_tmp_qst_import WHERE rate_code=''", "payroll_importDedAtSrcRates");
 
 				$fm->deleteDir(); //sobald die Datei eingelesen ist, wird sie nicht mehr benoetigt
 
-				//Wurden aeberhaupt Daten eingelesen?
+				
+				//Wurden ueberhaupt Daten eingelesen?
 				$res = $system_database_manager->executeQuery("SELECT COUNT(*) as rateCount FROM `payroll_tmp_qst_import`", "payroll_processPayment");
 				if($res[0]["rateCount"]==0) {
 					$response["success"] = false;
@@ -800,7 +805,7 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 					return $response;
 				}
 
-				//Kanton auslesen -> es darf nur 1 Kanton sein -> der Kantonscode muss gaeltig sein
+				//Kanton auslesen -> es darf nur 1 Kanton sein -> der Kantonscode muss gueltig sein
 				$res = $system_database_manager->executeQuery("SELECT DISTINCT canton FROM `payroll_tmp_qst_import`", "payroll_processPayment");
 				if(count($res)!=1) {
 					$response["success"] = false;
@@ -829,9 +834,17 @@ DELETE FROM payroll_account_label WHERE id='12345' AND payroll_year_ID=2012
 				$system_database_manager->executeUpdate("UPDATE payroll_tmp_qst_import SET sex='F' WHERE sex='w'", "payroll_importDedAtSrcRates");
 				$system_database_manager->executeUpdate("UPDATE payroll_tmp_qst_import SET sex='M' WHERE sex='m'", "payroll_importDedAtSrcRates");
 				$system_database_manager->executeUpdate("DELETE taxrates FROM payroll_das_tax_rates taxrates INNER JOIN (SELECT canton FROM payroll_tmp_qst_import LIMIT 1) tmpct ON taxrates.DedAtSrcCanton=tmpct.canton", "payroll_importDedAtSrcRates");
-				$system_database_manager->executeUpdate("INSERT INTO `payroll_das_tax_rates`(`DedAtSrcCanton`,`DedAtSrcCode`,`Sex`,`IncomeFrom`,`IncomeTo`,`amount`,`rate`) SELECT canton,rate_code,sex,taxable_income,taxable_income+step_rate,tax_amount,tax_rate FROM payroll_tmp_qst_import WHERE taxable_income<20000", "payroll_importDedAtSrcRates");
-				$system_database_manager->executeUpdate("INSERT INTO `payroll_das_tax_rates`(`DedAtSrcCanton`,`DedAtSrcCode`,`Sex`,`IncomeFrom`,`IncomeTo`,`amount`,`rate`) SELECT canton,rate_code,sex,MIN(taxable_income),MAX(taxable_income)+step_rate,IF(COUNT(*)=1,tax_amount,0),tax_rate FROM payroll_tmp_qst_import WHERE taxable_income>19999 GROUP BY canton,rate_code,sex,tax_rate", "payroll_importDedAtSrcRates");
-				$system_database_manager->executeUpdate("UPDATE `payroll_das_tax_rates` dest INNER JOIN (SELECT `DedAtSrcCanton`,`DedAtSrcCode`,`Sex`,MAX(`IncomeFrom`) as maxIncomeFrom FROM `payroll_das_tax_rates` WHERE `DedAtSrcCanton`='".$response["canton"]."' GROUP BY `DedAtSrcCanton`,`DedAtSrcCode`,`Sex`) src ON src.`DedAtSrcCanton`=dest.`DedAtSrcCanton` AND src.`DedAtSrcCode`=dest.`DedAtSrcCode` AND src.`Sex`=dest.`Sex` AND src.`maxIncomeFrom`=dest.`IncomeFrom` SET dest.`IncomeTo`=999999999", "payroll_importDedAtSrcRates"); //das Maximum pro QST-Code beim von-bis-Einkommen wird hier auf 999'999'999 gesetzt. Damit sollte auch fuer sehr hohe Loehne der QST-Tarif ermittelt werden koennen
+				$system_database_manager->executeUpdate("INSERT INTO `payroll_das_tax_rates`
+															(`DedAtSrcCanton`,`DedAtSrcCode`,`Sex`,`IncomeFrom`,`IncomeTo`,`amount`,`rate`) 
+															SELECT canton,rate_code,sex,taxable_income,taxable_income+step_rate,tax_amount,tax_rate FROM payroll_tmp_qst_import WHERE taxable_income<20000", "payroll_importDedAtSrcRates");
+				$system_database_manager->executeUpdate("INSERT INTO `payroll_das_tax_rates`
+															(`DedAtSrcCanton`,`DedAtSrcCode`,`Sex`,`IncomeFrom`,`IncomeTo`,`amount`,`rate`) 
+															SELECT canton,rate_code,sex,MIN(taxable_income),MAX(taxable_income)+step_rate,IF(COUNT(*)=1,tax_amount,0),tax_rate 
+															FROM payroll_tmp_qst_import WHERE taxable_income>19999 GROUP BY canton,rate_code,sex,tax_rate", "payroll_importDedAtSrcRates");
+				$system_database_manager->executeUpdate("UPDATE `payroll_das_tax_rates` dest INNER JOIN (SELECT `DedAtSrcCanton`,`DedAtSrcCode`,`Sex`,MAX(`IncomeFrom`) as maxIncomeFrom FROM `payroll_das_tax_rates` 
+															WHERE `DedAtSrcCanton`='".$response["canton"]."' 
+															GROUP BY `DedAtSrcCanton`,`DedAtSrcCode`,`Sex`) src ON src.`DedAtSrcCanton`=dest.`DedAtSrcCanton` AND src.`DedAtSrcCode`=dest.`DedAtSrcCode` AND src.`Sex`=dest.`Sex` AND src.`maxIncomeFrom`=dest.`IncomeFrom` 
+															SET dest.`IncomeTo`=99999999", "payroll_importDedAtSrcRates"); //das Maximum pro QST-Code beim von-bis-Einkommen wird hier auf 999'999'999 gesetzt. Damit sollte auch fuer sehr hohe Loehne der QST-Tarif ermittelt werden koennen
 				$system_database_manager->executeUpdate("COMMIT", "payroll_importDedAtSrcRates");
 				$system_database_manager->executeUpdate("TRUNCATE TABLE `payroll_tmp_qst_import`", "payroll_importDedAtSrcRates");
 			}

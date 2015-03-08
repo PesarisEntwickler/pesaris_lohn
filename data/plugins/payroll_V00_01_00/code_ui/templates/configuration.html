@@ -674,7 +674,7 @@
 			<label for="prlFormCfg_DaysPerMonth">Arbeitstage:</label><select id="prlFormCfg_DaysPerMonth"><option value="0">30-Tage-Regel</option><option value="1">effektive Tage</option></select><br/>
 			<label for="prlFormCfg_commission">Provision:</label><input type="text" id="prlFormCfg_commission" /> %<br/>
 		</fieldset><br/>
-		<fieldset class="dascntAcc" style="width: 95%">
+		<fieldset class="dascntAcc" style="width: 95%;">
 			<legend>Zugewiesene Lohnarten</legend>
 			<label for="prlFormCfg_dasacc1">QST-Basis f&uuml;r Jahresausgleich:</label><input type="text" id="prlFormCfg_dasacc1" /><br/>
 			<label for="prlFormCfg_dasacc2">QST-Basis satzbestimmend:</label><input type="text" id="prlFormCfg_dasacc2" /><br/>
@@ -689,14 +689,17 @@
 	<div class="ui-tabs ui-widget-content ui-corner-all PesarisWGUI">
 		<form id="prlCfgDascUplRtFrm" enctype="multipart/form-data" action="rcvfile.php" method="POST" target="dlFrame">
 			<input type="hidden" name="MAX_FILE_SIZE" value="<wgui:var name="MAX_FILE_SIZE"/>" />
+			<br/>
 			Tarifdatei ausw&auml;hlen:<br/>
+			<br/>
 			<input name="rcvfile" type="file" style="background-color: #ffa;"/><br/>
-			Bemerkung: Stellen Sie bitte sicher, dass Sie nur Dateien mit der Endung .txt einlesen.
+			Bemerkung:<br/>
+			Stellen Sie bitte sicher, dass Sie nur Dateien mit der Endung .txt einlesen.
 			<input type="hidden" name="param" value="<wgui:var name="param"/>" />
 		</form>
 	</div>
-	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnCancel"/></button>
-	<button class="PesarisButton" id="prlFormCfgSave" style="float: right;"><wgui:text id="btnSave"/></button>
+	<button class="PesarisButton" id="prlFormCfgCancel"><wgui:text id="btnClose"/></button>
+	<button class="PesarisButton" id="prlFormCfgSave" style="float: right; width:150px;"><wgui:text id="btnUpload"/></button>
 	<div id="prlCfgDascUplRtWait"><img src="web/img/working.gif" /></div>
 </wgui:block name="prlCfgDascUplRt">
 

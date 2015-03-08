@@ -1,18 +1,16 @@
 <?php
-	ini_set('max_execution_time', 300); //5 minutes maximum execution time
+ini_set('max_execution_time', 360); //6 minutes maximum execution time
 
-	if(!isset($_POST["param"])) exit();
+if(!isset($_POST["param"])) exit();
 
-	if(!isset($_COOKIE["aafw"])) exit();
+if(!isset($_COOKIE["aafw"])) exit();
 
-	require_once("kernel/common-functions/configuration.php");
-	require_once('kernel/core-logic/system_database_manager.php');
-	require_once("kernel/core-logic/session_control.php");
-	require_once("kernel/common-functions/file_manager.php");
-	$session_control = session_control::getInstance();
-	if(!$session_control->setSessionToken($_COOKIE["aafw"])) exit();
-
-
+require_once("kernel/common-functions/configuration.php");
+require_once('kernel/core-logic/system_database_manager.php');
+require_once("kernel/core-logic/session_control.php");
+require_once("kernel/common-functions/file_manager.php");
+$session_control = session_control::getInstance();
+if(!$session_control->setSessionToken($_COOKIE["aafw"])) exit();
 
 $fm = new file_manager();
 $token = $fm->createTmpDir();
@@ -20,10 +18,11 @@ $token = $fm->createTmpDir();
 $uploaddir = $fm->getFullPath();
 $uploadfile = $uploaddir.basename($_FILES['rcvfile']['name']);
 
-$decrypted = unserialize(openssl_decrypt($_POST['param'], "aes128", "pw_rcvfile_pw"));
+$decrypted = unserialize(openssl_decrypt($_POST['param'], "aes128", "pw_rcvfile_pw", 0, "0123456781234567"));
 
 $decrypted["data"]["tmpDirToken"] = $token;
 $decrypted["data"]["fileName"] = basename($_FILES['rcvfile']['name']);
+
 
 if (move_uploaded_file($_FILES['rcvfile']['tmp_name'], $uploadfile)) {
 	$decrypted["data"]["success"] = true;
@@ -37,4 +36,5 @@ if (move_uploaded_file($_FILES['rcvfile']['tmp_name'], $uploadfile)) {
 		echo "<script>alert('fehler'); parent.$('#modalContainer').mb_close();</script>\n";
 	}
 }
+
 ?>
