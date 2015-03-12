@@ -96,7 +96,7 @@ AND major_period <= ".$Bis.";";
 	foreach ($result as $value) {
 		$PeriodIDs[]=$value["id"];
 	}
-	return  $PeriodIDs;
+	return  implode(",", $PeriodIDs);
 }
 
 function getBetroffeneMitarbeiter($PeriodIDList, $QstAcounts) {
@@ -215,33 +215,8 @@ function getQSTKanton($Kanton) {
 	);
 }
 
-// function getAnzahlKinder($MaID, $Jahr, $Von, $Bis) {
-// 	$V = str_pad($Von,2,"0",STR_PAD_LEFT );
-// 	$B = str_pad($Bis,2,"0",STR_PAD_LEFT );
-// 	$MaxTag = "31";
-// 	switch ($Bis) {
-// 		case 2:		$MaxTag = "29"; break;
-// 		case 4:		$MaxTag = "30"; break;
-// 		case 6:		$MaxTag = "30"; break;
-// 		case 9:		$MaxTag = "30"; break;
-// 		case 11:	$MaxTag = "30"; break;
-// 	}	
-// 	$system_database_manager = system_database_manager::getInstance();
-// 	$sql = 
-// 	"SELECT count(*) AS Anzahl FROM payroll_employee_children 
-// 	WHERE payroll_employee_ID = '".$MaID."'
-// 	AND (DateFrom  BETWEEN '".$Jahr."-".$V."-01' AND '".$Jahr."-".$B."-".$MaxTag."')
-// 	AND (DateTo    BETWEEN '".$Jahr."-".$V."-01' AND '".$Jahr."-".$B."-".$MaxTag."'); ";	
-// 	$result = $system_database_manager->executeQuery($sql, "");
-// 	$Anzahl = 0;
-// 	if (count($result)>0) {
-// 		$Anzahl = $result[0]["Anzahl"];
-// 	}
-// 	return $Anzahl;
-// }
 
 function getAnzahlKinder($MaID, $Jahr, $Monat) {
-	$system_database_manager = system_database_manager::getInstance();
 	$sql =
 "SELECT SUM(CE.quantity) AS AnzKinder
 FROM payroll_das_account AS A, payroll_calculation_entry AS CE, payroll_period AS P
@@ -251,7 +226,8 @@ AND CE.payroll_employee_ID = ".$MaID."
 AND P.payroll_year_ID = ".$Jahr."
 AND P.major_period = ".$Monat."
 AND A.AccountType in (18);";
-   	$result = $system_database_manager->executeQuery($sql, "");
+	$system_database_manager = system_database_manager::getInstance();
+	$result = $system_database_manager->executeQuery($sql, "");
 	$Anzahl = 0;
 	if (count($result)>0) {
 		$Anzahl = $result[0]["AnzKinder"];
@@ -276,6 +252,32 @@ where payroll_employee_ID = ".$MaID;
 	return $AnzKinder;
 }
 
+function getZulagen($MaID, $PeriodIDList) {
+	$sql = 
+"SELECT SUM(amount) AS KinderUndAusbildungsZulagen 
+FROM payroll_calculation_entry
+WHERE payroll_employee_ID = ".$MaID."
+AND payroll_period_ID IN (".$PeriodIDList.")
+AND payroll_account_ID
+ IN (SELECT R.payroll_account_ID FROM 
+     payroll_insurance_code AS IC
+    ,payroll_insurance      AS I
+    ,payroll_insurance_rate AS R
+    ,payroll_employee_children AS C
+  WHERE I.id = IC.payroll_insurance_ID
+  AND  IC.id = R.payroll_insurance_code_ID
+  AND  IC.InsuranceCode = C.Code
+  AND   C.payroll_employee_ID = ".$MaID.")";
+
+	$system_database_manager = system_database_manager::getInstance();
+	$result = $system_database_manager->executeQuery($sql, "");
+	$KinderUndAusbildungsZulagen	= 0;
+	if (count($result)>0) {
+		$KinderUndAusbildungsZulagen	= $result[0]["KinderUndAusbildungsZulagen"];
+	}
+	
+	return $KinderUndAusbildungsZulagen;
+}
 
 function getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, $Typ) {
 	switch ($Typ) {
@@ -354,6 +356,7 @@ function getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, $Typ) {
 				,"minCode"=>$minCode
 				,"maxCode"=>$maxCode);
 }
+
 
 function getSummierteLohnart($MaID, $Jahr, $Von, $Bis, $LohnArt, $Attribut) {
 	$sql = 
@@ -548,7 +551,6 @@ function getQuellensteuerAbrechnung($param) {
 								if (strlen(trim($MaSVASNummer)) > 2) {
 									$MaAHVNummer = $MaSVASNummer;
 								}
-								$MaKinder	= $this->getAnzahlKinder($MaID, $Jahr, $Bis);//rechnet die Anzahl Kinder am Ende der Auswertungsperiode
 								$MaQSTBetragBruttoLohn	= $this->getSummierteLohnart($MaID, $Jahr, $Von, $Bis, "5000", "amount");//5000[amount] ist BruttoLohn
 								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "QSTPflichtig");
 								$MaQSTBetragPflichtig	= floatval($MaQST["Summe"]);
@@ -571,15 +573,15 @@ function getQuellensteuerAbrechnung($param) {
 									}
 								}
 								$MaQSTPeriodeVonBis		= substr("0".$codeBeginMonat,-2)."-".substr("0".$codeEndetMonat,-2);//Echte betroffene Periode des MA innerhalb der Report-Periode
-								$MaQST 					= $this->getQSTPeriodenSumme($MaID, $Jahr, $Von, $Bis, "Zulagen");
-								$MaQSTBetragZulagen		= floatval($MaQST["Summe"]);
+								$MaKinder				= $this->getAnzahlKinder($MaID, $Jahr, $Bis);//rechnet die Anzahl Kinder am Ende der Auswertungsperiode
+ 								$MaQSTBetragZulagen		= $this->getZulagen($MaID, $PeriodIDList);
 								fwrite($fp, $t_______."<Mitarbeiter>");
 								fwrite($fp, $t________."<MaName>".$MaName."</MaName>");
 								fwrite($fp, $t________."<MaAHVNummer>".$MaAHVNummer."</MaAHVNummer>");
 								fwrite($fp, $t________."<MaGeboren>".$MaGeboren."</MaGeboren>");
 								fwrite($fp, $t________."<MaSex>".$MaSex."</MaSex>");
 								fwrite($fp, $t________."<MaZivilstand>".$MaZivilstand."</MaZivilstand>");
-								fwrite($fp, $t________."<MaKinder>".$MaKinder."</MaKinder>");
+								fwrite($fp, $t________."<MaKinder>".intval($MaKinder)."</MaKinder>");
 								fwrite($fp, $t________."<MaQSTCodeVorher>".$MaQSTCodeVorher."</MaQSTCodeVorher>");
 								fwrite($fp, $t________."<MaQSTCode>".$MaQSTCodeAktuell."</MaQSTCode>");
 								fwrite($fp, $t________."<MaEintritt>".$MaEintritt."</MaEintritt>");
