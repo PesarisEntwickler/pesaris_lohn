@@ -242,6 +242,7 @@ $textResourceMap["prlCfgInscBtnQFilter"] = "Tabellenfilter";
 $textResourceMap["prlCfgInscBtnInsr"] = "Versicherer verwalten";
 $textResourceMap["prlCfgInscBtnCode"] = "Codes verwalten";
 $textResourceMap["prlCfgSyacBtnQFilter"] = "Tabellenfilter";
+$textResourceMap["txtQSTKantonsCodes"] = "QST Kantons Codes";
 $textResourceMap["prlcfgDasTab"] = "QST";
 $textResourceMap["prlCfgDasBtnNew"] = "Kanton hinzufuegen";
 $textResourceMap["prlCfgDasBtnQFilter"] = "Tabellenfilter";

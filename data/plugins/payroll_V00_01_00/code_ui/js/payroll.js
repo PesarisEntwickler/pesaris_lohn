@@ -54,251 +54,251 @@ function prlAuszahlenGenerateWindowInit() {
 ** Employee Overview
 *************************************
 */
-	var prlPsoDataView;
-	var prlPsoColumnFilters = {};
-	var prlPsoGrid;
-	var prlPsoColumns = [];
+var prlPsoDataView;
+var prlPsoColumnFilters = {};
+var prlPsoGrid;
+var prlPsoColumns = [];
 
-	var prlPsoOptions = {
-		showHeaderRow: true,
-		enableCellNavigation: false,
-		enableColumnReorder: false,
-		explicitInitialization: true
-	};
+var prlPsoOptions = {
+	showHeaderRow: true,
+	enableCellNavigation: false,
+	enableColumnReorder: false,
+	explicitInitialization: true
+};
 
-	var prlPsoData = [];
+var prlPsoData = [];
 
-	function prlPsoFilter(item) {
+function prlPsoFilter(item) {
+	for(var columnId in prlPsoColumnFilters) {
+		if(columnId !== undefined && prlPsoColumnFilters[columnId] !== "") {
+			var c = prlPsoGrid.getColumns()[prlPsoGrid.getColumnIndex(columnId)];
+			if(item[c.field].toString().toLowerCase().indexOf(prlPsoColumnFilters[columnId].toString().toLowerCase()) == -1) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function prlPsoSaveSettings() {
+	var settings = {};
+	settings['quickFilterEnabled'] = $("#prlPsoBtnQFilter").is(':checked');
+	if(settings['quickFilterEnabled']) {
+		settings['quickFilterValues'] = [];
 		for(var columnId in prlPsoColumnFilters) {
-			if(columnId !== undefined && prlPsoColumnFilters[columnId] !== "") {
-				var c = prlPsoGrid.getColumns()[prlPsoGrid.getColumnIndex(columnId)];
-				if(item[c.field].toString().toLowerCase().indexOf(prlPsoColumnFilters[columnId].toString().toLowerCase()) == -1) {
-					return false;
-				}
-			}
+			settings['quickFilterValues'].push({'colID': columnId, 'filterValue': prlPsoColumnFilters[columnId]});
 		}
-		return true;
+	}
+	settings['columnsWidth'] = [];
+	var cols = prlPsoGrid.getColumns();
+	for(var i=0;i<cols.length;i++) settings['columnsWidth'].push(cols[i].width);
+	settings['sort'] = prlPsoGrid.getSortColumns();
+	cb('payroll.psoSaveSettings',settings);
+}
+
+function prlPsoSetSettings(param) {
+	$('#prlPsoBtnQFilter').attr('checked', param.quickFilterEnabled);
+	if(param.quickFilterEnabled) {
+		for(var i=0;i<param.quickFilterValues.length;i++) {
+			prlPsoColumnFilters[param.quickFilterValues[i].colID] = param.quickFilterValues[i].filterValue;
+		}
+	}
+	var cols = prlPsoGrid.getColumns();
+	for(var i=0;i<cols.length;i++) cols[i].width=param.columnsWidth[i];
+	prlPsoGrid.setColumns(cols);
+
+	if(param.sort.length>0) {
+		prlPsoGrid.setSortColumn(param.sort[0].columnId, param.sort[0].sortAsc);
+		prlPsoSortSingleColumn(param.sort[0].columnId, param.sort[0].sortAsc, false);
 	}
 
-	function prlPsoSaveSettings() {
-		var settings = {};
-		settings['quickFilterEnabled'] = $("#prlPsoBtnQFilter").is(':checked');
-		if(settings['quickFilterEnabled']) {
-			settings['quickFilterValues'] = [];
-			for(var columnId in prlPsoColumnFilters) {
-				settings['quickFilterValues'].push({'colID': columnId, 'filterValue': prlPsoColumnFilters[columnId]});
-			}
-		}
-		settings['columnsWidth'] = [];
-		var cols = prlPsoGrid.getColumns();
-		for(var i=0;i<cols.length;i++) settings['columnsWidth'].push(cols[i].width);
-		settings['sort'] = prlPsoGrid.getSortColumns();
-		cb('payroll.psoSaveSettings',settings);
+	prlPsoToggleFilterRow();
+
+	prlPsoGrid.setData(prlPsoDataView);
+	prlPsoGrid.updateRowCount();
+	prlPsoGrid.render();
+}
+
+function prlPsoToggleFilterRow() {
+	if($("#prlPsoBtnQFilter").is(':checked')) {
+		$(prlPsoGrid.getHeaderRow()).show();
+		prlPsoGrid.showHeaderRow(true);
+	}else{
+		$(prlPsoGrid.getHeaderRow()).hide();
+		prlPsoGrid.showHeaderRow(false);
+		$(prlPsoGrid.getHeaderRow()).find("input").val('');
+		for(var columnId in prlPsoColumnFilters) prlPsoColumnFilters[columnId] = "";
+		prlPsoDataView.refresh();
 	}
+	prlPsoGrid.resizeCanvas();
+}
 
-	function prlPsoSetSettings(param) {
-		$('#prlPsoBtnQFilter').attr('checked', param.quickFilterEnabled);
-		if(param.quickFilterEnabled) {
-			for(var i=0;i<param.quickFilterValues.length;i++) {
-				prlPsoColumnFilters[param.quickFilterValues[i].colID] = param.quickFilterValues[i].filterValue;
-			}
-		}
-		var cols = prlPsoGrid.getColumns();
-		for(var i=0;i<cols.length;i++) cols[i].width=param.columnsWidth[i];
-		prlPsoGrid.setColumns(cols);
-
-		if(param.sort.length>0) {
-			prlPsoGrid.setSortColumn(param.sort[0].columnId, param.sort[0].sortAsc);
-			prlPsoSortSingleColumn(param.sort[0].columnId, param.sort[0].sortAsc, false);
-		}
-
-		prlPsoToggleFilterRow();
-
+function prlPsoSortSingleColumn(field, sortAsc, updateGrid) {
+	prlPsoDataView.sort(function(a, b){
+		var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
+		return sortAsc ? result : -result;
+	});
+	if(updateGrid==null) {
 		prlPsoGrid.setData(prlPsoDataView);
 		prlPsoGrid.updateRowCount();
 		prlPsoGrid.render();
 	}
+}
 
-	function prlPsoToggleFilterRow() {
-		if($("#prlPsoBtnQFilter").is(':checked')) {
-			$(prlPsoGrid.getHeaderRow()).show();
-			prlPsoGrid.showHeaderRow(true);
-		}else{
-			$(prlPsoGrid.getHeaderRow()).hide();
-			prlPsoGrid.showHeaderRow(false);
-			$(prlPsoGrid.getHeaderRow()).find("input").val('');
-			for(var columnId in prlPsoColumnFilters) prlPsoColumnFilters[columnId] = "";
+function prlPsoInit() {
+	prlPsoDataView = new Slick.Data.DataView();
+	prlPsoGrid = new Slick.Grid("#gridEmplOv", prlPsoDataView, prlPsoColumns, prlPsoOptions);
+	prlPsoGrid.onSort.subscribe(function (e, args) {
+		prlPsoSortSingleColumn(args.sortCol.field, args.sortAsc);
+	});
+
+	prlPsoDataView.onRowCountChanged.subscribe(function (e, args) {
+		prlPsoGrid.updateRowCount();
+		prlPsoGrid.render();
+	});
+
+	prlPsoDataView.onRowsChanged.subscribe(function (e, args) {
+		prlPsoGrid.invalidateRows(args.rows);
+		prlPsoGrid.render();
+	});
+
+
+	$(prlPsoGrid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+		var columnId = $(this).data("columnId");
+		if (columnId != null) {
+			prlPsoColumnFilters[columnId] = $.trim($(this).val());
 			prlPsoDataView.refresh();
 		}
-		prlPsoGrid.resizeCanvas();
-	}
+	});
 
-	function prlPsoSortSingleColumn(field, sortAsc, updateGrid) {
-		prlPsoDataView.sort(function(a, b){
-			var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
-			return sortAsc ? result : -result;
-		});
-		if(updateGrid==null) {
-			prlPsoGrid.setData(prlPsoDataView);
-			prlPsoGrid.updateRowCount();
-			prlPsoGrid.render();
+	prlPsoGrid.onHeaderRowCellRendered.subscribe(function(e, args) {
+		$(args.node).empty();
+		$("<input type='text'>")
+		   .data("columnId", args.column.id)
+		   .val(prlPsoColumnFilters[args.column.id])
+		   .appendTo(args.node);
+	});
+
+	prlPsoGrid.onClick.subscribe(function(e, args) {
+		var cell = prlPsoGrid.getCellFromEvent(e), row = cell.row;
+		var item = prlPsoDataView.getItem(row);
+		prlPsoOpenEmployeeForm(item.id);
+	});
+
+	prlPsoGrid.init();
+
+	prlPsoDataView.beginUpdate();
+	prlPsoDataView.setItems(prlPsoData);
+	prlPsoDataView.setFilter(prlPsoFilter);
+	prlPsoDataView.endUpdate();
+
+	//Button: MA hinzufuegen
+	$( "#prlPsoBtnNew" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-adduser"
 		}
-	}
-
-	function prlPsoInit() {
-		prlPsoDataView = new Slick.Data.DataView();
-		prlPsoGrid = new Slick.Grid("#gridEmplOv", prlPsoDataView, prlPsoColumns, prlPsoOptions);
-		prlPsoGrid.onSort.subscribe(function (e, args) {
-			prlPsoSortSingleColumn(args.sortCol.field, args.sortAsc);
-		});
-
-		prlPsoDataView.onRowCountChanged.subscribe(function (e, args) {
-			prlPsoGrid.updateRowCount();
-			prlPsoGrid.render();
-		});
-
-		prlPsoDataView.onRowsChanged.subscribe(function (e, args) {
-			prlPsoGrid.invalidateRows(args.rows);
-			prlPsoGrid.render();
-		});
-
-
-		$(prlPsoGrid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
-			var columnId = $(this).data("columnId");
-			if (columnId != null) {
-				prlPsoColumnFilters[columnId] = $.trim($(this).val());
-				prlPsoDataView.refresh();
-			}
-		});
-
-		prlPsoGrid.onHeaderRowCellRendered.subscribe(function(e, args) {
-			$(args.node).empty();
-			$("<input type='text'>")
-			   .data("columnId", args.column.id)
-			   .val(prlPsoColumnFilters[args.column.id])
-			   .appendTo(args.node);
-		});
-
-		prlPsoGrid.onClick.subscribe(function(e, args) {
-			var cell = prlPsoGrid.getCellFromEvent(e), row = cell.row;
-			var item = prlPsoDataView.getItem(row);
-			prlPsoOpenEmployeeForm(item.id);
-		});
-
-		prlPsoGrid.init();
-
-		prlPsoDataView.beginUpdate();
-		prlPsoDataView.setItems(prlPsoData);
-		prlPsoDataView.setFilter(prlPsoFilter);
-		prlPsoDataView.endUpdate();
-
-		//Button: MA hinzufuegen
-		$( "#prlPsoBtnNew" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-adduser"
-			}
-		})
-		.click(function() {
-			prlPsoOpenEmployeeForm(0);
-		});
+	})
+	.click(function() {
+		prlPsoOpenEmployeeForm(0);
+	});
 // ----------------------------------------
-		//Button: DB Filter
-		$( "#prlPsoBtnDFilter" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-db"
-			}
-		})
-		.click(function() {
-			cb('payroll.psoSetDBFilter');
-		}).addClass('toolbar-space-left');
+	//Button: DB Filter
+	$( "#prlPsoBtnDFilter" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-db"
+		}
+	})
+	.click(function() {
+		cb('payroll.psoSetDBFilter');
+	}).addClass('toolbar-space-left');
 
-		//Button: DB Edit
-		$( "#prlPsoBtnDEdit" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-dbedit"
-			}
-		})
-		.click(function() {
-			cb('payroll.EmployeeFilter',{'action':'overview'});
-		});
+	//Button: DB Edit
+	$( "#prlPsoBtnDEdit" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-dbedit"
+		}
+	})
+	.click(function() {
+		cb('payroll.EmployeeFilter',{'action':'overview'});
+	});
 // ----------------------------------------
-		//Button: Tabellenfilter
-		$( "#prlPsoBtnQFilter" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-tblfilter"
-			}
-		})
-		.click(function() {
-			prlPsoToggleFilterRow();
-		});
-		$('label[for=prlPsoBtnQFilter]').addClass('toolbar-space-left');
+	//Button: Tabellenfilter
+	$( "#prlPsoBtnQFilter" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-tblfilter"
+		}
+	})
+	.click(function() {
+		prlPsoToggleFilterRow();
+	});
+	$('label[for=prlPsoBtnQFilter]').addClass('toolbar-space-left');
 
-		//Button: Edit Table Columns
-		$( "#prlPsoBtnEditCols" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-editcols"
-			}
-		})
-		.click(function() {
-			alert('Tabellenspalten bearbeiten');
-		});
+	//Button: Edit Table Columns
+	$( "#prlPsoBtnEditCols" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-editcols"
+		}
+	})
+	.click(function() {
+		alert('Tabellenspalten bearbeiten');
+	});
 
-		//Button: Einstellungen speichern
-		$( "#prlPsoBtnSaveSettings" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-savesettings"
-			}
-		})
-		.click(function() {
-			prlPsoSaveSettings();
-		});
+	//Button: Einstellungen speichern
+	$( "#prlPsoBtnSaveSettings" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-savesettings"
+		}
+	})
+	.click(function() {
+		prlPsoSaveSettings();
+	});
 // ----------------------------------------
-		//Button: Select Form
-		$( "#prlPsoBtnForm" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-window"
-			}
-		})
-		.click(function() {
-			cb('payroll.prlVlSelectForm',0);
-		}).addClass('toolbar-space-left');
+	//Button: Select Form
+	$( "#prlPsoBtnForm" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-window"
+		}
+	})
+	.click(function() {
+		cb('payroll.prlVlSelectForm',0);
+	}).addClass('toolbar-space-left');
 
-		//Button: Edit Form
-		$( "#prlPsoBtnFormEdit" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-windowedit"
-			}
-		})
-		.click(function() {
-			var objWnd = $('#employeeForm');
-			if ( objWnd.length > 0 ) {
-				if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
-				else objWnd.mb_bringToFront();
-				if(!prlVlDesignMode) cb('payroll.prlVlEditForm',{'f':'dmAlert'});
-			}else{
-				cb('payroll.prlVlEditForm',{'f':'layoutOv'});
-			}
-		});
-// ----------------------------------------
-	}
-
-	function prlPsoOpenEmployeeOverview() {
-		var objWnd = $('#employeeOverview');
+	//Button: Edit Form
+	$( "#prlPsoBtnFormEdit" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-windowedit"
+		}
+	})
+	.click(function() {
+		var objWnd = $('#employeeForm');
 		if ( objWnd.length > 0 ) {
 			if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
 			else objWnd.mb_bringToFront();
+			if(!prlVlDesignMode) cb('payroll.prlVlEditForm',{'f':'dmAlert'});
 		}else{
-			cb('payroll.prlPsoEmployeeOverview');
+			cb('payroll.prlVlEditForm',{'f':'layoutOv'});
 		}
+	});
+// ----------------------------------------
+}
+
+function prlPsoOpenEmployeeOverview() {
+	var objWnd = $('#employeeOverview');
+	if ( objWnd.length > 0 ) {
+		if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
+		else objWnd.mb_bringToFront();
+	}else{
+		cb('payroll.prlPsoEmployeeOverview');
 	}
+}
 /*
 *************************************
 ** Employee Edit Form
@@ -314,7 +314,6 @@ var prlVlFldDefFP = "";
 var prlVlRid = 0;
 
 function prlVlSave() {
-//alert("0"); //TODO: XXX
 	if(prlVlDesignMode) {
 		var retObj = [];
 		//hier werden design-daten ausgelesen und in einen JSON-Array geschrieben, der anschliessend via ajax an den Server übermittelt wird
@@ -714,7 +713,6 @@ function prlVlBindAddEl() {
 function prlVlInit() {
 	if(!prlVlDesignMode) $.each(prlVlFieldDef, function(k, v) { prlVlFieldDef[k].inUse = false; });
 	prlVlInitTabs();
-
 	if(prlVlDesignMode) {
 		$( "#prlVlTab1, #prlVlTab2" ).sortable({
 		connectWith: ".ui-tabs-nav"
@@ -777,6 +775,23 @@ function prlVlInit() {
 
 		return false;
 	});
+	
+	
+	$(function() {
+	    $( "#accordion" ).accordion({
+	      collapsible: true
+	    });
+	});
+
+	$(function() {
+	  $( "#QSTdialog" ).dialog({
+	    autoOpen: false,
+	    modal:    true,
+	    show: {  effect: "highlight", duration: 500  },
+	    hide: {  effect: "fade",      duration: 300  }
+	  });
+	});	
+	
 }
 
 function prlVlInitTabs(tabID) {
@@ -1405,347 +1420,347 @@ function prlLoacOpenForm(accId) {
 ** Calculation Overview
 *************************************
 */
-	var prlCalcOvDataView;
-	var prlCalcOvColumnFilters = {};
-	var prlCalcOvGrid;
-	var prlCalcOvColumns = [];
-	var prlCalcOvCfg = {};
+var prlCalcOvDataView;
+var prlCalcOvColumnFilters = {};
+var prlCalcOvGrid;
+var prlCalcOvColumns = [];
+var prlCalcOvCfg = {};
 
-	var prlCalcOvOptions = {
-		showHeaderRow: true,
-		enableCellNavigation: false,
-		enableColumnReorder: false,
-		explicitInitialization: true
-	};
+var prlCalcOvOptions = {
+	showHeaderRow: true,
+	enableCellNavigation: false,
+	enableColumnReorder: false,
+	explicitInitialization: true
+};
 
-	var prlCalcOvData = [];
+var prlCalcOvData = [];
 
-	function prlCalcOvFilter(item) {
+function prlCalcOvFilter(item) {
+	for(var columnId in prlCalcOvColumnFilters) {
+		if(columnId !== undefined && prlCalcOvColumnFilters[columnId] !== "") {
+			var c = prlCalcOvGrid.getColumns()[prlCalcOvGrid.getColumnIndex(columnId)];
+			if(item[c.field].toString().toLowerCase().indexOf(prlCalcOvColumnFilters[columnId].toString().toLowerCase()) == -1) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function prlCalcOvSaveSettings() {
+	var settings = {};
+	settings['quickFilterEnabled'] = $("#prlCalcOvBtnQFilter").is(':checked');
+	if(settings['quickFilterEnabled']) {
+		settings['quickFilterValues'] = [];
 		for(var columnId in prlCalcOvColumnFilters) {
-			if(columnId !== undefined && prlCalcOvColumnFilters[columnId] !== "") {
-				var c = prlCalcOvGrid.getColumns()[prlCalcOvGrid.getColumnIndex(columnId)];
-				if(item[c.field].toString().toLowerCase().indexOf(prlCalcOvColumnFilters[columnId].toString().toLowerCase()) == -1) {
-					return false;
-				}
-			}
+			settings['quickFilterValues'].push({'colID': columnId, 'filterValue': prlCalcOvColumnFilters[columnId]});
 		}
-		return true;
+	}
+	settings['columnsWidth'] = [];
+	var cols = prlCalcOvGrid.getColumns();
+	for(var i=0;i<cols.length;i++) settings['columnsWidth'].push(cols[i].width);
+	settings['sort'] = prlCalcOvGrid.getSortColumns();
+	cb('payroll.calcOvSaveSettings',settings);
+}
+
+function prlCalcOvSetSettings(param) {
+	$('#prlCalcOvBtnQFilter').attr('checked', param.quickFilterEnabled);
+	if(param.quickFilterEnabled) {
+		for(var i=0;i<param.quickFilterValues.length;i++) {
+			prlCalcOvColumnFilters[param.quickFilterValues[i].colID] = param.quickFilterValues[i].filterValue;
+		}
+	}
+	var cols = prlCalcOvGrid.getColumns();
+	for(var i=0;i<cols.length;i++) cols[i].width=param.columnsWidth[i];
+	prlCalcOvGrid.setColumns(cols);
+
+	if(param.sort.length>0) {
+		prlCalcOvGrid.setSortColumn(param.sort[0].columnId, param.sort[0].sortAsc);
+		prlCalcOvSortSingleColumn(param.sort[0].columnId, param.sort[0].sortAsc, false);
 	}
 
-	function prlCalcOvSaveSettings() {
-		var settings = {};
-		settings['quickFilterEnabled'] = $("#prlCalcOvBtnQFilter").is(':checked');
-		if(settings['quickFilterEnabled']) {
-			settings['quickFilterValues'] = [];
-			for(var columnId in prlCalcOvColumnFilters) {
-				settings['quickFilterValues'].push({'colID': columnId, 'filterValue': prlCalcOvColumnFilters[columnId]});
-			}
-		}
-		settings['columnsWidth'] = [];
-		var cols = prlCalcOvGrid.getColumns();
-		for(var i=0;i<cols.length;i++) settings['columnsWidth'].push(cols[i].width);
-		settings['sort'] = prlCalcOvGrid.getSortColumns();
-		cb('payroll.calcOvSaveSettings',settings);
+	prlCalcOvToggleFilterRow();
+
+	prlCalcOvGrid.setData(prlCalcOvDataView);
+	prlCalcOvGrid.updateRowCount();
+	prlCalcOvGrid.render();
+}
+
+function prlCalcOvToggleFilterRow() {
+	if($("#prlCalcOvBtnQFilter").is(':checked')) {
+		$(prlCalcOvGrid.getHeaderRow()).show();
+		prlCalcOvGrid.showHeaderRow(true);
+	}else{
+		$(prlCalcOvGrid.getHeaderRow()).hide();
+		prlCalcOvGrid.showHeaderRow(false);
+		$(prlCalcOvGrid.getHeaderRow()).find("input").val('');
+		for(var columnId in prlCalcOvColumnFilters) prlCalcOvColumnFilters[columnId] = "";
+		prlCalcOvDataView.refresh();
 	}
+	prlCalcOvGrid.resizeCanvas();
+}
 
-	function prlCalcOvSetSettings(param) {
-		$('#prlCalcOvBtnQFilter').attr('checked', param.quickFilterEnabled);
-		if(param.quickFilterEnabled) {
-			for(var i=0;i<param.quickFilterValues.length;i++) {
-				prlCalcOvColumnFilters[param.quickFilterValues[i].colID] = param.quickFilterValues[i].filterValue;
-			}
-		}
-		var cols = prlCalcOvGrid.getColumns();
-		for(var i=0;i<cols.length;i++) cols[i].width=param.columnsWidth[i];
-		prlCalcOvGrid.setColumns(cols);
-
-		if(param.sort.length>0) {
-			prlCalcOvGrid.setSortColumn(param.sort[0].columnId, param.sort[0].sortAsc);
-			prlCalcOvSortSingleColumn(param.sort[0].columnId, param.sort[0].sortAsc, false);
-		}
-
-		prlCalcOvToggleFilterRow();
-
+function prlCalcOvSortSingleColumn(field, sortAsc, updateGrid) {
+	prlCalcOvDataView.sort(function(a, b){
+		var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
+		return sortAsc ? result : -result;
+	});
+	if(updateGrid==null) {
 		prlCalcOvGrid.setData(prlCalcOvDataView);
 		prlCalcOvGrid.updateRowCount();
 		prlCalcOvGrid.render();
 	}
+}
 
-	function prlCalcOvToggleFilterRow() {
-		if($("#prlCalcOvBtnQFilter").is(':checked')) {
-			$(prlCalcOvGrid.getHeaderRow()).show();
-			prlCalcOvGrid.showHeaderRow(true);
-		}else{
-			$(prlCalcOvGrid.getHeaderRow()).hide();
-			prlCalcOvGrid.showHeaderRow(false);
-			$(prlCalcOvGrid.getHeaderRow()).find("input").val('');
-			for(var columnId in prlCalcOvColumnFilters) prlCalcOvColumnFilters[columnId] = "";
-			prlCalcOvDataView.refresh();
-		}
-		prlCalcOvGrid.resizeCanvas();
+function prlCalcOvSetData(updateTbl) {
+	var n = prlCalcOvData.length;
+	for(var i=0;i<n;i++) {
+		prlCalcOvData[i]['ProcStatus'] = prlCalcOvCfg.statusLabel[prlCalcOvData[i].processing]+(prlCalcOvData[i].fin_acc_status != prlCalcOvData[i].mgmt_acc_status?prlCalcOvData[i].fin_acc_status==1?prlCalcOvCfg.finAccLabel:prlCalcOvCfg.mgmtAccLabel:'');
 	}
-
-	function prlCalcOvSortSingleColumn(field, sortAsc, updateGrid) {
-		prlCalcOvDataView.sort(function(a, b){
-			var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
-			return sortAsc ? result : -result;
-		});
-		if(updateGrid==null) {
-			prlCalcOvGrid.setData(prlCalcOvDataView);
-			prlCalcOvGrid.updateRowCount();
-			prlCalcOvGrid.render();
-		}
-	}
-
-	function prlCalcOvSetData(updateTbl) {
-		var n = prlCalcOvData.length;
-		for(var i=0;i<n;i++) {
-			prlCalcOvData[i]['ProcStatus'] = prlCalcOvCfg.statusLabel[prlCalcOvData[i].processing]+(prlCalcOvData[i].fin_acc_status != prlCalcOvData[i].mgmt_acc_status?prlCalcOvData[i].fin_acc_status==1?prlCalcOvCfg.finAccLabel:prlCalcOvCfg.mgmtAccLabel:'');
-		}
-		if(updateTbl) {
-			prlCalcOvDataView.beginUpdate();
-			prlCalcOvDataView.setItems(prlCalcOvData);
-			prlCalcOvDataView.endUpdate();
-			prlCalcOvDataView.reSort();
-			prlCalcOvGrid.invalidate();
-		}
-	}
-
-	function prlCalcOvInit() {//Lohn bearbeiten
-		prlCalcOvDataView = new Slick.Data.DataView();
-		prlCalcOvGrid = new Slick.Grid("#gridCalcOv", prlCalcOvDataView, prlCalcOvColumns, prlCalcOvOptions);
-		prlCalcOvGrid.onSort.subscribe(function (e, args) {
-			prlCalcOvSortSingleColumn(args.sortCol.field, args.sortAsc);
-		});
-
-		prlCalcOvDataView.onRowCountChanged.subscribe(function (e, args) {
-			prlCalcOvGrid.updateRowCount();
-			prlCalcOvGrid.render();
-		});
-
-		prlCalcOvDataView.onRowsChanged.subscribe(function (e, args) {
-			prlCalcOvGrid.invalidateRows(args.rows);
-			prlCalcOvGrid.render();
-		});
-
-
-		$(prlCalcOvGrid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
-			var columnId = $(this).data("columnId");
-			if (columnId != null) {
-				prlCalcOvColumnFilters[columnId] = $.trim($(this).val());
-				prlCalcOvDataView.refresh();
-			}
-		});
-
-		prlCalcOvGrid.onHeaderRowCellRendered.subscribe(function(e, args) {
-			$(args.node).empty();
-			$("<input type='text'>")
-			   .data("columnId", args.column.id)
-			   .val(prlCalcOvColumnFilters[args.column.id])
-			   .appendTo(args.node);
-		});
-
-		prlCalcOvGrid.onClick.subscribe(function(e, args) {
-			var cell = prlCalcOvGrid.getCellFromEvent(e), row = cell.row;
-			var item = prlCalcOvDataView.getItem(row);
-//			alert(item.id);
-			cb('payroll.paymentSplit', {'empId':item.id});
-		});
-
-
-		prlCalcOvGrid.init();
-
+	if(updateTbl) {
 		prlCalcOvDataView.beginUpdate();
 		prlCalcOvDataView.setItems(prlCalcOvData);
-		prlCalcOvDataView.setFilter(prlCalcOvFilter);
 		prlCalcOvDataView.endUpdate();
-
-		//Button: MA hinzufügen
-		$( "#prlCalcOvBtnNew" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-add"
-			}
-		})
-		.click(function() {
-			alert("Zwischenzahltag hinzufuegen");
-		});
-// ----------------------------------------
-		//Button: Perioden-Einstellungen bearbeiten
-		$( "#prlCalcOvBtnSettings" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-info"
-			}
-		})
-		.click(function() {
-			var pYear = $('#prlCalcOvYear').val();
-			var pMajorPeriod = $('#prlCalcOvMajorPeriod').val();
-			var pMinorPeriod = 0;
-			var param = {'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
-			cb('payroll.prlCalcOvSettings', param);
-		}).addClass('toolbar-space-left');
-// ----------------------------------------
-// ----------------------------------------
-		$( "#prlCalcOvBtnEdit" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-edit"
-			}
-		})
-		.click(function() {
-			prlCalcDataOpen();
-		});
-// ----------------------------------------
-		//Button: Add employee
-		$( "#prlCalcOvBtnAddEmpl" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-adduser"
-			}
-		})
-		.click(function() {
-			cb('payroll.EmployeeSelectorOpen');
-		}).addClass('toolbar-space-left');
-// ----------------------------------------
-		//Button: Tabellenfilter
-		$( "#prlCalcOvBtnQFilter" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-tblfilter"
-			}
-		})
-		.click(function() {
-			prlCalcOvToggleFilterRow();
-		});
-		$('label[for=prlCalcOvBtnQFilter]').addClass('toolbar-space-left');
-
-		//Button: Edit Table Columns
-		$( "#prlCalcOvBtnEditCols" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-editcols"
-			}
-		})
-		.click(function() {
-			alert('Tabellenspalten bearbeiten');
-		});
-
-		//Button: Einstellungen speichern
-		$( "#prlCalcOvBtnSaveSettings" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-savesettings"
-			}
-		})
-		.click(function() {
-			prlCalcOvSaveSettings();
-//			alert('Coming soon...');
-		});
-// ----------------------------------------
-		//Button: Daten verarbeiten
-		$( "#prlCalcOvBtnProcess" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-process",
-				secondary: "ui-icon-triangle-1-s"
-			}
-		})
-		.click(function() {
-			var prlCalcOvProcessMenu = $("#prlCalcOvProcessMenu");
-			if(prlCalcOvProcessMenu.is(":visible")) {
-				prlCalcOvProcessMenu.hide();
-			}else{
-				prlCalcOvProcessMenu.show().position({
-					my: "left top",
-					at: "left bottom",
-					of: this
-				});
-				$(document).one("click", function() {
-					prlCalcOvProcessMenu.hide();
-				});
-				$("#prlCalcOvOutputMenu").hide();
-			}
-			return false;
-		}).addClass('toolbar-space-left');
-
-// ----------------------------------------
-		//Button: Output (PDF)
-		$( "#prlCalcOvBtnOutput" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-pdf",
-				secondary: "ui-icon-triangle-1-s"
-			}
-		})
-		.click(function() {
-			var prlCalcOvOutputMenu = $("#prlCalcOvOutputMenu");
-			if(prlCalcOvOutputMenu.is(":visible")) {
-				prlCalcOvOutputMenu.hide();
-			}else{
-				prlCalcOvOutputMenu.show().position({
-					my: "left top",
-					at: "left bottom",
-					of: this
-				});
-				$(document).one("click", function() {
-					prlCalcOvOutputMenu.hide();
-				});
-				$("#prlCalcOvProcessMenu").hide();
-			}
-			return false;
-		}).addClass('toolbar-space-left');
-// ----------------------------------------
-		$("#prlCalcOvProcessMenu").hide().menu().css('width','150').css('position','fixed').css('zIndex','9999');
-		$("#prlCalcOvOutputMenu").hide().menu().css('width','150').css('position','fixed').css('zIndex','9999');
-
-		$('#prlCalcOvProcessMenu a').bind('click', function(e) {
-			var pFunctionNumber = $(this).attr('fnc');
-			var pYear = $('#prlCalcOvYear').val();
-			var pMajorPeriod = $('#prlCalcOvMajorPeriod').val();
-			var pMinorPeriod = 0;
-			var param = {'functionNumber': pFunctionNumber, 'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
-			cb('payroll.prlCalcOvProcess',param);
-			$("#prlCalcOvProcessMenu").hide();
-			return false;
-		});
-
-		$('#prlCalcOvOutputMenu a').bind('click', function(e) {
-			var pFunctionNumber = $(this).attr('fnc');
-			var pYear = $('#prlCalcOvYear').val();
-			var pMajorPeriod = $('#prlCalcOvMajorPeriod').val();
-			var pMinorPeriod = 0;
-			var param = {'functionNumber': pFunctionNumber, 'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
-			cb('payroll.prlCalcOvOutput',param);
-			$("#prlCalcOvOutputMenu").hide();
-			return false;
-		});
-
-		$('#prlCalcOvYear').bind('change', function(e) {
-			var param = {'functionNumber': 1, 'year': $(this).val() };
-			cb('payroll.prlCalcOvFnc',param);
-			return false;
-		});
-
-		$('#prlCalcOvMajorPeriod').bind('change', function(e) {
-			var pYear = $('#prlCalcOvYear').val();
-			var pMajorPeriod = $(this).val();
-			var pMinorPeriod = 0;
-			var param = {'functionNumber': 2, 'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
-			cb('payroll.prlCalcOvFnc',param);
-			return false;
-		});
+		prlCalcOvDataView.reSort();
+		prlCalcOvGrid.invalidate();
 	}
+}
 
-	function prlCalcOvOpen() {
-		var objWnd = $('#prlCalcOverview');
-		if ( objWnd.length > 0 ) {
-			if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
-			else objWnd.mb_bringToFront();
-		}else{
-			cb('payroll.prlCalcOverview');
+function prlCalcOvInit() {//Lohn bearbeiten
+	prlCalcOvDataView = new Slick.Data.DataView();
+	prlCalcOvGrid = new Slick.Grid("#gridCalcOv", prlCalcOvDataView, prlCalcOvColumns, prlCalcOvOptions);
+	prlCalcOvGrid.onSort.subscribe(function (e, args) {
+		prlCalcOvSortSingleColumn(args.sortCol.field, args.sortAsc);
+	});
+
+	prlCalcOvDataView.onRowCountChanged.subscribe(function (e, args) {
+		prlCalcOvGrid.updateRowCount();
+		prlCalcOvGrid.render();
+	});
+
+	prlCalcOvDataView.onRowsChanged.subscribe(function (e, args) {
+		prlCalcOvGrid.invalidateRows(args.rows);
+		prlCalcOvGrid.render();
+	});
+
+
+	$(prlCalcOvGrid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+		var columnId = $(this).data("columnId");
+		if (columnId != null) {
+			prlCalcOvColumnFilters[columnId] = $.trim($(this).val());
+			prlCalcOvDataView.refresh();
 		}
+	});
+
+	prlCalcOvGrid.onHeaderRowCellRendered.subscribe(function(e, args) {
+		$(args.node).empty();
+		$("<input type='text'>")
+		   .data("columnId", args.column.id)
+		   .val(prlCalcOvColumnFilters[args.column.id])
+		   .appendTo(args.node);
+	});
+
+	prlCalcOvGrid.onClick.subscribe(function(e, args) {
+		var cell = prlCalcOvGrid.getCellFromEvent(e), row = cell.row;
+		var item = prlCalcOvDataView.getItem(row);
+//			alert(item.id);
+		cb('payroll.paymentSplit', {'empId':item.id});
+	});
+
+
+	prlCalcOvGrid.init();
+
+	prlCalcOvDataView.beginUpdate();
+	prlCalcOvDataView.setItems(prlCalcOvData);
+	prlCalcOvDataView.setFilter(prlCalcOvFilter);
+	prlCalcOvDataView.endUpdate();
+
+	//Button: MA hinzufügen
+	$( "#prlCalcOvBtnNew" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-add"
+		}
+	})
+	.click(function() {
+		alert("Zwischenzahltag hinzufuegen");
+	});
+// ----------------------------------------
+	//Button: Perioden-Einstellungen bearbeiten
+	$( "#prlCalcOvBtnSettings" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-info"
+		}
+	})
+	.click(function() {
+		var pYear = $('#prlCalcOvYear').val();
+		var pMajorPeriod = $('#prlCalcOvMajorPeriod').val();
+		var pMinorPeriod = 0;
+		var param = {'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
+		cb('payroll.prlCalcOvSettings', param);
+	}).addClass('toolbar-space-left');
+// ----------------------------------------
+// ----------------------------------------
+	$( "#prlCalcOvBtnEdit" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-edit"
+		}
+	})
+	.click(function() {
+		prlCalcDataOpen();
+	});
+// ----------------------------------------
+	//Button: Add employee
+	$( "#prlCalcOvBtnAddEmpl" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-adduser"
+		}
+	})
+	.click(function() {
+		cb('payroll.EmployeeSelectorOpen');
+	}).addClass('toolbar-space-left');
+// ----------------------------------------
+	//Button: Tabellenfilter
+	$( "#prlCalcOvBtnQFilter" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-tblfilter"
+		}
+	})
+	.click(function() {
+		prlCalcOvToggleFilterRow();
+	});
+	$('label[for=prlCalcOvBtnQFilter]').addClass('toolbar-space-left');
+
+	//Button: Edit Table Columns
+	$( "#prlCalcOvBtnEditCols" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-editcols"
+		}
+	})
+	.click(function() {
+		alert('Tabellenspalten bearbeiten');
+	});
+
+	//Button: Einstellungen speichern
+	$( "#prlCalcOvBtnSaveSettings" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-savesettings"
+		}
+	})
+	.click(function() {
+		prlCalcOvSaveSettings();
+//			alert('Coming soon...');
+	});
+// ----------------------------------------
+	//Button: Daten verarbeiten
+	$( "#prlCalcOvBtnProcess" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-process",
+			secondary: "ui-icon-triangle-1-s"
+		}
+	})
+	.click(function() {
+		var prlCalcOvProcessMenu = $("#prlCalcOvProcessMenu");
+		if(prlCalcOvProcessMenu.is(":visible")) {
+			prlCalcOvProcessMenu.hide();
+		}else{
+			prlCalcOvProcessMenu.show().position({
+				my: "left top",
+				at: "left bottom",
+				of: this
+			});
+			$(document).one("click", function() {
+				prlCalcOvProcessMenu.hide();
+			});
+			$("#prlCalcOvOutputMenu").hide();
+		}
+		return false;
+	}).addClass('toolbar-space-left');
+
+// ----------------------------------------
+	//Button: Output (PDF)
+	$( "#prlCalcOvBtnOutput" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-pdf",
+			secondary: "ui-icon-triangle-1-s"
+		}
+	})
+	.click(function() {
+		var prlCalcOvOutputMenu = $("#prlCalcOvOutputMenu");
+		if(prlCalcOvOutputMenu.is(":visible")) {
+			prlCalcOvOutputMenu.hide();
+		}else{
+			prlCalcOvOutputMenu.show().position({
+				my: "left top",
+				at: "left bottom",
+				of: this
+			});
+			$(document).one("click", function() {
+				prlCalcOvOutputMenu.hide();
+			});
+			$("#prlCalcOvProcessMenu").hide();
+		}
+		return false;
+	}).addClass('toolbar-space-left');
+// ----------------------------------------
+	$("#prlCalcOvProcessMenu").hide().menu().css('width','150').css('position','fixed').css('zIndex','9999');
+	$("#prlCalcOvOutputMenu").hide().menu().css('width','150').css('position','fixed').css('zIndex','9999');
+
+	$('#prlCalcOvProcessMenu a').bind('click', function(e) {
+		var pFunctionNumber = $(this).attr('fnc');
+		var pYear = $('#prlCalcOvYear').val();
+		var pMajorPeriod = $('#prlCalcOvMajorPeriod').val();
+		var pMinorPeriod = 0;
+		var param = {'functionNumber': pFunctionNumber, 'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
+		cb('payroll.prlCalcOvProcess',param);
+		$("#prlCalcOvProcessMenu").hide();
+		return false;
+	});
+
+	$('#prlCalcOvOutputMenu a').bind('click', function(e) {
+		var pFunctionNumber = $(this).attr('fnc');
+		var pYear = $('#prlCalcOvYear').val();
+		var pMajorPeriod = $('#prlCalcOvMajorPeriod').val();
+		var pMinorPeriod = 0;
+		var param = {'functionNumber': pFunctionNumber, 'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
+		cb('payroll.prlCalcOvOutput',param);
+		$("#prlCalcOvOutputMenu").hide();
+		return false;
+	});
+
+	$('#prlCalcOvYear').bind('change', function(e) {
+		var param = {'functionNumber': 1, 'year': $(this).val() };
+		cb('payroll.prlCalcOvFnc',param);
+		return false;
+	});
+
+	$('#prlCalcOvMajorPeriod').bind('change', function(e) {
+		var pYear = $('#prlCalcOvYear').val();
+		var pMajorPeriod = $(this).val();
+		var pMinorPeriod = 0;
+		var param = {'functionNumber': 2, 'year': pYear, 'majorPeriod': pMajorPeriod, 'minorPeriod': pMinorPeriod};
+		cb('payroll.prlCalcOvFnc',param);
+		return false;
+	});
+}
+
+function prlCalcOvOpen() {
+	var objWnd = $('#prlCalcOverview');
+	if ( objWnd.length > 0 ) {
+		if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
+		else objWnd.mb_bringToFront();
+	}else{
+		cb('payroll.prlCalcOverview');
 	}
+}
 	
 	
 	
@@ -1754,449 +1769,449 @@ function prlLoacOpenForm(accId) {
 ** Calculation Data Editor
 *************************************
 */
-	var prlCalcDataFldDef = {};
-	var prlCalcDataLOA = [];
-	var prlCalcDataLoaAC = [];
-	var prlCalcDataEmpl = [];
-	var prlCalcDataStorage = {};
-	var prlCalcDataCurEmpl = [];
-	var prlCalcDataRidOffset = 2000000000;
-	var prlCalcDataView;
-	var prlCalcDataGrid;
-	var prlCalcDataCols = [
-		{id: "RecStatus", name: "", field: "RecStatus", sortable: false, resizable: false, width: 20, cssClass: "txtCenter", formatter: function (row, cell, value, columnDef, dataContext) { var ic,tt; switch(value){case 1: ic="db"; tt=prlCalcDataLbl.db; break; case 2: ic="star"; tt=prlCalcDataLbl.new; break; case 3: ic="redx"; tt=prlCalcDataLbl.del; break; case 4: ic="pencil"; tt=prlCalcDataLbl.edit; break;} return '<div title="'+tt+'" class="prlCalcDataIcon prlCalcData-'+ic+'"></div>'; }},
-		{id: "PayrollDataType", name: "Gültigk.", field: "PayrollDataType", sortable: false, resizable: false, width: 60, cssClass: "txtCenter", formatter: function (row, cell, value, columnDef, dataContext) { var ic,tt; switch(value){case '1': ic="1x"; tt=prlCalcDataLbl.once; break; case '3': ic="eternal"; tt=prlCalcDataLbl.perm; break; case '4': ic="calendar"; tt=prlCalcDataLbl.limt; break;} return '<div title="'+tt+'" class="prlCalcDataIcon prlCalcData-'+ic+'"></div>'; } },
-		{id: "payroll_account_ID", name: "LOA Nr.", field: "payroll_account_ID", sortable: true, resizable: false, width: 65},
-		{id: "account_text", name: "LOA Text", field: "account_text", sortable: true, resizable: false, width: 275},
-		{id: "quantity", name: "Menge", field: "quantity", sortable: true, resizable: false, width: 100, cssClass: "txtRight"},
-		{id: "rate", name: "Ansatz", field: "rate", sortable: true, resizable: false, width: 100, cssClass: "txtRight"},
-		{id: "amount", name: "Betrag", field: "amount", sortable: true, resizable: false, width: 100, cssClass: "txtRight"},
-		{id: "CostCenter", name: "Kostenstelle", field: "CostCenter", sortable: true, resizable: false, width: 100}
-	];
-	var prlCalcDataTblData = [];
-	var prlCalcDataLbl = {};
+var prlCalcDataFldDef = {};
+var prlCalcDataLOA = [];
+var prlCalcDataLoaAC = [];
+var prlCalcDataEmpl = [];
+var prlCalcDataStorage = {};
+var prlCalcDataCurEmpl = [];
+var prlCalcDataRidOffset = 2000000000;
+var prlCalcDataView;
+var prlCalcDataGrid;
+var prlCalcDataCols = [
+	{id: "RecStatus", name: "", field: "RecStatus", sortable: false, resizable: false, width: 20, cssClass: "txtCenter", formatter: function (row, cell, value, columnDef, dataContext) { var ic,tt; switch(value){case 1: ic="db"; tt=prlCalcDataLbl.db; break; case 2: ic="star"; tt=prlCalcDataLbl.new; break; case 3: ic="redx"; tt=prlCalcDataLbl.del; break; case 4: ic="pencil"; tt=prlCalcDataLbl.edit; break;} return '<div title="'+tt+'" class="prlCalcDataIcon prlCalcData-'+ic+'"></div>'; }},
+	{id: "PayrollDataType", name: "Gültigk.", field: "PayrollDataType", sortable: false, resizable: false, width: 60, cssClass: "txtCenter", formatter: function (row, cell, value, columnDef, dataContext) { var ic,tt; switch(value){case '1': ic="1x"; tt=prlCalcDataLbl.once; break; case '3': ic="eternal"; tt=prlCalcDataLbl.perm; break; case '4': ic="calendar"; tt=prlCalcDataLbl.limt; break;} return '<div title="'+tt+'" class="prlCalcDataIcon prlCalcData-'+ic+'"></div>'; } },
+	{id: "payroll_account_ID", name: "LOA Nr.", field: "payroll_account_ID", sortable: true, resizable: false, width: 65},
+	{id: "account_text", name: "LOA Text", field: "account_text", sortable: true, resizable: false, width: 275},
+	{id: "quantity", name: "Menge", field: "quantity", sortable: true, resizable: false, width: 100, cssClass: "txtRight"},
+	{id: "rate", name: "Ansatz", field: "rate", sortable: true, resizable: false, width: 100, cssClass: "txtRight"},
+	{id: "amount", name: "Betrag", field: "amount", sortable: true, resizable: false, width: 100, cssClass: "txtRight"},
+	{id: "CostCenter", name: "Kostenstelle", field: "CostCenter", sortable: true, resizable: false, width: 100}
+];
+var prlCalcDataTblData = [];
+var prlCalcDataLbl = {};
 
-	function prlCalOvSortSingleColumn(field, sortAsc, updateGrid) {
-		prlCalcDataView.sort(function(a, b){
-			var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
-			return sortAsc ? result : -result;
-		});
-		if(updateGrid==null) {
-			prlCalcDataGrid.setData(prlCalcDataView);
-			prlCalcDataGrid.updateRowCount();
-			prlCalcDataGrid.render();
-		}
+function prlCalOvSortSingleColumn(field, sortAsc, updateGrid) {
+	prlCalcDataView.sort(function(a, b){
+		var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
+		return sortAsc ? result : -result;
+	});
+	if(updateGrid==null) {
+		prlCalcDataGrid.setData(prlCalcDataView);
+		prlCalcDataGrid.updateRowCount();
+		prlCalcDataGrid.render();
 	}
+}
 
-	function prlCalcDataFldState(state) {
-		var fldDateFrom,fldDateTo;
-		switch(state) {
-		case '1': //einmalig
-			fldDateFrom = false;
-			fldDateTo = false;
-			break;
-		case '3': //permanent
-			fldDateFrom = true;
-			fldDateTo = false;
-			break;
-		case '4': //befristet
-			fldDateFrom = true;
-			fldDateTo = true;
-			break;
-		}
-		$('#prlCalcDataFrom').prop('disabled', !fldDateFrom);
-		$('label[for=prlCalcDataFrom]').css('color', fldDateFrom?'':'#888');
-		$('#prlCalcDataTo').prop('disabled', !fldDateTo);
-		$('label[for=prlCalcDataTo]').css('color', fldDateTo?'':'#888');
+function prlCalcDataFldState(state) {
+	var fldDateFrom,fldDateTo;
+	switch(state) {
+	case '1': //einmalig
+		fldDateFrom = false;
+		fldDateTo = false;
+		break;
+	case '3': //permanent
+		fldDateFrom = true;
+		fldDateTo = false;
+		break;
+	case '4': //befristet
+		fldDateFrom = true;
+		fldDateTo = true;
+		break;
 	}
+	$('#prlCalcDataFrom').prop('disabled', !fldDateFrom);
+	$('label[for=prlCalcDataFrom]').css('color', fldDateFrom?'':'#888');
+	$('#prlCalcDataTo').prop('disabled', !fldDateTo);
+	$('label[for=prlCalcDataTo]').css('color', fldDateTo?'':'#888');
+}
 
-	function prlCalcDataLoadTbl() {
-		prlCalcDataTblData = [];
-		var srec,accountText,i,eid=0,storageItemsDone = [];
-		$.each(prlCalcDataCurEmpl, function() {
-			eid = this.emplId;
-			if(this.accTxt=='') {
-				for(i=0;i<prlCalcDataLOA.length;i++) if(prlCalcDataLOA[i][0]==this.accNo) {accountText = prlCalcDataLOA[i][1]; break;}
-			}else{
-				accountText = this.accTxt;
-			}
-
-			if((eid in prlCalcDataStorage) && (this.rid in prlCalcDataStorage[eid])) {
-				switch(prlCalcDataStorage[eid][this.rid].action) {
-				case 'delete':
-					rStatus = 3;
-					storageItemsDone.push(parseInt(this.rid));
-					break;
-				case 'add':
-					rStatus = 2;
-					break;
-				case 'edit':
-					rStatus = 4;
-					storageItemsDone.push(parseInt(this.rid));
-					break;
-				default:
-					rStatus = 1;
-					break;
-				}
-			}else rStatus = 1;
-
-			if(rStatus==4) {
-				srec = prlCalcDataStorage[eid.toString()][this.rid.toString()];
-				srec.RecStatus = 4;
-			}else{
-				srec = {
-					id: this.rid,
-					emplId: eid,
-					RecStatus: rStatus,
-					PayrollDataType: this.PayrollDataType,
-					payroll_account_ID: this.accNo,
-					account_text: accountText,
-					quantity: this.quantity,
-					rate: this.rate,
-					amount: this.amount,
-					dateFrom: this.dateFrom,
-					dateTo: this.dateTo,
-					CostCenter: this.cc
-				};
-			}
-			prlCalcDataTblData.push(srec);
-		});
-
-		if(eid==0) eid = $('#prlCalcDataCmbEmpl').val();
-		if((eid in prlCalcDataStorage)) {
-			$.each(prlCalcDataStorage[eid], function(k,v) {
-				if($.inArray(parseInt(k), storageItemsDone) == -1) prlCalcDataTblData.push(v);
-			});
-		}
-
-		prlCalcDataView.beginUpdate();
-		prlCalcDataView.setItems(prlCalcDataTblData);
-		prlCalcDataView.endUpdate();
-
-		prlCalcDataGrid.setSortColumn("payroll_account_ID",true);
-		prlCalOvSortSingleColumn("payroll_account_ID",true);
-	}
-
-	function prlCalcDataAdd() {
-		//Mandatory + validity checks
-
-		// --> Gültige LOA-Nr?
-		// --> weicht LOA-Text vom Standard ab?
-		var validLoaNo = false;
-		var defaultLoaTxt = false;
-		var loaNo = $('#prlCalcDataLoaNo').val();
-		var loaTxt = $('#prlCalcDataLoaTxt').val();
-		for(var i=0;i<prlCalcDataLOA.length;i++) if(prlCalcDataLOA[i][0]==loaNo) { validLoaNo = true; if(prlCalcDataLOA[i][1]==loaTxt) defaultLoaTxt = true; break;}
-
-		var testPassed = true;
-		if(!validLoaNo) {
-			testPassed = validLoaNo;
-			$('#prlCalcDataLoaNo').css('background-color','#f88');
-		}else $('#prlCalcDataLoaNo').css('background-color','');
-		$.each(prlCalcDataFldDef, function(k,v) {
-			if($('#'+k).is(':disabled') || (!v.mandatory && $('#'+k).val()=='') || v.rgx.test($('#'+k).val()) ) {
-				$('#'+k).css('background-color','');
-			}else{
-				$('#'+k).css('background-color','#f88');
-				testPassed = false;
-			}
-		});
-		if(!testPassed) return;
-
-		//Check if Redcord with corresponding ID already exists -> if YES, then update existing record, otherwise append a new record
-		var editMode = $('#prlCalcDataBtnAdd[rid]').length>0 ? true : false;
-
-		var rid = prlCalcDataRidOffset;
-		if(editMode) rid = $('#prlCalcDataBtnAdd').attr('rid');
-		else prlCalcDataRidOffset++;
-
-		var employeeID = $('#prlCalcDataCmbEmpl').val();
-		if(!(employeeID in prlCalcDataStorage)) prlCalcDataStorage[employeeID] = {};
-
-		var isDefaultLoaTxt = true;
-		for(i=0;i<prlCalcDataLOA.length;i++) if(prlCalcDataLOA[i][0]==$('#prlCalcDataLoaNo').val()) {accountText = prlCalcDataLOA[i][1]; break;}
-		if($('#prlCalcDataLoaTxt').val()!=accountText) isDefaultLoaTxt = false;
-
-		var actn = 'edit';
-		if(!editMode || parseInt(rid)>=2000000000) actn = 'add';
-
-		var srec = {
-			id: rid,
-			action: actn,
-			emplId: $('#prlCalcDataCmbEmpl').val(),
-			RecStatus: (actn=='edit'?4:2),
-			PayrollDataType: $('#prlCalcDataCmbType').val(),
-			payroll_account_ID: $('#prlCalcDataLoaNo').val(),
-			account_text: $('#prlCalcDataLoaTxt').val(),
-			defaultTxt: isDefaultLoaTxt,
-			quantity: $("#prlCalcDataQuantity").is(':disabled')?'':$("#prlCalcDataQuantity").val(),
-			rate: $("#prlCalcDataRate").is(':disabled')?'':$("#prlCalcDataRate").val(),
-			amount: $("#prlCalcDataAmount").is(':disabled')?'':$("#prlCalcDataAmount").val(),
-			dateFrom: $("#prlCalcDataFrom").is(':disabled')?'':$("#prlCalcDataFrom").val(),
-			dateTo: $("#prlCalcDataTo").is(':disabled')?'':$("#prlCalcDataTo").val(),
-			CostCenter: $('#prlCalcDataCC').val()
-		};
-		prlCalcDataStorage[employeeID.toString()][rid.toString()] = srec;
-		if(editMode) {
-			for(i=0;i<prlCalcDataTblData.length;i++) {
-				if(prlCalcDataTblData[i].id==rid) prlCalcDataTblData[i] = srec;
-			}
-		}else prlCalcDataTblData.push(srec);
-
-		prlCalcDataView.beginUpdate();
-		prlCalcDataView.setItems(prlCalcDataTblData);
-		prlCalcDataView.endUpdate();
-
-		prlCalcDataGrid.setSortColumn("payroll_account_ID",true);
-		prlCalOvSortSingleColumn("payroll_account_ID",true); //,false
-
-		if(editMode) prlCalcDataEditMode(false);
-		prlCalcDataClr();
-	}
-
-	function prlCalcDataClr(startFld) {
-		if(startFld==null) startFld = $('input[name=prlCalcDataRad]:checked').val();
-		else $('input[name=prlCalcDataRad][value='+startFld+']').attr('checked', true);
-		var selVal = 0;
-		var clrFlds = ['prlCalcDataTxtEmpl', 'prlCalcDataCmbEmpl', 'prlCalcDataCmbType', 'prlCalcDataLoaNo', 'prlCalcDataLoaTxt', 'prlCalcDataQuantity', 'prlCalcDataRate', 'prlCalcDataAmount', 'prlCalcDataFrom', 'prlCalcDataTo', 'prlCalcDataCC'];
-		$('#'+clrFlds[0]).data("suspendEvents",true);
-		$('#'+clrFlds[1]).data("suspendEvents",true);
-
-		$.each(prlCalcDataFldDef, function(k,v) { $('#'+k).css('background-color',''); });
-		$('#prlCalcDataLoaNo').css('background-color','');
-
-		if(startFld==clrFlds[0]) selVal = $('#'+clrFlds[1]).val();
-		for(var i=0;i<clrFlds.length;i++) if(clrFlds[i]==startFld) break;
-		for(i--;i<clrFlds.length;i++) {
-			if($('#'+clrFlds[i]).is('input')) $('#'+clrFlds[i]).val('');
-		}
-
-		prlCalcDataEditMode(false);
-		if(selVal != 0) {
-			$('#'+clrFlds[1]+' option[value='+selVal+']').attr("selected", true);
-		}
-		$('#'+clrFlds[0]).data("suspendEvents",false);
-		$('#'+clrFlds[1]).data("suspendEvents",false);
-		$('#'+startFld).focus();
-	}
-
-	function prlCalcDataEditMode(editMode,rid) {
-		var labelAttr = editMode ? 'lblEdit' : 'lblAdd';
-		$('#prlCalcDataTxtEmpl').prop('disabled', editMode);
-		$('#prlCalcDataCmbEmpl').prop('disabled', editMode);
-		if(editMode) {
-			$('#prlCalcDataBtnAdd').text($('#prlCalcDataBtnAdd').attr(labelAttr)).attr('rid',rid);
-			$('#prlCalcDataBtnClr').text($('#prlCalcDataBtnClr').attr(labelAttr)).attr('rid',rid);
+function prlCalcDataLoadTbl() {
+	prlCalcDataTblData = [];
+	var srec,accountText,i,eid=0,storageItemsDone = [];
+	$.each(prlCalcDataCurEmpl, function() {
+		eid = this.emplId;
+		if(this.accTxt=='') {
+			for(i=0;i<prlCalcDataLOA.length;i++) if(prlCalcDataLOA[i][0]==this.accNo) {accountText = prlCalcDataLOA[i][1]; break;}
 		}else{
-			$('#prlCalcDataBtnAdd').removeAttr('rid');
-			$('#prlCalcDataBtnClr').removeAttr('rid');
+			accountText = this.accTxt;
 		}
+
+		if((eid in prlCalcDataStorage) && (this.rid in prlCalcDataStorage[eid])) {
+			switch(prlCalcDataStorage[eid][this.rid].action) {
+			case 'delete':
+				rStatus = 3;
+				storageItemsDone.push(parseInt(this.rid));
+				break;
+			case 'add':
+				rStatus = 2;
+				break;
+			case 'edit':
+				rStatus = 4;
+				storageItemsDone.push(parseInt(this.rid));
+				break;
+			default:
+				rStatus = 1;
+				break;
+			}
+		}else rStatus = 1;
+
+		if(rStatus==4) {
+			srec = prlCalcDataStorage[eid.toString()][this.rid.toString()];
+			srec.RecStatus = 4;
+		}else{
+			srec = {
+				id: this.rid,
+				emplId: eid,
+				RecStatus: rStatus,
+				PayrollDataType: this.PayrollDataType,
+				payroll_account_ID: this.accNo,
+				account_text: accountText,
+				quantity: this.quantity,
+				rate: this.rate,
+				amount: this.amount,
+				dateFrom: this.dateFrom,
+				dateTo: this.dateTo,
+				CostCenter: this.cc
+			};
+		}
+		prlCalcDataTblData.push(srec);
+	});
+
+	if(eid==0) eid = $('#prlCalcDataCmbEmpl').val();
+	if((eid in prlCalcDataStorage)) {
+		$.each(prlCalcDataStorage[eid], function(k,v) {
+			if($.inArray(parseInt(k), storageItemsDone) == -1) prlCalcDataTblData.push(v);
+		});
 	}
 
-	function prlCalcDataInit() {
-		var options = {
-			showHeaderRow: false,
-			enableCellNavigation: false,
-			enableColumnReorder: false,
-			explicitInitialization: true
-		};
+	prlCalcDataView.beginUpdate();
+	prlCalcDataView.setItems(prlCalcDataTblData);
+	prlCalcDataView.endUpdate();
 
-		prlCalcDataView = new Slick.Data.DataView();
-		prlCalcDataGrid = new Slick.Grid("#prlCalcDataGrid", prlCalcDataView, prlCalcDataCols, options);
-		prlCalcDataGrid.onSort.subscribe(function (e, args) {
-			prlCalOvSortSingleColumn(args.sortCol.field, args.sortAsc);
-		});
+	prlCalcDataGrid.setSortColumn("payroll_account_ID",true);
+	prlCalOvSortSingleColumn("payroll_account_ID",true);
+}
 
-		prlCalcDataView.onRowCountChanged.subscribe(function (e, args) {
-			prlCalcDataGrid.updateRowCount();
-			prlCalcDataGrid.render();
-		});
+function prlCalcDataAdd() {
+	//Mandatory + validity checks
 
-		prlCalcDataView.onRowsChanged.subscribe(function (e, args) {
-			prlCalcDataGrid.invalidateRows(args.rows);
-			prlCalcDataGrid.render();
-		});
+	// --> Gültige LOA-Nr?
+	// --> weicht LOA-Text vom Standard ab?
+	var validLoaNo = false;
+	var defaultLoaTxt = false;
+	var loaNo = $('#prlCalcDataLoaNo').val();
+	var loaTxt = $('#prlCalcDataLoaTxt').val();
+	for(var i=0;i<prlCalcDataLOA.length;i++) if(prlCalcDataLOA[i][0]==loaNo) { validLoaNo = true; if(prlCalcDataLOA[i][1]==loaTxt) defaultLoaTxt = true; break;}
 
-		prlCalcDataGrid.onClick.subscribe(function(e, args) {
-			var cell = prlCalcDataGrid.getCellFromEvent(e), row = cell.row;
-			var item = prlCalcDataView.getItem(row); //args.item;
-			if($('#prlCalcDataBtnAdd[rid]').length>0) return; //do not show menu in edit mode!
+	var testPassed = true;
+	if(!validLoaNo) {
+		testPassed = validLoaNo;
+		$('#prlCalcDataLoaNo').css('background-color','#f88');
+	}else $('#prlCalcDataLoaNo').css('background-color','');
+	$.each(prlCalcDataFldDef, function(k,v) {
+		if($('#'+k).is(':disabled') || (!v.mandatory && $('#'+k).val()=='') || v.rgx.test($('#'+k).val()) ) {
+			$('#'+k).css('background-color','');
+		}else{
+			$('#'+k).css('background-color','#f88');
+			testPassed = false;
+		}
+	});
+	if(!testPassed) return;
 
-			var mnu = $('#prlCalcDataTblMenu');
-			mnu.css('top',e.pageY-15);
-			mnu.css('left',e.pageX-70);
-			mnu.css('zIndex', 9999);
-			mnu.attr('rid', item.id);
-			mnu.show();
-		});
+	//Check if Redcord with corresponding ID already exists -> if YES, then update existing record, otherwise append a new record
+	var editMode = $('#prlCalcDataBtnAdd[rid]').length>0 ? true : false;
 
+	var rid = prlCalcDataRidOffset;
+	if(editMode) rid = $('#prlCalcDataBtnAdd').attr('rid');
+	else prlCalcDataRidOffset++;
 
-		prlCalcDataGrid.init();
+	var employeeID = $('#prlCalcDataCmbEmpl').val();
+	if(!(employeeID in prlCalcDataStorage)) prlCalcDataStorage[employeeID] = {};
 
-		prlCalcDataView.beginUpdate();
-		prlCalcDataView.setItems(prlCalcDataTblData);
-		prlCalcDataView.endUpdate();
+	var isDefaultLoaTxt = true;
+	for(i=0;i<prlCalcDataLOA.length;i++) if(prlCalcDataLOA[i][0]==$('#prlCalcDataLoaNo').val()) {accountText = prlCalcDataLOA[i][1]; break;}
+	if($('#prlCalcDataLoaTxt').val()!=accountText) isDefaultLoaTxt = false;
 
-		prlCalcDataLoaAC = [];
-		$.each( prlCalcDataLOA, function() {
-			prlCalcDataLoaAC.push({ 
-				"label" : this[0] + ' - ' + this[1],
-				"value" : this[0]
-			});
-		});
+	var actn = 'edit';
+	if(!editMode || parseInt(rid)>=2000000000) actn = 'add';
 
-		var empOpt = "";
-		$.each( prlCalcDataEmpl, function() {
-			empOpt += "<option value=\"";
-			empOpt += this[0] + "\">";
-			empOpt += this[1] + " - " + this[2] + ", " + this[3] + "</option>";
-		});
-		$('#prlCalcDataCmbEmpl').empty().append(empOpt);
+	var srec = {
+		id: rid,
+		action: actn,
+		emplId: $('#prlCalcDataCmbEmpl').val(),
+		RecStatus: (actn=='edit'?4:2),
+		PayrollDataType: $('#prlCalcDataCmbType').val(),
+		payroll_account_ID: $('#prlCalcDataLoaNo').val(),
+		account_text: $('#prlCalcDataLoaTxt').val(),
+		defaultTxt: isDefaultLoaTxt,
+		quantity: $("#prlCalcDataQuantity").is(':disabled')?'':$("#prlCalcDataQuantity").val(),
+		rate: $("#prlCalcDataRate").is(':disabled')?'':$("#prlCalcDataRate").val(),
+		amount: $("#prlCalcDataAmount").is(':disabled')?'':$("#prlCalcDataAmount").val(),
+		dateFrom: $("#prlCalcDataFrom").is(':disabled')?'':$("#prlCalcDataFrom").val(),
+		dateTo: $("#prlCalcDataTo").is(':disabled')?'':$("#prlCalcDataTo").val(),
+		CostCenter: $('#prlCalcDataCC').val()
+	};
+	prlCalcDataStorage[employeeID.toString()][rid.toString()] = srec;
+	if(editMode) {
+		for(i=0;i<prlCalcDataTblData.length;i++) {
+			if(prlCalcDataTblData[i].id==rid) prlCalcDataTblData[i] = srec;
+		}
+	}else prlCalcDataTblData.push(srec);
 
-		$('#prlCalcDataCmbEmpl').filterByText($('#prlCalcDataTxtEmpl'), true);
-		$('input[type=text]').keypress(function (e) {
-			if (e.which == 13) {
-				prlCalcDataAdd();
-			}
-		});
+	prlCalcDataView.beginUpdate();
+	prlCalcDataView.setItems(prlCalcDataTblData);
+	prlCalcDataView.endUpdate();
 
-		$('#prlCalcDataCmbEmpl').bind('change', function() {
-			if($(this).data("suspendEvents")) return;
-			cb('payroll.prlCalcDataGetEmplRecs',$(this).val());
-		});
-		$('#prlCalcDataCmbType').bind('change', function() {
-			prlCalcDataFldState($(this).val());
-		});
-		$('#prlCalcDataLoaNo').bind('change', function() {
-			var vf = ['prlCalcDataQuantity', 'prlCalcDataRate', 'prlCalcDataAmount'];
-			var loaTxt = "";
-			var varFields = 0;
-			for(var i = 0; i < prlCalcDataLOA.length; i++) {
-				if(prlCalcDataLOA[i][0]==$(this).val()) { loaTxt = prlCalcDataLOA[i][1]; varFields = prlCalcDataLOA[i][2]; break; }
-			}
-			for(i=0;i<3;i++) {
-				var a = (varFields & Math.pow(2,i)) != 0 ? true : false;
-				$('#'+vf[i]).prop('disabled', !a);
-				$('label[for='+vf[i]+']').css('color', a?'':'#888');
-			}
-			$('#prlCalcDataLoaTxt').val(loaTxt);
-		});
+	prlCalcDataGrid.setSortColumn("payroll_account_ID",true);
+	prlCalOvSortSingleColumn("payroll_account_ID",true); //,false
 
-		$('#prlCalcDataTxtEmpl').bind('focus', function() {
-			$(this).data("lastEmplID", $('#prlCalcDataCmbEmpl'));
-		});
-		$('#prlCalcDataTxtEmpl').bind('blur', function() {
-			if($('#prlCalcDataCmbEmpl') != $(this).data("lastEmplID")) $('#prlCalcDataCmbEmpl').change();
-		});
+	if(editMode) prlCalcDataEditMode(false);
+	prlCalcDataClr();
+}
 
-		prlCalcDataFldState(1);
-		$('#prlCalcDataTxtEmpl').focus();
-		$('#prlCalcDataCmbEmpl').change(); //hiermit laden wir die Daten des ersten selektierten MA
+function prlCalcDataClr(startFld) {
+	if(startFld==null) startFld = $('input[name=prlCalcDataRad]:checked').val();
+	else $('input[name=prlCalcDataRad][value='+startFld+']').attr('checked', true);
+	var selVal = 0;
+	var clrFlds = ['prlCalcDataTxtEmpl', 'prlCalcDataCmbEmpl', 'prlCalcDataCmbType', 'prlCalcDataLoaNo', 'prlCalcDataLoaTxt', 'prlCalcDataQuantity', 'prlCalcDataRate', 'prlCalcDataAmount', 'prlCalcDataFrom', 'prlCalcDataTo', 'prlCalcDataCC'];
+	$('#'+clrFlds[0]).data("suspendEvents",true);
+	$('#'+clrFlds[1]).data("suspendEvents",true);
 
-		$( "#prlCalcDataLoaNo" ).autocomplete({
-			delay: 1000,
-			source: prlCalcDataLoaAC,
-			close: function() { $('#prlCalcDataLoaNo').change(); }
-		});
+	$.each(prlCalcDataFldDef, function(k,v) { $('#'+k).css('background-color',''); });
+	$('#prlCalcDataLoaNo').css('background-color','');
 
-		$('#prlCalcDataBtnAdd').bind('click', function() {
-			prlCalcDataAdd();
-		});
-		$('#prlCalcDataBtnClr').bind('click', function() {
-			prlCalcDataClr('prlCalcDataTxtEmpl');
-		});
-		$('#prlCalcDataBtnCancel').bind('click', function() {
-			$('#prlCalcDataCmbEmpl').data('suspendEvents',true);
-			$('#prlCalcDataEditor').mb_close();
-		});
-		$('#prlCalcDataBtnSave').bind('click', function() {
-			$.each(prlCalcDataStorage, function(empl,recs) {
-				$.each(recs, function(recid,recdat) {
-					if(recdat.action!='delete') {
-						if(recdat.defaultTxt) delete recdat.account_text;
-						delete recdat.defaultTxt;
-						if(recdat.quantity=='') delete recdat.quantity;
-						if(recdat.rate=='') delete recdat.rate;
-						if(recdat.amount=='') delete recdat.amount;
-						if(recdat.dateFrom=='') delete recdat.dateFrom;
-						if(recdat.dateTo=='') delete recdat.dateTo;
-						if(recdat.CostCenter=='') delete recdat.CostCenter;
-					}
-				});
-			});
-			cb('payroll.prlCalcDataSave',prlCalcDataStorage);
-		});
+	if(startFld==clrFlds[0]) selVal = $('#'+clrFlds[1]).val();
+	for(var i=0;i<clrFlds.length;i++) if(clrFlds[i]==startFld) break;
+	for(i--;i<clrFlds.length;i++) {
+		if($('#'+clrFlds[i]).is('input')) $('#'+clrFlds[i]).val('');
+	}
 
+	prlCalcDataEditMode(false);
+	if(selVal != 0) {
+		$('#'+clrFlds[1]+' option[value='+selVal+']').attr("selected", true);
+	}
+	$('#'+clrFlds[0]).data("suspendEvents",false);
+	$('#'+clrFlds[1]).data("suspendEvents",false);
+	$('#'+startFld).focus();
+}
+
+function prlCalcDataEditMode(editMode,rid) {
+	var labelAttr = editMode ? 'lblEdit' : 'lblAdd';
+	$('#prlCalcDataTxtEmpl').prop('disabled', editMode);
+	$('#prlCalcDataCmbEmpl').prop('disabled', editMode);
+	if(editMode) {
+		$('#prlCalcDataBtnAdd').text($('#prlCalcDataBtnAdd').attr(labelAttr)).attr('rid',rid);
+		$('#prlCalcDataBtnClr').text($('#prlCalcDataBtnClr').attr(labelAttr)).attr('rid',rid);
+	}else{
+		$('#prlCalcDataBtnAdd').removeAttr('rid');
+		$('#prlCalcDataBtnClr').removeAttr('rid');
+	}
+}
+
+function prlCalcDataInit() {
+	var options = {
+		showHeaderRow: false,
+		enableCellNavigation: false,
+		enableColumnReorder: false,
+		explicitInitialization: true
+	};
+
+	prlCalcDataView = new Slick.Data.DataView();
+	prlCalcDataGrid = new Slick.Grid("#prlCalcDataGrid", prlCalcDataView, prlCalcDataCols, options);
+	prlCalcDataGrid.onSort.subscribe(function (e, args) {
+		prlCalOvSortSingleColumn(args.sortCol.field, args.sortAsc);
+	});
+
+	prlCalcDataView.onRowCountChanged.subscribe(function (e, args) {
+		prlCalcDataGrid.updateRowCount();
+		prlCalcDataGrid.render();
+	});
+
+	prlCalcDataView.onRowsChanged.subscribe(function (e, args) {
+		prlCalcDataGrid.invalidateRows(args.rows);
+		prlCalcDataGrid.render();
+	});
+
+	prlCalcDataGrid.onClick.subscribe(function(e, args) {
+		var cell = prlCalcDataGrid.getCellFromEvent(e), row = cell.row;
+		var item = prlCalcDataView.getItem(row); //args.item;
+		if($('#prlCalcDataBtnAdd[rid]').length>0) return; //do not show menu in edit mode!
 
 		var mnu = $('#prlCalcDataTblMenu');
-		mnu.menu();
-		mnu.hide();
-		mnu.css('width','100');
-		mnu.css('position','fixed');
-		mnu.bind('mouseleave', function(e) { $(this).hide(); });
-		$('#prlCalcDataTblMenu li a').bind('click', function(e) {
-			var rid = $(this).parent().parent().attr('rid');
-			switch($(this).attr('act')) {
-			case '1':
-				//Daten in Felder laden
-				var srec = {};
-				for(i=0;i<prlCalcDataTblData.length;i++) if(prlCalcDataTblData[i].id==rid) { srec = prlCalcDataTblData[i]; break; }
-				$('#prlCalcDataCmbType').val(srec.PayrollDataType);
-				$('#prlCalcDataLoaNo').val(srec.payroll_account_ID);
-				$('#prlCalcDataQuantity').val(srec.quantity);
-				$('#prlCalcDataRate').val(srec.rate);
-				$('#prlCalcDataAmount').val(srec.amount);
-				$('#prlCalcDataFrom').val(srec.dateFrom);
-				$('#prlCalcDataTo').val(srec.dateTo);
-				$('#prlCalcDataCC').val(srec.CostCenter);
+		mnu.css('top',e.pageY-15);
+		mnu.css('left',e.pageX-70);
+		mnu.css('zIndex', 9999);
+		mnu.attr('rid', item.id);
+		mnu.show();
+	});
 
-				//Felder MENGE,ANSATZ,BETRAG gem. LOA-Einstellungen ein-/ausblenden
-				$('#prlCalcDataLoaNo').change();
-				$('#prlCalcDataLoaTxt').val(srec.account_text);
-				//Felder DATUM von/bis gem. LOA-Einstellungen ein-/ausblenden
-				prlCalcDataFldState(srec.PayrollDataType);
 
-				//Controlls, die etwas mit dem Ändern des MA zu tun haben, sperren
-				//Labels der Buttons ändern
-				prlCalcDataEditMode(true,rid);
-				//Entsprechende Tabellenzeile einfärben (#7d7)
-				break;
-			case '2':
-				var employeeID = 0;
-				for(var i=0;i<prlCalcDataTblData.length;i++) {
-					if(prlCalcDataTblData[i].id==rid) {
-						employeeID = prlCalcDataTblData[i].emplId;
-						if(rid>=2000000000) prlCalcDataTblData.splice(i, 1);
-						else prlCalcDataTblData[i].RecStatus=3; //rec auf 'gelöscht' setzen
-						break;
-					}
-				}
+	prlCalcDataGrid.init();
 
-				if(!(employeeID in prlCalcDataStorage)) prlCalcDataStorage[employeeID.toString()] = {};
-				if(rid>=2000000000) delete prlCalcDataStorage[employeeID.toString()][rid.toString()];
-				else prlCalcDataStorage[employeeID.toString()][rid.toString()] = {'action':'delete'};
+	prlCalcDataView.beginUpdate();
+	prlCalcDataView.setItems(prlCalcDataTblData);
+	prlCalcDataView.endUpdate();
 
-				prlCalcDataView.beginUpdate();
-				prlCalcDataView.setItems(prlCalcDataTblData);
-				prlCalcDataView.endUpdate();
-				prlCalcDataGrid.setSortColumn("payroll_account_ID",true);
-				prlCalOvSortSingleColumn("payroll_account_ID",true);
-				break;
-			}
-			$(this).parent().parent().hide();
-			return false;
+	prlCalcDataLoaAC = [];
+	$.each( prlCalcDataLOA, function() {
+		prlCalcDataLoaAC.push({ 
+			"label" : this[0] + ' - ' + this[1],
+			"value" : this[0]
 		});
-	}
+	});
 
-	function prlCalcDataOpen() {
-		var objWnd = $('#prlCalcDataEditor');
-		if ( objWnd.length > 0 ) {
-			if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
-			else objWnd.mb_bringToFront();
-		}else{
-			cb('payroll.prlCalcDataEditor');
+	var empOpt = "";
+	$.each( prlCalcDataEmpl, function() {
+		empOpt += "<option value=\"";
+		empOpt += this[0] + "\">";
+		empOpt += this[1] + " - " + this[2] + ", " + this[3] + "</option>";
+	});
+	$('#prlCalcDataCmbEmpl').empty().append(empOpt);
+
+	$('#prlCalcDataCmbEmpl').filterByText($('#prlCalcDataTxtEmpl'), true);
+	$('input[type=text]').keypress(function (e) {
+		if (e.which == 13) {
+			prlCalcDataAdd();
 		}
+	});
+
+	$('#prlCalcDataCmbEmpl').bind('change', function() {
+		if($(this).data("suspendEvents")) return;
+		cb('payroll.prlCalcDataGetEmplRecs',$(this).val());
+	});
+	$('#prlCalcDataCmbType').bind('change', function() {
+		prlCalcDataFldState($(this).val());
+	});
+	$('#prlCalcDataLoaNo').bind('change', function() {
+		var vf = ['prlCalcDataQuantity', 'prlCalcDataRate', 'prlCalcDataAmount'];
+		var loaTxt = "";
+		var varFields = 0;
+		for(var i = 0; i < prlCalcDataLOA.length; i++) {
+			if(prlCalcDataLOA[i][0]==$(this).val()) { loaTxt = prlCalcDataLOA[i][1]; varFields = prlCalcDataLOA[i][2]; break; }
+		}
+		for(i=0;i<3;i++) {
+			var a = (varFields & Math.pow(2,i)) != 0 ? true : false;
+			$('#'+vf[i]).prop('disabled', !a);
+			$('label[for='+vf[i]+']').css('color', a?'':'#888');
+		}
+		$('#prlCalcDataLoaTxt').val(loaTxt);
+	});
+
+	$('#prlCalcDataTxtEmpl').bind('focus', function() {
+		$(this).data("lastEmplID", $('#prlCalcDataCmbEmpl'));
+	});
+	$('#prlCalcDataTxtEmpl').bind('blur', function() {
+		if($('#prlCalcDataCmbEmpl') != $(this).data("lastEmplID")) $('#prlCalcDataCmbEmpl').change();
+	});
+
+	prlCalcDataFldState(1);
+	$('#prlCalcDataTxtEmpl').focus();
+	$('#prlCalcDataCmbEmpl').change(); //hiermit laden wir die Daten des ersten selektierten MA
+
+	$( "#prlCalcDataLoaNo" ).autocomplete({
+		delay: 1000,
+		source: prlCalcDataLoaAC,
+		close: function() { $('#prlCalcDataLoaNo').change(); }
+	});
+
+	$('#prlCalcDataBtnAdd').bind('click', function() {
+		prlCalcDataAdd();
+	});
+	$('#prlCalcDataBtnClr').bind('click', function() {
+		prlCalcDataClr('prlCalcDataTxtEmpl');
+	});
+	$('#prlCalcDataBtnCancel').bind('click', function() {
+		$('#prlCalcDataCmbEmpl').data('suspendEvents',true);
+		$('#prlCalcDataEditor').mb_close();
+	});
+	$('#prlCalcDataBtnSave').bind('click', function() {
+		$.each(prlCalcDataStorage, function(empl,recs) {
+			$.each(recs, function(recid,recdat) {
+				if(recdat.action!='delete') {
+					if(recdat.defaultTxt) delete recdat.account_text;
+					delete recdat.defaultTxt;
+					if(recdat.quantity=='') delete recdat.quantity;
+					if(recdat.rate=='') delete recdat.rate;
+					if(recdat.amount=='') delete recdat.amount;
+					if(recdat.dateFrom=='') delete recdat.dateFrom;
+					if(recdat.dateTo=='') delete recdat.dateTo;
+					if(recdat.CostCenter=='') delete recdat.CostCenter;
+				}
+			});
+		});
+		cb('payroll.prlCalcDataSave',prlCalcDataStorage);
+	});
+
+
+	var mnu = $('#prlCalcDataTblMenu');
+	mnu.menu();
+	mnu.hide();
+	mnu.css('width','100');
+	mnu.css('position','fixed');
+	mnu.bind('mouseleave', function(e) { $(this).hide(); });
+	$('#prlCalcDataTblMenu li a').bind('click', function(e) {
+		var rid = $(this).parent().parent().attr('rid');
+		switch($(this).attr('act')) {
+		case '1':
+			//Daten in Felder laden
+			var srec = {};
+			for(i=0;i<prlCalcDataTblData.length;i++) if(prlCalcDataTblData[i].id==rid) { srec = prlCalcDataTblData[i]; break; }
+			$('#prlCalcDataCmbType').val(srec.PayrollDataType);
+			$('#prlCalcDataLoaNo').val(srec.payroll_account_ID);
+			$('#prlCalcDataQuantity').val(srec.quantity);
+			$('#prlCalcDataRate').val(srec.rate);
+			$('#prlCalcDataAmount').val(srec.amount);
+			$('#prlCalcDataFrom').val(srec.dateFrom);
+			$('#prlCalcDataTo').val(srec.dateTo);
+			$('#prlCalcDataCC').val(srec.CostCenter);
+
+			//Felder MENGE,ANSATZ,BETRAG gem. LOA-Einstellungen ein-/ausblenden
+			$('#prlCalcDataLoaNo').change();
+			$('#prlCalcDataLoaTxt').val(srec.account_text);
+			//Felder DATUM von/bis gem. LOA-Einstellungen ein-/ausblenden
+			prlCalcDataFldState(srec.PayrollDataType);
+
+			//Controlls, die etwas mit dem Ändern des MA zu tun haben, sperren
+			//Labels der Buttons ändern
+			prlCalcDataEditMode(true,rid);
+			//Entsprechende Tabellenzeile einfärben (#7d7)
+			break;
+		case '2':
+			var employeeID = 0;
+			for(var i=0;i<prlCalcDataTblData.length;i++) {
+				if(prlCalcDataTblData[i].id==rid) {
+					employeeID = prlCalcDataTblData[i].emplId;
+					if(rid>=2000000000) prlCalcDataTblData.splice(i, 1);
+					else prlCalcDataTblData[i].RecStatus=3; //rec auf 'gelöscht' setzen
+					break;
+				}
+			}
+
+			if(!(employeeID in prlCalcDataStorage)) prlCalcDataStorage[employeeID.toString()] = {};
+			if(rid>=2000000000) delete prlCalcDataStorage[employeeID.toString()][rid.toString()];
+			else prlCalcDataStorage[employeeID.toString()][rid.toString()] = {'action':'delete'};
+
+			prlCalcDataView.beginUpdate();
+			prlCalcDataView.setItems(prlCalcDataTblData);
+			prlCalcDataView.endUpdate();
+			prlCalcDataGrid.setSortColumn("payroll_account_ID",true);
+			prlCalOvSortSingleColumn("payroll_account_ID",true);
+			break;
+		}
+		$(this).parent().parent().hide();
+		return false;
+	});
+}
+
+function prlCalcDataOpen() {
+	var objWnd = $('#prlCalcDataEditor');
+	if ( objWnd.length > 0 ) {
+		if(objWnd.mb_getState('iconized')) objWnd.mb_iconize();
+		else objWnd.mb_bringToFront();
+	}else{
+		cb('payroll.prlCalcDataEditor');
 	}
+}
 /*
 *************************************
 ** Calculation: period closing/carry forward form
@@ -3172,186 +3187,186 @@ function prlUtlEfcInit() {
 /*
 *** Configuration: field modifiers (overview)
 */
-	var prlFldModDataView;
-	var prlFldModColumnFilters = {};
-	var prlFldModGrid;
-	var prlFldModColumns = [];
+var prlFldModDataView;
+var prlFldModColumnFilters = {};
+var prlFldModGrid;
+var prlFldModColumns = [];
 
-	var prlFldModOptions = {
-		showHeaderRow: true,
-		enableCellNavigation: false,
-		enableColumnReorder: false,
-		explicitInitialization: true
-	};
+var prlFldModOptions = {
+	showHeaderRow: true,
+	enableCellNavigation: false,
+	enableColumnReorder: false,
+	explicitInitialization: true
+};
 
-	var prlFldModData = [];
+var prlFldModData = [];
 
-	function prlFldModFilter(item) {
+function prlFldModFilter(item) {
+	for(var columnId in prlFldModColumnFilters) {
+		if(columnId !== undefined && prlFldModColumnFilters[columnId] !== "") {
+			var c = prlFldModGrid.getColumns()[prlFldModGrid.getColumnIndex(columnId)];
+			if(item[c.field].toString().toLowerCase().indexOf(prlFldModColumnFilters[columnId].toString().toLowerCase()) == -1) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function prlFldModSaveSettings() {
+	var settings = {};
+	settings['quickFilterEnabled'] = $("#prlFldModBtnQFilter").is(':checked');
+	if(settings['quickFilterEnabled']) {
+		settings['quickFilterValues'] = [];
 		for(var columnId in prlFldModColumnFilters) {
-			if(columnId !== undefined && prlFldModColumnFilters[columnId] !== "") {
-				var c = prlFldModGrid.getColumns()[prlFldModGrid.getColumnIndex(columnId)];
-				if(item[c.field].toString().toLowerCase().indexOf(prlFldModColumnFilters[columnId].toString().toLowerCase()) == -1) {
-					return false;
-				}
-			}
+			settings['quickFilterValues'].push({'colID': columnId, 'filterValue': prlFldModColumnFilters[columnId]});
 		}
-		return true;
+	}
+	settings['columnsWidth'] = [];
+	var cols = prlFldModGrid.getColumns();
+	for(var i=0;i<cols.length;i++) settings['columnsWidth'].push(cols[i].width);
+	settings['sort'] = prlFldModGrid.getSortColumns();
+	cb('payroll.psoSaveSettings',settings);
+}
+
+function prlFldModSetSettings(param) {
+	$('#prlFldModBtnQFilter').attr('checked', param.quickFilterEnabled);
+	if(param.quickFilterEnabled) {
+		for(var i=0;i<param.quickFilterValues.length;i++) {
+			prlFldModColumnFilters[param.quickFilterValues[i].colID] = param.quickFilterValues[i].filterValue;
+		}
+	}
+	var cols = prlFldModGrid.getColumns();
+	for(var i=0;i<cols.length;i++) cols[i].width=param.columnsWidth[i];
+	prlFldModGrid.setColumns(cols);
+
+	if(param.sort.length>0) {
+		prlFldModGrid.setSortColumn(param.sort[0].columnId, param.sort[0].sortAsc);
+		prlFldModSortSingleColumn(param.sort[0].columnId, param.sort[0].sortAsc, false);
 	}
 
-	function prlFldModSaveSettings() {
-		var settings = {};
-		settings['quickFilterEnabled'] = $("#prlFldModBtnQFilter").is(':checked');
-		if(settings['quickFilterEnabled']) {
-			settings['quickFilterValues'] = [];
-			for(var columnId in prlFldModColumnFilters) {
-				settings['quickFilterValues'].push({'colID': columnId, 'filterValue': prlFldModColumnFilters[columnId]});
-			}
-		}
-		settings['columnsWidth'] = [];
-		var cols = prlFldModGrid.getColumns();
-		for(var i=0;i<cols.length;i++) settings['columnsWidth'].push(cols[i].width);
-		settings['sort'] = prlFldModGrid.getSortColumns();
-		cb('payroll.psoSaveSettings',settings);
+	prlFldModToggleFilterRow();
+
+	prlFldModGrid.setData(prlFldModDataView);
+	prlFldModGrid.updateRowCount();
+	prlFldModGrid.render();
+}
+
+function prlFldModToggleFilterRow() {
+	if($("#prlFldModBtnQFilter").is(':checked')) {
+		$(prlFldModGrid.getHeaderRow()).show();
+		prlFldModGrid.showHeaderRow(true);
+	}else{
+		$(prlFldModGrid.getHeaderRow()).hide();
+		prlFldModGrid.showHeaderRow(false);
+		$(prlFldModGrid.getHeaderRow()).find("input").val('');
+		for(var columnId in prlFldModColumnFilters) prlFldModColumnFilters[columnId] = "";
+		prlFldModDataView.refresh();
 	}
+	prlFldModGrid.resizeCanvas();
+}
 
-	function prlFldModSetSettings(param) {
-		$('#prlFldModBtnQFilter').attr('checked', param.quickFilterEnabled);
-		if(param.quickFilterEnabled) {
-			for(var i=0;i<param.quickFilterValues.length;i++) {
-				prlFldModColumnFilters[param.quickFilterValues[i].colID] = param.quickFilterValues[i].filterValue;
-			}
-		}
-		var cols = prlFldModGrid.getColumns();
-		for(var i=0;i<cols.length;i++) cols[i].width=param.columnsWidth[i];
-		prlFldModGrid.setColumns(cols);
-
-		if(param.sort.length>0) {
-			prlFldModGrid.setSortColumn(param.sort[0].columnId, param.sort[0].sortAsc);
-			prlFldModSortSingleColumn(param.sort[0].columnId, param.sort[0].sortAsc, false);
-		}
-
-		prlFldModToggleFilterRow();
-
+function prlFldModSortSingleColumn(field, sortAsc, updateGrid) {
+	prlFldModDataView.sort(function(a, b){
+		var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
+		return sortAsc ? result : -result;
+	});
+	if(updateGrid==null) {
 		prlFldModGrid.setData(prlFldModDataView);
 		prlFldModGrid.updateRowCount();
 		prlFldModGrid.render();
 	}
+}
 
-	function prlFldModToggleFilterRow() {
-		if($("#prlFldModBtnQFilter").is(':checked')) {
-			$(prlFldModGrid.getHeaderRow()).show();
-			prlFldModGrid.showHeaderRow(true);
-		}else{
-			$(prlFldModGrid.getHeaderRow()).hide();
-			prlFldModGrid.showHeaderRow(false);
-			$(prlFldModGrid.getHeaderRow()).find("input").val('');
-			for(var columnId in prlFldModColumnFilters) prlFldModColumnFilters[columnId] = "";
+function prlFldModInit() {
+	prlFldModDataView = new Slick.Data.DataView();
+	prlFldModGrid = new Slick.Grid("#prlFldModGrd", prlFldModDataView, prlFldModColumns, prlFldModOptions);
+	prlFldModGrid.onSort.subscribe(function (e, args) {
+		prlFldModSortSingleColumn(args.sortCol.field, args.sortAsc);
+	});
+
+	prlFldModDataView.onRowCountChanged.subscribe(function (e, args) {
+		prlFldModGrid.updateRowCount();
+		prlFldModGrid.render();
+	});
+
+	prlFldModDataView.onRowsChanged.subscribe(function (e, args) {
+		prlFldModGrid.invalidateRows(args.rows);
+		prlFldModGrid.render();
+	});
+
+
+	$(prlFldModGrid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+		var columnId = $(this).data("columnId");
+		if (columnId != null) {
+			prlFldModColumnFilters[columnId] = $.trim($(this).val());
 			prlFldModDataView.refresh();
 		}
-		prlFldModGrid.resizeCanvas();
-	}
+	});
 
-	function prlFldModSortSingleColumn(field, sortAsc, updateGrid) {
-		prlFldModDataView.sort(function(a, b){
-			var result = a[field] > b[field] ? 1 : a[field] < b[field] ? -1 : 0; 
-			return sortAsc ? result : -result;
-		});
-		if(updateGrid==null) {
-			prlFldModGrid.setData(prlFldModDataView);
-			prlFldModGrid.updateRowCount();
-			prlFldModGrid.render();
+	prlFldModGrid.onHeaderRowCellRendered.subscribe(function(e, args) {
+		$(args.node).empty();
+		$("<input type='text'>")
+		   .data("columnId", args.column.id)
+		   .val(prlFldModColumnFilters[args.column.id])
+		   .appendTo(args.node);
+	});
+
+	prlFldModGrid.onClick.subscribe(function(e, args) {
+		var cell = prlFldModGrid.getCellFromEvent(e), row = cell.row;
+		var item = prlFldModDataView.getItem(row);
+		$('#prlFldModGrdTblMenu').css('top',e.pageY-15).css('left',e.pageX-70).css('zIndex',9999).attr('rid', item.id).show();
+	});
+
+	prlFldModGrid.init();
+
+	prlFldModDataView.beginUpdate();
+	prlFldModDataView.setItems(prlFldModData);
+	prlFldModDataView.setFilter(prlFldModFilter);
+	prlFldModDataView.endUpdate();
+
+	$('#prlFldModGrdTblMenu').menu().hide().css('width','100').css('position','fixed').bind('mouseleave', function(e) { $(this).hide(); });
+	$('#prlFldModGrdTblMenu li a').bind('click', function(e) {
+		var rid = $(this).parent().parent().attr('rid');
+		switch($(this).attr('act')) {
+		case '1':
+			cb('payroll.ConfigEditFormOpen',{'section':'CfgFldMod','id':rid});
+			break;
+		case '2':
+			cb('payroll.ConfigEditFormDelete',{'section':'CfgFldMod','id':rid});
+			break;
 		}
-	}
+		$(this).parent().parent().hide();
+		return false;
+	});
 
-	function prlFldModInit() {
-		prlFldModDataView = new Slick.Data.DataView();
-		prlFldModGrid = new Slick.Grid("#prlFldModGrd", prlFldModDataView, prlFldModColumns, prlFldModOptions);
-		prlFldModGrid.onSort.subscribe(function (e, args) {
-			prlFldModSortSingleColumn(args.sortCol.field, args.sortAsc);
-		});
+	$( "#prlFldModBtnClose" ).click(function() { $('#modalContainer').mb_close(); });
 
-		prlFldModDataView.onRowCountChanged.subscribe(function (e, args) {
-			prlFldModGrid.updateRowCount();
-			prlFldModGrid.render();
-		});
-
-		prlFldModDataView.onRowsChanged.subscribe(function (e, args) {
-			prlFldModGrid.invalidateRows(args.rows);
-			prlFldModGrid.render();
-		});
-
-
-		$(prlFldModGrid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
-			var columnId = $(this).data("columnId");
-			if (columnId != null) {
-				prlFldModColumnFilters[columnId] = $.trim($(this).val());
-				prlFldModDataView.refresh();
-			}
-		});
-
-		prlFldModGrid.onHeaderRowCellRendered.subscribe(function(e, args) {
-			$(args.node).empty();
-			$("<input type='text'>")
-			   .data("columnId", args.column.id)
-			   .val(prlFldModColumnFilters[args.column.id])
-			   .appendTo(args.node);
-		});
-
-		prlFldModGrid.onClick.subscribe(function(e, args) {
-			var cell = prlFldModGrid.getCellFromEvent(e), row = cell.row;
-			var item = prlFldModDataView.getItem(row);
-			$('#prlFldModGrdTblMenu').css('top',e.pageY-15).css('left',e.pageX-70).css('zIndex',9999).attr('rid', item.id).show();
-		});
-
-		prlFldModGrid.init();
-
-		prlFldModDataView.beginUpdate();
-		prlFldModDataView.setItems(prlFldModData);
-		prlFldModDataView.setFilter(prlFldModFilter);
-		prlFldModDataView.endUpdate();
-
-		$('#prlFldModGrdTblMenu').menu().hide().css('width','100').css('position','fixed').bind('mouseleave', function(e) { $(this).hide(); });
-		$('#prlFldModGrdTblMenu li a').bind('click', function(e) {
-			var rid = $(this).parent().parent().attr('rid');
-			switch($(this).attr('act')) {
-			case '1':
-				cb('payroll.ConfigEditFormOpen',{'section':'CfgFldMod','id':rid});
-				break;
-			case '2':
-				cb('payroll.ConfigEditFormDelete',{'section':'CfgFldMod','id':rid});
-				break;
-			}
-			$(this).parent().parent().hide();
-			return false;
-		});
-
-		$( "#prlFldModBtnClose" ).click(function() { $('#modalContainer').mb_close(); });
-
-		//Button: Modifikator hinzufügen
-		$( "#prlFldModBtnNew" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-add"
-			}
-		})
-		.click(function() {
-			cb('payroll.ConfigEditFormOpen',{'section':'CfgFldMod','id':'0'});
-		});
+	//Button: Modifikator hinzufügen
+	$( "#prlFldModBtnNew" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-add"
+		}
+	})
+	.click(function() {
+		cb('payroll.ConfigEditFormOpen',{'section':'CfgFldMod','id':'0'});
+	});
 // ----------------------------------------
-		//Button: Tabellenfilter
-		$( "#prlFldModBtnQFilter" ).button({
-			text: false,
-			icons: {
-				primary: "p-icon-tblfilter"
-			}
-		})
-		.click(function() {
-			prlFldModToggleFilterRow();
-		});
-		$('label[for=prlFldModBtnQFilter]').addClass('toolbar-space-left');
-
+	//Button: Tabellenfilter
+	$( "#prlFldModBtnQFilter" ).button({
+		text: false,
+		icons: {
+			primary: "p-icon-tblfilter"
+		}
+	})
+	.click(function() {
 		prlFldModToggleFilterRow();
-	}
+	});
+	$('label[for=prlFldModBtnQFilter]').addClass('toolbar-space-left');
+
+	prlFldModToggleFilterRow();
+}
 
 /*
 *** Config: Field modifier
@@ -3410,6 +3425,8 @@ function prlCfgFldModInit(param) {
 
 	prlCfgFldModToggle();
 }
+
+
 /*
 *** Formula editor
 */
@@ -3753,10 +3770,9 @@ function prlVlFldCfgDataToJSON() {
 	});
 }
 
-/*
+/**
 *** Payment Split
 */
-
 var prlPmtSplt = {};
 
 function prlPmtSpltMainInit() {
@@ -3906,4 +3922,16 @@ function prl_BankSourceEdit_btnSave() {
 	cb('payroll.paymentSplit', {'action':'GUI_bank_source_save', 'data':r});
 }
 
+function js_qstcd() {
+	$( "#QSTdialog" ).dialog( "open" );
+}
+
+function js_transQSTcd(aCanton, aCode) {
+	$( "#QSTdialog" ).dialog( "close" );
+	document.getElementById("DedAtSrcCanton").disabled = false;
+	document.getElementById("DedAtSrcCode").value = aCode;
+	document.getElementById("DedAtSrcCanton").value = aCanton;
+	document.getElementById("DedAtSrcCanton").disabled = true;
+
+}
 

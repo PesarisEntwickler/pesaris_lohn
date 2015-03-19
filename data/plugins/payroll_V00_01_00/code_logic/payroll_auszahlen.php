@@ -657,9 +657,9 @@ class auszahlen {
 
 	public function getEmpl_Personenkreis_FromTrackingTable($emplFilter) {
 		$sql = "SELECT id AS payroll_employee_ID FROM 
- lohndev.payroll_employee AS emp 
+ payroll_employee AS emp 
  WHERE emp.id IN (
-	SELECT payroll_employee_ID FROM lohndev.`payroll_auszahlen_tracking` WHERE amount_available > 0.001
+	SELECT payroll_employee_ID FROM `payroll_auszahlen_tracking` WHERE amount_available > 0.001
  )				
  ".$emplFilter;
 		$return = array();

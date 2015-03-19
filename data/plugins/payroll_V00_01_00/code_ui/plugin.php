@@ -218,6 +218,7 @@ class payroll_UI {
 				//nur ausfuehren, wenn Window noch nicht geoeffnet ist
 				$data = array();
 				$data["modus"] = "mitarbeiterdatenBearbeiten";
+				$data["QSTCodeLookup"] = blFunctionCall('payroll.QSTCodeLookup');
 				$objWindow = new wgui_window("payroll", "employeeForm");
 				$title = $objWindow->getText("txtMitarbeiterdatenBearbeiten");
 				$objWindow->windowTitle($title); 
@@ -234,7 +235,7 @@ class payroll_UI {
 
 				communication_interface::jsExecute("prlVlDirty = false;");
 				communication_interface::jsExecute("prlVlDesignMode = false;");
-				if($functionParameters[0]["fldDefFP"]=="") { //TODO: Dieser Check muss in Zukunft noch etwas "rafinierter" gemacht werden
+				if($functionParameters[0]["fldDefFP"]=="") { //TODO: Dieser Check muss in Zukunft noch etwas "raffinierter" gemacht werden
 					communication_interface::jsExecute($this->getEmplFieldDef());
 					communication_interface::jsExecute("prlVlFldDefFP = 'X';"); //TODO: in Zukunft nicht nur 'X', sondern echten Fingerprint uebermitteln
 				}

@@ -655,7 +655,33 @@ function getQuellensteuerAbrechnung($param) {
 }
 
 
-
+public function getQSTCodeLookup() {
+	$sql = 
+	"SELECT DedAtSrcCanton FROM payroll_das_tax_rates
+	group by DedAtSrcCanton
+	order by DedAtSrcCanton";
+	$system_database_manager = system_database_manager::getInstance();
+	$result = $system_database_manager->executeQuery($sql, "");
+	$kantonArr = array();
+	$ktHTML = array();
+	foreach ($result as $value) {
+		$kantonArr[] =	$value["DedAtSrcCanton"];
+		$sql = "SELECT DedAtSrcCode FROM payroll_das_tax_rates
+				where DedAtSrcCanton = '".$value["DedAtSrcCanton"]."'
+				group by DedAtSrcCode
+				order by DedAtSrcCode";
+				$res = $system_database_manager->executeQuery($sql, "");
+				$codeArr = array();
+				foreach ($res as $val) {
+					$codeArr[] = "<a href='#' onclick='js_transQSTcd(\"".$value["DedAtSrcCanton"]."\", \"".$val["DedAtSrcCode"]."\")'>".$val["DedAtSrcCode"]."</a>";
+				}				
+		$ktHTML[] =	"<h3 style='padding-left:30px;'>".$value["DedAtSrcCanton"]."</h3><div>".implode(", ", $codeArr)."</div>";
+	}
+	
+	$s = implode(" ", $ktHTML);
+	
+	return $s;
+}
 
 }//end class
 ?>

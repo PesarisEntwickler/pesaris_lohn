@@ -61,7 +61,9 @@ class payroll_BL {
 			return $reports->generateAuszahlDataReports($functionParameters[0], $functionParameters[1], $functionParameters[2]);
 		case 'payroll.getQuellensteuerAbrechnung':
 			return $qstAuswertg->getQuellensteuerAbrechnung($functionParameters[0]);
-					
+		case 'payroll.QSTCodeLookup':
+			return $qstAuswertg->getQSTCodeLookup();
+			
 		case 'payroll.auszahlen.getAuszahlMitarbeiteranzahl':
 			return $auszahlen->getAuszahlMitarbeiteranzahl();
 		case 'payroll.auszahlen.getCalculationCurrentPeriodEmployeeList':
